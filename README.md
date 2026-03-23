@@ -28,10 +28,7 @@ Precision agriculture is often locked behind expensive paywalls. Our goal is to 
 
 
 ### Installation
-1. **Clone the repo:**
-   ```bash
-   git clone [https://github.com/](https://github.com/)[YOUR_ORG]/[PROJECT_NAME].git
-   cd [PROJECT_NAME]
+
 
 ### Repo structure
 <code>
