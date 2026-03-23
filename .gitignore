@@ -1,0 +1,49 @@
+# --- Geospatial & Satellite Data (CRITICAL) ---
+# Never commit raw satellite imagery or large datasets
+*.tif
+*.tiff
+*.jp2
+*.hdf
+*.nc
+*.geojson
+*.shp
+*.dbf
+*.shx
+*.prj
+data/raw/
+data/processed/
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+.env
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- Frontend (Node/React/Vue) ---
+node_modules/
+/dist
+/build
+.eslintcache
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# --- Environment & Secrets (SECURITY) ---
+# Never commit API keys for Sentinel Hub, Mapbox, or Earth Engine
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+credentials.json
+
+# --- Operating System ---
+.DS_Store
+Thumbs.db
