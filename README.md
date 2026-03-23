@@ -32,3 +32,27 @@ Precision agriculture is often locked behind expensive paywalls. Our goal is to 
    ```bash
    git clone [https://github.com/](https://github.com/)[YOUR_ORG]/[PROJECT_NAME].git
    cd [PROJECT_NAME]
+
+### Repo structure
+<code>
+.
+├── .github/                # GitHub-specific automation & community standards
+│   ├── ISSUE_TEMPLATE/     # Standardized forms for bug reports & features
+│   └── workflows/          # CI/CD pipelines (automated testing & deployment)
+├── analysis/               # Satellite data processing (Python)
+│   ├── models/             # Models for soil health prediction
+│   ├── processors/         # Core logic for NDVI, moisture, and salinity indices
+│   └── utils/              # Helper functions for GIS and data cleaning
+├── docs/                   # Project documentation, science whitepapers, and guides
+├── frontend/               # The website interface (React/Vue)
+│   ├── public/             # Static assets (images, icons, manifest files)
+│   └── src/                # Frontend source code
+│       ├── api/            # Functions to communicate with data providers
+│       └── components/     # UI elements (Maps, Charts, Dashboards)
+├── tests/                  # Automated test suites for math and logic validation
+├── .gitignore              # Files to exclude (large data files, secrets, local envs)
+├── CONTRIBUTING.md         # Guidelines for developers joining the project
+├── LICENSE                 # Legal information
+├── README.md               
+└── requirements.txt        # Python library dependencies
+</code>
