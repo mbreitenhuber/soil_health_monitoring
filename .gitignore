@@ -24,6 +24,8 @@ env/
 .env
 .pytest_cache/
 .ipynb_checkpoints/
+.idea/
+*.iml
 
 # --- Frontend (Node/React/Vue) ---
 node_modules/
