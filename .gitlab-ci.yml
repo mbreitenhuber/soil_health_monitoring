@@ -1,0 +1,143 @@
+###########################################
+# CONFIGURATION
+###########################################
+stages:
+  - prepare
+  - build
+  - deploy
+
+variables:
+  HELM_TIMEOUT: 10m0s
+  #
+  # Generic helm chart from https://gitlab.inf.ethz.ch/ou-ivia/generic-helm-chart
+  HELM_CHART: oci://harbor.ivia.ch/ivia-generic-helm-chart/ivia-generic-helm-chart
+  HELM_CHART_VERSION: 4.1.4
+
+default:
+  tags:
+    - runner-shared
+
+###############################
+# SETUP ENVIRONMENT VARIABLES #
+###############################
+
+export-environment:
+  image:
+    name: alpine:3.19.1
+    entrypoint: [ "bash" ]
+  stage: prepare
+  script:
+    - PROJECT_NAME_SHORTENED=$(echo -n ${CI_PROJECT_NAME} | cut -c 1-30 | tr / - | tr . - | tr _ - | tr '[:upper:]' '[:lower:]' | sed -E 's#-+$##')
+    - URL_FRONTEND="${PROJECT_NAME_SHORTENED}.${BASE_URL}"
+    - URL_BACKEND="be.${PROJECT_NAME_SHORTENED}.${BASE_URL}"
+    - RELEASE_NAME="${PROJECT_NAME_SHORTENED}"
+    - CI_REGISTRY_IMAGE_RAW="${CI_REGISTRY}/${CI_PROJECT_PATH}"
+    - CI_REGISTRY_IMAGE="$(echo -n ${CI_REGISTRY_IMAGE_RAW} | tr '[:upper:]' '[:lower:]')"
+    - SECRET=$(echo -n "${CI_REGISTRY_USER}:${CI_REGISTRY_PWD}" | base64 -w 0)
+    - echo "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}" > .env
+    - echo "DOCKER_REGISTRY_AUTH=${DOCKER_REGISTRY_AUTH}" >> .env
+    - echo "RELEASE_NAME=${RELEASE_NAME}" >> .env
+    - echo "URL_FRONTEND=${URL_FRONTEND}" >> .env
+    - echo "URL_BACKEND=${URL_BACKEND}" >> .env
+    - 'echo "Registry image: ${CI_REGISTRY_IMAGE}"'
+    - 'echo "Release name:   ${RELEASE_NAME}"'
+    - 'echo "Frontend URL:   ${URL_FRONTEND}"'
+    - 'echo "Backend URL:    ${URL_BACKEND}"'
+  artifacts:
+    reports:
+      dotenv: .env
+    expire_in: 100 days
+
+
+########################
+# DEFINE TRIGGER RULES #
+########################
+
+.deployment-trigger-rules:
+  rules:
+    - if: >
+        $CI_COMMIT_BRANCH == "main"
+      when: on_success
+
+
+###########################################
+# DOCKERIZE
+###########################################
+
+build:buildah:
+  extends: .deployment-trigger-rules
+  stage: build
+  image:
+    name: quay.io/buildah/stable:latest
+  variables:
+    STORAGE_DRIVER: vfs
+    BUILDAH_FORMAT: docker
+    BUILDAH_LAYERS: "true"
+  parallel:
+    matrix:
+      - APP_LAYER:
+        - frontend
+        - backend
+  tags:
+    - ivialab-student-cluster
+  timeout: 10m
+  retry: 2
+  before_script:
+    - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PWD}" "${CI_REGISTRY}"
+  script:
+    - IMG="${CI_REGISTRY_IMAGE}-${APP_LAYER}:latest"
+    - CACHE_REF="${CI_REGISTRY}/ai4good-cache"
+    - >
+      buildah bud
+      --layers
+      --cache-from "${CACHE_REF}"
+      --cache-to "${CACHE_REF}"
+      --file "./Dockerfile"
+      --tag "${IMG}"
+      "./${APP_LAYER}"
+    - buildah push "${IMG}"
+
+
+###########################################
+# DEPLOY  (generic-helm-chart)
+###########################################
+
+.deploy-template:
+  extends: .deployment-trigger-rules
+  image:
+    name: alpine/helm:3.14.1
+    entrypoint: [ "bash" ]
+  before_script:
+    - mkdir -p "${CI_PROJECT_DIR}/.kube"
+    - echo "${KUBECONFIG_B64}" | base64 -d > "${CI_PROJECT_DIR}/.kube/config"
+    - chmod 600 "${CI_PROJECT_DIR}/.kube/config"
+    - export KUBECONFIG="${CI_PROJECT_DIR}/.kube/config"
+    - |
+      if [ -z "${K8S_NAMESPACE}" ]; then
+        echo "ERROR: K8S_NAMESPACE is not set. Add it under CI/CD variables (project or group)."
+        exit 1
+      fi
+    - echo ${CI_REGISTRY_PWD} | helm registry login -u ${CI_REGISTRY_USER} --password-stdin ${CI_REGISTRY}
+
+deploy-app:
+  extends: .deploy-template
+  stage: deploy
+  script:
+    - >
+      helm upgrade
+      ${RELEASE_NAME}
+      ${HELM_CHART}
+      --version ${HELM_CHART_VERSION}
+      --namespace "${K8S_NAMESPACE}"
+      --install
+      --atomic
+      -f "helm/values.yaml"
+      --timeout "${HELM_TIMEOUT}"
+      --set components.frontend.image.repository="${CI_REGISTRY_IMAGE}-frontend"
+      --set components.frontend.ingress.url="${URL_FRONTEND}"
+      --set components.backend.image.repository="${CI_REGISTRY_IMAGE}-backend"
+      --set components.backend.ingress.url="${URL_BACKEND}"
+      --set components.backend.extraEnv.CORS_ORIGINS="https://${URL_FRONTEND}"
+  environment:
+    url: https://$URL_FRONTEND
+    name: $CI_PROJECT_NAME/$CI_COMMIT_REF_SLUG

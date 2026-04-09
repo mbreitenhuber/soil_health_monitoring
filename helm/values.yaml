@@ -1,0 +1,27 @@
+components:
+  frontend:
+    enabled: true
+    image:
+      repository: null  # set via --set in CI
+      tag: latest
+      pullPolicy: Always
+    port: 80
+    health: /healthz
+    readinessProbe: null
+    livenessProbe: null
+    ingress:
+      enabled: true
+      url: null  # set via --set in CI
+
+  backend:
+    enabled: true
+    image:
+      repository: null  # set via --set in CI
+      tag: latest
+      pullPolicy: Always
+    port: 8000
+    health: /healthz
+    extraEnv: {}
+    ingress:
+      enabled: true
+      url: null  # set via --set in CI
