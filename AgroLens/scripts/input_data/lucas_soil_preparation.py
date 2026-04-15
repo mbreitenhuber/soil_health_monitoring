@@ -25,7 +25,7 @@ if not os.path.isfile(LUCAS_INPUT):
 print(f"Loading LUCAS data from: {LUCAS_INPUT}")
 df = pd.read_csv(LUCAS_INPUT)
 
-# Drop unnecessary chemical elements
+# Drop unnecessary chemical elements (only if they exist)
 df.drop(
     columns=[
         "EC",
@@ -37,29 +37,43 @@ df.drop(
         "Ox_Fe",
     ],
     inplace=True,
+    errors="ignore",  # Ignore columns that don't exist
 )
 # Drop depth column as it's values are '0-10 cm', '0-20 cm', or '10-20 cm'
-df.drop(columns=["Depth"], inplace=True)
+df.drop(columns=["Depth"], inplace=True, errors="ignore")
 # Note: Values for pH exist in 2 columns as they have been tested by 2 separate test methods pH_CaCl2 and pH_H2O
 # The patterns are very similar for both, however pH_H2O is about 0.4 higher than pH_CaCl2
 # Hence assuming it doesn't matter which of the 2 we use for training
 
 # Drop rows that match "< LOD" in 'N' and 'K' (Total number of deleted rows: 1)
-df = df[df["N"].str.contains("< LOD") == False]
-df = df[df["K"].str.contains("< LOD") == False]
+if "N" in df.columns:
+    df = df[df["N"].astype(str).str.contains("< LOD", na=False) == False]
+if "K" in df.columns:
+    df = df[df["K"].astype(str).str.contains("< LOD", na=False) == False]
 
 # Impute 'P' where it is below 10 mg/kg (limit of detection) with 5 (Average between 0 and 10) -> total number of imputed records: 4945
-df["P"] = df["P"].replace("< LOD", 5)
-# Impute 'P' where it is <0.0 with 0 -> total number of imputed records: 1
-df["P"] = df["P"].replace("<0.0", 0)
+if "P" in df.columns:
+    df["P"] = df["P"].astype(str).replace("< LOD", "5")
+    # Impute 'P' where it is <0.0 with 0 -> total number of imputed records: 1
+    df["P"] = df["P"].astype(str).replace("<0.0", "0")
 
-df.dropna(subset=["P"], inplace=True)
-df["pH_CaCl2"] = df["pH_CaCl2"].astype(float)
-df["pH_H2O"] = df["pH_H2O"].astype(float)
-df["P"] = df["P"].astype(float)
-df["N"] = df["N"].astype(float)
-df["K"] = df["K"].astype(float)
-df["SURVEY_DATE"] = pd.to_datetime(df["SURVEY_DATE"], format="%d-%m-%y")
+if "P" in df.columns:
+    df.dropna(subset=["P"], inplace=True)
+
+# Convert columns to float (only if they exist)
+if "pH_CaCl2" in df.columns:
+    df["pH_CaCl2"] = pd.to_numeric(df["pH_CaCl2"], errors="coerce")
+if "pH_H2O" in df.columns:
+    df["pH_H2O"] = pd.to_numeric(df["pH_H2O"], errors="coerce")
+if "P" in df.columns:
+    df["P"] = pd.to_numeric(df["P"], errors="coerce")
+if "N" in df.columns:
+    df["N"] = pd.to_numeric(df["N"], errors="coerce")
+if "K" in df.columns:
+    df["K"] = pd.to_numeric(df["K"], errors="coerce")
+
+if "SURVEY_DATE" in df.columns:
+    df["SURVEY_DATE"] = pd.to_datetime(df["SURVEY_DATE"], format="%d-%m-%y", errors="coerce")
 
 # Create output directory if it doesn't exist
 os.makedirs(DATASET_PATH, exist_ok=True)
