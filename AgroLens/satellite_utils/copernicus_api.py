@@ -77,7 +77,7 @@ class CopernicusApi:
             product_type = "L2SP"
 
         query = (
-            f"{cls.API_URL.replace("#product#", product)}"
+            f"{cls.API_URL.replace('#product#', product)}"
             f"?productType={product_type}"
             f"&startDate={start.isoformat()}Z"
             f"&completionDate={end.isoformat()}Z"
@@ -91,7 +91,7 @@ class CopernicusApi:
         response = requests.get(
             query,
             allow_redirects=True,
-            headers={"Authorization": f"Bearer {os.environ["COPERNICUS_TOKEN"]}"},
+            headers={"Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}"},
         )
         response.raise_for_status()
         data = response.json()
@@ -115,7 +115,7 @@ class CopernicusApi:
                 break
             if cls._cloud_covered(feature, latitude, longitude, product):
                 print(
-                    f"Dataset '{feature["id"]}' ({feature["properties"]["startDate"]}) has been cloud filtered."
+                    f"Dataset '{feature['id']}' ({feature['properties']['startDate']}) has been cloud filtered."
                 )
             else:
                 result.append(feature)
@@ -161,7 +161,7 @@ class CopernicusApi:
                 cls.DOWNLOAD_URL.replace("#product_id#", id),
                 allow_redirects=True,
                 stream=True,
-                headers={"Authorization": f"Bearer {os.environ["COPERNICUS_TOKEN"]}"},
+                headers={"Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}"},
             ) as response:
                 response.raise_for_status()
                 with open(zipfile, "wb") as file:
@@ -261,6 +261,7 @@ class CopernicusApi:
         if cls._is_authenticated():
             return
 
+        print("Authenticating with Copernicus Dataspace...")
         response = requests.post(
             cls.AUTH_URL,
             allow_redirects=True,
