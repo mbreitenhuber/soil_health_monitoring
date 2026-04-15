@@ -11,6 +11,10 @@ import time
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
 from satellite_utils.copernicus_api import CopernicusApi
@@ -63,6 +67,31 @@ data_length: 0
 
 api_finished = False
 download_finished = False
+
+
+def check_environment_variables():
+    """
+    Checks if all required environment variables are set.
+    
+    Raises:
+        EnvironmentError: If any required environment variable is missing
+    """
+    required_vars = [
+        "SENTINEL_DIR",
+        "TMP_DIR",
+        "COPERNICUS_USER",
+        "COPERNICUS_PASSWORD",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+    ]
+    
+    missing_vars = [var for var in required_vars if var not in os.environ]
+    
+    if missing_vars:
+        raise EnvironmentError(
+            f"Missing required environment variables: {', '.join(missing_vars)}\n"
+            f"Please set these variables using 'export VAR=value' or in a .env file"
+        )
 
 
 def setup_parser() -> argparse.Namespace:
@@ -163,8 +192,19 @@ def api_thread(thread_index: int) -> None:
             return
 
         row = dataframe.iloc[index]
-        date = row["SURVEY_DATE"].split("-")
-        date = f"20{date[2]}-{date[1]}-{date[0]}"
+        # Handle both "-" and "/" date separators
+        date_str = row["SURVEY_DATE"]
+        if "/" in date_str:
+            date_parts = date_str.split("/")
+        else:
+            date_parts = date_str.split("-")
+        
+        # Ensure we have exactly 3 parts (DD, MM, YY)
+        if len(date_parts) != 3:
+            print(f"Invalid date format: {date_str}", file=sys.stderr)
+            continue
+            
+        date = f"20{date_parts[2]}-{date_parts[1]}-{date_parts[0]}"
         latitude = float(row["TH_LAT"])
         longitude = float(row["TH_LONG"])
         print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
@@ -290,6 +330,9 @@ def main():
     global dataframe, data_length, api_threads, download_threads, crop_threads, api_finished, download_finished, mapping_file
 
     args = setup_parser()
+    
+    # Check if all required environment variables are set
+    check_environment_variables()
 
     # create Sentinel mapping file
     if mapping_file and not os.path.isfile(mapping_file):
