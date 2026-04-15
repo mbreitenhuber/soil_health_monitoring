@@ -13,8 +13,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-from satellite_utils.copernicus_api import CopernicusApi
-
+from AgroLens.satellite_utils.copernicus_api import CopernicusApi # remove AgroLens if necessary
 
 class ThreadPrefix:
     """
@@ -59,7 +58,7 @@ crop_threads = 0
 mapping_file = ""
 
 dataframe: pd.DataFrame
-data_length: 0
+data_length = 0
 
 api_finished = False
 download_finished = False
