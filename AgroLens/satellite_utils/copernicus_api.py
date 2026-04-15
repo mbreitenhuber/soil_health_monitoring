@@ -13,7 +13,7 @@ import cv2
 import numpy as np
 import requests
 
-from satellite_utils.image_utils import ImageUtils
+from AgroLens.satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
 
 
 class CopernicusApi:

@@ -13,7 +13,7 @@ import pandas as pd
 from sklearn import preprocessing
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-from satellite_utils.image_utils import ImageUtils
+from AgroLens.satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
 
 
 def setup_parser() -> argparse.Namespace:
