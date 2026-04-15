@@ -1,6 +1,10 @@
-PointID,Depth,pH(CaCl2),pH(H2O),EC,OC,CaCO3,P,N,K,OC (20-30 cm),CaCO3 (20-30 cm),Ox_Al,Ox_Fe,NUTS_0,NUTS_1,NUTS_2,NUTS_3,TH_LAT,TH_LON,SURVEY_DATE,Elev,LC,LU
-10000001,0_10,6.5,7.1,45,12.3,<LOD,25,1.2,180,,,450,380,DE,DE1,DE11,DE111,52.5200,13.4050,2018-05-12,34,B1,U1
-10000002,0_10,5.8,6.3,30,9.5,0,15,0.9,150,,,320,290,FR,FR1,FR10,FR101,48.8566,2.3522,2018-06-03,45,B2,U2
-10000003,10_20,7.2,7.8,60,15.1,120,40,1.5,210,,,500,410,ES,ES3,ES30,ES300,40.4168,-3.7038,2018-04-21,650,B3,U3
-10000004,20_30,7.5,8.0,55,,<LOD,35,1.3,190,8.2,15.0,,,PT,PT1,PT17,PT170,38.7223,-9.1393,2018-07-10,120,B4,U4
-10000005,0_10,6.0,6.7,25,10.2,NA,20,1.0,160,,,410,350,IT,ITC,ITC4,ITC45,45.4642,9.1900,2018-05-30,80,B1,U2
+Point_ID,Revisited_point,Coarse,Clay,Sand,Silt,pH(CaCl2),pH(H2O),EC,OC,CaCO3,P,N,K,Elevation,LC1,LU1,Soil_Stones,NUTS_0,NUTS_1,NUTS_2,NUTS_3,LC1_Desc,LU1_Desc
+34103754,No,,,,,3.9,3.91,44.2,25.5,0,42.9,2.8,24.6,158,H11,U420,1,UK,UKM,UKM8,UKM81,Inland marshes,Semi-natural and natural areas not in use
+34443774,No,,,,,3.1,3.91,46.4,503.5,0,164.9,19.9,460.3,500,H12,U420,1,UK,UKM,UKM7,UKM77,Peatbogs,Semi-natural and natural areas not in use
+35163814,No,,,,,4.9,5.48,15.85,51.4,0,26.9,4.3,173.2,404,H11,U420,1,UK,UKM,UKM7,UKM71,Inland marshes,Semi-natural and natural areas not in use
+32323656,No,,,,,3,3.76,26.9,470.3,0,102.8,16.1,313,364,H12,U150,1,UK,UKN,UKN1,UKN10,Peatbogs,OTHER PRIMARY PRODUCTION
+34463934,No,28,10,46,44,3.9,4.04,28.4,43.1,1,6.3,2.3,38.6,315,D20,U111,2,UK,UKM,UKM6,UKM61,Shrubland without tree cover,Agriculture (excluding fallow land and kitchen gardens)
+33983238,No,18,14,36,50,4.2,4.41,41.8,32.4,0,7.5,3.3,48,137,E20,U362,1,UK,UKL,UKL2,UKL22,Grassland without tree/shrub cover,Sport
+34043240,No,20,18,35,46,4.9,5.13,32,21.1,1,12.4,2.1,36,131,E20,U111,1,UK,UKL,UKL2,UKL22,Grassland without tree/shrub cover,Agriculture (excluding fallow land and kitchen gardens)
+33723266,No,13,14,36,50,4,4.16,72.4,53.2,0,52.1,4.2,158.5,137,E20,U111,1,UK,UKL,UKL1,UKL17,Grassland without tree/shrub cover,Agriculture (excluding fallow land and kitchen gardens)
+34203268,No,34,19,48,34,3.7,3.87,11.63,16,1,3.7,1,24.4,514,E20,U420,1,UK,UKL,UKL1,UKL16,Grassland without tree/shrub cover,Semi-natural and natural areas not in use

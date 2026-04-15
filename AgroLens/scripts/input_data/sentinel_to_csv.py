@@ -2,6 +2,9 @@
 # Extracts and saves Sentinel-2 band pixel data to a CSV table
 # More information with 'sentinel_to_csv.py -h'
 
+# command
+# python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/sentinel_bands.csv
+
 import argparse
 import os
 import sys
@@ -10,7 +13,11 @@ from warnings import simplefilter
 
 import numpy as np
 import pandas as pd
+from dotenv import load_dotenv
 from sklearn import preprocessing
+
+# Load environment variables from .env
+load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
 from satellite_utils.image_utils import ImageUtils
