@@ -204,9 +204,9 @@ def api_thread(thread_index: int) -> None:
             print(f"Invalid date format: {date_str}", file=sys.stderr)
             continue
             
-        date = f"20{date_parts[2]}-{date_parts[1]}-{date_parts[0]}"
+        date = f"{date_parts[0]}-{date_parts[1]}-{date_parts[2]}"
         latitude = float(row["TH_LAT"])
-        longitude = float(row["TH_LONG"])
+        longitude = float(row["TH_LON"])
         print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
 
         try:
@@ -216,12 +216,12 @@ def api_thread(thread_index: int) -> None:
 
             data = data[0]
             sentinel_date = data["properties"]["startDate"].split("T")[0]
-            print(f"Best dataset: {data["id"]} ({sentinel_date})")
+            print(f"Best dataset: {data['id']} ({sentinel_date})")
 
             if mapping_file:
                 with open(mapping_file, "a") as file:
                     print(
-                        f"{row["POINTID"]},{date},{latitude},{longitude},{sentinel_date},{data["id"]}",
+                        f"{row['POINTID']},{date},{latitude},{longitude},{sentinel_date},{data['id']}",
                         file=file,
                     )
 
@@ -267,7 +267,7 @@ def download_thread(thread_index: int) -> None:
         result_path = (
             Path(os.environ["SENTINEL_DIR"])
             / job["date"]
-            / f"{job["lat"]} {job["lon"]}"
+            / f"{job['lat']} {job['lon']}"
         )
         if result_path.is_dir():
             print("Dataset already downloaded")
@@ -309,7 +309,7 @@ def crop_thread(thread_index: int) -> None:
         result_path = (
             Path(os.environ["SENTINEL_DIR"])
             / job["date"]
-            / f"{job["lat"]} {job["lon"]}"
+            / f"{job['lat']} {job['lon']}"
         )
 
         try:
@@ -318,7 +318,7 @@ def crop_thread(thread_index: int) -> None:
             )
             os.makedirs(Path(os.environ["SENTINEL_DIR"]) / job["date"], exist_ok=True)
             shutil.move(Path(os.environ["TMP_DIR"]) / job["point"], result_path)
-            print(f"Point {job["point"]} finished.")
+            print(f"Point {job['point']} finished.")
         except Exception as e:
             print(e, file=sys.stderr)
             with counter_lock:
@@ -338,7 +338,7 @@ def main():
     if mapping_file and not os.path.isfile(mapping_file):
         with open(mapping_file, "w") as file:
             print(
-                "POINTID,SURVEY_DATE,TH_LAT,TH_LONG,SENTINEL_DATE,SENTINEL_ID",
+                "POINTID,SURVEY_DATE,TH_LAT,TH_LON,SENTINEL_DATE,SENTINEL_ID",
                 file=file,
             )
 
@@ -355,7 +355,7 @@ def main():
         dataframe = data.iloc[start:]
     data_length = len(dataframe)
 
-    print(f"Loaded {data_length} rows (lines {start+1}-{end or "∞"}).")
+    #print(f"Loaded {data_length} rows (lines {start+1}-{end or 'infinite'}).")
 
     # create all threads
     threads_api = []
