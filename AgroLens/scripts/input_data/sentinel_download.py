@@ -2,6 +2,9 @@
 # Downloads and crops all Sentinel-2 images in the given CSV table (multi-threaded)
 # More information with 'sentinel_download.py -h'
 
+## command
+# python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
+
 import argparse
 import os
 import shutil
@@ -11,6 +14,10 @@ import time
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
+
+# Load environment variables from .env
+load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
 from AgroLens.satellite_utils.copernicus_api import CopernicusApi # remove AgroLens if necessary
