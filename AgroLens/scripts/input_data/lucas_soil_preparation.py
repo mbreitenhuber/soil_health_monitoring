@@ -47,7 +47,6 @@ df.drop(
         "CaCO3 (20-30 cm)",
         "Ox_Al",
         "Ox_Fe",
-        # what is everything after that? NUTS_0...?
     ],
     inplace=True,
 )
