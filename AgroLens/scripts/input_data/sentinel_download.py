@@ -4,6 +4,7 @@
 
 ## command
 # python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
+# python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv --api-threads 1 --download-threads 1 --worker-threads 1  
 
 import argparse
 import os
@@ -20,7 +21,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-from AgroLens.satellite_utils.copernicus_api import CopernicusApi # remove AgroLens if necessary
+#from AgroLens.satellite_utils.copernicus_api import CopernicusApi # remove AgroLens if necessary
+from satellite_utils.copernicus_api import CopernicusApi 
 
 class ThreadPrefix:
     """
@@ -168,14 +170,15 @@ def api_thread(thread_index: int) -> None:
             print("Thread finished.")
             return
 
-        row = dataframe.iloc[index]
-        date = row["SURVEY_DATE"].split("-")
-        date = f"20{date[2]}-{date[1]}-{date[0]}"
-        latitude = float(row["TH_LAT"])
-        longitude = float(row["TH_LONG"])
-        print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
-
         try:
+            row = dataframe.iloc[index]
+            date = pd.to_datetime(str(row["SURVEY_DATE"]).strip(), errors="raise").strftime(
+                "%Y-%m-%d"
+            )
+            latitude = float(row["TH_LAT"])
+            longitude = float(row["TH_LONG"])
+            print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
+
             data = CopernicusApi.get_data(date, latitude, longitude)
             if not data:
                 raise ValueError("No Sentinel data found!")
@@ -306,6 +309,8 @@ def main():
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
+    data = data.head(2)
+    print("Limiting processing to the first 2 datapoints from the input CSV.")
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])
