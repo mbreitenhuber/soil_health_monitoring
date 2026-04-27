@@ -243,7 +243,7 @@ def download_thread(thread_index: int) -> None:
             continue
 
         try:
-            CopernicusApi.download_data(job["id"], job["point"], os.environ["TMP_DIR"])
+            CopernicusApi.download_data(job["id"], job["point"], target_path=os.environ["TMP_DIR"])
             crop_jobs.append(job)
         except Exception as e:
             print(e, file=sys.stderr)
@@ -283,7 +283,7 @@ def crop_thread(thread_index: int) -> None:
 
         try:
             CopernicusApi.crop_images(
-                job["point"], job["lat"], job["lon"], os.environ["TMP_DIR"]
+                job["point"], job["lat"], job["lon"], parent_path=os.environ["TMP_DIR"]
             )
             os.makedirs(Path(os.environ["SENTINEL_DIR"]) / job["date"], exist_ok=True)
             shutil.move(Path(os.environ["TMP_DIR"]) / job["point"], result_path)
@@ -309,8 +309,8 @@ def main():
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
-    data = data.head(2)
-    print("Limiting processing to the first 2 datapoints from the input CSV.")
+    data = data.head(8)
+    print("Limiting processing to the first 8 datapoints from the input CSV.")
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])
