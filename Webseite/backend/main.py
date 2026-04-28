@@ -1,135 +1,240 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+"""
+main.py — AgroScan Backend
+FastAPI + Jinja2: Seiten werden serverseitig gerendert.
+
+╔══════════════════════════════════════════════════════╗
+║  NEUE SEITE HINZUFÜGEN — nur 3 Schritte:             ║
+║  1. NAV_PAGES: Eintrag ergänzen                      ║
+║  2. Route mit @app.get("/pfad") anlegen              ║
+║  3. templates/pages/_template.html kopieren          ║
+║     → templates/pages/meinname.html                 ║
+╚══════════════════════════════════════════════════════╝
+"""
+
+from datetime import datetime
+from pathlib import Path
 from typing import List
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel
 import numpy as np
 import random
 
-app = FastAPI(title="Agri-ML API")
+# ── Pfade ──────────────────────────────────────────────
+ROOT         = Path(__file__).parent.parent          # → agroscan/
+TEMPLATE_DIR = ROOT / "frontend" / "templates"
+STATIC_DIR   = ROOT / "frontend" / "static"
 
-# CORS erlaubt dem Frontend, mit dem Backend zu kommunizieren
+# ── App ────────────────────────────────────────────────
+app = FastAPI(title="AgroScan")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+templates = Jinja2Templates(directory=TEMPLATE_DIR)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In Produktion: nur deine Domain eintragen
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ── Datenmodelle ──────────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════════════════
+# SEITEN-DATEN — alles zentral hier, kein HTML anfassen
+# ══════════════════════════════════════════════════════
+
+# Neue Seite: Eintrag hier ergänzen + Route unten anlegen
+NAV_PAGES = [
+    {"id": "home",     "label": "Home",     "href": "/"},
+    {"id": "analysis", "label": "Analyse",  "href": "/analyse"},
+    {"id": "about",    "label": "Über uns", "href": "/ueber-uns"},
+    # {"id": "kontakt", "label": "Kontakt", "href": "/kontakt"},
+]
+
+HOME_STATS = [
+    {"value": "4×4", "label": "Zonen pro Fläche"},
+    {"value": "<1s",  "label": "Analysezeit"},
+    {"value": "±5%",  "label": "Modell-Rauschen"},
+    {"value": "OSM",  "label": "Kartenbasis"},
+]
+
+HOME_FEATURES = [
+    {"icon": "✏️", "name": "Polygon-Zeichnung",
+     "desc": "Zeichne beliebig geformte Flächen direkt auf der Karte — keine CAD-Software nötig."},
+    {"icon": "🧠", "name": "ML-Zonenkarte",
+     "desc": "Das Backend teilt deine Fläche in Zellen auf und liefert für jede Zone einen Vorhersagewert (0–1)."},
+    {"icon": "🎨", "name": "Farbkodierte Karte",
+     "desc": "Grün = hohe Qualität, Gelb = mittel, Rot = niedrig — auf einen Blick erkennbar."},
+    {"icon": "🔌", "name": "Eigenes Modell",
+     "desc": "Ersetze run_model() im Backend mit deinem scikit-learn / PyTorch Modell."},
+    {"icon": "☁️", "name": "Cloud-bereit",
+     "desc": "Backend auf Render, Frontend auf Netlify — kostenlos, in unter 10 Minuten live."},
+    {"icon": "🇨🇭", "name": "Schweiz-fokussiert",
+     "desc": "Startet direkt mit Blick auf die ganze Schweiz."},
+]
+
+ROADMAP = [
+    {"version": "v0.1", "title": "Starter-Template",  "done": True,
+     "desc": "Polygon-Zeichnung, FastAPI-Backend, Zonen-Visualisierung mit Platzhalter-Modell."},
+    {"version": "v0.2", "title": "ML-Integration",    "done": False,
+     "desc": "Echtes Bodenqualitäts-Modell, Feature-Extraktion, Shapely-Clipping."},
+    {"version": "v0.3", "title": "Satellitendaten",   "done": False,
+     "desc": "Sentinel-2 NDVI-Einbindung, historische Zeitreihen, Export als GeoJSON/CSV."},
+    {"version": "v1.0", "title": "Produktionsrelease","done": False,
+     "desc": "Auth, Multi-Tenant, mobile-optimiert, Schweizer Amt für Landwirtschaft Daten."},
+]
+
+# Neue Teammitglieder: Eintrag hier ergänzen.
+# photo: Dateiname in static/assets/team/ — oder None für Platzhalter
+TEAM_MEMBERS = [
+    {"name": "Dein Name",   "role": "ML Engineer",   "photo": None,
+     "bio": "Kurze Bio — Spezialgebiet, Uni, Erfahrung mit Agrardaten."},
+    {"name": "Teamkollege", "role": "Backend / GIS",  "photo": None,
+     "bio": "FastAPI, PostGIS, Geodatenverarbeitung."},
+    {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
+     "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
+]
+
+
+# ── Hilfsfunktion: Basis-Kontext für jede Seite ────────
+def ctx(request: Request, page_id: str, **extra) -> dict:
+    """
+    Liefert den Kontext, den base.html, nav.html und footer.html brauchen.
+    Seitenspezifische Daten als **extra übergeben.
+    """
+    return {
+        "request":      request,
+        "nav_pages":    NAV_PAGES,
+        "current_page": page_id,
+        "current_year": datetime.now().year,
+        "api_url":      "http://localhost:8000",
+        **extra,
+    }
+
+
+# ══════════════════════════════════════════════════════
+# HTML-ROUTEN
+# ══════════════════════════════════════════════════════
+
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("pages/index.html", ctx(
+        request, "home",
+        stats=HOME_STATS,
+        features=HOME_FEATURES,
+        hero_image=None,         # z.B. "screenshot.png" → static/assets/
+    ))
+
+@app.get("/analyse", response_class=HTMLResponse)
+async def analysis(request: Request):
+    return templates.TemplateResponse("pages/analysis.html", ctx(
+        request, "analysis",
+    ))
+
+@app.get("/ueber-uns", response_class=HTMLResponse)
+async def about(request: Request):
+    return templates.TemplateResponse("pages/about.html", ctx(
+        request, "about",
+        roadmap=ROADMAP,
+        team=TEAM_MEMBERS,
+        gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
+    ))
+
+# Neue Route — Vorlage:
+# @app.get("/kontakt", response_class=HTMLResponse)
+# async def kontakt(request: Request):
+#     return templates.TemplateResponse("pages/kontakt.html", ctx(
+#         request, "kontakt",
+#         # seitenspezifische Daten hier:
+#         # my_data=MY_DATA,
+#     ))
+
+
+# ══════════════════════════════════════════════════════
+# API-ENDPUNKTE (JSON)
+# ══════════════════════════════════════════════════════
 
 class Coordinate(BaseModel):
     lat: float
     lng: float
 
 class FieldRequest(BaseModel):
-    polygon: List[Coordinate]   # Eckpunkte der Landwirtschaftsfläche
-    # Optional: weitere Eingaben des Users, z.B.:
-    # crop_type: str
-    # year: int
+    polygon: List[Coordinate]
 
 class ZoneResult(BaseModel):
-    sub_polygon: List[Coordinate]   # Teil-Polygon (Unter-Zone)
-    value: float                    # Vorhergesagter Wert (0.0 – 1.0)
-    label: str                      # z.B. "Hoch", "Mittel", "Niedrig"
+    sub_polygon: List[Coordinate]
+    value: float
+    label: str
 
 class PredictionResponse(BaseModel):
-    zones: List[ZoneResult]
-    unit: str                       # z.B. "Bodenqualität", "Ertragspotenzial"
+    zones:     List[ZoneResult]
+    unit:      str
     min_value: float
     max_value: float
 
 
-# ── Hilfsfunktion: Polygon in Gitter-Zonen aufteilen ─────────────────────────
-
-def split_polygon_into_grid(polygon: List[Coordinate], grid_size: int = 3):
-    """
-    Teilt das Bounding-Box des Polygons in ein grid_size x grid_size Gitter auf.
-    In einer echten App: verwende shapely für präzises Polygon-Clipping.
-    """
+def split_polygon_into_grid(polygon: List[Coordinate], grid_size: int = 4):
     lats = [p.lat for p in polygon]
     lngs = [p.lng for p in polygon]
     min_lat, max_lat = min(lats), max(lats)
     min_lng, max_lng = min(lngs), max(lngs)
-
     lat_step = (max_lat - min_lat) / grid_size
     lng_step = (max_lng - min_lng) / grid_size
-
     zones = []
     for i in range(grid_size):
         for j in range(grid_size):
-            cell = [
-                Coordinate(lat=min_lat + i * lat_step,       lng=min_lng + j * lng_step),
-                Coordinate(lat=min_lat + (i+1) * lat_step,   lng=min_lng + j * lng_step),
-                Coordinate(lat=min_lat + (i+1) * lat_step,   lng=min_lng + (j+1) * lng_step),
-                Coordinate(lat=min_lat + i * lat_step,       lng=min_lng + (j+1) * lng_step),
-            ]
-            zones.append(cell)
+            zones.append([
+                Coordinate(lat=min_lat +  i    * lat_step, lng=min_lng +  j    * lng_step),
+                Coordinate(lat=min_lat + (i+1) * lat_step, lng=min_lng +  j    * lng_step),
+                Coordinate(lat=min_lat + (i+1) * lat_step, lng=min_lng + (j+1) * lng_step),
+                Coordinate(lat=min_lat +  i    * lat_step, lng=min_lng + (j+1) * lng_step),
+            ])
     return zones
 
 
-# ── ML-Modell Placeholder ─────────────────────────────────────────────────────
-
 def run_model(sub_polygon: List[Coordinate]) -> float:
     """
-    PLATZHALTER – hier kommt dein echtes ML-Modell rein.
-
-    Typischer Ablauf mit einem echten Modell:
-        1. Features aus den Koordinaten extrahieren
-           (z.B. Satellitendaten, Bodendaten via API laden)
-        2. Features in numpy array umwandeln
-        3. model.predict(features) aufrufen
-        4. Ergebnis zurückgeben
+    PLATZHALTER — hier kommt dein echtes ML-Modell rein.
 
     Beispiel mit scikit-learn:
-        import pickle
         model = pickle.load(open("model.pkl", "rb"))
-        features = extract_features(sub_polygon)  # deine Funktion
+        features = extract_features(sub_polygon)
         return float(model.predict([features])[0])
     """
-    # Simuliert räumlich variierende Werte (nur für Demo)
     center_lat = np.mean([p.lat for p in sub_polygon])
     center_lng = np.mean([p.lng for p in sub_polygon])
     value = (np.sin(center_lat * 50) + np.cos(center_lng * 50) + 2) / 4
-    value += random.uniform(-0.05, 0.05)  # etwas Rauschen
+    value += random.uniform(-0.05, 0.05)
     return float(np.clip(value, 0, 1))
 
 
 def value_to_label(value: float) -> str:
-    if value >= 0.66:
-        return "Hoch"
-    elif value >= 0.33:
-        return "Mittel"
-    else:
-        return "Niedrig"
+    if value >= 0.66: return "Hoch"
+    if value >= 0.33: return "Mittel"
+    return "Niedrig"
 
 
-# ── API Endpoints ──────────────────────────────────────────────────────────────
-
-@app.get("/")
-def root():
-    return {"status": "Agri-ML API läuft ✅"}
+@app.get("/api/health")
+def health():
+    return {"status": "AgroScan API läuft ✅"}
 
 
-@app.post("/predict", response_model=PredictionResponse)
+@app.post("/api/predict", response_model=PredictionResponse)
 def predict(request: FieldRequest):
-    """
-    Nimmt ein Polygon (Eckpunkte der Landwirtschaftsfläche) entgegen,
-    teilt es in Zonen auf, und gibt für jede Zone einen ML-Vorhersagewert zurück.
-    """
-    sub_polygons = split_polygon_into_grid(request.polygon, grid_size=4)
-
     zones = []
-    for sub_poly in sub_polygons:
+    for sub_poly in split_polygon_into_grid(request.polygon):
         value = run_model(sub_poly)
         zones.append(ZoneResult(
             sub_polygon=sub_poly,
             value=round(value, 3),
-            label=value_to_label(value)
+            label=value_to_label(value),
         ))
-
     return PredictionResponse(
         zones=zones,
-        unit="Bodenqualität",   # ← anpassen je nach Modell
+        unit="Bodenqualität",
         min_value=0.0,
-        max_value=1.0
+        max_value=1.0,
     )

@@ -37,9 +37,7 @@ uvicorn main:app --reload
 ```
 
 ### 2. Frontend
-
-Einfach `frontend/index.html` im Browser öffnen —
-oder mit VS Code Live Server (Extension: "Live Server" von Ritwick Dey).
+`http://localhost:8000`im Webbrowser öffnen um die Webseite zu sehen
 
 ---
 

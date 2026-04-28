@@ -1,0 +1,21 @@
+{#
+  partials/nav.html
+  Wird von base.html eingebunden — einmal schreiben, überall gleich.
+  nav_pages und current_page kommen aus main.py → ctx()
+#}
+<nav>
+  <a class="nav-logo" href="/">
+    Agro<span>Scan</span>
+    <div class="nav-badge">Beta</div>
+  </a>
+
+  <div class="nav-links">
+    {% for page in nav_pages %}
+      <a class="nav-link {% if current_page == page.id %}active{% endif %}"
+         href="{{ page.href }}">{{ page.label }}</a>
+    {% endfor %}
+  </div>
+
+  <div class="nav-spacer"></div>
+  <a class="nav-cta" href="/analyse">⟶ Analyse starten</a>
+</nav>

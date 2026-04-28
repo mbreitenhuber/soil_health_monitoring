@@ -1,0 +1,48 @@
+/* base.css — Design Tokens, Reset, globale Komponenten */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0d1a0f;
+  --surface:  #111f13;
+  --surface2: #162819;
+  --border:   #1e3320;
+  --border2:  #2a4a2e;
+  --accent:   #4ade80;
+  --accent2:  #86efac;
+  --muted:    #3a5c3e;
+  --text:     #e8f5ea;
+  --text-dim: #7aab80;
+  --danger:   #f87171;
+  --nav-h:    64px;
+}
+
+html, body { min-height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); }
+body.page-app { height: 100%; overflow: hidden; }
+
+.btn-primary {
+  font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
+  padding: 12px 28px; border-radius: 8px; border: none;
+  background: var(--accent); color: var(--bg); cursor: pointer;
+  letter-spacing: 0.04em; transition: opacity 0.2s, transform 0.12s;
+  text-decoration: none; display: inline-block;
+}
+.btn-primary:hover { opacity: 0.87; transform: translateY(-2px); }
+
+.btn-outline {
+  font-family: 'DM Mono', monospace; font-size: 0.82rem;
+  padding: 12px 24px; border-radius: 8px; border: 1px solid var(--border2);
+  background: transparent; color: var(--text-dim); cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, transform 0.12s;
+  text-decoration: none; display: inline-block;
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+.section-eyebrow { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.4rem); letter-spacing: -0.03em; color: var(--text); margin-bottom: 48px; }
+
+.img-placeholder { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-dim); font-size: 0.78rem; padding: 32px; }
+.img-placeholder .icon { font-size: 2rem; opacity: 0.4; }
+
+footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-dim); flex-wrap: wrap; gap: 12px; }
+.footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--accent); letter-spacing: -0.03em; text-decoration: none; }
+.footer-logo span { color: var(--text-dim); font-weight: 400; }

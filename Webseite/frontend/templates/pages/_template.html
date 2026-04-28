@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{#
+  ╔══════════════════════════════════════════════════════╗
+  ║  NEUE SEITE — Checkliste                             ║
+  ║                                                      ║
+  ║  1. Datei kopieren:                                  ║
+  ║     _template.html → pages/meinname.html            ║
+  ║                                                      ║
+  ║  2. In backend/main.py:                              ║
+  ║     a) NAV_PAGES Eintrag ergänzen                    ║
+  ║     b) Route @app.get("/meinname") anlegen           ║
+  ║                                                      ║
+  ║  3. Fertig — Nav + Footer erscheinen automatisch.    ║
+  ╚══════════════════════════════════════════════════════╝
+#}
+
+{% block title %}Seitenname{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <div class="about-hero">
+    <div class="section-eyebrow">Kategorie</div>
+    <h1>Seitentitel</h1>
+    <p>Kurze Beschreibung dieser Seite.</p>
+  </div>
+
+  <section class="about-section">
+    <div class="section-eyebrow">Abschnitt</div>
+    <h2 class="section-title">Überschrift</h2>
+
+    {# Daten aus main.py hier rendern, z.B.: #}
+    {# {% for item in items %}<p>{{ item.name }}</p>{% endfor %} #}
+
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;">
+      Seiteninhalt hier…
+    </p>
+  </section>
+
+</div>
+{% endblock %}
+
+{# Nur nötig wenn die Seite eigenes JS braucht: #}
+{# {% block scripts %}<script src="/static/js/meinscript.js"></script>{% endblock %} #}

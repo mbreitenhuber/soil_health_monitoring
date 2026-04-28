@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <section class="hero">
+    <div class="hero-eyebrow">Präzisionslandwirtschaft · ML-gestützte Analyse</div>
+    <h1 class="hero-title">
+      Deine Felder.<br>
+      <span class="accent">Intelligent analysiert.</span>
+    </h1>
+    <p class="hero-sub">
+      AgroScan verbindet Satellitengeografie mit Machine Learning —
+      zeichne deine Landwirtschaftsfläche und erhalte sekundenschnell
+      eine detaillierte Zonenkarte.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="/analyse">⟶ Jetzt analysieren</a>
+      <a class="btn-outline"  href="/ueber-uns">Mehr erfahren</a>
+    </div>
+  </section>
+
+  <!-- Hauptbild -->
+  <div style="padding:0 32px 72px; max-width:1100px; margin:0 auto;">
+    {% if hero_image %}
+      <img src="/static/assets/{{ hero_image }}" alt="AgroScan Screenshot"
+           style="width:100%; border-radius:12px; border:1px solid var(--border2);" />
+    {% else %}
+      <div class="img-placeholder" style="border-radius:12px;">
+        <div class="icon">🗺️</div>
+        <div>Hauptbild einfügen — hero_image in main.py setzen</div>
+        <div style="font-size:0.68rem;opacity:0.6;">Empfohlen: 1400×600px</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Stats — Daten kommen aus HOME_STATS in main.py -->
+  <div class="stats-bar">
+    {% for stat in stats %}
+      <div class="stat-item">
+        <div class="stat-num">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Features — Daten kommen aus HOME_FEATURES in main.py -->
+  <section class="features">
+    <div class="section-eyebrow">Was AgroScan kann</div>
+    <h2 class="section-title">Einfach. Präzise. Erweiterbar.</h2>
+    <div class="features-grid">
+      {% for f in features %}
+        <div class="feature-card">
+          <div class="feature-icon">{{ f.icon }}</div>
+          <div class="feature-name">{{ f.name }}</div>
+          <div class="feature-desc">{{ f.desc }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Showcase 1 -->
+  <section class="showcase" style="border-top:1px solid var(--border);padding-top:80px;">
+    <div class="img-placeholder" style="aspect-ratio:4/3;border-radius:10px;">
+      <div class="icon">📸</div><div>Bild: Analyse in Aktion</div>
+    </div>
+    <div class="showcase-text">
+      <div class="section-eyebrow">Wie es funktioniert</div>
+      <h3>Vom Polygon zur Zonenkarte in Sekunden</h3>
+      <p>Wähle das Polygon-Zeichenwerkzeug auf der Karte, klicke die Ecken deiner Fläche ab und starte die Analyse.</p>
+      <p>Das FastAPI-Backend unterteilt die Bounding-Box in ein 4×4-Gitter und berechnet für jede Zelle einen Qualitätswert.</p>
+      <a class="btn-primary" href="/analyse">Jetzt ausprobieren →</a>
+    </div>
+  </section>
+
+  <!-- Showcase 2 -->
+  <section class="showcase">
+    <div class="showcase-text">
+      <div class="section-eyebrow">ML-Modell</div>
+      <h3>Plug-in dein eigenes Modell</h3>
+      <p>Das Template liefert einen Platzhalter, der räumlich variierende Werte simuliert. Ersetze ihn mit deinem trainierten Modell.</p>
+      <p>Features extrahieren, Modell laden, Wert zurückgeben — drei Zeilen Code genügen.</p>
+      <a class="btn-outline" href="/ueber-uns">Über das Projekt →</a>
+    </div>
+    <div class="img-placeholder" style="aspect-ratio:4/3;border-radius:10px;">
+      <div class="icon">🤖</div><div>Bild: Modell-Visualisierung</div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="home-cta">
+    <h2>Bereit für smarte Flächenanalyse?</h2>
+    <p>Starte das Backend, öffne die Karte und zeichne dein erstes Polygon.</p>
+    <a class="btn-primary" href="/analyse">⟶ Zur Analyse</a>
+  </div>
+
+</div>
+{% endblock %}
