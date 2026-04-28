@@ -1,7 +1,0 @@
-fastapi==0.111.0
-uvicorn[standard]==0.29.0
-numpy==1.26.4
-pydantic==2.7.1
-# shapely==2.0.4      # Für präzises Polygon-Clipping (empfohlen für Produktion)
-# scikit-learn==1.4.2 # Für dein ML-Modell
-# pandas==2.2.2       # Für Datenverarbeitung

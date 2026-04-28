@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Analyse{% endblock %}
+{% block body_class %}page-app{% endblock %}
+
+{% block head_libs %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+{% endblock %}
+
+{% block head_styles %}
+  <link rel="stylesheet" href="/static/css/app.css" />
+{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+
+  <aside class="sidebar">
+
+    <div>
+      <div class="section-label">Anleitung</div>
+      <div class="steps">
+        <div class="step active" id="step-1">
+          <div class="step-num">1</div>
+          <div class="step-text">Zeichne deine Landwirtschaftsfläche auf der Karte (Polygon-Tool nutzen)</div>
+        </div>
+        <div class="step" id="step-2">
+          <div class="step-num">2</div>
+          <div class="step-text">Prüfe die erkannten Eckpunkte und Fläche</div>
+        </div>
+        <div class="step" id="step-3">
+          <div class="step-num">3</div>
+          <div class="step-text">Starte die Analyse — das ML-Modell berechnet die Zonenkarte</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Fläche</div>
+      <div class="poly-info">
+        <div class="poly-stat"><span>Eckpunkte</span><span class="val" id="stat-points">–</span></div>
+        <div class="poly-stat"><span>Fläche (ca.)</span><span class="val" id="stat-area">–</span></div>
+        <div class="poly-stat"><span>Status</span><span class="val" id="stat-status">Kein Polygon</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn-analyse" id="btn-analyse" disabled>⟶ Analyse starten</button>
+      <div class="loader" id="loader"><div class="spinner"></div><span>Modell rechnet…</span></div>
+      <button class="btn-reset" id="btn-reset">Zurücksetzen</button>
+    </div>
+
+    <div>
+      <div class="section-label">Ergebnis</div>
+      <div class="result-box" id="result-box">
+        <div class="result-row"><span>Zonen analysiert</span><span class="val" id="res-zones">–</span></div>
+        <div class="result-row"><span>Ø Bodenqualität</span> <span class="val" id="res-avg">–</span></div>
+        <div class="result-row"><span>Höchste Zone</span>    <span class="val" id="res-max">–</span></div>
+        <div class="result-row"><span>Niedrigste Zone</span> <span class="val" id="res-min">–</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Legende – Bodenqualität</div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:linear-gradient(to right,#22c55e,#4ade80);"></div>
+          <span>Hoch (0.66 – 1.0)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:linear-gradient(to right,#f59e0b,#facc15);"></div>
+          <span>Mittel (0.33 – 0.66)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:linear-gradient(to right,#ef4444,#f87171);"></div>
+          <span>Niedrig (0.0 – 0.33)</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <main><div id="map"></div></main>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  {# api_url wird sicher vom Server übergeben — kein Hardcode im JS nötig #}
+  <script>const API_URL = "{{ api_url }}";</script>
+  <script src="/static/js/map.js"></script>
+{% endblock %}
