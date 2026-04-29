@@ -27,6 +27,8 @@ class CopernicusApiS1:
     DOWNLOAD_URL = (
         "https://zipper.dataspace.copernicus.eu/odata/v1/Products(#product_id#)/$value"
     )
+    REQUEST_TIMEOUT = 30
+    USER_AGENT = "soil-health-monitoring-s1/1.0"
 
     @classmethod
     def get_data(
@@ -50,25 +52,35 @@ class CopernicusApiS1:
         start = date_obj - timedelta(days=span)
         end = date_obj + timedelta(days=span + 1)
 
-        query = (
-            f"{cls.API_URL}"
-            f"?productType={product_type}"
-            f"&startDate={start.isoformat()}Z"
-            f"&completionDate={end.isoformat()}Z"
-            f"&lat={latitude}"
-            f"&lon={longitude}"
-            "&radius=500"
-            "&sortParam=startDate"
-            "&sortOrder=descending"
-            f"&sensorMode={sensor_mode}"
-            f"&polarisation={polarization}"
-        )
+        params = {
+            "productType": product_type,
+            "startDate": f"{start.isoformat()}Z",
+            "completionDate": f"{end.isoformat()}Z",
+            "lat": latitude,
+            "lon": longitude,
+            "radius": 500,
+            "sortParam": "startDate",
+            "sortOrder": "descending",
+            "sensorMode": sensor_mode,
+            "polarisation": polarization,
+        }
 
         response = requests.get(
-            query,
+            cls.API_URL,
+            params=params,
             allow_redirects=True,
-            headers={"Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}"},
+            timeout=cls.REQUEST_TIMEOUT,
+            headers={
+                "Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}",
+                "User-Agent": cls.USER_AGENT,
+            },
         )
+        if response.status_code in (401, 403):
+            response_summary = response.text[:500].replace("\n", " ")
+            raise PermissionError(
+                f"CDSE catalogue request denied ({response.status_code}) for "
+                f"{response.url}. Response: {response_summary}"
+            )
         response.raise_for_status()
         data = response.json()
 
@@ -180,15 +192,27 @@ class CopernicusApiS1:
         response = requests.post(
             cls.AUTH_URL,
             allow_redirects=True,
+            timeout=cls.REQUEST_TIMEOUT,
             data={
                 "username": os.environ["COPERNICUS_USER"],
                 "password": os.environ["COPERNICUS_PASSWORD"],
                 "client_id": "cdse-public",
                 "grant_type": "password",
             },
+            headers={"User-Agent": cls.USER_AGENT},
         )
         response.raise_for_status()
         token = response.json()
+        if "access_token" not in token:
+            raise RuntimeError(
+                "Token endpoint did not return access_token. "
+                f"Response keys: {list(token.keys())}"
+            )
+        if "expires_in" not in token:
+            raise RuntimeError(
+                "Token endpoint did not return expires_in. "
+                f"Response keys: {list(token.keys())}"
+            )
 
         os.environ["COPERNICUS_TOKEN"] = token["access_token"]
         os.environ["COPERNICUS_TOKEN_EXPIRES"] = str(
@@ -201,7 +225,7 @@ class CopernicusApiS1:
         if not os.environ.get("COPERNICUS_TOKEN"):
             return False
         if not os.environ.get("COPERNICUS_TOKEN_EXPIRES"):
-            return True
+            return False
         return int(os.environ["COPERNICUS_TOKEN_EXPIRES"]) > time.time()
 
     @staticmethod

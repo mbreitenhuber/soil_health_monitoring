@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 from copernicus_api_S1 import CopernicusApiS1
 
 # Load environment variables from .env file
-load_dotenv()
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 print('environment variables:', os.environ)
 
 class ThreadPrefix:
