@@ -2,17 +2,27 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:       #0d1a0f;
-  --surface:  #111f13;
-  --surface2: #162819;
-  --border:   #1e3320;
-  --border2:  #2a4a2e;
-  --accent:   #4ade80;
-  --accent2:  #86efac;
-  --muted:    #3a5c3e;
-  --text:     #e8f5ea;
-  --text-dim: #7aab80;
-  --danger:   #f87171;
+  /* Base */
+  --bg:       #F1F2F3;
+  --surface:  #F0F1F2;
+  --surface2: #FFFFFF;
+
+  /* Borders (etwas stärker für klare Trennung) */
+  --border:   #D4D8DC;
+  --border2:  #C7CCD1;
+
+  /* Text (HIER liegt der größte Fix) */
+  --text:     #1A0D0C;   /* dunkler → besserer Kontrast */
+  --text-dim: #5A3A33;   /* deutlich dunkler als vorher */
+
+  /* Accents (kontrastreicher gemacht) */
+  --accent:   #5FA764;   /* dunkleres Grün → besser für Text */
+  --accent2:  #4A90E2;   /* kräftigeres Blau */
+
+  /* States */
+  --muted:    #9FA8AE;   /* etwas dunkler → besser lesbar */
+  --danger:   #C94F4F;   /* weniger „washed out“ */
+
   --nav-h:    64px;
 }
 
