@@ -15,9 +15,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Cookie
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
@@ -48,10 +48,13 @@ app.add_middleware(
 
 # Neue Seite: Eintrag hier ergänzen + Route unten anlegen
 NAV_PAGES = [
-    {"id": "home",     "label": "Home",     "href": "/"},
-    {"id": "analysis", "label": "Analyse",  "href": "/analyse"},
-    {"id": "about",    "label": "Über uns", "href": "/ueber-uns"},
-    # {"id": "kontakt", "label": "Kontakt", "href": "/kontakt"},
+    {"id": "home",               "label": {"en": "Home",               "de": "Home"},               "href": "/",                   "group": "main"},
+    {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
+    {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
+    {"id": "users_experience",   "label": {"en": "Users Experience",   "de": "Nutzererfahrungen"},   "href": "/users_experience",   "group": "about"},
+    {"id": "about",              "label": {"en": "Research Background", "de": "Forschungshintergrund"}, "href": "/ueber-uns",       "group": "about"},
+    {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "about"},
+    {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
 ]
 
 HOME_STATS = [
@@ -114,33 +117,92 @@ def ctx(request: Request, page_id: str, **extra) -> dict:
         **extra,
     }
 
+# ══════════════════════════════════════════════════════
+# Spracheinstellung über Cookie und Nav-Label-Auswahl
+# ══════════════════════════════════════════════════════
+
+def get_nav_context(current_page: str, lang: str = "de"):
+    """Gibt nav_pages mit übersetzten Labels zurück."""
+    pages = [
+        {**p, "label": p["label"][lang]}
+        for p in NAV_PAGES
+    ]
+    return {"nav_pages": pages, "current_page": current_page, "lang": lang}
+
+# Sprache aus Cookie lesen
+@app.get("/set-lang/{lang}")
+def set_language(lang: str, request: Request):
+    redirect_url = request.headers.get("Referer", "/")
+    response = RedirectResponse(url=redirect_url)
+    response.set_cookie("lang", lang, max_age=60*60*24*365)
+    return response
 
 # ══════════════════════════════════════════════════════
 # HTML-ROUTEN
 # ══════════════════════════════════════════════════════
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/index.html", ctx(
         request, "home",
         stats=HOME_STATS,
         features=HOME_FEATURES,
         hero_image=None,         # z.B. "screenshot.png" → static/assets/
+        **get_nav_context("home", lang),
     ))
 
 @app.get("/analyse", response_class=HTMLResponse)
-async def analysis(request: Request):
+async def analysis(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/analysis.html", ctx(
         request, "analysis",
+        **get_nav_context("analysis", lang),
     ))
 
 @app.get("/ueber-uns", response_class=HTMLResponse)
-async def about(request: Request):
+async def about(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/about.html", ctx(
         request, "about",
         roadmap=ROADMAP,
         team=TEAM_MEMBERS,
         gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
+        **get_nav_context("about", lang),
+    ))
+
+@app.get("/how_to", response_class=HTMLResponse)
+async def how_to(request: Request, lang: str = Cookie(default="en")):
+    return templates.TemplateResponse("pages/how_to.html", ctx(
+        request, "how_to",
+        **get_nav_context("how_to", lang), 
+        # seitenspezifische Daten hier:
+        # my_data=MY_DATA,
+    ))
+
+
+@app.get("/personal_dashboard", response_class=HTMLResponse)
+async def pers_dash(request: Request, lang: str = Cookie(default="en")):
+    return templates.TemplateResponse("pages/pers_dash.html", ctx(
+        request, "pers_dash",
+        **get_nav_context("pers_dash", lang),
+        # seitenspezifische Daten hier:
+        # my_data=MY_DATA,
+    ))
+
+@app.get("/report", response_class=HTMLResponse)
+async def report(request: Request, lang: str = Cookie(default="en")):
+    return templates.TemplateResponse("pages/report.html", ctx(
+        request, "report",
+        **get_nav_context("report", lang),
+        # seitenspezifische Daten hier:
+        # my_data=MY_DATA,
+    ))
+
+@app.get("/users_experience", response_class=HTMLResponse)
+async def users_experience(request: Request, lang: str = Cookie(default="en")):
+    return templates.TemplateResponse("pages/users_experience.html", ctx(
+        request, "users_experience",
+        **get_nav_context("users_experience", lang),
+        # seitenspezifische Daten hier:
+        # my_data=MY_DATA,
     ))
 
 # Neue Route — Vorlage:

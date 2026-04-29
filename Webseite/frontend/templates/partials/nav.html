@@ -9,13 +9,73 @@
     <div class="nav-badge">Beta</div>
   </a>
 
-  <div class="nav-links">
-    {% for page in nav_pages %}
+  <div class="nav-left">
+    {% for page in nav_pages if page.group == "main" %}
       <a class="nav-link {% if current_page == page.id %}active{% endif %}"
          href="{{ page.href }}">{{ page.label }}</a>
     {% endfor %}
+
+    <div class="nav-dropdown" id="dd-about">
+      <button class="nav-dropdown-btn" onclick="toggleDropdown('dd-about')">
+        {{ "About us" if lang == "en" else "Über uns" }}
+        <span class="nav-chevron">▾</span>
+      </button>
+      <div class="nav-dropdown-menu">
+        {% for page in nav_pages if page.group == "about" %}
+          <a class="nav-dropdown-item {% if current_page == page.id %}active{% endif %}"
+             href="{{ page.href }}">{{ page.label }}</a>
+        {% endfor %}
+      </div>
+    </div>
   </div>
 
   <div class="nav-spacer"></div>
-  <a class="nav-cta" href="/analyse">⟶ Analyse starten</a>
+
+  <div class="nav-right">
+    <div class="nav-dropdown" id="dd-lang">
+      <button class="nav-dropdown-btn" onclick="toggleDropdown('dd-lang')">
+        {% if lang == "en" %}🇬🇧 EN{% else %}🇩🇪 DE{% endif %}
+        <span class="nav-chevron">▾</span>
+      </button>
+      <div class="nav-dropdown-menu nav-dropdown-right">
+        <a class="nav-dropdown-item" href="/set-lang/en">🇬🇧 English</a>
+        <a class="nav-dropdown-item" href="/set-lang/de">🇩🇪 Deutsch</a>
+      </div>
+    </div>
+
+    <a class="nav-link" href="/personal_dashboard">Personal Dashboard</a>
+  </div>
 </nav>
+
+<script>
+function toggleDropdown(id) {
+  document.querySelectorAll('.nav-dropdown').forEach(d => {
+    if (d.id !== id) d.classList.remove('open');
+  });
+  document.getElementById(id).classList.toggle('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('.nav-dropdown'))
+    document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+});
+</script>
+
+<script>
+  console.log("Nav JS geladen");
+  
+  function toggleDropdown(id) {
+    console.log("toggleDropdown aufgerufen:", id);
+    const el = document.getElementById(id);
+    console.log("Element gefunden:", el);
+    document.querySelectorAll('.nav-dropdown').forEach(d => {
+      if (d.id !== id) d.classList.remove('open');
+    });
+    el.classList.toggle('open');
+    console.log("Klassen nach toggle:", el.className);
+  }
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.nav-dropdown'))
+      document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
+  });
+</script>
