@@ -44,6 +44,7 @@ df.drop(
         "P",
         "N",
         "K",
+        "OC (20-30 cm)",
         "CaCO3 (20-30 cm)",
         "Ox_Al",
         "Ox_Fe",
@@ -52,11 +53,10 @@ df.drop(
 )
 
 #  Dataset now contains the following columns:
-#  POINTID,OC,OC (20-30 cm),NUTS_0,NUTS_1,NUTS_2,NUTS_3,TH_LAT,TH_LONG,SURVEY_DATE,Elev,LC,LU,LC0_Desc,LC1_Desc,LU1_Desc
+#  POINTID,OC,NUTS_0,NUTS_1,NUTS_2,NUTS_3,TH_LAT,TH_LONG,SURVEY_DATE,Elev,LC,LU,LC0_Desc,LC1_Desc,LU1_Desc
 
 # PointID: 	                Unique identifier of the LUCAS survey point
 # OC:                   	Organic carbon content (at depth 0-20cm) in g/kg
-# OC (20-30 cm):	        Organic carbon content (at depth 20-30cm) in g/kg
 # NUTS_0:	                NUTS code for the country where the sample was taken
 # NUTS_1, NUTS_2, NUTS_3:	NUTS 1, 2 and 3 codes for the actual location where the sample was taken (thus based on GPS coordinates)
 # TH_LAT, TH_LON:	        Theoretical Coordinates in decimal degrees
@@ -71,10 +71,9 @@ df.drop(
 # TODO: upload this file to repo and link it here
 
 
-# Drop rows that match "< LOD" in 'OC' and 'OC (20-30 cm)'
+# Drop rows that match "< LOD" in 'OC'
 rows_before_lod_filter = len(df)
 df = df[df["OC"].astype(str).str.contains("< LOD", na=False) == False]
-df = df[df["OC (20-30 cm)"].astype(str).str.contains("< LOD", na=False) == False]
 rows_deleted_lod_filter = rows_before_lod_filter - len(df)
 print(f"Dropped {rows_deleted_lod_filter} rows due to '< LOD' in OC columns")
 
@@ -90,7 +89,6 @@ if "P" in df.columns:
 
 # Convert columns to float
 df["OC"] = pd.to_numeric(df["OC"], errors="coerce")
-df["OC (20-30 cm)"] = pd.to_numeric(df["OC (20-30 cm)"], errors="coerce")
 
 df["SURVEY_DATE"] = pd.to_datetime(df["SURVEY_DATE"], format="%d-%m-%y", errors="coerce")
 
