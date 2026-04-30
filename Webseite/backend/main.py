@@ -121,13 +121,53 @@ def ctx(request: Request, page_id: str, **extra) -> dict:
 # Spracheinstellung über Cookie und Nav-Label-Auswahl
 # ══════════════════════════════════════════════════════
 
-def get_nav_context(current_page: str, lang: str = "de"):
+LEAFLET_DRAW_TRANSLATIONS = {
+    "en": {
+        "draw_polygon": "Draw a polygon",
+        "draw_rectangle": "Draw a rectangle", 
+        "draw_polyline": "Draw a polyline",
+        "draw_circle": "Draw a circle",
+        "draw_marker": "Add a marker",
+        "edit_layers": "Edit layers",
+        "delete_layers": "Delete layers",
+        "cancel": "Cancel",
+        "finish": "Finish",
+        "undo": "Undo last point",
+        "save": "Save changes",
+        "clear_all": "Delete all"
+    },
+    "de": {
+        "draw_polygon": "Polygon zeichnen",
+        "draw_rectangle": "Rechteck zeichnen",
+        "draw_polyline": "Linie zeichnen", 
+        "draw_circle": "Kreis zeichnen",
+        "draw_marker": "Marker setzen",
+        "edit_layers": "Layer bearbeiten",
+        "delete_layers": "Layer entfernen",
+        "cancel": "Abbrechen",
+        "finish": "Beenden",
+        "undo": "Rückgängig",
+        "save": "Speichern",
+        "clear_all": "Alle entfernen"
+    }
+}
+
+def get_nav_context(current_page: str, lang: str = "en"):
     """Gibt nav_pages mit übersetzten Labels zurück."""
+    # Sprache validieren
+    if lang not in LEAFLET_DRAW_TRANSLATIONS:
+        lang = "en"
+    
     pages = [
         {**p, "label": p["label"][lang]}
         for p in NAV_PAGES
     ]
-    return {"nav_pages": pages, "current_page": current_page, "lang": lang}
+    return {
+        "nav_pages": pages, 
+        "current_page": current_page, 
+        "lang": lang,
+        "leaflet_translations": LEAFLET_DRAW_TRANSLATIONS[lang]
+    }
 
 # Sprache aus Cookie lesen
 @app.get("/set-lang/{lang}")

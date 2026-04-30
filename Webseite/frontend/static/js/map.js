@@ -1,6 +1,5 @@
 /* map.js — Leaflet Karte + Analyse
-   API_URL wird von Jinja2 in analysis.html gesetzt:
-   <script>const API_URL = "{{ api_url }}";</script>
+   API_URL und Übersetzungen werden von Jinja2 in analysis.html gesetzt
 */
 
 const map = L.map("map").setView([46.8182, 8.2275], 8); // Schweiz gesamt
@@ -15,7 +14,7 @@ const resultLayer = new L.FeatureGroup().addTo(map);
 map.addControl(new L.Control.Draw({
   edit: { featureGroup: drawnItems },
   draw: {
-    polygon: { shapeOptions: { color: "#4ade80", fillOpacity: 0.15 } },
+    polygon: { shapeOptions: { color: "#5A3A33" , fillOpacity: 0.15 } },
     polyline: false, rectangle: false, circle: false, marker: false, circlemarker: false
   }
 }));
@@ -101,7 +100,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
       resultLayer.addLayer(poly);
     });
     resultLayer.addLayer(L.polygon(currentPolygon.map(p => [p.lat, p.lng]),
-      { color: "#4ade80", fill: false, weight: 2.5 }));
+      { color: "#5A3A33", fill: false, weight: 2.5 }));
     const values = data.zones.map(z => z.value);
     const avg = values.reduce((a,b) => a+b, 0) / values.length;
     document.getElementById("res-zones").textContent = data.zones.length;

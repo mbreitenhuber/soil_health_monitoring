@@ -32,5 +32,10 @@
 .legend-item { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; }
 .legend-swatch { width: 32px; height: 14px; border-radius: 3px; flex-shrink: 0; }
 #map { width: 100%; height: 100%; }
-.leaflet-control-zoom a, .leaflet-bar a { background: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
+.leaflet-control-zoom a, .leaflet-bar a { background-color: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
 .leaflet-draw-toolbar a { background-color: var(--surface) !important; }
+.leaflet-draw-toolbar a:before { background-image: inherit !important; }
+.leaflet-draw-draw-polygon:before { content: "⬡"; color: var(--text); font-size: 14px; line-height: 1; }
+.leaflet-draw-edit-edit:before { content: "✎"; color: var(--text); font-size: 14px; line-height: 1; }
+.leaflet-draw-edit-remove:before { content: "🗑"; color: var(--text); font-size: 14px; line-height: 1; }
+/*path.leaflet-interactive {stroke: var(--text) !important; stroke-opacity: 0.5 ; fill: var(--text-dim) !important; fill-opacity: 0.15 !important; } */
