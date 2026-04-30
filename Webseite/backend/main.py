@@ -187,7 +187,7 @@ async def home(request: Request, lang: str = Cookie(default="en")):
         request, "home",
         stats=HOME_STATS,
         features=HOME_FEATURES,
-        hero_image=None,         # z.B. "screenshot.png" → static/assets/
+        hero_image="Hauptbild.png",      # z.B. "screenshot.png" → static/assets/
         **get_nav_context("home", lang),
     ))
 
