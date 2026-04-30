@@ -85,10 +85,60 @@
 </div>
 {% endblock %}
 
-{% block scripts %}
+  {% block scripts %}
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
   {# api_url wird sicher vom Server übergeben — kein Hardcode im JS nötig #}
-  <script>const API_URL = "{{ api_url }}";</script>
+  <script>
+    // Leaflet Draw Übersetzungen aus Jinja laden
+    const leafletTranslations = JSON.parse('{{ leaflet_translations | tojson if leaflet_translations else "{}" }}');
+    
+    // Fallback für fehlende Übersetzungen
+    const defaultTranslations = {
+      "draw_polygon": "Draw a polygon",
+      "draw_rectangle": "Draw a rectangle", 
+      "draw_polyline": "Draw a polyline",
+      "draw_circle": "Draw a circle",
+      "draw_marker": "Add a marker",
+      "edit_layers": "Edit layers",
+      "delete_layers": "Delete layers",
+      "cancel": "Cancel",
+      "finish": "Finish",
+      "undo": "Undo last point",
+      "save": "Save changes",
+      "clear_all": "Delete all"
+    };
+    
+    // Übersetzungen zusammenführen (Jinja + Fallback)
+    const translations = { ...defaultTranslations, ...leafletTranslations };
+    
+    // Leaflet Draw Texte setzen
+    L.drawLocal.draw.toolbar.buttons.polygon = translations.draw_polygon;
+    L.drawLocal.draw.toolbar.buttons.rectangle = translations.draw_rectangle;
+    L.drawLocal.draw.toolbar.buttons.polyline = translations.draw_polyline;
+    L.drawLocal.draw.toolbar.buttons.circle = translations.draw_circle;
+    L.drawLocal.draw.toolbar.buttons.marker = translations.draw_marker;
+    L.drawLocal.draw.toolbar.actions.title = translations.cancel;
+    L.drawLocal.draw.toolbar.actions.text = translations.cancel;
+    L.drawLocal.draw.toolbar.finish.title = translations.finish;
+    L.drawLocal.draw.toolbar.finish.text = translations.finish;
+    L.drawLocal.draw.toolbar.undo.title = translations.undo;
+    L.drawLocal.draw.toolbar.undo.text = translations.undo;
+    L.drawLocal.edit.toolbar.buttons.edit = translations.edit_layers;
+    L.drawLocal.edit.toolbar.buttons.editDisabled = "No layers to edit";
+    L.drawLocal.edit.toolbar.buttons.remove = translations.delete_layers;
+    L.drawLocal.edit.toolbar.buttons.removeDisabled = "No layers to delete";
+    L.drawLocal.edit.toolbar.actions.save.title = translations.save;
+    L.drawLocal.edit.toolbar.actions.save.text = translations.save;
+    L.drawLocal.edit.toolbar.actions.cancel.title = translations.cancel;
+    L.drawLocal.edit.toolbar.actions.cancel.text = translations.cancel;
+    L.drawLocal.edit.toolbar.actions.clearAll.title = translations.clear_all;
+    L.drawLocal.edit.toolbar.actions.clearAll.text = translations.clear_all;
+    L.drawLocal.edit.handlers.edit.tooltip.text = "Drag handles or markers to edit features";
+    L.drawLocal.edit.handlers.edit.tooltip.subtext = "Click cancel to undo changes";
+    L.drawLocal.edit.handlers.remove.tooltip.text = "Click on a feature to remove";
+    
+    const API_URL = "{{ api_url }}";
+  </script>
   <script src="/static/js/map.js"></script>
 {% endblock %}
