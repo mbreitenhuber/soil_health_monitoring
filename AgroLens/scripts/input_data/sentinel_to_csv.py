@@ -3,7 +3,7 @@
 # More information with 'sentinel_to_csv.py -h'
 
 # command
-# python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/sentinel_bands.csv
+# python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/sentinel_bands.csv --shape 9x9 --flatten --normalize
 
 import argparse
 import os
