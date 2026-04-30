@@ -12,6 +12,7 @@
 *.prj
 data/raw/
 data/processed/
+data/sentinel_output/
 
 # --- Python ---
 __pycache__/

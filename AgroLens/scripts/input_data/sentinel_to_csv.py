@@ -20,7 +20,7 @@ from sklearn import preprocessing
 load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-from AgroLens.satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
+from satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
 
 
 def setup_parser() -> argparse.Namespace:
