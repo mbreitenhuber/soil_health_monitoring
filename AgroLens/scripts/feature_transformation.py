@@ -1,10 +1,20 @@
 # Creates features based on Sentinel 2 data using locations selected based on LUCAS
 
+import os
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
-# read in Excel file (remove hardcoded path)
-sentinel2 = pd.read_excel("/Users/clarabuller/Documents/GitHub/soil_health_monitoring/data/datasets/LUCAS-Sentinel-cropland-sample.xlsx")
+# Read Sentinel-2 bands from CSV (project-relative by default).
+project_root = Path(__file__).resolve().parents[2]
+sentinel_bands_path = Path(
+    os.environ.get("SENTINEL_BANDS_PATH", project_root / "data" / "sentinel_bands.csv")
+)
+if not sentinel_bands_path.is_file():
+    raise FileNotFoundError(f"Sentinel bands file not found: {sentinel_bands_path}")
+
+sentinel2 = pd.read_csv(sentinel_bands_path)
 
 # Dataset structure:
 ## at each location a 9x9 pixel was evaluated for 10 bands, values were flattened & normalized s.t. for each Band 81 values exist

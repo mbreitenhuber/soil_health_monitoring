@@ -208,8 +208,8 @@ def main():
     print(f"Dropping {len(drop)} rows...")
     output.drop(output.index[drop], inplace=True)
 
-    # drop redundant second index and create new index
-    output.drop(output.columns[0], axis=1, inplace=True)
+    # Create new index column
+    # output.drop(output.columns[0], axis=1, inplace=True) # this drops the PointID column
     output.reset_index(drop=True, inplace=True)
     output.index.names = ["Index"]
 
