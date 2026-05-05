@@ -52,7 +52,7 @@ NAV_PAGES = [
     {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
     {"id": "users_experience",   "label": {"en": "Users Experience",   "de": "Nutzererfahrungen"},   "href": "/users_experience",   "group": "about"},
-    {"id": "about",              "label": {"en": "Research Background", "de": "Forschungshintergrund"}, "href": "/ueber-uns",       "group": "about"},
+    {"id": "about",              "label": {"en": "Research Background", "de": "Forschungshintergrund"}, "href": "/research_background",       "group": "about"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "about"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
 ]
@@ -65,18 +65,18 @@ HOME_STATS = [
 ]
 
 HOME_FEATURES = [
-    {"icon": "✏️", "name": "Polygon-Zeichnung",
-     "desc": "Zeichne beliebig geformte Flächen direkt auf der Karte — keine CAD-Software nötig."},
-    {"icon": "🧠", "name": "ML-Zonenkarte",
-     "desc": "Das Backend teilt deine Fläche in Zellen auf und liefert für jede Zone einen Vorhersagewert (0–1)."},
-    {"icon": "🎨", "name": "Farbkodierte Karte",
-     "desc": "Grün = hohe Qualität, Gelb = mittel, Rot = niedrig — auf einen Blick erkennbar."},
-    {"icon": "🔌", "name": "Eigenes Modell",
-     "desc": "Ersetze run_model() im Backend mit deinem scikit-learn / PyTorch Modell."},
-    {"icon": "☁️", "name": "Cloud-bereit",
-     "desc": "Backend auf Render, Frontend auf Netlify — kostenlos, in unter 10 Minuten live."},
-    {"icon": "🇨🇭", "name": "Schweiz-fokussiert",
-     "desc": "Startet direkt mit Blick auf die ganze Schweiz."},
+    {"icon": "✏️", "name": {"en": "Polygon Drawing", "de": "Polygon-Zeichnung"},
+     "desc": {"en": "Draw arbitrarily shaped areas directly on the map — no CAD software needed.", "de": "Zeichne beliebig geformte Flächen direkt auf der Karte — keine CAD-Software nötig."}},
+    {"icon": "🧠", "name": {"en": "ML Zone Map", "de": "ML-Zonenkarte"},
+     "desc": {"en": "The backend divides your area into cells and provides a prediction value (0–1) for each zone.", "de": "Das Backend teilt deine Fläche in Zellen auf und liefert für jede Zone einen Vorhersagewert (0–1)."}},
+    {"icon": "🎨", "name": {"en": "Color-Coded Map", "de": "Farbkodierte Karte"},
+     "desc": {"en": "Green = high quality, yellow = medium, red = low — clearly recognizable at a glance.", "de": "Grün = hohe Qualität, Gelb = mittel, Rot = niedrig — auf einen Blick erkennbar."}},
+    #{"icon": "🔌", "name": {"en": "Custom Model", "de": "Eigenes Modell"},
+    # "desc": {"en": "Replace run_model() in the backend with your scikit-learn / PyTorch model.", "de": "Ersetze run_model() im Backend mit deinem scikit-learn / PyTorch Modell."}},
+    #{"icon": "☁️", "name": {"en": "Cloud-Ready", "de": "Cloud-bereit"},
+    # "desc": {"en": "Backend on Render, Frontend on Netlify — free, live in under 10 minutes.", "de": "Backend auf Render, Frontend auf Netlify — kostenlos, in unter 10 Minuten live."}}, 
+    {"icon": "🇨🇭", "name": {"en": "Swiss-Focused", "de": "Schweiz-fokussiert"},
+     "desc": {"en": "Launches directly with a focus on the entire Switzerland.", "de": "Startet direkt mit Blick auf die ganze Schweiz."}},
 ]
 
 ROADMAP = [
@@ -103,17 +103,25 @@ TEAM_MEMBERS = [
 
 
 # ── Hilfsfunktion: Basis-Kontext für jede Seite ────────
-def ctx(request: Request, page_id: str, **extra) -> dict:
-    """
-    Liefert den Kontext, den base.html, nav.html und footer.html brauchen.
-    Seitenspezifische Daten als **extra übergeben.
-    """
+def ctx(request: Request, page_id: str, lang: str = "en", **extra) -> dict:
+    """lang direkt hier verarbeiten — get_nav_context() wird überflüssig."""
+    if lang not in ("en", "de"):
+        lang = "en"
+
+    translated_pages = [
+        {**p, "label": p["label"][lang]}
+        for p in NAV_PAGES
+    ]
+
     return {
-        "request":      request,
-        "nav_pages":    NAV_PAGES,
-        "current_page": page_id,
-        "current_year": datetime.now().year,
-        "api_url":      "http://localhost:8000",
+        "request":       request,
+        "nav_pages":     translated_pages,   # ← direkt übersetzt
+        "current_page":  page_id,
+        "current_year":  datetime.now().year,
+        "api_url":       "http://localhost:8000",
+        "lang":          lang,
+        # analysis.html erwartet `leaflet_translations` (wird im JS geparst)
+        "leaflet_translations": LEAFLET_DRAW_TRANSLATIONS.get(lang, {}),
         **extra,
     }
 
@@ -184,35 +192,33 @@ def set_language(lang: str, request: Request):
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/index.html", ctx(
-        request, "home",
+        request, "home", lang,
         stats=HOME_STATS,
         features=HOME_FEATURES,
-        hero_image="Hauptbild.png",      # z.B. "screenshot.png" → static/assets/
-        **get_nav_context("home", lang),
+        hero_image="Hauptbild.png",
+        roadmap=ROADMAP,
+        gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
     ))
 
 @app.get("/analyse", response_class=HTMLResponse)
 async def analysis(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/analysis.html", ctx(
-        request, "analysis",
-        **get_nav_context("analysis", lang),
+        request, "analysis", lang,
     ))
 
-@app.get("/ueber-uns", response_class=HTMLResponse)
-async def about(request: Request, lang: str = Cookie(default="en")):
-    return templates.TemplateResponse("pages/about.html", ctx(
-        request, "about",
+@app.get("/research_background", response_class=HTMLResponse)
+async def research_background(request: Request, lang: str = Cookie(default="en")):
+    return templates.TemplateResponse("pages/research_background.html", ctx(
+        request, "research_background", lang,
         roadmap=ROADMAP,
         team=TEAM_MEMBERS,
         gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
-        **get_nav_context("about", lang),
     ))
 
 @app.get("/how_to", response_class=HTMLResponse)
 async def how_to(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/how_to.html", ctx(
-        request, "how_to",
-        **get_nav_context("how_to", lang), 
+        request, "how_to", lang,
         # seitenspezifische Daten hier:
         # my_data=MY_DATA,
     ))
@@ -221,8 +227,7 @@ async def how_to(request: Request, lang: str = Cookie(default="en")):
 @app.get("/personal_dashboard", response_class=HTMLResponse)
 async def pers_dash(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
-        request, "pers_dash",
-        **get_nav_context("pers_dash", lang),
+        request, "pers_dash", lang,
         # seitenspezifische Daten hier:
         # my_data=MY_DATA,
     ))
@@ -230,8 +235,7 @@ async def pers_dash(request: Request, lang: str = Cookie(default="en")):
 @app.get("/report", response_class=HTMLResponse)
 async def report(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/report.html", ctx(
-        request, "report",
-        **get_nav_context("report", lang),
+        request, "report", lang,
         # seitenspezifische Daten hier:
         # my_data=MY_DATA,
     ))
@@ -239,8 +243,7 @@ async def report(request: Request, lang: str = Cookie(default="en")):
 @app.get("/users_experience", response_class=HTMLResponse)
 async def users_experience(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/users_experience.html", ctx(
-        request, "users_experience",
-        **get_nav_context("users_experience", lang),
+        request, "users_experience", lang,
         # seitenspezifische Daten hier:
         # my_data=MY_DATA,
     ))

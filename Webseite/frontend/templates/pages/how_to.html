@@ -2,29 +2,237 @@
 
 {% block title %}How to Use{% endblock %}
 
+{% block head_styles %}
+  <link rel="stylesheet" href="/static/css/how_to.css" />
+{% endblock %}
+
 {% block content %}
 <div class="page-content">
 
+  <!-- Hero -->
   <div class="about-hero">
-    <div class="section-eyebrow">Kategorie</div>
-    <h1>How to Use</h1>
-    <p>Kurze Beschreibung dieser Seite.</p>
+    <div class="section-eyebrow">User Guide</div>
+    <h1>How to use <em>AgroScan</em></h1>
+    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil quality zone map.</p>
   </div>
 
-  <section class="about-section">
-    <div class="section-eyebrow">Abschnitt</div>
-    <h2 class="section-title">Überschrift</h2>
+  <!-- Quick Steps Overview -->
+  <section class="about-section" style="padding-top:0;">
+    <div class="section-eyebrow">Overview</div>
+    <h2 class="section-title">Three steps to your zone map</h2>
+    <div class="howto-steps-grid">
 
-    {# Daten aus main.py hier rendern, z.B.: #}
-    {# {% for item in items %}<p>{{ item.name }}</p>{% endfor %} #}
+      <div class="howto-step-card">
+        <div class="howto-step-num">01</div>
+        <div class="howto-step-icon">✏️</div>
+        <h3>Draw your field</h3>
+        <p>Use the polygon tool on the map to outline the boundaries of your agricultural area. Click to set each corner, then close the shape.</p>
+      </div>
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;">
-      Seiteninhalt hier…
-    </p>
+      <div class="howto-step-card">
+        <div class="howto-step-num">02</div>
+        <div class="howto-step-icon">⟶</div>
+        <h3>Start the analysis</h3>
+        <p>Once your polygon is drawn, click <strong>Start analysis</strong> in the sidebar. The ML model will process your field within seconds.</p>
+      </div>
+
+      <div class="howto-step-card">
+        <div class="howto-step-num">03</div>
+        <div class="howto-step-icon">🗺️</div>
+        <h3>Read your zone map</h3>
+        <p>Your field is divided into color-coded zones. Green means high soil quality, yellow is medium, and red indicates areas that may need attention.</p>
+      </div>
+
+    </div>
   </section>
+
+  <!-- Detailed Walkthrough -->
+  <section class="about-section">
+    <div class="section-eyebrow">Step-by-Step</div>
+    <h2 class="section-title">Detailed walkthrough</h2>
+
+    <!-- Step 1 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 1</div>
+        <h3>Navigate to the Analysis page</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Switzerland.</p>
+        <div class="howto-tip">
+          <span class="howto-tip-label">💡 Tip</span>
+          Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 2</div>
+        <h3>Draw your field polygon</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>In the top-left corner of the map you will find the drawing toolbar. Select the <strong>Polygon</strong> tool (the pentagon icon). Then:</p>
+        <ol class="howto-list">
+          <li>Click once on the map to place the first corner of your field.</li>
+          <li>Continue clicking along the field boundary to add more points.</li>
+          <li>Close the polygon by clicking on the first point again, or press <kbd>Finish</kbd> in the toolbar.</li>
+        </ol>
+        <p style="margin-top:16px;">The sidebar will update automatically, showing you the number of vertices and the approximate area of your drawn field.</p>
+        <div class="howto-tip">
+          <span class="howto-tip-label">💡 Tip</span>
+          You do not need to be pixel-perfect. A rough outline of your field is enough for the model to produce a meaningful zone map. You can always edit or delete the polygon and redraw it using the toolbar.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 3</div>
+        <h3>Start the analysis</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>Once a polygon is drawn, the <strong>Start analysis</strong> button in the sidebar becomes active. Click it to send your field data to the backend. A loading indicator will appear while the model runs — this typically takes less than one second.</p>
+        <div class="howto-tip">
+          <span class="howto-tip-label">⚠️ Note</span>
+          The analysis requires an active internet connection to reach the backend API. If the button remains inactive, make sure your polygon is properly closed on the map.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 4</div>
+        <h3>Read your results</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>After the analysis completes, colored zones will appear on top of your drawn polygon. The sidebar also shows a summary with the number of zones analyzed, the average soil quality score, and the highest and lowest zone values.</p>
+        <p style="margin-top:12px;">To start fresh, click the <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- About the ML Model -->
+  <section class="about-section">
+    <div class="section-eyebrow">Under the hood</div>
+    <h2 class="section-title">About the ML model & data</h2>
+
+    <div class="howto-model-grid">
+
+      <div class="howto-model-card">
+        <div class="howto-model-icon">🛰️</div>
+        <h4>Sentinel-1 & Sentinel-2</h4>
+        <p>The model is powered by satellite imagery from the European Space Agency's Copernicus programme. Sentinel-1 provides radar backscatter data (independent of cloud cover), while Sentinel-2 delivers high-resolution optical imagery including NDVI, NDWI, and other vegetation indices.</p>
+      </div>
+
+      <div class="howto-model-card">
+        <div class="howto-model-icon">📅</div>
+        <h4>Data freshness</h4>
+        <p>Sentinel satellites revisit the same location every 5–6 days. In the worst case, the satellite data used for your analysis may therefore be up to <strong>5–6 days old</strong>. For most soil quality assessments this is well within an acceptable margin, but keep this in mind if you recently performed field operations such as irrigation or tilling.</p>
+      </div>
+
+      <div class="howto-model-card">
+        <div class="howto-model-icon">🧠</div>
+        <h4>Model output</h4>
+        <p>The model produces a score between <strong>0.0</strong> and <strong>1.0</strong> for each grid cell inside your polygon. These scores represent relative soil quality based on spectral reflectance, vegetation density, and moisture content indicators derived from the satellite data.</p>
+      </div>
+
+      <div class="howto-model-card">
+        <div class="howto-model-icon">±</div>
+        <h4>Accuracy & noise</h4>
+        <p>The current model includes approximately <strong>±5% random noise</strong> as part of the placeholder implementation. The production model will replace this with a trained classifier. Zone boundaries should be treated as estimates, not precise surveying data.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Reading the Results -->
+  <section class="about-section">
+    <div class="section-eyebrow">Interpreting results</div>
+    <h2 class="section-title">How to read the zone map</h2>
+
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
+      The zone map divides your field into a regular grid of cells. Each cell is assigned a soil quality score and colored accordingly. The following guide explains what each color range means in practice and how you can act on the results.
+    </p>
+
+    <div class="howto-legend-block">
+
+      <div class="howto-legend-row">
+        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#22c55e,#4ade80);"></div>
+        <div>
+          <div class="howto-legend-label">High quality — Score 0.66 to 1.0</div>
+          <p>These zones show strong indicators of healthy soil conditions: good moisture retention, dense and active vegetation cover, and favorable spectral reflectance patterns. Fields or sub-areas in this range are performing well and generally require no immediate intervention. [Placeholder — detailed agronomic interpretation to be added by the project team.]</p>
+        </div>
+      </div>
+
+      <div class="howto-legend-row">
+        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#f59e0b,#facc15);"></div>
+        <div>
+          <div class="howto-legend-label">Medium quality — Score 0.33 to 0.66</div>
+          <p>These zones are within an acceptable range but show some variability. Possible causes include uneven irrigation, localized compaction, or transitional vegetation states. Monitoring these areas over successive analyses can help identify whether quality is improving or declining. [Placeholder — to be refined with field-specific thresholds.]</p>
+        </div>
+      </div>
+
+      <div class="howto-legend-row" style="border-bottom:none;">
+        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#ef4444,#f87171);"></div>
+        <div>
+          <div class="howto-legend-label">Low quality — Score 0.0 to 0.33</div>
+          <p>These zones flag areas that may require attention. Low scores can indicate moisture stress, bare soil, erosion risk, or compacted layers. This does not replace a physical soil assessment, but can help you prioritize which areas of a large field to investigate first. [Placeholder — actionable recommendations to be added.]</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="howto-tip" style="margin-top:40px;">
+      <span class="howto-tip-label">📌 Important</span>
+      The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
+    </div>
+
+  
+
+  </section>
+
+  <!-- FAQ -->
+  <section class="about-section">
+    <div class="section-eyebrow">FAQ</div>
+    <h2 class="section-title">Common questions</h2>
+
+    <div class="howto-faq">
+
+      <div class="howto-faq-item">
+        <div class="howto-faq-q">Can I analyze multiple fields in one session?</div>
+        <p>Currently, one polygon can be active on the map at a time. Use the Reset button to clear the current polygon and draw a new one for a different field. Multi-polygon support is planned for a future release.</p>
+      </div>
+
+      <div class="howto-faq-item">
+        <div class="howto-faq-q">How large can my polygon be?</div>
+        <p>There is no hard size limit, but very large areas (several hundred hectares) will result in a larger number of grid cells and a slightly longer analysis time. For best results, analyze individual fields or management zones separately.</p>
+      </div>
+
+      <div class="howto-faq-item">
+        <div class="howto-faq-q">Why does the result look the same every time?</div>
+        <p>The current backend uses a placeholder model with synthetic data. Once the real Sentinel-based ML model is integrated, results will reflect actual satellite observations and will differ depending on location, season, and field conditions.</p>
+      </div>
+
+      <div class="howto-faq-item" style="border-bottom:none;">
+        <div class="howto-faq-q">Can I export the results?</div>
+        <p>Export functionality (GeoJSON, CSV) is on the roadmap for v0.3. For now, you can take a screenshot of the zone map or note the summary statistics shown in the sidebar.</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="home-cta">
+    <h2>Ready to analyze your field?</h2>
+    <p>Head to the Analysis page and draw your first polygon — results in under a second.</p>
+    <a class="btn-primary" href="/analyse">⟶ Go to Analysis</a>
+  </div>
 
 </div>
 {% endblock %}
 
-{# Nur nötig wenn die Seite eigenes JS braucht: #}
-{# {% block scripts %}<script src="/static/js/meinscript.js"></script>{% endblock %} #}

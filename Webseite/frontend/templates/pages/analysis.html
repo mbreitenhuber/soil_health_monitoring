@@ -13,67 +13,90 @@
 {% endblock %}
 
 {% block content %}
+{% set t = {
+  "instructions": ("Instructions" if lang == "en" else "Anleitung"),
+  "step1": ("Draw your agricultural field on the map (use the Polygon tool)" if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte (Polygon-Werkzeug)"),
+  "step2": ("Check the detected vertices and area" if lang == "en" else "Prüfe die erkannten Eckpunkte und die Fläche"),
+  "step3": ("Start the analysis — the ML model calculates the zone map" if lang == "en" else "Starte die Analyse — das ML-Modell berechnet die Zonenkarte"),
+  "area": ("Area" if lang == "en" else "Fläche"),
+  "vertices": ("Vertices" if lang == "en" else "Eckpunkte"),
+  "area_approx": ("Area (approx.)" if lang == "en" else "Fläche (ca.)"),
+  "status": ("Status" if lang == "en" else "Status"),
+  "no_polygon": ("No Polygon" if lang == "en" else "Kein Polygon"),
+  "start_analysis": ("Start analysis" if lang == "en" else "Analyse starten"),
+  "calculating": ("The model is calculating…" if lang == "en" else "Das Modell berechnet…"),
+  "reset": ("Reset" if lang == "en" else "Zurücksetzen"),
+  "result": ("Result" if lang == "en" else "Ergebnis"),
+  "zones_analyzed": ("Zones analyzed" if lang == "en" else "Analysierte Zonen"),
+  "avg_soil_quality": ("Average Soil Quality" if lang == "en" else "Durchschnittliche Bodenqualität"),
+  "highest_zone": ("Highest Zone" if lang == "en" else "Beste Zone"),
+  "lowest_zone": ("Lowest Zone" if lang == "en" else "Schlechteste Zone"),
+  "legend_title": ("Legend – Soil Quality" if lang == "en" else "Legende – Bodenqualität"),
+  "high": ("High" if lang == "en" else "Hoch"),
+  "medium": ("Medium" if lang == "en" else "Mittel"),
+  "low": ("Low" if lang == "en" else "Niedrig")
+} %}
 <div class="app-layout">
 
   <aside class="sidebar">
 
     <div>
-      <div class="section-label">Anleitung</div>
+      <div class="section-label">{{ t.instructions }}</div>
       <div class="steps">
         <div class="step active" id="step-1">
           <div class="step-num">1</div>
-          <div class="step-text">Zeichne deine Landwirtschaftsfläche auf der Karte (Polygon-Tool nutzen)</div>
+          <div class="step-text">{{ t.step1 }}</div>
         </div>
         <div class="step" id="step-2">
           <div class="step-num">2</div>
-          <div class="step-text">Prüfe die erkannten Eckpunkte und Fläche</div>
+          <div class="step-text">{{ t.step2 }}</div>
         </div>
         <div class="step" id="step-3">
           <div class="step-num">3</div>
-          <div class="step-text">Starte die Analyse — das ML-Modell berechnet die Zonenkarte</div>
+          <div class="step-text">{{ t.step3 }}</div>
         </div>
       </div>
     </div>
 
     <div>
-      <div class="section-label">Fläche</div>
+      <div class="section-label">{{ t.area }}</div>
       <div class="poly-info">
-        <div class="poly-stat"><span>Eckpunkte</span><span class="val" id="stat-points">–</span></div>
-        <div class="poly-stat"><span>Fläche (ca.)</span><span class="val" id="stat-area">–</span></div>
-        <div class="poly-stat"><span>Status</span><span class="val" id="stat-status">Kein Polygon</span></div>
+        <div class="poly-stat"><span>{{ t.vertices }}</span><span class="val" id="stat-points">–</span></div>
+        <div class="poly-stat"><span>{{ t.area_approx }}</span><span class="val" id="stat-area">–</span></div>
+        <div class="poly-stat"><span>{{ t.status }}</span><span class="val" id="stat-status">{{ t.no_polygon }}</span></div>
       </div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="btn-analyse" id="btn-analyse" disabled>⟶ Analyse starten</button>
-      <div class="loader" id="loader"><div class="spinner"></div><span>Modell rechnet…</span></div>
-      <button class="btn-reset" id="btn-reset">Zurücksetzen</button>
+      <button class="btn-analyse" id="btn-analyse" disabled>⟶ {{ t.start_analysis }}</button>
+      <div class="loader" id="loader"><div class="spinner"></div><span>{{ t.calculating }}</span></div>
+      <button class="btn-reset" id="btn-reset">{{ t.reset }}</button>
     </div>
 
     <div>
-      <div class="section-label">Ergebnis</div>
+      <div class="section-label">{{ t.result }}</div>
       <div class="result-box" id="result-box">
-        <div class="result-row"><span>Zonen analysiert</span><span class="val" id="res-zones">–</span></div>
-        <div class="result-row"><span>Ø Bodenqualität</span> <span class="val" id="res-avg">–</span></div>
-        <div class="result-row"><span>Höchste Zone</span>    <span class="val" id="res-max">–</span></div>
-        <div class="result-row"><span>Niedrigste Zone</span> <span class="val" id="res-min">–</span></div>
+        <div class="result-row"><span>{{ t.zones_analyzed }}</span><span class="val" id="res-zones">–</span></div>
+        <div class="result-row"><span>{{ t.avg_soil_quality }}</span> <span class="val" id="res-avg">–</span></div>
+        <div class="result-row"><span>{{ t.highest_zone }}</span>    <span class="val" id="res-max">–</span></div>
+        <div class="result-row"><span>{{ t.lowest_zone }}</span> <span class="val" id="res-min">–</span></div>
       </div>
     </div>
 
     <div>
-      <div class="section-label">Legende – Bodenqualität</div>
+      <div class="section-label">{{ t.legend_title }}</div>
       <div class="legend">
         <div class="legend-item">
           <div class="legend-swatch" style="background:linear-gradient(to right,#22c55e,#4ade80);"></div>
-          <span>Hoch (0.66 – 1.0)</span>
+          <span>{{ t.high }} (0.66 – 1.0)</span>
         </div>
         <div class="legend-item">
           <div class="legend-swatch" style="background:linear-gradient(to right,#f59e0b,#facc15);"></div>
-          <span>Mittel (0.33 – 0.66)</span>
+          <span>{{ t.medium }} (0.33 – 0.66)</span>
         </div>
         <div class="legend-item">
           <div class="legend-swatch" style="background:linear-gradient(to right,#ef4444,#f87171);"></div>
-          <span>Niedrig (0.0 – 0.33)</span>
+          <span>{{ t.low }} (0.0 – 0.33)</span>
         </div>
       </div>
     </div>
