@@ -47,7 +47,7 @@
   </div>
 </nav>
 
-<script>
+<script> 
 function toggleDropdown(id) {
   document.querySelectorAll('.nav-dropdown').forEach(d => {
     if (d.id !== id) d.classList.remove('open');
@@ -58,24 +58,4 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.nav-dropdown'))
     document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
 });
-</script>
-
-<script>
-  console.log("Nav JS geladen");
-  
-  function toggleDropdown(id) {
-    console.log("toggleDropdown aufgerufen:", id);
-    const el = document.getElementById(id);
-    console.log("Element gefunden:", el);
-    document.querySelectorAll('.nav-dropdown').forEach(d => {
-      if (d.id !== id) d.classList.remove('open');
-    });
-    el.classList.toggle('open');
-    console.log("Klassen nach toggle:", el.className);
-  }
-
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.nav-dropdown'))
-      document.querySelectorAll('.nav-dropdown').forEach(d => d.classList.remove('open'));
-  });
-</script>
+</script> 

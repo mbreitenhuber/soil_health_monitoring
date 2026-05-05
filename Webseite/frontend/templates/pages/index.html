@@ -53,8 +53,8 @@
       {% for f in features %}
         <div class="feature-card">
           <div class="feature-icon">{{ f.icon }}</div>
-          <div class="feature-name">{{ f.name }}</div>
-          <div class="feature-desc">{{ f.desc }}</div>
+          <div class="feature-name">{{ f.name[lang] if f.name is mapping and lang in f.name else f.name }}</div>
+          <div class="feature-desc">{{ f.desc[lang] if f.desc is mapping and lang in f.desc else f.desc }}</div>
         </div>
       {% endfor %}
     </div>
@@ -81,18 +81,80 @@
       <h3>Plug in your own model</h3>
       <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
       <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-      <a class="btn-outline" href="/ueber-uns">About the project →</a>
+      <a class="btn-outline" href="/research_background">Learn more about the project →</a>
     </div>
     <div class="img-placeholder" style="aspect-ratio:4/3;border-radius:10px;">
       <div class="icon">🤖</div><div>Image: Model visualization</div>
     </div>
   </section>
 
+  <!-- Users Experience -->
+  <section class="about-section" style="border-top:1px solid var(--border);">
+    <div class="section-eyebrow">Social proof</div>
+    <h2 class="section-title">Trusted by users in the field</h2>
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:720px;">
+      Read three short (placeholder) reviews from different types of farms and see how AgroScan helped them
+      move from intuition to clearer, data-supported decisions.
+    </p>
+    <div style="margin-top:18px;">
+      <a class="btn-primary" href="/users_experience">⟶ Read user experiences</a>
+    </div>
+  </section>
+
+ <!-- Roadmap — Daten kommen aus ROADMAP in main.py -->
+  <section class="about-section">
+    <div class="section-eyebrow">Development</div>
+      <h2 class="section-title">Roadmap</h2>
+      <div class="timeline">
+        {% for item in roadmap %}
+        <div class="tl-item">
+          <div class="tl-dot {% if not item.done %}tl-dot--future{% endif %}"></div>
+            <div>
+              <div class="tl-year {% if not item.done %}tl-year--future{% endif %}">
+                {{ item.version }}
+              </div>
+            <div class="tl-content">
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.desc }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Galerie -->
+  <section class="about-section">
+    <div class="section-eyebrow">The Project</div>
+    <h2 class="section-title">Pictures & Impressions</h2>
+    <div class="img-gallery">
+      {% if gallery_images %}
+        {% for img in gallery_images %}
+          <img src="/static/assets/{{ img.file }}" alt="{{ img.alt }}"
+               style="border-radius:10px;width:100%;object-fit:cover;" />
+        {% endfor %}
+      {% else %}
+        <div class="img-placeholder" style="aspect-ratio:16/9;border-radius:10px;">
+          <div class="icon">🌾</div>
+          <div>Photo — gallery_images in main.py setzen</div>
+        </div>
+        <div class="img-gallery-right">
+          <div class="img-placeholder" style="flex:1;border-radius:10px;min-height:120px;">
+            <div class="icon">🛰️</div><div style="font-size:0.72rem;">Satellite image</div>
+          </div>
+          <div class="img-placeholder" style="flex:1;border-radius:10px;min-height:120px;">
+            <div class="icon">📊</div><div style="font-size:0.72rem;">Result chart</div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
   <!-- CTA -->
   <div class="home-cta">
-    <h2>Bereit für smarte Flächenanalyse?</h2>
-    <p>Starte das Backend, öffne die Karte und zeichne dein erstes Polygon.</p>
-    <a class="btn-primary" href="/analyse">⟶ Zur Analyse</a>
+    <h2>Ready for smart field analysis?</h2>
+    <p>Go to the analysis page and draw your first polygon.</p>
+    <a class="btn-primary" href="/analyse">⟶ Start analysis</a>
   </div>
 
 </div>
