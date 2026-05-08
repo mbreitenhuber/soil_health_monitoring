@@ -6,12 +6,19 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import pandas as pd
+from dotenv import load_dotenv
+
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
 
 
 def main():
     # ----- CONFIGURATION -----
-    input_csv = Path(os.environ["DATASET_PATH"]) / "Model_A+.csv"
-    histogram_folder = Path(os.environ["DATASET_PATH"]) / "Histograms_A+"
+    #input_csv = Path(os.environ["DATASET_PATH"]) / "Model_A+.csv"
+    #histogram_folder = Path(os.environ["DATASET_PATH"]) / "Histograms_A+"
+    dataset_path = Path(os.environ["DATASET_PATH"])
+    input_csv = dataset_path / "LUCAS_SOIL_processed.csv"
+    histogram_folder = dataset_path / "Histograms_A+"
 
     # Create the histogram folder if it doesn't already exist
     if not os.path.exists(histogram_folder):
