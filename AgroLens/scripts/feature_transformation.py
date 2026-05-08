@@ -8,13 +8,20 @@ import pandas as pd
 
 # Read Sentinel-2 bands from CSV (project-relative by default).
 project_root = Path(__file__).resolve().parents[2]
-sentinel_bands_path = Path(
-    os.environ.get("SENTINEL_BANDS_PATH", project_root / "data" / "sentinel_bands.csv")
+model_path = Path(
+    os.environ.get("MODEL_PATH", project_root / "data" / "datasets" / "Model_A_norm.csv")
 )
-if not sentinel_bands_path.is_file():
-    raise FileNotFoundError(f"Sentinel bands file not found: {sentinel_bands_path}")
+if not model_path.is_file():
+    raise FileNotFoundError(f"Model file not found: {model_path}")
 
-sentinel2 = pd.read_csv(sentinel_bands_path)
+output_path = Path(
+    os.environ.get(
+        "MODEL_TRANSFORMED_PATH",
+        project_root / "data" / "datasets" / "Model_A_norm_trans.csv",
+    )
+)
+
+sentinel2 = pd.read_csv(model_path)
 
 # Dataset structure:
 ## at each location a 9x9 pixel was evaluated for 10 bands, values were flattened & normalized s.t. for each Band 81 values exist
@@ -28,7 +35,7 @@ sentinel2 = pd.read_csv(sentinel_bands_path)
 # **B11, B12 (Short-Wave Infrared - SWIR):** Great for detecting moisture in plants/soil and distinguishing between snow, ice, and clouds. (20 m res)
 
 # Remove unnecessary columns
-specified_columns = ['POINTID', 'NUTS_0', 'NUTS_1', 'NUTS_2', 'NUTS_3', 'TH_LAT', 'TH_LONG', 'SURVEY_DATE', 'Elev', 'LC', 'LU', 'LC1_Desc', 'LU1_Desc']  # Adjust as needed
+specified_columns = ['POINTID', 'OC', 'NUTS_0', 'NUTS_1', 'NUTS_2', 'NUTS_3', 'TH_LAT', 'TH_LONG', 'SURVEY_DATE', 'LC', 'LU', 'LC1_Desc', 'LU1_Desc']  # Adjust as needed
 normalized_columns = [col for col in sentinel2.columns if col.endswith('_normalized')]
 columns_to_keep = specified_columns + normalized_columns
 sentinel2 = sentinel2[columns_to_keep]
@@ -46,21 +53,26 @@ sentinel2 = sentinel2[columns_to_keep]
 # Redness index (RI): (RED^2) / (GREEN^3) = (B4^2)/B3^3)
 # Color index (CI): (RED-GREEN)/(RED+GREEN)
 
-# Extract sample numbers from B08 columns to make it flexible
-b08_columns = [col for col in sentinel2.columns if col.startswith('B08_') and col.endswith('_normalized')]
-sample_numbers = [col.split('_')[1] for col in b08_columns]
+# Extract sample numbers from B08 columns to make it flexible.
+band_prefix = 'norm_' if any(col.startswith('norm_B08_') for col in sentinel2.columns) else ''
+b08_columns = [
+    col for col in sentinel2.columns if col.startswith(f'{band_prefix}B08_') and col.endswith('_normalized')
+]
+if not b08_columns:
+    raise ValueError('No B08 normalized columns found in the input file.')
+sample_numbers = [col.split('_')[2] if band_prefix else col.split('_')[1] for col in b08_columns]
 
 # Question: When to normalize the features? Before or after feature transformation? Re-normalize results of trans?
 
 # Create feature columns for each sample
 for sample in sample_numbers:
     L = 0.5 # soil brightness factor for most conditions, double-check where it applies
-    b03_col = f'B03_{sample}_normalized'
-    b04_col = f'B04_{sample}_normalized'
-    b05_col = f'B05_{sample}_normalized'
-    b06_col = f'B06_{sample}_normalized'
-    b07_col = f'B07_{sample}_normalized'
-    b08_col = f'B08_{sample}_normalized'
+    b03_col = f'{band_prefix}B03_{sample}_normalized'
+    b04_col = f'{band_prefix}B04_{sample}_normalized'
+    b05_col = f'{band_prefix}B05_{sample}_normalized'
+    b06_col = f'{band_prefix}B06_{sample}_normalized'
+    b07_col = f'{band_prefix}B07_{sample}_normalized'
+    b08_col = f'{band_prefix}B08_{sample}_normalized'
     rvi_col = f'RVI_{sample}'
     ndvi_col = f'NDVI_{sample}'
     gndvi_col = f'GNDVI_{sample}'
@@ -72,12 +84,31 @@ for sample in sample_numbers:
     bi2_col = f'BI2_{sample}'
     ri_col = f'RI_{sample}'
     ci_col = f'CI_{sample}'
-    sentinel2[rvi_col] = sentinel2[b08_col] / sentinel2[b04_col]
-    sentinel2[ndvi_col] = (sentinel2[b08_col]-sentinel2[b04_col])/(sentinel2[b08_col]+sentinel2[b04_col])
-    sentinel2[gndvi_col] = (sentinel2[b08_col]-sentinel2[b03_col])/(sentinel2[b08_col]+sentinel2[b03_col])
-    sentinel2[ndvi45_col] = (sentinel2[b05_col] - sentinel2[b04_col]) / (sentinel2[b05_col] + sentinel2[b04_col])
-    sentinel2[savi_col] = (sentinel2[b08_col]-sentinel2[b04_col])/(sentinel2[b08_col]+sentinel2[b04_col]+L)*(1+L)
-    sentinel2[ireci_col] = (sentinel2[b07_col]-sentinel2[b04_col])/(sentinel2[b05_col]/sentinel2[b06_col])
+    # Safe division: replace inf/nan with 0
+    eps = 1e-8  # Small epsilon to avoid division by zero
+    sentinel2[rvi_col] = np.where(np.abs(sentinel2[b04_col]) > eps, sentinel2[b08_col] / sentinel2[b04_col], 0)
+    sentinel2[ndvi_col] = np.where(np.abs(sentinel2[b08_col]+sentinel2[b04_col]) > eps, (sentinel2[b08_col]-sentinel2[b04_col])/(sentinel2[b08_col]+sentinel2[b04_col]), 0)
+    sentinel2[gndvi_col] = np.where(np.abs(sentinel2[b08_col]+sentinel2[b03_col]) > eps, (sentinel2[b08_col]-sentinel2[b03_col])/(sentinel2[b08_col]+sentinel2[b03_col]), 0)
+    sentinel2[ndvi45_col] = np.where(np.abs(sentinel2[b05_col] + sentinel2[b04_col]) > eps, (sentinel2[b05_col] - sentinel2[b04_col]) / (sentinel2[b05_col] + sentinel2[b04_col]), 0)
+    sentinel2[savi_col] = np.where(np.abs(sentinel2[b08_col]+sentinel2[b04_col]+L) > eps, (sentinel2[b08_col]-sentinel2[b04_col])/(sentinel2[b08_col]+sentinel2[b04_col]+L)*(1+L), 0)
+    sentinel2[ireci_col] = np.where((np.abs(sentinel2[b05_col]/sentinel2[b06_col]) > eps) & (np.abs(sentinel2[b05_col]) > eps), (sentinel2[b07_col]-sentinel2[b04_col])/(sentinel2[b05_col]/sentinel2[b06_col]), 0)
     sentinel2[bi2_col] = (np.sqrt(((sentinel2[b04_col]**2)+(sentinel2[b03_col]**2)+(sentinel2[b08_col]**2))/2))
-    sentinel2[ri_col] = (sentinel2[b04_col]**2)/(sentinel2[b03_col]**3)
-    sentinel2[ci_col] = (sentinel2[b04_col]-sentinel2[b03_col])/(sentinel2[b04_col]+sentinel2[b03_col])
+    sentinel2[ri_col] = np.where(np.abs(sentinel2[b03_col]**3) > eps, (sentinel2[b04_col]**2)/(sentinel2[b03_col]**3), 0)
+    sentinel2[ci_col] = np.where(np.abs(sentinel2[b04_col]+sentinel2[b03_col]) > eps, (sentinel2[b04_col]-sentinel2[b03_col])/(sentinel2[b04_col]+sentinel2[b03_col]), 0)
+    
+    # Replace any remaining inf/nan values with 0
+    sentinel2[rvi_col] = sentinel2[rvi_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[ndvi_col] = sentinel2[ndvi_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[gndvi_col] = sentinel2[gndvi_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[ndvi45_col] = sentinel2[ndvi45_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[savi_col] = sentinel2[savi_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[ireci_col] = sentinel2[ireci_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[bi2_col] = sentinel2[bi2_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[ri_col] = sentinel2[ri_col].replace([np.inf, -np.inf], 0).fillna(0)
+    sentinel2[ci_col] = sentinel2[ci_col].replace([np.inf, -np.inf], 0).fillna(0)
+
+# Remove '_normalized' suffix from column names for cleaner output
+sentinel2.rename(columns=lambda col: col.replace('_normalized', '') if col.endswith('_normalized') else col, inplace=True)
+
+output_path.parent.mkdir(parents=True, exist_ok=True)
+sentinel2.to_csv(output_path, index=False)
