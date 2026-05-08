@@ -72,9 +72,25 @@
     </div>
 
     <div style="display:flex;flex-direction:column;gap:10px;">
-      <button class="btn-analyse" id="btn-analyse" disabled>⟶ {{ t.start_analysis }}</button>
-      <div class="loader" id="loader"><div class="spinner"></div><span>{{ t.calculating }}</span></div>
+
+      <!-- DATE SELECTOR -->
+      <div class="analysis-date-box">
+        <label for="analysis-date">Analyse Datum</label>
+        <input type="date" id="analysis-date">
+      </div>
+
+      <!-- ANALYSE BUTTON -->
+      <button class="btn-analyse" id="btn-analyse" disabled>
+        ⟶ {{ t.start_analysis }}
+      </button>
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span>{{ t.calculating }}</span>
+      </div>
+
       <button class="btn-reset" id="btn-reset">{{ t.reset }}</button>
+
     </div>
 
     <div>
