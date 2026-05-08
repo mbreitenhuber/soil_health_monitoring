@@ -148,6 +148,18 @@ map.on('draw:editstart', () => {
 
 let currentPolygon = null;
 
+const savePopup = document.getElementById("save-popup");
+
+const btnSaveDashboard = document.getElementById("btn-save-dashboard");
+
+const closeSavePopupBtn = document.getElementById("close-save-popup");
+
+const confirmDashboardSaveBtn = document.getElementById("confirm-dashboard-save");
+
+const dashboardCropSelect = document.getElementById("dashboard-crop");
+
+const dashboardCustomCrop = document.getElementById("dashboard-custom-crop");
+
 // =====================
 // HELPERS
 // =====================
@@ -262,6 +274,7 @@ map.on(L.Draw.Event.CREATED, e => {
   resultLayer.clearLayers();
 
   document.getElementById("result-box").classList.remove("visible");
+  document.getElementById("btn-save-dashboard").style.display = "block";
 
   drawnItems.addLayer(e.layer);
   currentPolygon = e.layer.getLatLngs()[0];
@@ -296,6 +309,7 @@ map.on(L.Draw.Event.DELETED, () => {
   document.getElementById("result-box").classList.remove("visible");
 
   setStep(1);
+
 });
 
 // =====================
@@ -311,6 +325,8 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
 
   resultLayer.clearLayers();
   setStep(3);
+
+  document.getElementById("steps-container").classList.add("hidden");
 
   try {
     const res = await fetch(`${API_URL}/api/predict`, {
@@ -378,6 +394,8 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     document.getElementById("res-min").textContent = (Math.min(...values) * 100).toFixed(1) + "%";
 
     document.getElementById("result-box").classList.add("visible");
+    btnSaveDashboard.classList.add("visible");
+    document.getElementById("btn-save-dashboard").style.display = "block";
 
   } catch (err) {
     alert("Backend nicht erreichbar:\n" + err.message);
@@ -407,12 +425,95 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   document.getElementById("stat-status").textContent = "Kein Polygon";
   document.getElementById("btn-analyse").disabled = true;
   document.getElementById("result-box").classList.remove("visible");
+  document.getElementById("btn-save-dashboard").style.display = "none";
+
+  closeSavePopup();
+
+  btnSaveDashboard.classList.remove("visible");
 
   switchToFieldMode();
   setStep(1);
 
+  document.getElementById("steps-container").classList.remove("hidden");
+  document.getElementById("btn-save-dashboard").style.display = "none";
+
   const dateInput = document.getElementById("analysis-date");
   if (dateInput) {
     dateInput.valueAsDate = new Date();
+  }
+});
+
+// =====================
+// Safe to personal dashboard
+// =====================
+
+document.getElementById("btn-save-dashboard").addEventListener("click", () => {
+  if (!currentPolygon) return;
+
+  const data = {
+    date: document.getElementById("analysis-date").value,
+    polygon: currentPolygon,
+    stats: {
+      zones: document.getElementById("res-zones").textContent,
+      avg: document.getElementById("res-avg").textContent,
+      max: document.getElementById("res-max").textContent,
+      min: document.getElementById("res-min").textContent
+    },
+    timestamp: new Date().toISOString()
+  };
+
+  let existing = JSON.parse(localStorage.getItem("dashboard_analyses")) || [];
+  existing.push(data);
+  localStorage.setItem("dashboard_analyses", JSON.stringify(existing));
+
+  alert("Saved to dashboard ✔");
+});
+
+// =====================
+// SAVE POPUP
+// =====================
+
+function openSavePopup() {
+  savePopup.classList.add("visible");
+}
+
+function closeSavePopup() {
+  savePopup.classList.remove("visible");
+}
+
+btnSaveDashboard.addEventListener("click", () => {
+  openSavePopup();
+});
+
+closeSavePopupBtn.addEventListener("click", () => {
+  closeSavePopup();
+});
+
+// Close on background click
+savePopup.addEventListener("click", (e) => {
+  if (e.target === savePopup) {
+    closeSavePopup();
+  }
+});
+
+// =====================
+// CUSTOM CROP
+// =====================
+
+dashboardCropSelect.addEventListener("change", () => {
+
+  if (dashboardCropSelect.value === "custom") {
+    dashboardCustomCrop.style.display = "block";
+  } else {
+    dashboardCustomCrop.style.display = "none";
+    dashboardCustomCrop.value = "";
+  }
+
+});
+
+// ESC close
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeSavePopup();
   }
 });
