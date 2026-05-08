@@ -44,3 +44,53 @@
 .leaflet-control-geocoder-form input {font-size: 14px; padding: 6px 10px;}
 .pulse-marker { animation: pulse 1.4s infinite;}
 @keyframes pulse {0% { transform: scale(1); opacity: 1;} 50% {transform: scale(1.2); opacity: 0.6;} 100% {transform: scale(1); opacity: 1;}}
+
+/* ===================== */
+/* ANALYSIS DATE BOX */
+/* ===================== */
+
+.analysis-date-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analysis-date-box label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-dim);
+}
+
+/* Input selbst im System-Stil */
+.analysis-date-box input[type="date"] {
+  background: transparent;
+  border: none;
+
+  color: var(--text);
+  font-size: 0.8rem;
+
+  padding: 6px 0;
+  outline: none;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Kalender Icon anpassen */
+.analysis-date-box input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.analysis-date-box input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+.analysis-date-box:hover {
+  border-color: var(--accent);
+}

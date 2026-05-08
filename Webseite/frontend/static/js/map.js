@@ -6,6 +6,17 @@ const map = L.map("map", {
   markerZoomAnimation: true
 }).setView([51.1657, 10.4515], 7);
 
+document.addEventListener("DOMContentLoaded", () => {
+  const dateInput = document.getElementById("analysis-date");
+  if (dateInput) {
+    const today = new Date();
+    dateInput.valueAsDate = today;
+
+    // ❗ no future dates allowed
+    dateInput.max = today.toISOString().split("T")[0];
+  }
+});
+
 let analysisMode = false;
 let searchMarker = null;
 
@@ -271,7 +282,7 @@ map.on(L.Draw.Event.EDITED, () => {
 
 map.on(L.Draw.Event.DELETED, () => {
   switchToFieldMode();
-  
+
   currentPolygon = null;
 
   ["stat-points", "stat-area"].forEach(id =>
@@ -306,7 +317,8 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        polygon: currentPolygon.map(p => ({ lat: p.lat, lng: p.lng }))
+        polygon: currentPolygon.map(p => ({ lat: p.lat, lng: p.lng })),
+        analysis_date: document.getElementById("analysis-date").value
       })
     });
 
@@ -398,4 +410,9 @@ document.getElementById("btn-reset").addEventListener("click", () => {
 
   switchToFieldMode();
   setStep(1);
+
+  const dateInput = document.getElementById("analysis-date");
+  if (dateInput) {
+    dateInput.valueAsDate = new Date();
+  }
 });
