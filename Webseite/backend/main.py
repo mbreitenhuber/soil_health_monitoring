@@ -25,6 +25,11 @@ from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 import numpy as np
 import random
+import math
+
+import pandas as pd
+from shapely.geometry import Point, Polygon
+from pyproj import CRS, Transformer
 
 # ── Pfade ──────────────────────────────────────────────
 ROOT         = Path(__file__).parent.parent          # → agroscan/
@@ -95,15 +100,15 @@ HOME_FEATURES = [
     {"icon": "✏️", "name": {"en": "Polygon Drawing", "de": "Polygon-Zeichnung"},
      "desc": {"en": "Draw arbitrarily shaped areas directly on the map — no CAD software needed.", "de": "Zeichne beliebig geformte Flächen direkt auf der Karte — keine CAD-Software nötig."}},
     {"icon": "🧠", "name": {"en": "ML Zone Map", "de": "ML-Zonenkarte"},
-     "desc": {"en": "The backend divides your area into cells and provides a prediction value (0–1) for each zone.", "de": "Das Backend teilt deine Fläche in Zellen auf und liefert für jede Zone einen Vorhersagewert (0–1)."}},
+     "desc": {"en": "The backend divides your area into cells of 60m x 60m and provides a prediction value (0–1) for each zone.", "de": "Das Backend teilt deine Fläche in Zellen von 60m x 60m auf und liefert für jede Zone einen Vorhersagewert (0–1)."}},
     {"icon": "🎨", "name": {"en": "Color-Coded Map", "de": "Farbkodierte Karte"},
      "desc": {"en": "Green = high quality, yellow = medium, red = low — clearly recognizable at a glance.", "de": "Grün = hohe Qualität, Gelb = mittel, Rot = niedrig — auf einen Blick erkennbar."}},
     #{"icon": "🔌", "name": {"en": "Custom Model", "de": "Eigenes Modell"},
     # "desc": {"en": "Replace run_model() in the backend with your scikit-learn / PyTorch model.", "de": "Ersetze run_model() im Backend mit deinem scikit-learn / PyTorch Modell."}},
     #{"icon": "☁️", "name": {"en": "Cloud-Ready", "de": "Cloud-bereit"},
     # "desc": {"en": "Backend on Render, Frontend on Netlify — free, live in under 10 minutes.", "de": "Backend auf Render, Frontend auf Netlify — kostenlos, in unter 10 Minuten live."}}, 
-    {"icon": "🇨🇭", "name": {"en": "Swiss-Focused", "de": "Schweiz-fokussiert"},
-     "desc": {"en": "Launches directly with a focus on the entire Switzerland.", "de": "Startet direkt mit Blick auf die ganze Schweiz."}},
+    {"icon": "🇩🇪", "name": {"en": "German-Focused", "de": "Deutschland-fokussiert"},
+     "desc": {"en": "Launches directly with a focus on the entire Germany but usable worldwide.", "de": "Startet direkt mit Blick auf die ganze Deutschland aber ist weltweit nutzbar."}},
 ]
 
 ROADMAP = [
@@ -114,7 +119,7 @@ ROADMAP = [
     {"version": "v0.3", "title": "Satellitendaten",   "done": False,
      "desc": "Sentinel-2 NDVI-Einbindung, historische Zeitreihen, Export als GeoJSON/CSV."},
     {"version": "v1.0", "title": "Produktionsrelease","done": False,
-     "desc": "Auth, Multi-Tenant, mobile-optimiert, Schweizer Amt für Landwirtschaft Daten."},
+     "desc": "Auth, Multi-Tenant, mobile-optimiert, Deutschlandisches Amt für Landwirtschaft Daten."},
 ]
 
 # Neue Teammitglieder: Eintrag hier ergänzen.
@@ -218,13 +223,22 @@ def set_language(lang: str, request: Request):
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, lang: str = Cookie(default="en")):
+    hero_image = "Hauptbild.png"
+    hero_image_version = None
+    try:
+        hero_path = STATIC_DIR / "assets" / "image" / hero_image
+        hero_image_version = int(hero_path.stat().st_mtime)
+    except FileNotFoundError:
+        hero_image_version = None
+
     return templates.TemplateResponse("pages/index.html", ctx(
         request, "home", lang,
         stats=HOME_STATS,
         features=HOME_FEATURES,
-        hero_image="Hauptbild.png",
+        hero_image=hero_image,
+        hero_image_version=hero_image_version,
         roadmap=ROADMAP,
-        gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
+        gallery_images=[{"file": "image/Europe.png", "alt": "European Field"}, {"file": "image/Sentinel-2.png", "alt": "Sentinel-2 Satellite Image"} ],     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
     ))
 
 @app.get("/analyse", response_class=HTMLResponse)
@@ -315,6 +329,7 @@ class Coordinate(BaseModel):
 
 class FieldRequest(BaseModel):
     polygon: List[Coordinate]
+    analysis_date: str | None = None  # comes from frontend date input (YYYY-MM-DD)
 
 class ZoneResult(BaseModel):
     sub_polygon: List[Coordinate]
@@ -337,39 +352,146 @@ class SaveRequest(BaseModel):
     crop: str | None = None
 
 
-def split_polygon_into_grid(polygon: List[Coordinate], grid_size: int = 4):
-    lats = [p.lat for p in polygon]
-    lngs = [p.lng for p in polygon]
-    min_lat, max_lat = min(lats), max(lats)
-    min_lng, max_lng = min(lngs), max(lngs)
-    lat_step = (max_lat - min_lat) / grid_size
-    lng_step = (max_lng - min_lng) / grid_size
-    zones = []
-    for i in range(grid_size):
-        for j in range(grid_size):
-            zones.append([
-                Coordinate(lat=min_lat +  i    * lat_step, lng=min_lng +  j    * lng_step),
-                Coordinate(lat=min_lat + (i+1) * lat_step, lng=min_lng +  j    * lng_step),
-                Coordinate(lat=min_lat + (i+1) * lat_step, lng=min_lng + (j+1) * lng_step),
-                Coordinate(lat=min_lat +  i    * lat_step, lng=min_lng + (j+1) * lng_step),
-            ])
-    return zones
+def _pick_utm_epsg(lat: float, lng: float) -> int:
+    """
+    Pick a UTM CRS EPSG based on lat/lng.
+    North hemisphere: EPSG:326xx, South hemisphere: EPSG:327xx.
+    """
+    zone = int(math.floor((lng + 180) / 6) + 1)
+    if lat >= 0:
+        return 32600 + zone
+    return 32700 + zone
 
 
-def run_model(sub_polygon: List[Coordinate]) -> float:
+def _polygon_centroid_latlng(polygon: List[Coordinate]) -> Coordinate:
+    # simple mean centroid is good enough for picking UTM zone
+    return Coordinate(
+        lat=float(np.mean([p.lat for p in polygon])),
+        lng=float(np.mean([p.lng for p in polygon])),
+    )
+
+
+def _transformer(src_epsg: int, dst_epsg: int) -> Transformer:
+    return Transformer.from_crs(CRS.from_epsg(src_epsg), CRS.from_epsg(dst_epsg), always_xy=True)
+
+
+def _polygon_to_utm_polygon(polygon_latlng: List[Coordinate], utm_epsg: int) -> Polygon:
+    t = _transformer(4326, utm_epsg)
+    xy = [t.transform(p.lng, p.lat) for p in polygon_latlng]  # (x, y) meters
+    poly = Polygon(xy)
+    if not poly.is_valid:
+        # best-effort fix for self intersections, etc.
+        poly = poly.buffer(0)
+    return poly
+
+
+def _grid_center_points_in_polygon(
+    polygon_latlng: List[Coordinate],
+    cell_size_m: float = 60.0,
+    include_border: bool = True,
+):
+    """
+    Returns:
+      - utm_epsg used
+      - list of points: dicts with row/col, center x/y in meters, and lat/lng
+    """
+    centroid = _polygon_centroid_latlng(polygon_latlng)
+    utm_epsg = _pick_utm_epsg(centroid.lat, centroid.lng)
+
+    poly_m = _polygon_to_utm_polygon(polygon_latlng, utm_epsg)
+    minx, miny, maxx, maxy = poly_m.bounds
+
+    half = cell_size_m / 2.0
+    nx = int(math.ceil((maxx - minx) / cell_size_m))
+    ny = int(math.ceil((maxy - miny) / cell_size_m))
+
+    t_back = _transformer(utm_epsg, 4326)
+
+    points = []
+    for r in range(ny):
+        y = miny + half + r * cell_size_m
+        for c in range(nx):
+            x = minx + half + c * cell_size_m
+            pt = Point(x, y)
+            inside = poly_m.covers(pt) if include_border else poly_m.contains(pt)
+            if not inside:
+                continue
+
+            lng, lat = t_back.transform(x, y)
+            points.append(
+                {
+                    "row": r,
+                    "col": c,
+                    "center_x_m": float(x),
+                    "center_y_m": float(y),
+                    "center_lat": float(lat),
+                    "center_lng": float(lng),
+                }
+            )
+
+    return utm_epsg, points
+
+
+def _cell_polygon_latlng_from_center(
+    *,
+    center_x_m: float,
+    center_y_m: float,
+    cell_size_m: float,
+    utm_epsg: int,
+) -> List[Coordinate]:
+    """
+    Build the 60m×60m cell polygon corners around a center point.
+    Returned as lat/lng (EPSG:4326) for the frontend map.
+    """
+    half = cell_size_m / 2.0
+    corners_m = [
+        (center_x_m - half, center_y_m - half),
+        (center_x_m + half, center_y_m - half),
+        (center_x_m + half, center_y_m + half),
+        (center_x_m - half, center_y_m + half),
+    ]
+    t_back = _transformer(utm_epsg, 4326)
+    coords = []
+    for x, y in corners_m:
+        lng, lat = t_back.transform(x, y)
+        coords.append(Coordinate(lat=float(lat), lng=float(lng)))
+    return coords
+
+
+def get_field_elevation_m(center_lat: float, center_lng: float) -> float | None:
+    """
+    Placeholder hook:
+      - Option 1: call a DEM / elevation API
+      - Option 2: sample from a local raster (rasterio)
+    """
+    return None
+
+
+def run_model(grid_csv: pd.DataFrame) -> np.ndarray:
     """
     PLATZHALTER — hier kommt dein echtes ML-Modell rein.
 
-    Beispiel mit scikit-learn:
-        model = pickle.load(open("model.pkl", "rb"))
-        features = extract_features(sub_polygon)
-        return float(model.predict([features])[0])
+    WICHTIG: Wir geben dem Modell die Raster-Zellmittelpunkte als "CSV-Tabelle"
+    (in-memory). D.h. `grid_csv` ist ein DataFrame, der die Spalten enthält, die
+    du sonst ins CSV schreiben würdest, z.B.:
+
+      - center_lat
+      - center_lng
+      - analysis_date
+      - field_elevation_m
+      - row, col, ...
+
+    Beispiel (scikit-learn):
+        model = joblib.load("model.joblib")
+        X = grid_csv[FEATURE_COLS]              # z.B. ["center_lat", "center_lng", ...]
+        y = model.predict_proba(X)[:, 1]        # oder model.predict(X)
+        return y
     """
-    center_lat = np.mean([p.lat for p in sub_polygon])
-    center_lng = np.mean([p.lng for p in sub_polygon])
+    center_lat = grid_csv["center_lat"].to_numpy(dtype=float)
+    center_lng = grid_csv["center_lng"].to_numpy(dtype=float)
     value = (np.sin(center_lat * 50) + np.cos(center_lng * 50) + 2) / 4
-    value += random.uniform(-0.05, 0.05)
-    return float(np.clip(value, 0, 1))
+    value += np.random.uniform(-0.05, 0.05, size=value.shape[0])
+    return np.clip(value, 0, 1).astype(float)
 
 
 def value_to_label(value: float) -> str:
@@ -385,14 +507,53 @@ def health():
 
 @app.post("/api/predict", response_model=PredictionResponse)
 def predict(request: FieldRequest):
+    # 1) Build 60m grid centers (this is your "CSV" table)
+    utm_epsg, grid_points = _grid_center_points_in_polygon(
+        request.polygon,
+        cell_size_m=60.0,
+        include_border=True,
+    )
+
+    # 2) Field elevation hook (single value for whole field)
+    centroid = _polygon_centroid_latlng(request.polygon)
+    field_elevation_m = get_field_elevation_m(centroid.lat, centroid.lng)
+
+    # 3) Build the in-memory CSV rows
+    # Note: you can later add more columns here (satellite features, slope, soil grids, etc.)
+    rows = []
+    for p in grid_points:
+        rows.append(
+            {
+                "center_lat": p["center_lat"],
+                "center_lng": p["center_lng"],
+                "analysis_date": request.analysis_date,
+                "field_elevation_m": field_elevation_m,
+                "row": p["row"],
+                "col": p["col"],
+            }
+        )
+    grid_csv = pd.DataFrame(rows)
+
+    # 4) Model inference (returns one value per 60m cell center)
+    y = run_model(grid_csv)
+
+    # 5) Convert predictions into polygons for the frontend (each cell as a zone)
     zones = []
-    for sub_poly in split_polygon_into_grid(request.polygon):
-        value = run_model(sub_poly)
-        zones.append(ZoneResult(
-            sub_polygon=sub_poly,
-            value=round(value, 3),
-            label=value_to_label(value),
-        ))
+    for p, value in zip(grid_points, y):
+        cell_poly = _cell_polygon_latlng_from_center(
+            center_x_m=p["center_x_m"],
+            center_y_m=p["center_y_m"],
+            cell_size_m=60.0,
+            utm_epsg=utm_epsg,
+        )
+        zones.append(
+            ZoneResult(
+                sub_polygon=cell_poly,
+                value=round(float(value), 3),
+                label=value_to_label(float(value)),
+            )
+        )
+
     return PredictionResponse(
         zones=zones,
         unit="Bodenqualität",

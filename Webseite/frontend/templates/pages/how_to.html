@@ -26,14 +26,14 @@
         <div class="howto-step-num">01</div>
         <div class="howto-step-icon">✏️</div>
         <h3>Draw your field</h3>
-        <p>Use the polygon tool on the map to outline the boundaries of your agricultural area. Click to set each corner, then close the shape.</p>
+        <p>Use the polygon tool on the map to outline the boundaries of your agricultural field. Click to set each corner until you close the shape.</p>
       </div>
 
       <div class="howto-step-card">
         <div class="howto-step-num">02</div>
         <div class="howto-step-icon">⟶</div>
         <h3>Start the analysis</h3>
-        <p>Once your polygon is drawn, click <strong>Start analysis</strong> in the sidebar. The ML model will process your field within seconds.</p>
+        <p>Once your polygon is drawn, choose a date and click <strong>Start analysis</strong> in the sidebar. The ML model will process your field.</p>
       </div>
 
       <div class="howto-step-card">
@@ -58,7 +58,7 @@
         <h3>Navigate to the Analysis page</h3>
       </div>
       <div class="howto-detail-body">
-        <p>Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Switzerland.</p>
+        <p>Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">💡 Tip</span>
           Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
@@ -94,16 +94,16 @@
         <h3>Start the analysis</h3>
       </div>
       <div class="howto-detail-body">
-        <p>Once a polygon is drawn, the <strong>Start analysis</strong> button in the sidebar becomes active. Click it to send your field data to the backend. A loading indicator will appear while the model runs — this typically takes less than one second.</p>
+        <p>Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">⚠️ Note</span>
-          The analysis requires an active internet connection to reach the backend API. If the button remains inactive, make sure your polygon is properly closed on the map.
+          The analysis requires an active internet connection to download the satellite data. If the button remains inactive, make sure your polygon is properly closed on the map.
         </div>
       </div>
     </div>
 
     <!-- Step 4 -->
-    <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
+    <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">Step 4</div>
         <h3>Read your results</h3>
@@ -114,6 +114,52 @@
       </div>
     </div>
 
+    <!-- Step 5 -->
+    <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 5</div>
+        <h3>Save your results</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>You can save your results by clicking the <strong>Save</strong> button in the sidebar. This stores your analysis (including the polygon and summary statistics) so you can view and compare it later in your Personal Dashboard.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Saving & managing fields -->
+  <section class="about-section">
+    <div class="section-eyebrow">Data management</div>
+    <h2 class="section-title">Saving fields & managing your analyses</h2>
+
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:28px;">
+      AgroScan treats a “saved field” as a <strong>saved analysis</strong>: your drawn polygon plus the selected date and the computed zone statistics. Saving lets you build a history for the same field over time and compare different dates.
+    </p>
+
+    <div class="howto-steps-grid" style="margin-top:0;">
+      <div class="howto-step-card">
+        <div class="howto-step-icon">💾</div>
+        <h3>What gets saved?</h3>
+        <p>The field polygon (your drawn boundary), the analysis date, summary values (avg/min/max), and the computed zones. This makes it possible to revisit results later without re-running the analysis.</p>
+      </div>
+
+      <div class="howto-step-card">
+        <div class="howto-step-icon">📂</div>
+        <h3>Where do I find it?</h3>
+        <p>Open the <strong>Personal Dashboard</strong> to see your saved analyses list. Each entry shows the crop (if provided), date, and summary statistics.</p>
+      </div>
+
+      <div class="howto-step-card">
+        <div class="howto-step-icon">🧹</div>
+        <h3>How can I manage saved items?</h3>
+        <p>You can delete saved analyses directly from the dashboard. If you want to re-analyze the same field, simply draw the polygon again (or reuse the same outline) and save a new entry for the new date.</p>
+      </div>
+    </div>
+
+    <div class="howto-tip" style="margin-top:28px;">
+      <span class="howto-tip-label">📌 Tip</span>
+      <p>If you frequently analyze the same field, use saving to create a timeline of results. This is especially useful to track changes after management actions (e.g., irrigation, fertilization, cover crops).</p>
+      <a class="btn-primary" href="/personal_dashboard" style="margin-top:16px;">⟶ Go to Personal Dashboard</a>
+    </div>
   </section>
 
   <!-- About the ML Model -->
@@ -141,13 +187,14 @@
         <p>The model produces a score between <strong>0.0</strong> and <strong>1.0</strong> for each grid cell inside your polygon. These scores represent relative soil quality based on spectral reflectance, vegetation density, and moisture content indicators derived from the satellite data.</p>
       </div>
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">±</div>
-        <h4>Accuracy & noise</h4>
-        <p>The current model includes approximately <strong>±5% random noise</strong> as part of the placeholder implementation. The production model will replace this with a trained classifier. Zone boundaries should be treated as estimates, not precise surveying data.</p>
-      </div>
-
     </div>
+
+    <div class="howto-tip" style="margin-top:40px;">
+      <span class="howto-tip-label">💡 Tip</span>
+      If you want to learn more about how the ML-Model exactely works and are interested in the research background you can visit the Research Background page.
+      <a class="btn-primary" href="/research_background" style="margin-top:20px;"> ⟶ Research Background</a>
+    </div>
+
   </section>
 
   <!-- Reading the Results -->
@@ -205,7 +252,7 @@
 
       <div class="howto-faq-item">
         <div class="howto-faq-q">Can I analyze multiple fields in one session?</div>
-        <p>Currently, one polygon can be active on the map at a time. Use the Reset button to clear the current polygon and draw a new one for a different field. Multi-polygon support is planned for a future release.</p>
+        <p>Currently, one polygon can be active on the map at a time. You can still analyze and save multiple fields by saving the result, clicking Reset, and drawing the next field polygon. Your saved analyses are listed in the Personal Dashboard.</p>
       </div>
 
       <div class="howto-faq-item">
@@ -214,13 +261,18 @@
       </div>
 
       <div class="howto-faq-item">
-        <div class="howto-faq-q">Why does the result look the same every time?</div>
-        <p>The current backend uses a placeholder model with synthetic data. Once the real Sentinel-based ML model is integrated, results will reflect actual satellite observations and will differ depending on location, season, and field conditions.</p>
+        <div class="howto-faq-q">Why do my results look very similar across runs?</div>
+        <p>If you analyze the same polygon with the same date, results can be very similar because the same inputs are used. Try selecting a different date, or compare multiple saved runs in the Personal Dashboard to spot changes over time.</p>
+      </div>
+
+      <div class="howto-faq-item">
+        <div class="howto-faq-q">Where are saved analyses stored and how do I delete them?</div>
+        <p>Saved analyses are stored in the app’s database and can be managed from the Personal Dashboard. Use the Delete button on an entry to remove it from your history.</p>
       </div>
 
       <div class="howto-faq-item" style="border-bottom:none;">
         <div class="howto-faq-q">Can I export the results?</div>
-        <p>Export functionality (GeoJSON, CSV) is on the roadmap for v0.3. For now, you can take a screenshot of the zone map or note the summary statistics shown in the sidebar.</p>
+        <p>Export functionality (e.g., GeoJSON/CSV) can be added, but is not available in the current UI. For now, you can use screenshots of the zone map or rely on the saved summary statistics in the dashboard.</p>
       </div>
 
     </div>

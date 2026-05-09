@@ -17,14 +17,14 @@
     </p>
     <div class="hero-actions">
       <a class="btn-primary" href="/analyse">⟶ Analyze now</a>
-      <a class="btn-outline"  href="/how_to">Learn more</a>
+      <a class="btn-outline"  href="/how_to">Learn how to use</a>
     </div>
   </section>
 
   <!-- Hauptbild -->
   <div style="padding:0 32px 72px; max-width:1100px; margin:0 auto;">
     {% if hero_image %}
-      <img src="/static/assets/image/{{ hero_image }}" alt="AgroScan Screenshot"
+      <img src="/static/assets/image/{{ hero_image }}{% if hero_image_version %}?v={{ hero_image_version }}{% endif %}" alt="AgroScan Screenshot"
            style="width:100%; border-radius:12px; border:1px solid var(--border2);" />
     {% else %}
       <div class="img-placeholder" style="border-radius:12px;">
