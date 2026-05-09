@@ -188,7 +188,6 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-  {# api_url wird sicher vom Server übergeben — kein Hardcode im JS nötig #}
   <script>
     // Leaflet Draw Übersetzungen aus Jinja laden
     const leafletTranslations = JSON.parse('{{ leaflet_translations | tojson if leaflet_translations else "{}" }}');
