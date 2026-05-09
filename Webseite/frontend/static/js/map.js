@@ -149,17 +149,6 @@ map.on('draw:editstart', () => {
 
 let currentPolygon = null;
 
-const savePopup = document.getElementById("save-popup");
-
-const btnSaveDashboard = document.getElementById("btn-save-dashboard");
-
-const closeSavePopupBtn = document.getElementById("close-save-popup");
-
-const confirmDashboardSaveBtn = document.getElementById("confirm-dashboard-save");
-
-const dashboardCropSelect = document.getElementById("dashboard-crop");
-
-const dashboardCustomCrop = document.getElementById("dashboard-custom-crop");
 
 // =====================
 // HELPERS
@@ -460,85 +449,114 @@ document.getElementById("btn-reset").addEventListener("click", () => {
 // Safe to personal dashboard
 // =====================
 
+// =====================
+// SAVE POPUP ELEMENTS
+// =====================
+
+const savePopup = document.getElementById("save-popup");
+
+const btnSaveDashboard = document.getElementById("btn-save-dashboard");
+
+const closeSavePopupBtn = document.getElementById("close-save-popup");
+
+const confirmDashboardSaveBtn = document.getElementById("confirm-dashboard-save");
+
+const dashboardCropSelect = document.getElementById("dashboard-crop");
+
+const dashboardCustomCrop = document.getElementById("dashboard-custom-crop");
 
 
 // =====================
-// SAVE POPUP
+// SAVE POPUP FUNCTIONS
 // =====================
 
 function openSavePopup() {
+  if (!savePopup) return;
+
   savePopup.classList.add("visible");
 }
 
 function closeSavePopup() {
+  if (!savePopup) return;
+
   savePopup.classList.remove("visible");
 }
 
-btnSaveDashboard.addEventListener("click", () => {
-  openSavePopup();
-});
+// =====================
+// SAVE BUTTON EVENTS
+// =====================
 
-closeSavePopupBtn.addEventListener("click", () => {
-  closeSavePopup();
-});
+if (btnSaveDashboard) {
+  btnSaveDashboard.addEventListener("click", () => {
+    openSavePopup();
+  });
+}
 
-// Close on background click
-savePopup.addEventListener("click", (e) => {
-  if (e.target === savePopup) {
+if (closeSavePopupBtn) {
+  closeSavePopupBtn.addEventListener("click", () => {
     closeSavePopup();
-  }
-});
+  });
+}
 
-confirmDashboardSaveBtn.addEventListener("click", async () => {
-
-  if (!latestAnalysisData) return;
-
-  let selectedCrop = dashboardCropSelect.value;
-
-  // Falls custom crop gewählt wurde
-  if (selectedCrop === "custom") {
-
-    selectedCrop = dashboardCustomCrop.value.trim();
-
-    if (!selectedCrop) {
-      alert("Please enter a custom crop name");
-      return;
+if (savePopup) {
+  savePopup.addEventListener("click", (e) => {
+    if (e.target === savePopup) {
+      closeSavePopup();
     }
-  }
+  });
+}
 
-  // Crop zur Analyse hinzufügen
-  const payload = {
-    ...latestAnalysisData,
-    crop: selectedCrop
-  };
+if (confirmDashboardSaveBtn) {
+  confirmDashboardSaveBtn.addEventListener("click", async () => {
 
-  try {
+    if (!latestAnalysisData) return;
 
-    const res = await fetch(`${API_URL}/api/save-analysis`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(payload)
-    });
+    let selectedCrop = dashboardCropSelect.value;
 
-    if (!res.ok) {
-      throw new Error("Save failed");
+    // Falls custom crop gewählt wurde
+    if (selectedCrop === "custom") {
+
+      selectedCrop = dashboardCustomCrop.value.trim();
+
+      if (!selectedCrop) {
+        alert("Please enter a custom crop name");
+        return;
+      }
     }
 
-    closeSavePopup();
+    // Crop zur Analyse hinzufügen
+    const payload = {
+      ...latestAnalysisData,
+      crop: selectedCrop
+    };
 
-    alert("Analysis saved to dashboard ✓");
+    try {
 
-  } catch (err) {
+      const res = await fetch(`${API_URL}/api/save-analysis`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(payload)
+      });
 
-    console.error(err);
+      if (!res.ok) {
+        throw new Error("Save failed");
+      }
 
-    alert("Could not save analysis");
-  }
+      closeSavePopup();
 
-});
+      alert("Analysis saved to dashboard ✓");
 
+    } catch (err) {
+
+      console.error(err);
+
+      alert("Could not save analysis");
+    }
+
+  });
+}
 // =====================
 // CUSTOM CROP
 // =====================
