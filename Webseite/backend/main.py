@@ -16,6 +16,8 @@ from pathlib import Path
 from typing import List
 
 from fastapi import FastAPI, Request, Cookie
+import sqlite3
+import json
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -29,8 +31,33 @@ ROOT         = Path(__file__).parent.parent          # → agroscan/
 TEMPLATE_DIR = ROOT / "frontend" / "templates"
 STATIC_DIR   = ROOT / "frontend" / "static"
 
+DB_PATH = ROOT / "agroscan.db"
+
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
+
+def init_db():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+    CREATE TABLE IF NOT EXISTS analyses (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date TEXT,
+        polygon TEXT,
+        avg_value REAL,
+        min_value REAL,
+        max_value REAL,
+        zones TEXT,
+        crop TEXT
+    )
+    """)
+
+    conn.commit()
+    conn.close()
+
+init_db()
+
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 templates = Jinja2Templates(directory=TEMPLATE_DIR)
 
@@ -58,7 +85,7 @@ NAV_PAGES = [
 ]
 
 HOME_STATS = [
-    {"value": "4×4", "label": "Zonen pro Fläche"},
+    {"value": "60m×60m", "label": "Datapoint acurracy"},
     {"value": "<1s",  "label": "Analysezeit"},
     {"value": "±5%",  "label": "Modell-Rauschen"},
     {"value": "OSM",  "label": "Kartenbasis"},
@@ -226,10 +253,30 @@ async def how_to(request: Request, lang: str = Cookie(default="en")):
 
 @app.get("/personal_dashboard", response_class=HTMLResponse)
 async def pers_dash(request: Request, lang: str = Cookie(default="en")):
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+    c.execute("SELECT * FROM analyses ORDER BY id DESC")
+    rows = c.fetchall()
+    conn.close()
+
+    analyses = [
+        {
+            "id": r[0],
+            "date": r[1],
+            "polygon": json.loads(r[2]),
+            "avg_value": r[3],
+            "min_value": r[4],
+            "max_value": r[5],
+            "zones": json.loads(r[6]),
+            "crop": r[7] if len(r) > 7 else None
+        }
+        for r in rows
+    ]
+
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
         request, "pers_dash", lang,
-        # seitenspezifische Daten hier:
-        # my_data=MY_DATA,
+        analyses=analyses
     ))
 
 @app.get("/report", response_class=HTMLResponse)
@@ -279,6 +326,15 @@ class PredictionResponse(BaseModel):
     unit:      str
     min_value: float
     max_value: float
+
+class SaveRequest(BaseModel):
+    date: str
+    polygon: List[Coordinate]
+    avg_value: float
+    min_value: float
+    max_value: float
+    zones: list
+    crop: str | None = None
 
 
 def split_polygon_into_grid(polygon: List[Coordinate], grid_size: int = 4):
@@ -343,3 +399,52 @@ def predict(request: FieldRequest):
         min_value=0.0,
         max_value=1.0,
     )
+
+
+@app.post("/api/save-analysis")
+def save_analysis(req: SaveRequest):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+        INSERT INTO analyses (date, polygon, avg_value, min_value, max_value, zones, crop)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (
+        req.date,
+        json.dumps([p.dict() for p in req.polygon]),
+        req.avg_value,
+        req.min_value,
+        req.max_value,
+        json.dumps(req.zones),
+        req.crop
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return {"status": "saved"}
+
+@app.get("/api/analyses")
+def get_analyses():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM analyses ORDER BY id DESC")
+    rows = c.fetchall()
+
+    conn.close()
+
+    return [
+        {
+            "id": r[0],
+            "date": r[1],
+            "polygon": json.loads(r[2]),
+            "avg_value": r[3],
+            "min_value": r[4],
+            "max_value": r[5],
+            "zones": json.loads(r[6]),
+            "crop": r[7] if len(r) > 7 else None
+        }
+        for r in rows
+    ]
+

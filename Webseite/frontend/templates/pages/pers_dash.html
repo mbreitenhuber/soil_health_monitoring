@@ -18,9 +18,48 @@
     {# Daten aus main.py hier rendern, z.B.: #}
     {# {% for item in items %}<p>{{ item.name }}</p>{% endfor %} #}
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;">
-      Seiteninhalt hier…
-    </p>
+    <section class="about-section">
+      <div class="section-eyebrow">Saved Analyses</div>
+      <h2 class="section-title">Your Field History</h2>
+
+      {% if analyses|length == 0 %}
+        <p>No saved analyses yet.</p>
+      {% endif %}
+
+      <div style="display:grid; gap:12px; margin-top:20px;">
+
+        {% for a in analyses %}
+
+        <div style="
+          border:1px solid #ddd;
+          padding:12px;
+          border-radius:10px;
+          background:#fff;
+        ">
+
+          <h3 style="margin:0;">
+            {{ a.crop or "Unknown crop" }}
+          </h3>
+
+          <p style="margin:5px 0;">
+            📅 {{ a.date }}
+          </p>
+
+          <p style="margin:5px 0;">
+            📊 Avg: {{ (a.avg_value * 100) | round(1) }}%
+          </p>
+
+          <p style="margin:5px 0;">
+            🔴 Min: {{ (a.min_value * 100) | round(1) }}%
+            🟢 Max: {{ (a.max_value * 100) | round(1) }}%
+          </p>
+
+        </div>
+
+        {% endfor %}
+
+      </div>
+    </section>
   </section>
 
 </div>

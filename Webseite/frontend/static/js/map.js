@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 let analysisMode = false;
 let searchMarker = null;
+let latestAnalysisData = null;
 
 // =====================
 // BASE LAYERS
@@ -388,6 +389,18 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     const values = data.zones.map(z => z.value);
     const avg = values.reduce((a, b) => a + b, 0) / values.length;
 
+    latestAnalysisData = {
+      date: document.getElementById("analysis-date").value,
+      polygon: currentPolygon.map(p => ({
+        lat: p.lat,
+        lng: p.lng
+      })),
+      avg_value: avg,
+      min_value: Math.min(...values),
+      max_value: Math.max(...values),
+      zones: data.zones
+    };
+
     document.getElementById("res-zones").textContent = data.zones.length;
     document.getElementById("res-avg").textContent = (avg * 100).toFixed(1) + "%";
     document.getElementById("res-max").textContent = (Math.max(...values) * 100).toFixed(1) + "%";
@@ -447,27 +460,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
 // Safe to personal dashboard
 // =====================
 
-document.getElementById("btn-save-dashboard").addEventListener("click", () => {
-  if (!currentPolygon) return;
 
-  const data = {
-    date: document.getElementById("analysis-date").value,
-    polygon: currentPolygon,
-    stats: {
-      zones: document.getElementById("res-zones").textContent,
-      avg: document.getElementById("res-avg").textContent,
-      max: document.getElementById("res-max").textContent,
-      min: document.getElementById("res-min").textContent
-    },
-    timestamp: new Date().toISOString()
-  };
-
-  let existing = JSON.parse(localStorage.getItem("dashboard_analyses")) || [];
-  existing.push(data);
-  localStorage.setItem("dashboard_analyses", JSON.stringify(existing));
-
-  alert("Saved to dashboard ✔");
-});
 
 // =====================
 // SAVE POPUP
@@ -494,6 +487,56 @@ savePopup.addEventListener("click", (e) => {
   if (e.target === savePopup) {
     closeSavePopup();
   }
+});
+
+confirmDashboardSaveBtn.addEventListener("click", async () => {
+
+  if (!latestAnalysisData) return;
+
+  let selectedCrop = dashboardCropSelect.value;
+
+  // Falls custom crop gewählt wurde
+  if (selectedCrop === "custom") {
+
+    selectedCrop = dashboardCustomCrop.value.trim();
+
+    if (!selectedCrop) {
+      alert("Please enter a custom crop name");
+      return;
+    }
+  }
+
+  // Crop zur Analyse hinzufügen
+  const payload = {
+    ...latestAnalysisData,
+    crop: selectedCrop
+  };
+
+  try {
+
+    const res = await fetch(`${API_URL}/api/save-analysis`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error("Save failed");
+    }
+
+    closeSavePopup();
+
+    alert("Analysis saved to dashboard ✓");
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Could not save analysis");
+  }
+
 });
 
 // =====================
