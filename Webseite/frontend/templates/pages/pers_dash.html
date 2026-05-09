@@ -2,68 +2,105 @@
 
 {% block title %}Personal Dashboard{% endblock %}
 
+{% block head_styles %}
+<link rel="stylesheet" href="/static/css/dashboard.css" />
+{% endblock %}
+
 {% block content %}
+
 <div class="page-content">
 
+  <!-- =========================
+       HERO
+  ========================== -->
   <div class="about-hero">
-    <div class="section-eyebrow">Kategorie</div>
+    <div class="section-eyebrow">Dashboard</div>
     <h1>Personal Dashboard</h1>
-    <p>Kurze Beschreibung dieser Seite.</p>
+    <p>Manage, analyze and compare your saved field analyses.</p>
   </div>
 
+  <!-- =========================
+       FILTER BAR
+  ========================== -->
   <section class="about-section">
-    <div class="section-eyebrow">Abschnitt</div>
-    <h2 class="section-title">Überschrift</h2>
 
-    {# Daten aus main.py hier rendern, z.B.: #}
-    {# {% for item in items %}<p>{{ item.name }}</p>{% endfor %} #}
+    <div class="section-eyebrow">Filters</div>
+    <h2 class="section-title">Your Data</h2>
 
-    <section class="about-section">
-      <div class="section-eyebrow">Saved Analyses</div>
-      <h2 class="section-title">Your Field History</h2>
+    <div class="dashboard-filters">
 
-      {% if analyses|length == 0 %}
-        <p>No saved analyses yet.</p>
-      {% endif %}
+      <select id="filter-days">
+        <option value="">All time</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
 
-      <div style="display:grid; gap:12px; margin-top:20px;">
+      <select id="filter-crop">
+        <option value="">All crops</option>
+        <option value="wheat">Wheat</option>
+        <option value="corn">Corn</option>
+      </select>
 
-        {% for a in analyses %}
+    </div>
 
-        <div style="
-          border:1px solid #ddd;
-          padding:12px;
-          border-radius:10px;
-          background:#fff;
-        ">
+  </section>
 
-          <h3 style="margin:0;">
-            {{ a.crop or "Unknown crop" }}
-          </h3>
+  <!-- =========================
+       ANALYSIS LIST
+  ========================== -->
+  <section class="about-section">
 
-          <p style="margin:5px 0;">
-            📅 {{ a.date }}
-          </p>
+    <div class="section-eyebrow">History</div>
+    <h2 class="section-title">Saved Analyses</h2>
 
-          <p style="margin:5px 0;">
-            📊 Avg: {{ (a.avg_value * 100) | round(1) }}%
-          </p>
+    {% if analyses is not defined or analyses|length == 0 %}
+      <p>No saved analyses yet.</p>
+    {% endif %}
 
-          <p style="margin:5px 0;">
-            🔴 Min: {{ (a.min_value * 100) | round(1) }}%
-            🟢 Max: {{ (a.max_value * 100) | round(1) }}%
-          </p>
+    <div id="dashboard-container" class="dashboard-container">
 
+      {% for a in analyses %}
+
+      <div class="analysis-card">
+
+        <div class="analysis-title">
+          {{ a.crop or "Unknown crop" }}
         </div>
 
-        {% endfor %}
+        <div class="analysis-meta">
+          📅 {{ a.date }} <br>
+          📊 Avg: {{ (a.avg_value * 100) | round(1) }}% <br>
+          🔴 Min: {{ (a.min_value * 100) | round(1) }}%
+          🟢 Max: {{ (a.max_value * 100) | round(1) }}%
+        </div>
+
+        <button class="btn-danger delete-btn" data-id="{{ a.id }}">
+          Delete
+        </button>
 
       </div>
-    </section>
+
+      {% endfor %}
+
+    </div>
+
   </section>
 
 </div>
+
 {% endblock %}
 
-{# Nur nötig wenn die Seite eigenes JS braucht: #}
-{# {% block scripts %}<script src="/static/js/meinscript.js"></script>{% endblock %} #}
+<!-- =========================
+     SCRIPTS
+========================== -->
+{% block scripts %}
+
+<script src="/static/js/meinscript.js"></script>
+
+<script>
+  const API_URL = "http://127.0.0.1:8000";
+</script>
+
+<script src="/static/js/dashboard.js"></script>
+
+{% endblock %}

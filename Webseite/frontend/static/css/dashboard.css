@@ -1,0 +1,77 @@
+/* =========================
+   DASHBOARD LAYOUT
+========================= */
+
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+}
+
+/* =========================
+   ANALYSIS CARD
+========================= */
+
+.analysis-card {
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  transition: 0.2s ease;
+}
+
+.analysis-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   HEADER TEXT
+========================= */
+
+.analysis-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.analysis-meta {
+  font-size: 0.85rem;
+  color: #666;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-danger {
+  margin-top: 10px;
+  background: #c94f4f;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-danger:hover {
+  background: #b43f3f;
+}
+
+/* =========================
+   FILTER BAR
+========================= */
+
+.dashboard-filters {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.dashboard-filters select {
+  padding: 6px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}

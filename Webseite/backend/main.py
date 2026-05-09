@@ -448,3 +448,13 @@ def get_analyses():
         for r in rows
     ]
 
+@app.delete("/api/analyses/{id}")
+def delete_analysis(id: int):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("DELETE FROM analyses WHERE id = ?", (id,))
+    conn.commit()
+    conn.close()
+
+    return {"status": "deleted"}
