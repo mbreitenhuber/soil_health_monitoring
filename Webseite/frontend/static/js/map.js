@@ -100,7 +100,7 @@ searchMarker = L.circleMarker(center, {
   weight: 2,
   opacity: 1,
   fillOpacity: 0.85,
-  className: "pulse-marker"
+  className: ""
 }).addTo(map);
 
 })
