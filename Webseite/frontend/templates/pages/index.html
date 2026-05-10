@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <section class="hero">
+    <div class="hero-eyebrow">Precision agriculture · ML-based analysis</div>
+    <h1 class="hero-title">
+      Your fields<br>
+      <span class="accent">Intelligently analyzed</span>
+    </h1>
+    <p class="hero-sub">
+      AgroScan combines satellite geospatial data with machine learning —
+    draw your agricultural area and receive a detailed zone map in seconds.
+    </p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="/analyse">⟶ Analyze now</a>
+      <a class="btn-outline"  href="/how_to">Learn how to use</a>
+    </div>
+  </section>
+
+  <!-- Hauptbild -->
+  <div style="padding:0 32px 72px; max-width:1100px; margin:0 auto;">
+    {% if hero_image %}
+      <img src="/static/assets/image/{{ hero_image }}{% if hero_image_version %}?v={{ hero_image_version }}{% endif %}" alt="AgroScan Screenshot"
+           style="width:100%; border-radius:12px; border:1px solid var(--border2);" />
+    {% else %}
+      <div class="img-placeholder" style="border-radius:12px;">
+        <div class="icon">🗺️</div>
+        <div>Hauptbild einfügen — hero_image in main.py setzen</div>
+        <div style="font-size:0.68rem;opacity:0.6;">Empfohlen: 1400×600px</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Stats — Daten kommen aus HOME_STATS in main.py -->
+  <div class="stats-bar">
+    {% for stat in stats %}
+      <div class="stat-item">
+        <div class="stat-num">{{ stat.value }}</div>
+        <div class="stat-label">{{ stat.label }}</div>
+      </div>
+    {% endfor %}
+  </div>
+
+  <!-- Features — Daten kommen aus HOME_FEATURES in main.py -->
+  <section class="features">
+    <div class="section-eyebrow">What AgroScan delivers</div>
+    <h2 class="section-title">Simple. Precise. Scalable.</h2>
+    <div class="features-grid">
+      {% for f in features %}
+        <div class="feature-card">
+          <div class="feature-icon">{{ f.icon }}</div>
+          <div class="feature-name">{{ f.name[lang] if f.name is mapping and lang in f.name else f.name }}</div>
+          <div class="feature-desc">{{ f.desc[lang] if f.desc is mapping and lang in f.desc else f.desc }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Showcase 1 -->
+  <section class="showcase" style="border-top:1px solid var(--border);padding-top:80px;">
+    <div class="img-placeholder" style="aspect-ratio:4/3;border-radius:10px;">
+      <div class="icon">📸</div><div>Bild: Analyse in Aktion</div>
+    </div>
+    <div class="showcase-text">
+      <div class="section-eyebrow">How it works</div>
+      <h3>From polygon to zone map in seconds</h3>
+      <p>Select the polygon drawing tool on the map, click around the edges of your field, and start the analysis.</p>
+      <p>The FastAPI backend splits the bounding box into a 60m x 60m grid and computes a quality score for each cell.</p>
+      <a class="btn-primary" href="/analyse">Try out now →</a>
+    </div>
+  </section>
+
+  <!-- Showcase 2 -->
+  <section class="showcase">
+    <div class="showcase-text">
+      <div class="section-eyebrow">Machine Learning Model</div>
+      <h3>Plug in your own model</h3>
+      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <a class="btn-outline" href="/research_background">Learn more about the project →</a>
+    </div>
+    <div class="img-placeholder" style="aspect-ratio:4/3;border-radius:10px;">
+      <div class="icon">🤖</div><div>Image: Model visualization</div>
+    </div>
+  </section>
+
+  <!-- Users Experience -->
+  <section class="about-section" style="border-top:1px solid var(--border);">
+    <div class="section-eyebrow">Social proof</div>
+    <h2 class="section-title">Trusted by users in the field</h2>
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:720px;">
+      Read three short (placeholder) reviews from different types of farms and see how AgroScan helped them
+      move from intuition to clearer, data-supported decisions.
+    </p>
+    <div style="margin-top:18px;">
+      <a class="btn-primary" href="/users_experience">⟶ Read user experiences</a>
+    </div>
+  </section>
+
+ <!-- Roadmap — Daten kommen aus ROADMAP in main.py -->
+  <section class="about-section">
+    <div class="section-eyebrow">Development</div>
+      <h2 class="section-title">Roadmap</h2>
+      <div class="timeline">
+        {% for item in roadmap %}
+        <div class="tl-item">
+          <div class="tl-dot {% if not item.done %}tl-dot--future{% endif %}"></div>
+            <div>
+              <div class="tl-year {% if not item.done %}tl-year--future{% endif %}">
+                {{ item.version }}
+              </div>
+            <div class="tl-content">
+            <h4>{{ item.title }}</h4>
+            <p>{{ item.desc }}</p>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- Galerie -->
+  <section class="about-section">
+    <div class="section-eyebrow">The Project</div>
+    <h2 class="section-title">Pictures & Impressions</h2>
+    <div class="img-gallery">
+      {% if gallery_images %}
+        {% for img in gallery_images %}
+          <img src="/static/assets/{{ img.file }}" alt="{{ img.alt }}"
+               style="border-radius:10px;width:100%;object-fit:cover;" />
+        {% endfor %}
+      {% else %}
+        <div class="img-placeholder" style="aspect-ratio:16/9;border-radius:10px;">
+          <div class="icon">🌾</div>
+          <div>Photo — gallery_images in main.py setzen</div>
+        </div>
+        <div class="img-gallery-right">
+          <div class="img-placeholder" style="flex:1;border-radius:10px;min-height:120px;">
+            <div class="icon">🛰️</div><div style="font-size:0.72rem;">Satellite image</div>
+          </div>
+          <div class="img-placeholder" style="flex:1;border-radius:10px;min-height:120px;">
+            <div class="icon">📊</div><div style="font-size:0.72rem;">Result chart</div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="home-cta">
+    <h2>Ready for smart field analysis?</h2>
+    <p>Go to the analysis page and draw your first polygon.</p>
+    <a class="btn-primary" href="/analyse">⟶ Start analysis</a>
+  </div>
+
+</div>
+{% endblock %}

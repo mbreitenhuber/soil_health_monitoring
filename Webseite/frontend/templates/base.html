@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="{% if lang == 'en' %}en{% else %}de{% endif %}">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}AgroScan{% endblock %} – ML Fieldanalysis</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  {# Seiten-spezifische <link> Tags (z.B. Leaflet CSS) #}
+  {% block head_libs %}{% endblock %}
+
+  <link rel="stylesheet" href="/static/css/base.css" />
+  <link rel="stylesheet" href="/static/css/nav.css" />
+  <link rel="stylesheet" href="/static/css/pages.css" />
+
+  {# Seiten-spezifisches CSS (z.B. app.css für Karte) #}
+  {% block head_styles %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+
+  {% include "partials/nav.html" %}
+
+  {% block content %}{% endblock %}
+
+  {% include "partials/footer.html" %}
+
+  {% block scripts %}{% endblock %}
+
+</body>
+</html>

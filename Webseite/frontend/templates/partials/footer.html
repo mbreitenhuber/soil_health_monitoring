@@ -1,0 +1,6 @@
+{# partials/footer.html — current_year kommt aus main.py → ctx() #}
+<footer>
+  <a class="footer-logo" href="/">Agro<span>Scan</span></a>
+  <div>{{ "ML-based field analysis" if lang == "en" else "ML-gestützte Flächenanalyse" }} </div>
+  <div>© {{ current_year }} AgroScan</div>
+</footer>

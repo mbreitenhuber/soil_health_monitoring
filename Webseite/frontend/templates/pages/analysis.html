@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+
+{% block title %}Analyse{% endblock %}
+{% block body_class %}page-app{% endblock %}
+
+{% block head_libs %}
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
+
+  <!-- Search Bar -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+
+{% endblock %}
+
+{% block head_styles %}
+  <link rel="stylesheet" href="/static/css/app.css" />
+{% endblock %}
+
+{% block content %}
+{% set t = {
+  "instructions": ("Instructions" if lang == "en" else "Anleitung"),
+  "step1": ("Draw your agricultural field on the map (use the Polygon tool)" if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte (Polygon-Werkzeug)"),
+  "step2": ("Check the detected vertices and area" if lang == "en" else "Prüfe die erkannten Eckpunkte und die Fläche"),
+  "step3": ("Choose the date — Start the analysis — the ML model calculates the zone map" if lang == "en" else "Wähle das Datum — Starte die Analyse — das ML-Modell berechnet die Zonenkarte"),
+  "area": ("Area" if lang == "en" else "Fläche"),
+  "vertices": ("Vertices" if lang == "en" else "Eckpunkte"),
+  "area_approx": ("Area (approx.)" if lang == "en" else "Fläche (ca.)"),
+  "status": ("Status" if lang == "en" else "Status"),
+  "no_polygon": ("No Polygon" if lang == "en" else "Kein Polygon"),
+  "start_analysis": ("Start analysis" if lang == "en" else "Analyse starten"),
+  "calculating": ("The model is calculating…" if lang == "en" else "Das Modell berechnet…"),
+  "reset": ("Reset" if lang == "en" else "Zurücksetzen"),
+  "result": ("Result" if lang == "en" else "Ergebnis"),
+  "zones_analyzed": ("Zones analyzed" if lang == "en" else "Analysierte Zonen"),
+  "avg_soil_quality": ("Average Soil Quality" if lang == "en" else "Durchschnittliche Bodenqualität"),
+  "highest_zone": ("Highest Zone" if lang == "en" else "Beste Zone"),
+  "lowest_zone": ("Lowest Zone" if lang == "en" else "Schlechteste Zone"),
+  "legend_title": ("Legend – Soil Quality" if lang == "en" else "Legende – Bodenqualität"),
+  "high": ("High" if lang == "en" else "Hoch"),
+  "medium": ("Medium" if lang == "en" else "Mittel"),
+  "low": ("Low" if lang == "en" else "Niedrig")
+} %}
+<div class="app-layout">
+
+  <aside class="sidebar">
+
+    <div>
+      <div class="section-label">{{ t.instructions }}</div>
+      <div class="steps" id="steps-container">
+        <div class="step active" id="step-1">
+          <div class="step-num">1</div>
+          <div class="step-text">{{ t.step1 }}</div>
+        </div>
+        <div class="step" id="step-2">
+          <div class="step-num">2</div>
+          <div class="step-text">{{ t.step2 }}</div>
+        </div>
+        <div class="step" id="step-3">
+          <div class="step-num">3</div>
+          <div class="step-text">{{ t.step3 }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">{{ t.area }}</div>
+      <div class="poly-info">
+        <div class="poly-stat"><span>{{ t.vertices }}</span><span class="val" id="stat-points">–</span></div>
+        <div class="poly-stat"><span>{{ t.area_approx }}</span><span class="val" id="stat-area">–</span></div>
+        <div class="poly-stat"><span>{{ t.status }}</span><span class="val" id="stat-status">{{ t.no_polygon }}</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px;">
+
+      <!-- DATE SELECTOR -->
+      <div class="analysis-date-box">
+        <label for="analysis-date">Analyse Datum</label>
+        <input type="date" id="analysis-date">
+      </div>
+
+      <!-- ANALYSE BUTTON -->
+      <button class="btn-analyse" id="btn-analyse" disabled>
+        ⟶ {{ t.start_analysis }}
+      </button>
+
+      <div class="loader" id="loader">
+        <div class="spinner"></div>
+        <span>{{ t.calculating }}</span>
+      </div>
+
+      <button class="btn-reset" id="btn-reset">{{ t.reset }}</button>
+
+    </div>
+
+    <div>
+      <div class="section-label">{{ t.result }}</div>
+      <div class="result-box" id="result-box">
+        <button class="btn-save" id="btn-save-dashboard" style="display:none;">Save to Personal Dashboard</button>
+        <div class="result-row"><span>{{ t.zones_analyzed }}</span><span class="val" id="res-zones">–</span></div>
+        <div class="result-row"><span>{{ t.avg_soil_quality }}</span> <span class="val" id="res-avg">–</span></div>
+        <div class="result-row"><span>{{ t.highest_zone }}</span>    <span class="val" id="res-max">–</span></div>
+        <div class="result-row"><span>{{ t.lowest_zone }}</span> <span class="val" id="res-min">–</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">{{ t.legend_title }}</div>
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:linear-gradient(to right,#22c55e,#4ade80);"></div>
+          <span>{{ t.high }} (0.66 – 1.0)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:linear-gradient(to right,#f59e0b,#facc15);"></div>
+          <span>{{ t.medium }} (0.33 – 0.66)</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:linear-gradient(to right,#ef4444,#f87171);"></div>
+          <span>{{ t.low }} (0.0 – 0.33)</span>
+        </div>
+      </div>
+    </div>
+
+  </aside>
+
+  <main><div id="map"></div></main>
+
+</div>
+
+<!-- SAVE POPUP -->
+<div class="save-popup" id="save-popup">
+
+  <div class="save-popup-card">
+
+    <div class="save-popup-header">
+      <h3>Save Analysis</h3>
+      <button id="close-save-popup">✕</button>
+    </div>
+
+    <div class="save-popup-content">
+
+      <div class="save-field">
+        <label>Field Name</label>
+        <input type="text" id="dashboard-field-name" placeholder="North Wheat Field">
+      </div>
+
+      <div class="save-field">
+        <label>Crop</label>
+        <select id="dashboard-crop">
+          <option value="">Select crop</option>
+
+          <option>Wheat</option>
+          <option>Corn</option>
+          <option>Barley</option>
+          <option>Potato</option>
+          <option>Soybean</option>
+          <option>Rice</option>
+
+          <option value="custom">Other / Custom</option>
+        </select>
+
+        <input
+          type="text"
+          id="dashboard-custom-crop"
+          placeholder="Enter custom crop..."
+          style="display:none;"
+        >
+      </div>
+
+      <div class="save-field">
+        <label>Notes</label>
+        <textarea id="dashboard-notes" rows="4" placeholder="Optional notes..."></textarea>
+      </div>
+
+      <button class="btn-dashboard-save" id="confirm-dashboard-save">
+        Save Analysis
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+  {% block scripts %}
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+  <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+  <script>
+    // Leaflet Draw Übersetzungen aus Jinja laden
+    const leafletTranslations = JSON.parse('{{ leaflet_translations | tojson if leaflet_translations else "{}" }}');
+    
+    // Fallback für fehlende Übersetzungen
+    const defaultTranslations = {
+      "draw_polygon": "Draw a polygon",
+      "draw_rectangle": "Draw a rectangle", 
+      "draw_polyline": "Draw a polyline",
+      "draw_circle": "Draw a circle",
+      "draw_marker": "Add a marker",
+      "edit_layers": "Edit layers",
+      "delete_layers": "Delete layers",
+      "cancel": "Cancel",
+      "finish": "Finish",
+      "undo": "Undo last point",
+      "save": "Save changes",
+      "clear_all": "Delete all"
+    };
+    
+    // Übersetzungen zusammenführen (Jinja + Fallback)
+    const translations = { ...defaultTranslations, ...leafletTranslations };
+    
+    // Leaflet Draw Texte setzen
+    L.drawLocal.draw.toolbar.buttons.polygon = translations.draw_polygon;
+    L.drawLocal.draw.toolbar.buttons.rectangle = translations.draw_rectangle;
+    L.drawLocal.draw.toolbar.buttons.polyline = translations.draw_polyline;
+    L.drawLocal.draw.toolbar.buttons.circle = translations.draw_circle;
+    L.drawLocal.draw.toolbar.buttons.marker = translations.draw_marker;
+    L.drawLocal.draw.toolbar.actions.title = translations.cancel;
+    L.drawLocal.draw.toolbar.actions.text = translations.cancel;
+    L.drawLocal.draw.toolbar.finish.title = translations.finish;
+    L.drawLocal.draw.toolbar.finish.text = translations.finish;
+    L.drawLocal.draw.toolbar.undo.title = translations.undo;
+    L.drawLocal.draw.toolbar.undo.text = translations.undo;
+    L.drawLocal.edit.toolbar.buttons.edit = translations.edit_layers;
+    L.drawLocal.edit.toolbar.buttons.editDisabled = "No layers to edit";
+    L.drawLocal.edit.toolbar.buttons.remove = translations.delete_layers;
+    L.drawLocal.edit.toolbar.buttons.removeDisabled = "No layers to delete";
+    L.drawLocal.edit.toolbar.actions.save.title = translations.save;
+    L.drawLocal.edit.toolbar.actions.save.text = translations.save;
+    L.drawLocal.edit.toolbar.actions.cancel.title = translations.cancel;
+    L.drawLocal.edit.toolbar.actions.cancel.text = translations.cancel;
+    L.drawLocal.edit.toolbar.actions.clearAll.title = translations.clear_all;
+    L.drawLocal.edit.toolbar.actions.clearAll.text = translations.clear_all;
+    L.drawLocal.edit.handlers.edit.tooltip.text = "Drag handles or markers to edit features";
+    L.drawLocal.edit.handlers.edit.tooltip.subtext = "Click cancel to undo changes";
+    L.drawLocal.edit.handlers.remove.tooltip.text = "Click on a feature to remove";
+    
+    const API_URL = "{{ api_url }}";
+  </script>
+  <script src="/static/js/map.js"></script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Personal Dashboard{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" href="/static/css/dashboard.css" />
+{% endblock %}
+
+{% block content %}
+
+<div class="page-content">
+
+  <!-- =========================
+       HERO
+  ========================== -->
+  <div class="about-hero">
+    <div class="section-eyebrow">Dashboard</div>
+    <h1>Personal Dashboard</h1>
+    <p>Manage, analyze and compare your saved field analyses.</p>
+  </div>
+
+  <!-- =========================
+       FILTER BAR
+  ========================== -->
+  <section class="about-section">
+
+    <div class="section-eyebrow">Filters</div>
+    <h2 class="section-title">Your Data</h2>
+
+    <div class="dashboard-filters">
+
+      <select id="filter-days">
+        <option value="">All time</option>
+        <option value="7">Last 7 days</option>
+        <option value="30">Last 30 days</option>
+      </select>
+
+      <select id="filter-crop">
+        <option value="">All crops</option>
+        <option value="wheat">Wheat</option>
+        <option value="corn">Corn</option>
+      </select>
+
+    </div>
+
+  </section>
+
+  <!-- =========================
+       ANALYSIS LIST
+  ========================== -->
+  <section class="about-section">
+
+    <div class="section-eyebrow">History</div>
+    <h2 class="section-title">Saved Analyses</h2>
+
+    {% if analyses is not defined or analyses|length == 0 %}
+      <p>No saved analyses yet.</p>
+    {% endif %}
+
+    <div id="dashboard-container" class="dashboard-container">
+
+      {% for a in analyses %}
+
+      <div class="analysis-card">
+
+        <div class="analysis-title">
+          {{ a.crop or "Unknown crop" }}
+        </div>
+
+        <div class="analysis-meta">
+          📅 {{ a.date }} <br>
+          📊 Avg: {{ (a.avg_value * 100) | round(1) }}% <br>
+          🔴 Min: {{ (a.min_value * 100) | round(1) }}%
+          🟢 Max: {{ (a.max_value * 100) | round(1) }}%
+        </div>
+
+        <button class="btn-danger delete-btn" data-id="{{ a.id }}">
+          Delete
+        </button>
+
+      </div>
+
+      {% endfor %}
+
+    </div>
+
+  </section>
+
+</div>
+
+{% endblock %}
+
+<!-- =========================
+     SCRIPTS
+========================== -->
+{% block scripts %}
+
+<script>
+  const API_URL = "http://127.0.0.1:8000";
+</script>
+
+<script src="/static/js/dashboard.js"></script>
+
+{% endblock %}
