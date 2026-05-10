@@ -3,6 +3,10 @@ import json
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import neural_network_predictor as nn_pred
 import random_forest_predictor as rf_pred
 import xgboost_predictor
@@ -35,14 +39,14 @@ def run_model(model_var, model_config, target, validation, include_optional_data
     # Load the configuration file and get feature columns for the model configuration
     with open(config_path, "r") as file:
         configfile = json.load(file)
-    feature_columns = configfile[model_config]["feature_columns"]
+    feature_columns = list(configfile[model_config]["feature_columns"])
 
     # If optional data is included, extend the feature columns
     if include_optional_data:
-        feature_columns.extend(configfile[model_config]["optional_feature_columns"])
+        feature_columns.extend(configfile[model_config].get("optional_feature_columns", []))
     input_size = len(feature_columns)
 
-    file_path = Path(os.environ["DATASET_PATH"]) / f"{model_config}_norm.csv"
+    file_path = Path(os.environ["DATASET_PATH"]) / f"{model_config}_trans.csv"
     dataloader_creator = DataloaderCreator(str(file_path), target, feature_columns)
 
     if model_var == "xgboost":
@@ -95,11 +99,11 @@ def main():
 
     model_vars = ["xgboost", "nn", "rf"]
     # model_configs = ["Model_A", "Model_A+"]
-    targets = ["pH_CaCl2", "pH_H2O", "P", "N", "K"]
+    targets = ["OC"]
 
-    model_config = "Model_A+"  # Select model Model_A or Model_A+ (Differs in the used feature columns)
+    model_config = "Model_A"  # Select model Model_A or Model_A+ (Differs in the used feature columns)
     model_var = "xgboost"  # Specify the model variant to be used: xgboost, nn, rf
-    target = "pH_CaCl2"  # Select target nutrient 'pH_CaCl2', 'pH_H2O', 'P', 'N', 'K'
+    target = "OC"  # Select target nutrient for OC-only training
     include_optional_data = True  # Currently comprises Clay data
     validation = "Single"  # Select validation method 'Single' or 'Spatial' (Spatial Cross Validation is only available for XGBoost)
 

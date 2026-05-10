@@ -2,6 +2,10 @@
 # Downloads and crops all Sentinel-2 images in the given CSV table (multi-threaded)
 # More information with 'sentinel_download.py -h'
 
+## command
+# python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
+# python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv --api-threads 1 --download-threads 1 --worker-threads 1  
+
 import argparse
 import os
 import shutil
@@ -13,12 +17,12 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables from .env
 load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-from satellite_utils.copernicus_api import CopernicusApi
-
+#from AgroLens.satellite_utils.copernicus_api import CopernicusApi # remove AgroLens if necessary
+from satellite_utils.copernicus_api import CopernicusApi 
 
 class ThreadPrefix:
     """
@@ -63,35 +67,10 @@ crop_threads = 0
 mapping_file = ""
 
 dataframe: pd.DataFrame
-data_length: 0
+data_length = 0
 
 api_finished = False
 download_finished = False
-
-
-def check_environment_variables():
-    """
-    Checks if all required environment variables are set.
-    
-    Raises:
-        EnvironmentError: If any required environment variable is missing
-    """
-    required_vars = [
-        "SENTINEL_DIR",
-        "TMP_DIR",
-        "COPERNICUS_USER",
-        "COPERNICUS_PASSWORD",
-        "AWS_ACCESS_KEY_ID",
-        "AWS_SECRET_ACCESS_KEY",
-    ]
-    
-    missing_vars = [var for var in required_vars if var not in os.environ]
-    
-    if missing_vars:
-        raise EnvironmentError(
-            f"Missing required environment variables: {', '.join(missing_vars)}\n"
-            f"Please set these variables using 'export VAR=value' or in a .env file"
-        )
 
 
 def setup_parser() -> argparse.Namespace:
@@ -191,37 +170,27 @@ def api_thread(thread_index: int) -> None:
             print("Thread finished.")
             return
 
-        row = dataframe.iloc[index]
-        # Handle both "-" and "/" date separators
-        date_str = row["SURVEY_DATE"]
-        if "/" in date_str:
-            date_parts = date_str.split("/")
-        else:
-            date_parts = date_str.split("-")
-        
-        # Ensure we have exactly 3 parts (DD, MM, YY)
-        if len(date_parts) != 3:
-            print(f"Invalid date format: {date_str}", file=sys.stderr)
-            continue
-            
-        date = f"{date_parts[0]}-{date_parts[1]}-{date_parts[2]}"
-        latitude = float(row["TH_LAT"])
-        longitude = float(row["TH_LON"])
-        print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
-
         try:
+            row = dataframe.iloc[index]
+            date = pd.to_datetime(str(row["SURVEY_DATE"]).strip(), errors="raise").strftime(
+                "%Y-%m-%d"
+            )
+            latitude = float(row["TH_LAT"])
+            longitude = float(row["TH_LONG"])
+            print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
+
             data = CopernicusApi.get_data(date, latitude, longitude)
             if not data:
                 raise ValueError("No Sentinel data found!")
 
             data = data[0]
             sentinel_date = data["properties"]["startDate"].split("T")[0]
-            print(f"Best dataset: {data['id']} ({sentinel_date})")
+            print(f"Best dataset: {data["id"]} ({sentinel_date})")
 
             if mapping_file:
                 with open(mapping_file, "a") as file:
                     print(
-                        f"{row['POINTID']},{date},{latitude},{longitude},{sentinel_date},{data['id']}",
+                        f"{row["POINTID"]},{date},{latitude},{longitude},{sentinel_date},{data["id"]}",
                         file=file,
                     )
 
@@ -267,14 +236,14 @@ def download_thread(thread_index: int) -> None:
         result_path = (
             Path(os.environ["SENTINEL_DIR"])
             / job["date"]
-            / f"{job['lat']} {job['lon']}"
+            / f"{job["lat"]} {job["lon"]}"
         )
         if result_path.is_dir():
             print("Dataset already downloaded")
             continue
 
         try:
-            CopernicusApi.download_data(job["id"], job["point"], os.environ["TMP_DIR"])
+            CopernicusApi.download_data(job["id"], job["point"], target_path=os.environ["TMP_DIR"])
             crop_jobs.append(job)
         except Exception as e:
             print(e, file=sys.stderr)
@@ -309,16 +278,16 @@ def crop_thread(thread_index: int) -> None:
         result_path = (
             Path(os.environ["SENTINEL_DIR"])
             / job["date"]
-            / f"{job['lat']} {job['lon']}"
+            / f"{job["lat"]} {job["lon"]}"
         )
 
         try:
             CopernicusApi.crop_images(
-                job["point"], job["lat"], job["lon"], os.environ["TMP_DIR"]
+                job["point"], job["lat"], job["lon"], parent_path=os.environ["TMP_DIR"]
             )
             os.makedirs(Path(os.environ["SENTINEL_DIR"]) / job["date"], exist_ok=True)
             shutil.move(Path(os.environ["TMP_DIR"]) / job["point"], result_path)
-            print(f"Point {job['point']} finished.")
+            print(f"Point {job["point"]} finished.")
         except Exception as e:
             print(e, file=sys.stderr)
             with counter_lock:
@@ -330,19 +299,17 @@ def main():
     global dataframe, data_length, api_threads, download_threads, crop_threads, api_finished, download_finished, mapping_file
 
     args = setup_parser()
-    
-    # Check if all required environment variables are set
-    check_environment_variables()
 
     # create Sentinel mapping file
     if mapping_file and not os.path.isfile(mapping_file):
         with open(mapping_file, "w") as file:
             print(
-                "POINTID,SURVEY_DATE,TH_LAT,TH_LON,SENTINEL_DATE,SENTINEL_ID",
+                "POINTID,SURVEY_DATE,TH_LAT,TH_LONG,SENTINEL_DATE,SENTINEL_ID",
                 file=file,
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
+    data = data[0:1]
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])
@@ -355,7 +322,7 @@ def main():
         dataframe = data.iloc[start:]
     data_length = len(dataframe)
 
-    #print(f"Loaded {data_length} rows (lines {start+1}-{end or 'infinite'}).")
+    print(f"Loaded {data_length} rows (lines {start+1}-{end or "∞"}).")
 
     # create all threads
     threads_api = []

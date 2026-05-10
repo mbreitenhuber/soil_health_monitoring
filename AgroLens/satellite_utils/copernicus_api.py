@@ -13,8 +13,8 @@ import cv2
 import numpy as np
 import requests
 
+#from AgroLens.satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
 from satellite_utils.image_utils import ImageUtils
-
 
 class CopernicusApi:
     """
@@ -22,7 +22,7 @@ class CopernicusApi:
     """
 
     AUTH_URL = "https://identity.dataspace.copernicus.eu/auth/realms/CDSE/protocol/openid-connect/token"
-    API_URL = "https://catalogue.dataspace.copernicus.eu/resto/api/collections/#product#/search.json"
+    API_URL = "https://catalogue.dataspace.copernicus.eu/odata/v1/Products"
     DOWNLOAD_URL = (
         "https://zipper.dataspace.copernicus.eu/odata/v1/Products(#product_id#)/$value"
     )
@@ -65,44 +65,59 @@ class CopernicusApi:
             list[dict]: list of datasets, ordered by date difference to the search date
         """
         print(f"Getting {product} features for {date} ({latitude}, {longitude})...")
-        cls.authenticate()
 
         date = datetime.fromisoformat(date)
         start = date - timedelta(days=span)
         end = date + timedelta(days=span + 1)
 
-        product_type = "S2MSI2A"
+        collection = "SENTINEL-2"
+        name_token = "MSIL2A"
         if product.lower().startswith("landsat"):
-            product = "LANDSAT-8-ESA"
-            product_type = "L2SP"
+            collection = "LANDSAT-8-ESA"
+            name_token = "L2SP"
 
-        query = (
-            f"{cls.API_URL.replace('#product#', product)}"
-            f"?productType={product_type}"
-            f"&startDate={start.isoformat()}Z"
-            f"&completionDate={end.isoformat()}Z"
-            f"&lat={latitude}"
-            f"&lon={longitude}"
-            "&radius=500"
-            "&sortParam=startDate"
-            "&sortOrder=descending"
+        filter_query = (
+            f"Collection/Name eq '{collection}' and "
+            f"ContentDate/Start ge {start.isoformat()}Z and "
+            f"ContentDate/Start lt {end.isoformat()}Z and "
+            f"OData.CSC.Intersects(area=geography'SRID=4326;POINT({longitude} {latitude})') and "
+            f"contains(Name,'{name_token}')"
         )
 
         response = requests.get(
-            query,
+            cls.API_URL,
             allow_redirects=True,
-            headers={"Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}"},
+            params={
+                "$filter": filter_query,
+                "$orderby": "ContentDate/Start desc",
+                "$top": max(limit * 10, 20),
+            },
         )
         response.raise_for_status()
         data = response.json()
 
-        if not data["features"]:
+        products = data.get("value", [])
+        if not products:
             print(
                 f"No data available for the chosen date and location!", file=sys.stderr
             )
             return None
 
-        features = data["features"]
+        # Keep the legacy feature shape used by the rest of the pipeline.
+        features = []
+        for item in products:
+            s3_path = item.get("S3Path", "")
+            product_identifier = s3_path if s3_path else item.get("Name", "")
+            features.append(
+                {
+                    "id": item.get("Id", ""),
+                    "properties": {
+                        "startDate": item.get("ContentDate", {}).get("Start", ""),
+                        "productIdentifier": product_identifier,
+                    },
+                }
+            )
+
         # sort results by difference to the desired date
         features.sort(key=lambda product: cls._productTimestampDiff(product, date))
 
@@ -115,7 +130,7 @@ class CopernicusApi:
                 break
             if cls._cloud_covered(feature, latitude, longitude, product):
                 print(
-                    f"Dataset '{feature['id']}' ({feature['properties']['startDate']}) has been cloud filtered."
+                    f"Dataset '{feature["id"]}' ({feature["properties"]["startDate"]}) has been cloud filtered."
                 )
             else:
                 result.append(feature)
@@ -161,12 +176,13 @@ class CopernicusApi:
                 cls.DOWNLOAD_URL.replace("#product_id#", id),
                 allow_redirects=True,
                 stream=True,
-                headers={"Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}"},
+                headers={"Authorization": f"Bearer {os.environ["COPERNICUS_TOKEN"]}"},
             ) as response:
                 response.raise_for_status()
                 with open(zipfile, "wb") as file:
                     total = int(response.headers.get("content-length"))
                     downloaded = 0
+                    last_reported_bucket = -1
                     print(f"Downloading {round(total / 1048576)} MB to '{zipfile}'...")
                     for chunk in response.iter_content(
                         chunk_size=8388608
@@ -174,10 +190,14 @@ class CopernicusApi:
                         if chunk:
                             file.write(chunk)
                             if sys.stdout.isatty():
-                                # display progress (only in terminal)
                                 downloaded += len(chunk)
                                 progress = round(downloaded * 100 / total)
-                                print(f"  {progress}%", end="\r")
+                                progress_bucket = progress // 10
+                                if progress_bucket > last_reported_bucket:
+                                    last_reported_bucket = progress_bucket
+                                    print(
+                                        f"Download progress: {progress}% ({round(downloaded / 1048576)} / {round(total / 1048576)} MB)"
+                                    )
 
                     print("Download complete")
 
@@ -248,7 +268,12 @@ class CopernicusApi:
         Returns:
             int: Time difference in seconds
         """
-        startDate = datetime.fromisoformat(product["properties"]["startDate"])
+        start_date_raw = product["properties"].get("startDate", "")
+        if not start_date_raw:
+            return 10**18
+        if start_date_raw.endswith("Z"):
+            start_date_raw = start_date_raw.replace("Z", "+00:00")
+        startDate = datetime.fromisoformat(start_date_raw)
         return abs(date.timestamp() - startDate.timestamp())
 
     @classmethod
@@ -261,7 +286,6 @@ class CopernicusApi:
         if cls._is_authenticated():
             return
 
-        print("Authenticating with Copernicus Dataspace...")
         response = requests.post(
             cls.AUTH_URL,
             allow_redirects=True,

@@ -2,6 +2,7 @@ import numpy as np
 import optuna
 import xgboost as xgb
 from sklearn.metrics import mean_squared_error
+from pathlib import Path
 
 
 def objective(trial, dtrain, dtest, Y_test, path_savemodel):
@@ -38,6 +39,7 @@ def objective(trial, dtrain, dtest, Y_test, path_savemodel):
     print(f"RMSE of Trial {trial.number}: {rmse}")
 
     if trial.number == 0 or mse < trial.study.best_value:
+        Path(path_savemodel).parent.mkdir(parents=True, exist_ok=True)
         model.save_model(path_savemodel)
         print(f"Model with RMSE {rmse} saved.")
 
@@ -161,6 +163,7 @@ def run_xgboost_scv_train(folds, X_val, y_val, path_savemodel, n_trials=50):
     dtrain_full = xgb.DMatrix(X_train_full, label=y_train_full)
     best_model = xgb.train(param, dtrain_full)
 
+    Path(path_savemodel).parent.mkdir(parents=True, exist_ok=True)
     best_model.save_model(path_savemodel)
     print(f"Final model saved to {path_savemodel}")
 
