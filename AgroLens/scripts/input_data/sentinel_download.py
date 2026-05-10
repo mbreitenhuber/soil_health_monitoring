@@ -309,8 +309,7 @@ def main():
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
-    data = data.head(8)
-    print("Limiting processing to the first 8 datapoints from the input CSV.")
+    data = data[0:1]
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])

@@ -3,7 +3,8 @@
 # More information with 'sentinel_to_csv.py -h'
 
 # command
-# python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/sentinel_bands.csv --shape 9x9 --flatten --normalize
+# python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
+# DE: python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/datasets/mapping_S2_DE.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalized
 
 import argparse
 import os
@@ -208,6 +209,12 @@ def main():
     print(f"Dropping {len(drop)} rows...")
     output.drop(output.index[drop], inplace=True)
 
+    # debugging statement
+    print(f"Output dataframe shape after dropping rows: {output.shape}")
+    print(f"Number of rows in output: {len(output)}")
+    if len(output) == 0:
+        print("WARNING: Output dataframe is empty!")
+
     # Create new index column
     # output.drop(output.columns[0], axis=1, inplace=True) # this drops the PointID column
     output.reset_index(drop=True, inplace=True)
@@ -226,7 +233,7 @@ def main():
         output[bands] = output[bands].astype(str)
         output.replace("\n", "", regex=True, inplace=True)
 
-    output.to_csv(args.output, sep=",")
+    output.to_csv(args.output, sep=",", index=False, header=True)
     print(f"New data table saved to '{args.output}'.")
 
 

@@ -5,7 +5,9 @@ import os
 from pathlib import Path
 
 import pandas as pd
+from dotenv import load_dotenv
 
+load_dotenv()
 
 def main():
     """
@@ -17,8 +19,8 @@ def main():
     """
 
     # ----- CONFIGURATION -----
-    input_csv = Path(os.environ["DATASET_PATH"]) / "Model_A+.csv"
-    output_csv_normalized = Path(os.environ["DATASET_PATH"]) / "Model_A+_norm.csv"
+    input_csv = Path(os.environ["DATASET_PATH"]) / "Model_A.csv"
+    output_csv_normalized = Path(os.environ["DATASET_PATH"]) / "Model_A_norm.csv"
 
     # Specify columns to exclude from normalization
     excluded_columns = [
@@ -75,8 +77,10 @@ def main():
         # Rename the column to include the prefix "norm_"
         df_normalized.rename(columns={col: f"norm_{col}"}, inplace=True)
 
+    print(df_normalized.columns)
+
     # Save the DataFrame to a new CSV file
-    df_normalized.to_csv(output_csv_normalized, index=False)
+    df_normalized.to_csv(output_csv_normalized, index=False, header=True)
     print(f"Normalization complete. Saved to {output_csv_normalized}")
 
 

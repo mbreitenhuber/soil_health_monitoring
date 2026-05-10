@@ -2,6 +2,7 @@ import optuna
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from pathlib import Path
 from optuna.trial import TrialState
 
 
@@ -194,6 +195,8 @@ class TrainingPipeline:
             save_loss = "Huber"
         else:
             save_loss = "Unknown"
+
+        Path(file_path).parent.mkdir(parents=True, exist_ok=True)
 
         model_info = {
             "input_size": self.model.model[0].in_features,
