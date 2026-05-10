@@ -7,7 +7,9 @@ from pathlib import Path
 import pandas as pd
 from dotenv import load_dotenv
 
-load_dotenv()
+
+load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+
 
 def main():
     """
@@ -19,18 +21,15 @@ def main():
     """
 
     # ----- CONFIGURATION -----
-    input_csv = Path(os.environ["DATASET_PATH"]) / "Model_A.csv"
-    output_csv_normalized = Path(os.environ["DATASET_PATH"]) / "Model_A_norm.csv"
+    dataset_path = Path(os.environ["DATASET_PATH"])
+    input_csv = dataset_path / "Model_A.csv"
+    output_csv_normalized = dataset_path / "Model_A_norm.csv"
 
     # Specify columns to exclude from normalization
     excluded_columns = [
         "Index",
         "POINTID",
-        "pH_CaCl2",
-        "pH_H2O",
-        "P",
-        "N",
-        "K",
+        "OC",
         "NUTS_0",
         "NUTS_1",
         "NUTS_2",
@@ -44,14 +43,18 @@ def main():
         "LC1_Desc",
         "LU1_Desc",
         "SENTINEL_DATE",
-        "SENTINEL_ID",
-        "OW_lat",
-        "OW_lon",
-        "OW_timezone_offset",
+        "SENTINEL_ID"
     ]
 
     # Read the CSV into a pandas DataFrame
     df = pd.read_csv(input_csv)
+
+    # Drop rows without a valid OC target so training labels stay finite.
+    before_rows = len(df)
+    df = df.dropna(subset=["OC"])
+    dropped_rows = before_rows - len(df)
+    if dropped_rows:
+        print(f"Dropped {dropped_rows} rows with missing OC values")
 
     # Identify numeric columns
     numeric_cols = df.select_dtypes(include=["number"]).columns
@@ -77,10 +80,8 @@ def main():
         # Rename the column to include the prefix "norm_"
         df_normalized.rename(columns={col: f"norm_{col}"}, inplace=True)
 
-    print(df_normalized.columns)
-
     # Save the DataFrame to a new CSV file
-    df_normalized.to_csv(output_csv_normalized, index=False, header=True)
+    df_normalized.to_csv(output_csv_normalized, index=False)
     print(f"Normalization complete. Saved to {output_csv_normalized}")
 
 
