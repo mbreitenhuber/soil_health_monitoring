@@ -1,0 +1,45 @@
+/* ── How-To page specific styles ───────────────────── */
+.howto-steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 8px;}
+.howto-step-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s;}
+.howto-step-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.howto-step-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3.5rem; color: var(--border2); line-height: 1; position: absolute; top: 12px; right: 18px; letter-spacing: -0.05em; pointer-events: none;}
+.howto-step-icon { font-size: 1.6rem; margin-bottom: 16px;}
+.howto-step-card h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 10px;}
+.howto-step-card p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.75;}
+
+/* Detail blocks */
+.howto-detail { border-bottom: 1px solid var(--border); padding: 36px 0;}
+.howto-detail:first-of-type { padding-top: 0; }
+.howto-detail-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 20px;}
+.howto-detail-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); white-space: nowrap;}
+.howto-detail-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--text); letter-spacing: -0.02em;}
+.howto-detail-body p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.8; max-width: 720px;}
+.howto-list { margin: 16px 0 0 20px; display: flex; flex-direction: column; gap: 10px;}
+.howto-list li { font-size: 0.82rem; color: var(--text-dim); line-height: 1.7;}
+kbd { font-family: 'DM Mono', monospace; font-size: 0.72rem; background: var(--surface2); border: 1px solid var(--border2); border-radius: 4px; padding: 2px 7px; color: var(--text);}
+.howto-tip { margin-top: 20px; background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 0 8px 8px 0; padding: 16px 20px; font-size: 0.78rem; color: var(--text-dim); line-height: 1.75; max-width: 720px;}
+.howto-tip-label { display: inline-block; font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.72rem; color: var(--accent); margin-bottom: 6px; letter-spacing: 0.04em;}
+
+/* Model cards */
+.howto-model-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 8px;}
+.howto-model-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; transition: border-color 0.2s, transform 0.2s;}
+.howto-model-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.howto-model-icon { font-size: 1.4rem; margin-bottom: 14px;}
+.howto-model-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 10px;}
+.howto-model-card p { font-size: 0.77rem; color: var(--text-dim); line-height: 1.75;}
+
+/* Legend */
+.howto-legend-block { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;}
+.howto-legend-row { display: flex; gap: 24px; align-items: flex-start; padding: 28px; border-bottom: 1px solid var(--border); transition: background 0.15s;}
+.howto-legend-row:hover { background: var(--surface); }
+.howto-legend-swatch { width: 48px; height: 48px; border-radius: 8px; flex-shrink: 0; margin-top: 2px;}
+.howto-legend-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.88rem; color: var(--text); margin-bottom: 8px;}
+.howto-legend-row p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.75; max-width: 680px;}
+
+/* FAQ */
+.howto-faq { margin-top: 8px; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;}
+
+.howto-faq-item { padding: 28px; border-bottom: 1px solid var(--border); transition: background 0.15s;}
+.howto-faq-item:hover { background: var(--surface); }
+.howto-faq-q { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 10px;}
+.howto-faq-item p { font-size: 0.78rem; color: var(--text-dim); line-height: 1.75; max-width: 700px;}

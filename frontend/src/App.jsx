@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 
-const API_URL = `https://be.${window.location.hostname}`;
+const API_URL = `http://localhost:8000`;
 
 function DragonIcon({ delay }) {
   return (
