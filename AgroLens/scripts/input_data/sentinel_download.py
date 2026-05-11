@@ -342,7 +342,7 @@ def main():
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
-    data = data[3:4]
+    data = data[5:6]
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])

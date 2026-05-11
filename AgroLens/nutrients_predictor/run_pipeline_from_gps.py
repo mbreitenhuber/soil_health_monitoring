@@ -12,7 +12,7 @@ Steps performed:
 The script relies on environment variables set in the project's .env (SENTINEL_DIR, TMP_DIR, DATASET_PATH, MODEL_PATH, etc.).
 """
 
-# python AgroLens/nutrients_predictor/run_pipeline_from_gps.py --gps data/datasets/sample_gps_input.csv --flatten --output data/datasets/sample_gps_input_predictions.csv
+# python AgroLens/nutrients_predictor/run_pipeline_from_gps.py --gps data/datasets/LUCAS_SOIL_processed_DE.csv --flatten --normalize --output data/datasets/sample_gps_input_predictions.csv
 
 from pathlib import Path
 import subprocess
@@ -33,6 +33,7 @@ def parse_args():
     p.add_argument("--target", default="OC", help="Target column name (default: OC)")
     p.add_argument("--shape", default="9x9", help="Sentinel pixel shape for extraction (default: 9x9)")
     p.add_argument("--flatten", action="store_true", help="Flatten pixel matrices when extracting")
+    p.add_argument("--normalize", action="store_true", help="Normalize band values when loading to .csv")
     p.add_argument("--mapping", help="Path to write mapping CSV (optional)")
     p.add_argument("--model", help="Path to trained .pth model (optional)")
     p.add_argument(
@@ -60,7 +61,7 @@ def main():
 
     mapping_file = Path(args.mapping) if args.mapping else dataset_path / "mapping_from_gps.csv"
     sentinel_csv = dataset_path / f"{args.model_config}.csv"
-    transformed_csv = dataset_path / f"{args.model_config}_norm_trans.csv"
+    transformed_csv = dataset_path / f"{args.model_config}_trans.csv"
     predictions_csv = (
         Path(args.output)
         if args.output
@@ -73,7 +74,8 @@ def main():
 
     # 1) Download sentinel data (creates mapping CSV)
     sentinel_download = input_dir / "sentinel_download.py"
-    cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file), "--api-threads", "1", "--download-threads", "1", "--worker-threads", "1"]
+    #cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file), "--api-threads", "1", "--download-threads", "1", "--worker-threads", "1"]
+    cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file)]
     run_cmd(cmd, env=env)
 
     # 2) Extract pixel values to CSV
@@ -81,6 +83,8 @@ def main():
     csv_cmd = [sys.executable, str(sentinel_to_csv), "--input", str(gps_input), "--mapping", str(mapping_file), "--output", str(sentinel_csv), "--shape", args.shape]
     if args.flatten:
         csv_cmd.append("--flatten")
+    if args.normalize:
+        csv_cmd.append("--normalize")
     run_cmd(csv_cmd, env=env)
 
     # 3) Normalize dataset (normalize_data.py expects DATASET_PATH environment variable)
@@ -94,6 +98,9 @@ def main():
     env["MODEL_PATH"] = str(dataset_path / f"{args.model_config}.csv")
     feature_transform = scripts_dir / "feature_transformation.py"
     run_cmd([sys.executable, str(feature_transform)], env=env)
+
+    # Reset MODEL_PATH to the correct models directory for prediction
+    env["MODEL_PATH"] = os.environ.get("MODEL_PATH", "./data/models")
 
     # 5) Predict with neural network
     predict_script = project_root / "AgroLens" / "nutrients_predictor" / "predict_nn.py"

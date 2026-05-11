@@ -12,6 +12,7 @@ The input CSV must contain the feature columns listed in
 data/Feature_Cols/model_settings.json for the selected `model_config`.
 The script adds a new column `<target>_pred` to the CSV and saves it.
 """
+# python ./AgroLens/nutrients_predictor/predict_nn.py --input ./data/test.csv --model /Users/clarabuller/PycharmProjects/Nebula/data/models/Model_A/nn/Model_A_nn_OC.pth
 
 import argparse
 import json
@@ -30,7 +31,12 @@ import neural_network_predictor as nn_pred
 
 def parse_args():
     p = argparse.ArgumentParser(description="Predict OC with a trained NN model")
-    p.add_argument("--input", "-i", required=True, help="Input CSV with features")
+    p.add_argument(
+        "--input",
+        "-i",
+        required=True,
+        help="Input CSV with features"
+    )
     p.add_argument(
         "--model",
         "-m",
