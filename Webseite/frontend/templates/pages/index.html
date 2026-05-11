@@ -69,7 +69,7 @@
       <div class="section-eyebrow">How it works</div>
       <h3>From polygon to zone map in seconds</h3>
       <p>Select the polygon drawing tool on the map, click around the edges of your field, and start the analysis.</p>
-      <p>The FastAPI backend splits the bounding box into a 60m x 60m grid and computes a quality score for each cell.</p>
+      <p>The program splits the bounding box into a 60m x 60m grid and computes a quality score for each cell using a machine learning model.</p>
       <a class="btn-primary" href="/analyse">Try out now →</a>
     </div>
   </section>
@@ -79,12 +79,13 @@
     <div class="showcase-text">
       <div class="section-eyebrow">Machine Learning Model</div>
       <h3>Plug in your own model</h3>
-      <p> Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+      <h3>Satellite driven decision support</h3>
+      <p>The machine learning model is trained on ESA's Sentinel-1 and Sentinel-2 data and uses the NDVI (Normalized Difference Vegetation Index) and other vegetation indices to predict the quality of the soil.</p>
       <a class="btn-outline" href="/research_background">Learn more about the project →</a>
     </div>
-    <div class="img-placeholder" style="aspect-ratio:4/3;border-radius:10px;">
-      <div class="icon">🤖</div><div>Image: Model visualization</div>
+    <div class="img-placeholder" style="border-radius:10px;width:100%;height:100%;aspect-ratio:16/9;">
+      <img src="/static/assets/image/flow_chart_ML.png" alt="Flow chart of the machine learning model"
+      style="width:100%;height:100%;object-fit:cover;" />
     </div>
   </section>
 
