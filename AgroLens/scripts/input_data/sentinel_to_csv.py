@@ -4,7 +4,7 @@
 
 # command
 # python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
-# DE: python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/datasets/mapping_S2_DE.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalized
+# DE: python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_S2_DE.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
 
 import argparse
 import os
@@ -148,7 +148,7 @@ def main():
         path = (
             sentinel_path
             / row["SENTINEL_DATE"]
-            / f"{row["TH_LAT"]} {row["TH_LONG"]}"
+            / f"{row['TH_LAT']} {row['TH_LONG']}"
             / "IMG_DATA"
         )
 
@@ -172,7 +172,7 @@ def main():
                         value = ImageUtils.get_pixel_value(str(file), 50, 50, shape)
                     except:
                         print(
-                            f"Could not get value of point {row["POINTID"]}, band {band} ({resolution})!",
+                            f"Could not get value of point {row['POINTID']}, band {band} ({resolution})!",
                             file=sys.stderr,
                         )
                         pass

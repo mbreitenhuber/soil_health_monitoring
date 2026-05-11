@@ -5,6 +5,7 @@
 ## command
 # python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
 # python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv --api-threads 1 --download-threads 1 --worker-threads 1  
+# python ./AgroLens/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv
 
 import argparse
 import os
@@ -12,6 +13,7 @@ import shutil
 import sys
 import threading
 import time
+import traceback
 from pathlib import Path
 
 import pandas as pd
@@ -71,6 +73,34 @@ data_length = 0
 
 api_finished = False
 download_finished = False
+
+
+def validate_environment_variables() -> None:
+    """
+    Validates that all required environment variables are set.
+    Raises an error if any are missing.
+    """
+    required_vars = [
+        "SENTINEL_DIR",
+        "TMP_DIR",
+        "COPERNICUS_USER",
+        "COPERNICUS_PASSWORD",
+        "AWS_ACCESS_KEY_ID",
+        "AWS_SECRET_ACCESS_KEY",
+    ]
+    
+    missing_vars = [var for var in required_vars if not os.environ.get(var)]
+    
+    if missing_vars:
+        error_msg = (
+            "❌ Missing required environment variables:\n"
+            + "\n".join(f"  - {var}" for var in missing_vars)
+            + "\n\nPlease set these variables in your .env file or shell environment."
+        )
+        print(error_msg, file=sys.stderr)
+        sys.exit(1)
+    
+    print("✓ All required environment variables are set.")
 
 
 def setup_parser() -> argparse.Namespace:
@@ -185,12 +215,12 @@ def api_thread(thread_index: int) -> None:
 
             data = data[0]
             sentinel_date = data["properties"]["startDate"].split("T")[0]
-            print(f"Best dataset: {data["id"]} ({sentinel_date})")
+            print(f"Best dataset: {data['id']} ({sentinel_date})")
 
             if mapping_file:
                 with open(mapping_file, "a") as file:
                     print(
-                        f"{row["POINTID"]},{date},{latitude},{longitude},{sentinel_date},{data["id"]}",
+                        f"{row['POINTID']},{date},{latitude},{longitude},{sentinel_date},{data['id']}",
                         file=file,
                     )
 
@@ -236,7 +266,7 @@ def download_thread(thread_index: int) -> None:
         result_path = (
             Path(os.environ["SENTINEL_DIR"])
             / job["date"]
-            / f"{job["lat"]} {job["lon"]}"
+            / f"{job['lat']} {job['lon']}"
         )
         if result_path.is_dir():
             print("Dataset already downloaded")
@@ -278,7 +308,7 @@ def crop_thread(thread_index: int) -> None:
         result_path = (
             Path(os.environ["SENTINEL_DIR"])
             / job["date"]
-            / f"{job["lat"]} {job["lon"]}"
+            / f"{job['lat']} {job['lon']}"
         )
 
         try:
@@ -287,7 +317,7 @@ def crop_thread(thread_index: int) -> None:
             )
             os.makedirs(Path(os.environ["SENTINEL_DIR"]) / job["date"], exist_ok=True)
             shutil.move(Path(os.environ["TMP_DIR"]) / job["point"], result_path)
-            print(f"Point {job["point"]} finished.")
+            print(f"Point {job['point']} finished.")
         except Exception as e:
             print(e, file=sys.stderr)
             with counter_lock:
@@ -298,6 +328,9 @@ def crop_thread(thread_index: int) -> None:
 def main():
     global dataframe, data_length, api_threads, download_threads, crop_threads, api_finished, download_finished, mapping_file
 
+    # Validate environment variables before starting
+    validate_environment_variables()
+    
     args = setup_parser()
 
     # create Sentinel mapping file
@@ -309,7 +342,7 @@ def main():
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
-    data = data[0:1]
+    data = data[3:4]
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])
@@ -322,7 +355,7 @@ def main():
         dataframe = data.iloc[start:]
     data_length = len(dataframe)
 
-    print(f"Loaded {data_length} rows (lines {start+1}-{end or "∞"}).")
+    print(f"Loaded {data_length} rows (lines {start+1}-{end or '∞'}).")
 
     # create all threads
     threads_api = []

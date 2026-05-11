@@ -130,7 +130,7 @@ class CopernicusApi:
                 break
             if cls._cloud_covered(feature, latitude, longitude, product):
                 print(
-                    f"Dataset '{feature["id"]}' ({feature["properties"]["startDate"]}) has been cloud filtered."
+                    f"Dataset '{feature['id']}' ({feature['properties']['startDate']}) has been cloud filtered."
                 )
             else:
                 result.append(feature)
@@ -176,7 +176,7 @@ class CopernicusApi:
                 cls.DOWNLOAD_URL.replace("#product_id#", id),
                 allow_redirects=True,
                 stream=True,
-                headers={"Authorization": f"Bearer {os.environ["COPERNICUS_TOKEN"]}"},
+                headers={"Authorization": f"Bearer {os.environ['COPERNICUS_TOKEN']}"},
             ) as response:
                 response.raise_for_status()
                 with open(zipfile, "wb") as file:
