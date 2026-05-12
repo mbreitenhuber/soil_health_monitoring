@@ -59,6 +59,7 @@ class ThreadPrefix:
 api_counter = 0
 errors = 0
 counter_lock = threading.Lock()
+file_lock = threading.Lock()  # Lock for thread-safe file writing
 
 download_jobs = []
 crop_jobs = []
@@ -218,11 +219,12 @@ def api_thread(thread_index: int) -> None:
             print(f"Best dataset: {data['id']} ({sentinel_date})")
 
             if mapping_file:
-                with open(mapping_file, "a") as file:
-                    print(
-                        f"{row['POINTID']},{date},{latitude},{longitude},{sentinel_date},{data['id']}",
-                        file=file,
-                    )
+                with file_lock:  # Synchronize file write access
+                    with open(mapping_file, "a") as file:
+                        print(
+                            f"{row['POINTID']},{date},{latitude},{longitude},{sentinel_date},{data['id']}",
+                            file=file,
+                        )
 
             download_jobs.append(
                 {
@@ -342,7 +344,7 @@ def main():
             )
 
     data = pd.read_csv(args.input, sep=",", header=0)
-    data = data[5:6]
+    #data = data[5:6]
 
     os.makedirs(os.environ["TMP_DIR"], exist_ok=True)
     os.chdir(os.environ["TMP_DIR"])
