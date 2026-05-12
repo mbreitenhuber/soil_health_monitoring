@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Earth_Explorer_File xmlns="http://gs2.esa.int/DATA_STRUCTURE/olqcReport">
+    <Earth_Explorer_Header>
+        <Fixed_Header>
+            <File_Name>FORMAT_CORRECTNESS.xml</File_Name>
+            <File_Description>Report produced by OLQC-SC</File_Description>
+            <Notes></Notes>
+            <Mission>S2B</Mission>
+            <File_Class>OPER</File_Class>
+            <File_Type>REP_OLQCPA</File_Type>
+            <Validity_Period>
+                <Validity_Start>UTC=2015-06-22T00:00:00</Validity_Start>
+                <Validity_Stop>UTC=2100-01-01T00:00:00</Validity_Stop>
+            </Validity_Period>
+            <File_Version>2</File_Version>
+            <Source>
+                <System>OLQC-SC</System>
+                <Creator>OLQC-SC</Creator>
+                <Creator_Version>06.01.00</Creator_Version>
+                <Creation_Date>UTC=2023-07-31T22:27:57</Creation_Date>
+            </Source>
+        </Fixed_Header>
+    </Earth_Explorer_Header>
+    <Data_Block type="xml">
+        <report gippVersion="1.0" globalStatus="PASSED" date="2023-07-31T22:27:57.394Z">
+            <checkList>
+                <parentID>S2B_OPER_GIP_OLQCPA_MPC__20220715T000042_V20150622T000000</parentID>
+                <name>FORMAT_CORRECTNESS</name>
+                <version>1.0</version>
+                <item url="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/" className="PDI Level 2A Tile Folder" name="S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00" class="http://www.esa.int/s2#pdi_level_2a_tile_container"/>
+                <check>
+                    <inspection creation="2023-07-31T22:27:56.500Z" duration="791" execution="2023-07-31T22:27:56.595Z" id="schemaXmlValidator" item="MTD_TL.xml" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/MTD_TL.xml" name="Schema Validator. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">The schema validation passed successfully.</message>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:27:57.396Z" duration="42" execution="2023-07-31T22:27:57.516Z" id="Tile_Position_Size" item="MTD_TL.xml" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/MTD_TL.xml" name="Check of consistency of Tile Position by Size. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">Tile image size is between [90000.0,110000.0].</message>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:27:57.561Z" duration="12" execution="2023-07-31T22:27:57.605Z" id="Tile_Position_Geoposition" item="MTD_TL.xml" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/MTD_TL.xml" name="Check of consistency of Tile Position by Geoposition. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">Tile geoposition is valid.</message>
+                    <extraValues>
+                        <value name="ULX(10)">499980</value>
+                        <value name="ULY(10)">5500020</value>
+                        <value name="XDIM(10)">10</value>
+                        <value name="YDIM(10)">-10</value>
+                        <value name="ULX(20)">499980</value>
+                        <value name="ULY(20)">5500020</value>
+                        <value name="XDIM(20)">20</value>
+                        <value name="YDIM(20)">-20</value>
+                        <value name="ULX(60)">499980</value>
+                        <value name="ULY(60)">5500020</value>
+                        <value name="XDIM(60)">60</value>
+                        <value name="YDIM(60)">-60</value>
+                    </extraValues>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:27:58.681Z" duration="18" execution="2023-07-31T22:27:58.694Z" id="checkMetadata" item="S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/" name="Metadata file check. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">Metadata file is present.</message>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:27:58.722Z" duration="10" execution="2023-07-31T22:27:58.757Z" id="checkL2AMasks" item="S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/" name="L2A Masks availability check. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">All elements in QI_DATA are present.</message>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:27:58.769Z" duration="42" execution="2023-07-31T22:27:58.824Z" id="checkL2AImages" item="S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/" name="L2A images availability check. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">All bands are present.</message>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:28:14.453Z" duration="1" execution="2023-07-31T22:28:14.462Z" id="Aux_Cams" item="S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/" name="AUX_CAMS data conformity and completeness check  " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">AUX_CAMS file is present.</message>
+                </check>
+                <check>
+                    <inspection creation="2023-07-31T22:28:14.464Z" duration="1" execution="2023-07-31T22:28:14.471Z" id="Ecmwf" item="S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00" itemURL="/DATA_OUT/S2B_OPER_MSI_L0__DS_SGS__20180530T122328_S20180530T103018_N02.06/S2PDGS-TC-IPF-V2-ORCH-N-016_MPC_SCENARIO/TaskTable_20230731T055416/L2A_TL/output/S2B_OPER_MSI_L2A_TL_S2RP_20230731T184631_A006426_T32UNV_N05.00/" name="ECMWF data conformity and completeness check  " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">ECMWF file is present.</message>
+                </check>
+            </checkList>
+        </report>
+    </Data_Block>
+</Earth_Explorer_File>

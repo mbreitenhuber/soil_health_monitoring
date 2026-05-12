@@ -12,7 +12,7 @@ Steps performed:
 The script relies on environment variables set in the project's .env (SENTINEL_DIR, TMP_DIR, DATASET_PATH, MODEL_PATH, etc.).
 """
 
-# python AgroLens/nutrients_predictor/run_pipeline_from_gps.py --gps data/datasets/LUCAS_SOIL_processed_DE.csv --flatten --normalize --output data/datasets/sample_gps_input_predictions.csv
+# python AgroLens/nutrients_predictor/run_pipeline_from_gps.py --gps data/datasets/LUCAS_SOIL_processed_DE.csv --flatten --normalize --output data/datasets/sample_gps_input_predictions.csv --start 4 --end 5
 
 from pathlib import Path
 import subprocess
@@ -36,11 +36,9 @@ def parse_args():
     p.add_argument("--normalize", action="store_true", help="Normalize band values when loading to .csv")
     p.add_argument("--mapping", help="Path to write mapping CSV (optional)")
     p.add_argument("--model", help="Path to trained .pth model (optional)")
-    p.add_argument(
-        "--output",
-        "-o",
-        help="Path for the final predictions CSV (default: <input>_predicted.csv)",
-    )
+    p.add_argument("--output","-o",help="Path for the final predictions CSV (default: <input>_predicted.csv)")
+    p.add_argument("--start", help="First CSV row to download", nargs="?", default="1")
+    p.add_argument("--end", help="Last CSV row to download", nargs="?", default="0")
     return p.parse_args()
 
 
@@ -76,6 +74,12 @@ def main():
     sentinel_download = input_dir / "sentinel_download.py"
     #cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file), "--api-threads", "1", "--download-threads", "1", "--worker-threads", "1"]
     cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file)]
+    if args.start and args.start != "1":  # Only add if not the default
+        cmd.append("--start")
+        cmd.append(str(args.start))
+    if args.end and args.end != "0":  # Only add if not the default
+        cmd.append("--end")
+        cmd.append(str(args.end))
     run_cmd(cmd, env=env)
 
     # 2) Extract pixel values to CSV

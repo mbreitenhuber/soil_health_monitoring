@@ -24,6 +24,27 @@ sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
 from satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
 
 
+# ============================================================================
+# FIXED REFERENCE NORMALIZATION VALUES FOR SENTINEL-2 BANDS
+# create .json file with max & min values with:
+# python AgroLens/scripts/calculate_band_ranges.py --input ./data/datasets/Model_A_min_max_values.csv --output ./band_ranges.json
+# ============================================================================
+BAND_REFERENCE_RANGES = {
+  "B01": {"min": 0.0,"max": 15.0},
+  "B02": {"min": 0.0,"max": 15.0},
+  "B03": {"min": 0.0,"max": 20.0},
+  "B04": {"min": 0.0,"max": 21.0},
+  "B05": {"min": 0.0,"max": 26.0},
+  "B06": {"min": 0.0,"max": 44.0},
+  "B07": {"min": 0.0,"max": 52.0},
+  "B08": {"min": 0.0,"max": 53.0},
+  "B8A": {"min": 0.0,"max": 54.0},
+  "B09": {"min": 0.0,"max": 54.0},
+  "B11": {"min": 0.0,"max": 37.0},
+  "B12": {"min": 0.0,"max": 34.0}
+}
+
+
 def setup_parser() -> argparse.Namespace:
     """
     Parses command line arguments
@@ -85,6 +106,50 @@ def setup_parser() -> argparse.Namespace:
         )
 
     return args
+
+
+def normalize_with_fixed_ranges(data, normalize_columns, band_ranges):
+    """
+    Normalize data using fixed reference ranges for each band.
+    
+    This ensures consistent normalization across different datasets,
+    avoiding issues with small sample sizes (1-3 rows).
+    
+    Args:
+        data (pd.DataFrame): Input dataframe with band values
+        normalize_columns (list): List of column names to normalize
+        band_ranges (dict): Dictionary with band min/max reference values
+    
+    Returns:
+        pd.DataFrame: Dataframe with normalized columns appended
+    """
+    normalized_data = {}
+    
+    for col in normalize_columns:
+        # Extract band name (e.g., "B04_1" -> "B04")
+        band_name = col.split('_')[0]
+        
+        if band_name not in band_ranges:
+            print(f"WARNING: No reference range found for band {band_name}. Skipping normalization for {col}.")
+            continue
+        
+        min_val = band_ranges[band_name]["min"]
+        max_val = band_ranges[band_name]["max"]
+        
+        # Normalize using fixed range: (value - min) / (max - min)
+        if max_val == min_val:
+            print(f"WARNING: min == max for band {band_name}. Setting normalized values to 0.")
+            normalized_data[col + "_normalized"] = 0.0
+        else:
+            normalized_data[col + "_normalized"] = (data[col] - min_val) / (max_val - min_val)
+            
+            # Clip values to [0, 1] range (in case data exceeds reference range)
+            normalized_data[col + "_normalized"] = normalized_data[col + "_normalized"].clip(0, 1)
+    
+    # Convert to DataFrame and merge
+    normalized_df = pd.DataFrame(normalized_data)
+    
+    return normalized_df
 
 
 def main():
@@ -202,6 +267,7 @@ def main():
 
         # drop rows without any band data
         if empty:
+            print("Row empty")
             drop.append(index)
             continue
 
@@ -221,12 +287,12 @@ def main():
     output.index.names = ["Index"]
 
     if args.normalize:
-        scaler = preprocessing.MinMaxScaler()
-        normalizer = scaler.fit_transform(output[normalize_columns])
-        normalized = pd.DataFrame(normalizer)
+        print("Normalizing with fixed reference ranges...")
+        normalized_df = normalize_with_fixed_ranges(output, normalize_columns, BAND_REFERENCE_RANGES)
         names = [i + "_normalized" for i in normalize_columns]
-        normalized.columns = names
-        output = pd.merge(output, normalized, left_index=True, right_index=True)
+        normalized_df.columns = names
+        output = pd.merge(output, normalized_df, left_index=True, right_index=True)
+        print("Normalization complete.")
 
     if shape != (1, 1):
         # convert numpy arrays to strings

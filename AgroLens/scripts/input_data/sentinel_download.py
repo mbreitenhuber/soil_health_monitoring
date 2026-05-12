@@ -6,6 +6,7 @@
 # python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
 # python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv --api-threads 1 --download-threads 1 --worker-threads 1  
 # python ./AgroLens/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv
+# test with 2 rows: python ./AgroLens/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv --start 4 --end 5
 
 import argparse
 import os
