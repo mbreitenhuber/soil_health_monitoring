@@ -97,7 +97,8 @@ def main():
     to train and save models for each combination.
     """
 
-    model_vars = ["xgboost", "nn", "rf"]
+    #model_vars = ["xgboost", "nn", "rf"]
+    model_vars = ["nn"]
     # model_configs = ["Model_A", "Model_A+"]
     targets = ["OC"]
 
