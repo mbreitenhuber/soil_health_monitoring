@@ -133,7 +133,7 @@ deploy-app:
       -f "helm/values.yaml"
       --timeout "${HELM_TIMEOUT}"
       --set components.backend.image.repository="${CI_REGISTRY_IMAGE}-backend"
-      --set components.backend.ingress.url="${URL_FRONTEND}"
+      --set components.backend.ingress.url="${URL_BACKEND}"
   environment:
-    url: https://$URL_FRONTEND
+    url: https://$URL_BACKEND
     name: $CI_PROJECT_NAME/$CI_COMMIT_REF_SLUG
