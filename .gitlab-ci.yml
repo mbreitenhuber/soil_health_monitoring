@@ -7,7 +7,8 @@ stages:
   - deploy
 
 variables:
-  HELM_TIMEOUT: 10m0s
+  # Helm --atomic waits until resources are ready; slow pulls / probes need margin.
+  HELM_TIMEOUT: 25m0s
   #
   # Generic helm chart from https://gitlab.inf.ethz.ch/ou-ivia/generic-helm-chart
   HELM_CHART: oci://harbor.ivia.ch/ivia-generic-helm-chart/ivia-generic-helm-chart
@@ -76,7 +77,6 @@ build:buildah:
   parallel:
     matrix:
       - APP_LAYER:
-        - frontend
         - backend
   tags:
     - ivialab-student-cluster
@@ -122,6 +122,7 @@ build:buildah:
 deploy-app:
   extends: .deploy-template
   stage: deploy
+  timeout: 35m
   script:
     - >
       helm upgrade
@@ -133,11 +134,8 @@ deploy-app:
       --atomic
       -f "helm/values.yaml"
       --timeout "${HELM_TIMEOUT}"
-      --set components.frontend.image.repository="${CI_REGISTRY_IMAGE}-frontend"
-      --set components.frontend.ingress.url="${URL_FRONTEND}"
       --set components.backend.image.repository="${CI_REGISTRY_IMAGE}-backend"
       --set components.backend.ingress.url="${URL_BACKEND}"
-      --set components.backend.extraEnv.CORS_ORIGINS="https://${URL_FRONTEND}"
   environment:
-    url: https://$URL_FRONTEND
+    url: https://$URL_BACKEND
     name: $CI_PROJECT_NAME/$CI_COMMIT_REF_SLUG

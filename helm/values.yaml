@@ -1,6 +1,6 @@
 components:
   frontend:
-    enabled: true
+    enabled: false
     image:
       repository: null  # set via --set in CI
       tag: latest
@@ -10,7 +10,7 @@ components:
     readinessProbe: null
     livenessProbe: null
     ingress:
-      enabled: true
+      enabled: false
       url: null  # set via --set in CI
 
   backend:
