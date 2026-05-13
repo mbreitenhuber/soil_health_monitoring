@@ -7,7 +7,8 @@ stages:
   - deploy
 
 variables:
-  HELM_TIMEOUT: 10m0s
+  # Helm --atomic waits until resources are ready; slow pulls / probes need margin.
+  HELM_TIMEOUT: 25m0s
   #
   # Generic helm chart from https://gitlab.inf.ethz.ch/ou-ivia/generic-helm-chart
   HELM_CHART: oci://harbor.ivia.ch/ivia-generic-helm-chart/ivia-generic-helm-chart
@@ -121,6 +122,7 @@ build:buildah:
 deploy-app:
   extends: .deploy-template
   stage: deploy
+  timeout: 35m
   script:
     - >
       helm upgrade

@@ -505,6 +505,12 @@ def health():
     return {"status": "AgroScan API läuft ✅"}
 
 
+@app.get("/healthz")
+def healthz():
+    """Used by Kubernetes/Helm probes (see helm/values.yaml components.backend.health)."""
+    return {"status": "ok"}
+
+
 @app.post("/api/predict", response_model=PredictionResponse)
 def predict(request: FieldRequest):
     # 1) Build 60m grid centers (this is your "CSV" table)
