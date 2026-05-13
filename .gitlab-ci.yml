@@ -76,7 +76,6 @@ build:buildah:
   parallel:
     matrix:
       - APP_LAYER:
-        - frontend
         - backend
   tags:
     - ivialab-student-cluster
@@ -133,11 +132,8 @@ deploy-app:
       --atomic
       -f "helm/values.yaml"
       --timeout "${HELM_TIMEOUT}"
-      --set components.frontend.image.repository="${CI_REGISTRY_IMAGE}-frontend"
-      --set components.frontend.ingress.url="${URL_FRONTEND}"
       --set components.backend.image.repository="${CI_REGISTRY_IMAGE}-backend"
-      --set components.backend.ingress.url="${URL_BACKEND}"
-      --set components.backend.extraEnv.CORS_ORIGINS="https://${URL_FRONTEND}"
+      --set components.backend.ingress.url="${URL_FRONTEND}"
   environment:
     url: https://$URL_FRONTEND
     name: $CI_PROJECT_NAME/$CI_COMMIT_REF_SLUG

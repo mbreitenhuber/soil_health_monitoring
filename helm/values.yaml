@@ -1,6 +1,6 @@
 components:
   frontend:
-    enabled: true
+    enabled: false
     image:
       repository: null  # set via --set in CI
       tag: latest
