@@ -598,7 +598,7 @@ def run_model(
     return predictions_df[prediction_column].to_numpy(dtype=float)
 
 
-def value_to_label(value: float) -> str:
+def value_to_label(value: float) -> str: # TODO: adjust with relevant OC content thresholds
     if value >= 0.66: return "Hoch"
     if value >= 0.33: return "Mittel"
     return "Niedrig"
