@@ -14,8 +14,13 @@ FastAPI + Jinja2: Seiten werden serverseitig gerendert.
 from datetime import datetime
 from pathlib import Path
 from typing import List
+import os
+import subprocess
+import sys
+import tempfile
 
-from fastapi import FastAPI, Request, Cookie
+
+from fastapi import FastAPI, Request, Cookie, HTTPException
 import sqlite3
 import json
 from fastapi.middleware.cors import CORSMiddleware
@@ -29,14 +34,44 @@ import math
 
 import pandas as pd
 from shapely.geometry import Point, Polygon
-from pyproj import CRS, Transformer
+from pyproj import CRS, Transformer#
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # ── Pfade ──────────────────────────────────────────────
-ROOT         = Path(__file__).parent.parent          # → agroscan/
+ROOT         = Path(__file__).parent.parent          # → Nebula/
 TEMPLATE_DIR = ROOT / "frontend" / "templates"
 STATIC_DIR   = ROOT / "frontend" / "static"
+PROJECT_ROOT  = ROOT  # Fixed: was ROOT.parent, now ROOT (the Nebula directory)
 
-DB_PATH = ROOT / "agroscan.db"
+DB_PATH = ROOT / "backend" / "agroscan.db"  # Also fixed: database should be in backend/
+
+PIPELINE_SCRIPT = PROJECT_ROOT / "AgroLens" / "nutrients_predictor" / "run_pipeline_from_gps.py"
+PIPELINE_WORK_DIR = PROJECT_ROOT / "data" / "pipeline_runs"
+DEFAULT_MODEL_CONFIG = "Model_A"
+DEFAULT_TARGET = "OC"
+
+REQUIRED_SATELLITE_ENV_VARS = [
+    "SENTINEL_DIR",
+    "TMP_DIR",
+    "COPERNICUS_USER",
+    "COPERNICUS_PASSWORD",
+    "AWS_ACCESS_KEY_ID",
+    "AWS_SECRET_ACCESS_KEY",
+]
+
+
+def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = DEFAULT_TARGET) -> Path:
+    return Path(
+        os.environ.get(
+            "AGROSCAN_MODEL_PATH",
+            PROJECT_ROOT / "data" / "models" / model_config / "nn" / f"{model_config}_nn_{target}.pth",
+        )
+    )
+
+def _missing_satellite_env_vars(env: dict[str, str]) -> list[str]:
+    return [name for name in REQUIRED_SATELLITE_ENV_VARS if not env.get(name)]
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
@@ -466,32 +501,101 @@ def get_field_elevation_m(center_lat: float, center_lng: float) -> float | None:
     """
     return None
 
+def _build_gps_input_csv(grid_csv: pd.DataFrame, analysis_date: str, work_dir: Path) -> Path:
+    gps_input = work_dir / "gps_input.csv"
+    gps_input_df = pd.DataFrame(
+        {
+            "POINTID": [f"pt_{index + 1}" for index in range(len(grid_csv))],
+            "SURVEY_DATE": analysis_date,
+            "TH_LAT": grid_csv["center_lat"].astype(float).to_list(),
+            "TH_LONG": grid_csv["center_lng"].astype(float).to_list(),
+        }
+    )
+    gps_input_df.to_csv(gps_input, index=False)
+    return gps_input
 
-def run_model(grid_csv: pd.DataFrame) -> np.ndarray:
+def run_model(
+        grid_csv: pd.DataFrame,
+        analysis_date: str | None = None,
+        model_config: str = DEFAULT_MODEL_CONFIG,
+        target: str = DEFAULT_TARGET,
+) -> np.ndarray:
     """
-    PLATZHALTER — hier kommt dein echtes ML-Modell rein.
-
-    WICHTIG: Wir geben dem Modell die Raster-Zellmittelpunkte als "CSV-Tabelle"
-    (in-memory). D.h. `grid_csv` ist ein DataFrame, der die Spalten enthält, die
-    du sonst ins CSV schreiben würdest, z.B.:
-
-      - center_lat
-      - center_lng
-      - analysis_date
-      - field_elevation_m
-      - row, col, ...
-
-    Beispiel (scikit-learn):
-        model = joblib.load("model.joblib")
-        X = grid_csv[FEATURE_COLS]              # z.B. ["center_lat", "center_lng", ...]
-        y = model.predict_proba(X)[:, 1]        # oder model.predict(X)
-        return y
+    Runs the full GPS -> Sentinel -> feature -> NN pipeline and returns the
+    prediction values for the frontend.
     """
-    center_lat = grid_csv["center_lat"].to_numpy(dtype=float)
-    center_lng = grid_csv["center_lng"].to_numpy(dtype=float)
-    value = (np.sin(center_lat * 50) + np.cos(center_lng * 50) + 2) / 4
-    value += np.random.uniform(-0.05, 0.05, size=value.shape[0])
-    return np.clip(value, 0, 1).astype(float)
+    if grid_csv.empty:
+        print("[backend] run_model: received empty grid, skipping pipeline", flush=True)
+        return np.array([], dtype=float)
+
+    survey_date = analysis_date or datetime.now().strftime("%Y-%m-%d")
+    PIPELINE_WORK_DIR.mkdir(parents=True, exist_ok=True)
+    run_dir = Path(tempfile.mkdtemp(prefix="pipeline_", dir=str(PIPELINE_WORK_DIR)))
+    print(
+        f"[backend] run_model: starting pipeline for {len(grid_csv)} cells "
+        f"(date={survey_date}, model_config={model_config}, target={target})",
+        flush=True,
+    )
+
+    gps_input = _build_gps_input_csv(grid_csv, survey_date, run_dir)
+    predictions_output = run_dir / "predictions.csv"
+    model_path = _default_model_path(model_config, target)
+
+    print(f"[backend] run_model: wrote GPS input to {gps_input}", flush=True)
+    print(f"[backend] run_model: using model file {model_path}", flush=True)
+    print(f"[backend] run_model: pipeline output will be read from {predictions_output}", flush=True)
+
+    env = os.environ.copy()
+    env["DATASET_PATH"] = str(PROJECT_ROOT / "data" / "datasets")
+
+    missing_env_vars = _missing_satellite_env_vars(env)
+    if missing_env_vars:
+        print(
+            "[backend] run_model: missing satellite environment variables: "
+            + ", ".join(missing_env_vars),
+            flush=True,
+        )
+        raise HTTPException(
+            status_code=503,
+            detail=(
+                "Satellite pipeline cannot start because required environment variables are missing: "
+                + ", ".join(missing_env_vars)
+            ),
+        )
+
+    cmd = [
+        sys.executable,
+        str(PIPELINE_SCRIPT),
+        "--gps",
+        str(gps_input),
+        "--output",
+        str(predictions_output),
+        "--model-config",
+        model_config,
+        "--target",
+        target,
+        "--shape",
+        "9x9",
+        "--flatten",
+        "--normalize",
+        "--model",
+        str(model_path),
+    ]
+    print(f"[backend] run_model: launching pipeline script {PIPELINE_SCRIPT}", flush=True)
+    subprocess.run(cmd, check=True, env=env)
+    print("[backend] run_model: pipeline finished, reading predictions CSV", flush=True)
+
+    predictions_df = pd.read_csv(predictions_output)
+    prediction_column = f"{target}_pred"
+    if prediction_column not in predictions_df.columns:
+        raise ValueError(f"Prediction output missing column '{prediction_column}': {predictions_output}")
+    print(
+        f"[backend] run_model: loaded {len(predictions_df)} rows from predictions CSV "
+        f"(column={prediction_column})",
+        flush=True,
+    )
+
+    return predictions_df[prediction_column].to_numpy(dtype=float)
 
 
 def value_to_label(value: float) -> str:
@@ -513,12 +617,22 @@ def healthz():
 
 @app.post("/api/predict", response_model=PredictionResponse)
 def predict(request: FieldRequest):
+    print(
+        f"[backend] /api/predict: received request with {len(request.polygon)} polygon points "
+        f"and analysis_date={request.analysis_date}",
+        flush=True,
+    )
     # 1) Build 60m grid centers (this is your "CSV" table)
     utm_epsg, grid_points = _grid_center_points_in_polygon(
         request.polygon,
         cell_size_m=60.0,
         include_border=True,
     )
+    print(
+        f"[backend] /api/predict: generated {len(grid_points)} grid cells using UTM EPSG {utm_epsg}",
+        flush=True,
+    )
+
 
     # 2) Field elevation hook (single value for whole field)
     centroid = _polygon_centroid_latlng(request.polygon)
@@ -541,7 +655,8 @@ def predict(request: FieldRequest):
     grid_csv = pd.DataFrame(rows)
 
     # 4) Model inference (returns one value per 60m cell center)
-    y = run_model(grid_csv)
+    print("[backend] /api/predict: calling run_model", flush=True)
+    y = run_model(grid_csv, analysis_date=request.analysis_date)
 
     # 5) Convert predictions into polygons for the frontend (each cell as a zone)
     zones = []
@@ -559,6 +674,7 @@ def predict(request: FieldRequest):
                 label=value_to_label(float(value)),
             )
         )
+    print(f"[backend] /api/predict: created {len(zones)} prediction zones", flush=True)
 
     return PredictionResponse(
         zones=zones,
