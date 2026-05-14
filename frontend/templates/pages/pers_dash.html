@@ -10,111 +10,128 @@
 
 <div class="page-content">
 
-  <!-- =========================
-       HERO
-  ========================== -->
   <div class="about-hero">
     <div class="section-eyebrow">Dashboard</div>
     <h1>Personal Dashboard</h1>
     <p>Manage, analyze and compare your saved field analyses.</p>
   </div>
 
-  <!-- =========================
-       FILTER BAR
-  ========================== -->
-  <section class="about-section">
-
-    <div class="section-eyebrow">Filters</div>
-    <h2 class="section-title">Your Data</h2>
-
-    <div class="dashboard-filters">
-
-      <select id="filter-days">
-        <option value="">All time</option>
-        <option value="7">Last 7 days</option>
-        <option value="30">Last 30 days</option>
-      </select>
-
-      <select id="filter-crop">
-        <option value="">All crops</option>
-        <option value="wheat">Wheat</option>
-        <option value="corn">Corn</option>
-      </select>
-
-    </div>
-
-  </section>
-
-  <div class="dashboard-actions">
-
-  </div>
-
-  <!-- =========================
-       ANALYSIS LIST
-  ========================== -->
   <section class="about-section">
 
     <div class="dashboard-actions">
-
-      <button class="btn-primary" id="download-csv-btn">
-        Download CSV
-      </button>
-
+      <button class="btn-primary"   id="download-csv-btn">⬇ Download All</button>
+      <button class="btn-secondary" id="compare-btn">⚖ Compare Fields</button>
     </div>
 
     <div class="section-eyebrow">History</div>
     <h2 class="section-title">Saved Analyses</h2>
 
-    {% if analyses is not defined or analyses|length == 0 %}
-      <p>No saved analyses yet.</p>
-    {% endif %}
+    <!-- FILTER BAR -->
+    <div class="dashboard-filters">
 
-    <div id="dashboard-container" class="dashboard-container">
-
-      {% for a in analyses %}
-
-      <div class="analysis-card">
-
-        <div class="analysis-title">
-          {{ a.crop or "Unknown crop" }}
-        </div>
-
-        <div class="analysis-meta">
-          📅 {{ a.date }} <br>
-          📊 Avg: {{ (a.avg_value * 100) | round(1) }}% <br>
-          🔴 Min: {{ (a.min_value * 100) | round(1) }}%
-          🟢 Max: {{ (a.max_value * 100) | round(1) }}%
-        </div>
-
-        <button class="btn-secondary download-btn" data-id="{{ a.id }}">
-          Download
-        </button>
-
-        <button class="btn-danger delete-btn" data-id="{{ a.id }}">
-          Delete
-        </button>
-
+      <div class="filter-group">
+        <label class="filter-label">Field Name</label>
+        <input
+          id="filter-name"
+          type="text"
+          class="filter-input"
+          placeholder="Search field name…"
+        >
       </div>
 
-      {% endfor %}
+      <div class="filter-group">
+        <label class="filter-label">Crop</label>
+        <select id="filter-crop" class="filter-select">
+          <option value="">All crops</option>
+          <!-- populated dynamically from data -->
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">From</label>
+        <input id="filter-date-from" type="date" class="filter-input">
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">To</label>
+        <input id="filter-date-to" type="date" class="filter-input">
+      </div>
+
+      <div class="filter-group filter-group--btn">
+        <button id="filter-reset" class="btn-reset">✕ Reset</button>
+      </div>
 
     </div>
 
-  </section>
+    <div id="filter-summary" class="filter-summary" style="display:none;"></div>
 
+    <div id="dashboard-container" class="dashboard-container"></div>
+
+  </section>
+</div>
+
+<!-- ===================== DETAIL MODAL ===================== -->
+<div id="detail-modal" class="detail-modal">
+  <div class="detail-card">
+
+    <div class="detail-header">
+      <h2>Field Details</h2>
+      <button class="btn-close-x" onclick="closeDetailModal()">✕</button>
+    </div>
+
+    <div class="detail-grid">
+      <div class="detail-field">
+        <label>Field Name</label>
+        <input id="edit-field-name" placeholder="e.g. North Field">
+      </div>
+      <div class="detail-field">
+        <label>Location</label>
+        <input id="edit-location" placeholder="e.g. Bavaria, Germany">
+      </div>
+      <div class="detail-field">
+        <label>Crop</label>
+        <input id="edit-crop" placeholder="e.g. Wheat">
+      </div>
+      <div class="detail-field detail-full">
+        <label>Notes</label>
+        <textarea id="edit-notes" placeholder="Any additional notes…"></textarea>
+      </div>
+    </div>
+
+    <div class="detail-stats-grid">
+      <div class="detail-stat-card stat-min">
+        <span>Minimum</span>
+        <strong id="detail-min">–</strong>
+      </div>
+      <div class="detail-stat-card stat-avg">
+        <span>Average</span>
+        <strong id="detail-avg">–</strong>
+      </div>
+      <div class="detail-stat-card stat-max">
+        <span>Maximum</span>
+        <strong id="detail-max">–</strong>
+      </div>
+    </div>
+
+    <div class="detail-chart-wrapper">
+      <canvas id="quality-chart"></canvas>
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn-close-modal" onclick="closeDetailModal()">Close</button>
+      <button class="btn-save" id="save-details">Save Changes</button>
+    </div>
+
+  </div>
 </div>
 
 {% endblock %}
 
-<!-- =========================
-     SCRIPTS
-========================== -->
 {% block scripts %}
-
 <script>
-  const API_URL = "http://127.0.0.1:8000";
+  window.API_URL      = "http://127.0.0.1:8000";
+  window.__ANALYSES__ = {{ analyses | tojson }};
 </script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/js/dashboard.js"></script>
-
 {% endblock %}

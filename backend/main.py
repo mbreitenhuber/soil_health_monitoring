@@ -825,3 +825,30 @@ def download_all_csv():
             "Content-Disposition": "attachment; filename=all_analyses.csv"
         }
     )
+
+@app.put("/api/update-analysis/{id}")
+def update_analysis(id: int, req: SaveRequest):
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+        UPDATE analyses
+        SET
+            field_name = ?,
+            location_name = ?,
+            crop = ?,
+            notes = ?
+        WHERE id = ?
+    """, (
+        req.field_name,
+        req.location_name,
+        req.crop,
+        req.notes,
+        id
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return {"status": "updated"}
