@@ -45,18 +45,47 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
+    # Tabelle erstellen
     c.execute("""
     CREATE TABLE IF NOT EXISTS analyses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+
         date TEXT,
+        crop TEXT,
+
+        field_name TEXT,
+        notes TEXT,
+        location_name TEXT,
+
         polygon TEXT,
+
         avg_value REAL,
         min_value REAL,
         max_value REAL,
+
         zones TEXT,
-        crop TEXT
+
+        created_at TEXT
     )
     """)
+
+    # Fehlende Spalten ergänzen (für bestehende DB)
+    existing_columns = [
+        row[1]
+        for row in c.execute("PRAGMA table_info(analyses)")
+    ]
+
+    if "field_name" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN field_name TEXT")
+
+    if "notes" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN notes TEXT")
+
+    if "location_name" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN location_name TEXT")
+
+    if "created_at" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN created_at TEXT")
 
     conn.commit()
     conn.close()
@@ -269,24 +298,29 @@ async def how_to(request: Request, lang: str = Cookie(default="en")):
 async def pers_dash(request: Request, lang: str = Cookie(default="en")):
 
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
+
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
     conn.close()
 
-    analyses = [
-        {
-            "id": r[0],
-            "date": r[1],
-            "polygon": json.loads(r[2]),
-            "avg_value": r[3],
-            "min_value": r[4],
-            "max_value": r[5],
-            "zones": json.loads(r[6]),
-            "crop": r[7] if len(r) > 7 else None
-        }
-        for r in rows
-    ]
+    analyses = []
+    for r in rows:
+        analyses.append({
+            "id": r["id"],
+            "date": r["date"],
+            "crop": r["crop"],
+            "field_name": r["field_name"],
+            "notes": r["notes"],
+            "location_name": r["location_name"],
+            "polygon": json.loads(r["polygon"]) if r["polygon"] else [],
+            "avg_value": r["avg_value"] or 0,
+            "min_value": r["min_value"] or 0,
+            "max_value": r["max_value"] or 0,
+            "zones": json.loads(r["zones"]) if r["zones"] else [],
+            "created_at": r["created_at"],
+        })
 
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
         request, "pers_dash", lang,
@@ -344,12 +378,19 @@ class PredictionResponse(BaseModel):
 
 class SaveRequest(BaseModel):
     date: str
+
+    crop: str | None = None
+    field_name: str | None = None
+    notes: str | None = None
+    location_name: str | None = None
+
     polygon: List[Coordinate]
+
     avg_value: float
     min_value: float
     max_value: float
+
     zones: list
-    crop: str | None = None
 
 
 def _pick_utm_epsg(lat: float, lng: float) -> int:
@@ -574,16 +615,36 @@ def save_analysis(req: SaveRequest):
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO analyses (date, polygon, avg_value, min_value, max_value, zones, crop)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO analyses (
+            date,
+            crop,
+            field_name,
+            notes,
+            location_name,
+            polygon,
+            avg_value,
+            min_value,
+            max_value,
+            zones,
+            created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         req.date,
+        req.crop,
+        req.field_name,
+        req.notes,
+        req.location_name,
+
         json.dumps([p.dict() for p in req.polygon]),
+
         req.avg_value,
         req.min_value,
         req.max_value,
+
         json.dumps(req.zones),
-        req.crop
+
+        datetime.now().isoformat()
     ))
 
     conn.commit()
@@ -605,12 +666,20 @@ def get_analyses():
         {
             "id": r[0],
             "date": r[1],
-            "polygon": json.loads(r[2]),
-            "avg_value": r[3],
-            "min_value": r[4],
-            "max_value": r[5],
-            "zones": json.loads(r[6]),
-            "crop": r[7] if len(r) > 7 else None
+            "crop": r[2],
+            "field_name": r[3],
+            "notes": r[4],
+            "location_name": r[5],
+
+            "polygon": json.loads(r[6]),
+
+            "avg_value": r[7],
+            "min_value": r[8],
+            "max_value": r[9],
+
+            "zones": json.loads(r[10]),
+
+            "created_at": r[11]
         }
         for r in rows
     ]
@@ -625,3 +694,134 @@ def delete_analysis(id: int):
     conn.close()
 
     return {"status": "deleted"}
+
+# ══════════════════════════════════════════════════════
+# Download data function
+# ══════════════════════════════════════════════════════
+
+import csv
+from io import StringIO
+import json
+
+def _analysis_to_csv(analyses: list[dict]) -> str:
+    output = StringIO()
+    writer = csv.writer(output, delimiter=";")
+
+    writer.writerow([
+        "ID",
+        "Date",
+        "Crop",
+        "Field Name",
+        "Location",
+        "Notes",
+        "Avg (%)",
+        "Min (%)",
+        "Max (%)",
+        "Polygon Points",
+        "Zones Count",
+        "Created At"
+    ])
+
+    for a in analyses:
+
+        polygon = a.get("polygon") or []
+        zones = a.get("zones") or []
+
+        # SAFE guards (verhindert Internal Server Error)
+        poly_len = len(polygon) if isinstance(polygon, list) else 0
+        zone_len = len(zones) if isinstance(zones, list) else 0
+
+        writer.writerow([
+            a.get("id"),
+            a.get("date"),
+            a.get("crop"),
+            a.get("field_name"),
+            a.get("location_name"),
+            a.get("notes"),
+            round(a.get("avg_value", 0) * 100, 1),
+            round(a.get("min_value", 0) * 100, 1),
+            round(a.get("max_value", 0) * 100, 1),
+            poly_len,
+            zone_len,
+            a.get("created_at")
+        ])
+
+    output.seek(0)
+    return output.getvalue()
+
+from fastapi.responses import Response
+import sqlite3
+import json
+
+@app.get("/api/analyses/{id}/csv")
+def download_single_csv(id: int):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM analyses WHERE id = ?", (id,))
+    r = c.fetchone()
+    conn.close()
+
+    if not r:
+        return {"error": "not found"}
+
+    analysis = {
+        "id": r[0],
+        "date": r[1],
+        "crop": r[2],
+        "field_name": r[3],
+        "notes": r[4],
+        "location_name": r[5],
+        "polygon": json.loads(r[6]) if r[6] else [],
+        "avg_value": r[7],
+        "min_value": r[8],
+        "max_value": r[9],
+        "zones": json.loads(r[10]) if r[10] else [],
+        "created_at": r[11]
+    }
+
+    csv_data = _analysis_to_csv([analysis])
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=analysis_{id}.csv"
+        }
+    )
+
+@app.get("/api/analyses/csv")
+def download_all_csv():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM analyses ORDER BY id DESC")
+    rows = c.fetchall()
+    conn.close()
+
+    analyses = []
+    for r in rows:
+        analyses.append({
+            "id": r[0],
+            "date": r[1],
+            "crop": r[2],
+            "field_name": r[3],
+            "notes": r[4],
+            "location_name": r[5],
+            "polygon": json.loads(r[6]) if r[6] else [],
+            "avg_value": r[7],
+            "min_value": r[8],
+            "max_value": r[9],
+            "zones": json.loads(r[10]) if r[10] else [],
+            "created_at": r[11]
+        })
+
+    csv_data = _analysis_to_csv(analyses)
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=all_analyses.csv"
+        }
+    )

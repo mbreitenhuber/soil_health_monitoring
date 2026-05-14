@@ -45,10 +45,22 @@
 
   </section>
 
+  <div class="dashboard-actions">
+
+  </div>
+
   <!-- =========================
        ANALYSIS LIST
   ========================== -->
   <section class="about-section">
+
+    <div class="dashboard-actions">
+
+      <button class="btn-primary" id="download-csv-btn">
+        Download CSV
+      </button>
+
+    </div>
 
     <div class="section-eyebrow">History</div>
     <h2 class="section-title">Saved Analyses</h2>
@@ -73,6 +85,10 @@
           🔴 Min: {{ (a.min_value * 100) | round(1) }}%
           🟢 Max: {{ (a.max_value * 100) | round(1) }}%
         </div>
+
+        <button class="btn-secondary download-btn" data-id="{{ a.id }}">
+          Download
+        </button>
 
         <button class="btn-danger delete-btn" data-id="{{ a.id }}">
           Delete

@@ -37,3 +37,28 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 });
+
+// =====================
+// DOWNLOAD
+// =====================
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  document.querySelectorAll(".download-btn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+      const id = btn.dataset.id;
+      window.open(`${API_URL}/api/analyses/${id}/csv`, "_blank");
+    });
+
+  });
+
+  const downloadAllBtn = document.getElementById("download-csv-btn");
+
+  if (downloadAllBtn) {
+    downloadAllBtn.addEventListener("click", () => {
+      window.open(`${API_URL}/api/analyses/csv`, "_blank");
+    });
+  }
+
+});
