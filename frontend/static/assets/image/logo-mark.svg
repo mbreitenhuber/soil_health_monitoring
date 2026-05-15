@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="AgroScan">
+  <defs>
+    <clipPath id="field-shape">
+      <path d="M24 7.5 36.2 15.8 34.2 38.5 13.8 38.5 11.8 15.8Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Orbit (gestrichelt) -->
+  <ellipse cx="24" cy="23" rx="21" ry="13.5" fill="none" stroke="#3D7543" stroke-width="1.1" stroke-dasharray="2.2 2.8" opacity="0.85"/>
+
+  <!-- Feld-Pentagon: vier Quadranten -->
+  <g clip-path="url(#field-shape)">
+    <rect x="0" y="0" width="24" height="22.5" fill="#C5E6C9"/>
+    <rect x="24" y="0" width="24" height="22.5" fill="#A8D4AE"/>
+    <rect x="0" y="22.5" width="24" height="26" fill="#8BC892"/>
+    <rect x="24" y="22.5" width="24" height="26" fill="#5FA764"/>
+  </g>
+  <path d="M24 7.5 36.2 15.8 34.2 38.5 13.8 38.5 11.8 15.8Z" fill="none" stroke="#3D7543" stroke-width="1.35" stroke-linejoin="round"/>
+  <line x1="24" y1="7.5" x2="24" y2="38.5" stroke="#3D7543" stroke-width="0.7" opacity="0.9"/>
+  <line x1="11.8" y1="22.5" x2="36.2" y2="22.5" stroke="#3D7543" stroke-width="0.7" opacity="0.9"/>
+
+  <!-- Satellit: zwei Solar-Panels + Körper (oben rechts auf der Umlaufbahn) -->
+  <g transform="translate(36.8 10.2) rotate(32)">
+    <rect x="-7.2" y="0.6" width="3.4" height="2.2" rx="0.35" fill="#8BC892" stroke="#3D7543" stroke-width="0.45"/>
+    <rect x="-1.9" y="0.2" width="3.8" height="2.8" rx="0.4" fill="#4A8F51" stroke="#3D7543" stroke-width="0.5"/>
+    <rect x="3.8" y="0.6" width="3.4" height="2.2" rx="0.35" fill="#6FB876" stroke="#3D7543" stroke-width="0.45"/>
+  </g>
+</svg>

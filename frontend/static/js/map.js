@@ -45,10 +45,10 @@ const minimal = L.tileLayer(
 // =====================
 
 const labels = L.tileLayer(
-  "https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png",
+  "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
   {
-    attribution: "© OpenStreetMap contributors © CARTO",
-    subdomains: "abcd"
+    attribution: "Tiles © Esri",
+    opacity: 1
   }
 );
 
@@ -465,6 +465,12 @@ const dashboardCropSelect = document.getElementById("dashboard-crop");
 
 const dashboardCustomCrop = document.getElementById("dashboard-custom-crop");
 
+const dashboardFieldName = document.getElementById("dashboard-field-name");
+
+const dashboardNotes = document.getElementById("dashboard-notes");
+
+const dashboardLocationName = document.getElementById("dashboard-location-name");
+
 
 // =====================
 // SAVE POPUP FUNCTIONS
@@ -527,7 +533,17 @@ if (confirmDashboardSaveBtn) {
     // Crop zur Analyse hinzufügen
     const payload = {
       ...latestAnalysisData,
-      crop: selectedCrop
+
+      crop: selectedCrop,
+
+      field_name:
+        document.getElementById("dashboard-field-name").value,
+
+      notes:
+        document.getElementById("dashboard-notes").value,
+
+      location_name:
+        document.getElementById("dashboard-location-name").value
     };
 
     try {

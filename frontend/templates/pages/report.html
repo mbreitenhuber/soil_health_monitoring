@@ -1,28 +1,187 @@
 {% extends "base.html" %}
 
-{% block title %}Seitenname{% endblock %}
+{% block title %}Report — AgroScan{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" href="/static/css/report.css" />
+{% endblock %}
 
 {% block content %}
 <div class="page-content">
 
+  <!-- HERO -->
   <div class="about-hero">
-    <div class="section-eyebrow">Kategorie</div>
-    <h1>Report</h1>
-    <p>Kurze Beschreibung dieser Seite.</p>
+    <div class="section-eyebrow">Scientific Background</div>
+    <h1>AgroScan <em>Report</em></h1>
+    <p>
+      An open-source platform for scalable soil organic carbon estimation —
+      bridging remote sensing, machine learning, and sustainable agriculture.
+    </p>
   </div>
 
+  <!-- SECTION 1: SOC as Carbon Sink -->
   <section class="about-section">
-    <div class="section-eyebrow">Abschnitt</div>
-    <h2 class="section-title">Überschrift</h2>
+    <div class="section-eyebrow">Introduction</div>
+    <h2 class="section-title">Soil Organic Carbon &amp; Its Importance</h2>
 
-    {# Daten aus main.py hier rendern, z.B.: #}
-    {# {% for item in items %}<p>{{ item.name }}</p>{% endfor %} #}
-
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;">
-      Seiteninhalt hier…
+    <p class="report-body">
+      Soils can function as an important carbon sink through the process of soil
+      carbon sequestration, where atmospheric CO₂ is stored in the ground as soil
+      organic matter through photosynthesis <a href="#ref1" class="ref-link">[1]</a>.
+      When maintained in a healthy state, soils represent the largest terrestrial
+      carbon pool globally <a href="#ref2" class="ref-link">[2]</a>.
     </p>
+
+    <p class="report-body">
+      Agricultural soils with saturated soil organic carbon (SOC) levels provide
+      several environmental and agronomic benefits. In addition to binding carbon
+      that would otherwise remain in the atmosphere, high SOC content contributes
+      to improved long-term agricultural productivity, increased biodiversity, and
+      the preservation of ecosystem functions and services
+      <a href="#ref2" class="ref-link">[2]</a>. As a result, the enhancement and
+      monitoring of SOC stocks have become increasingly important objectives within
+      environmental and agricultural policy frameworks, including initiatives such
+      as the EU Soil Strategy for 2030 <a href="#ref3" class="ref-link">[3]</a>.
+    </p>
+
+    <!-- Pull quote -->
+    <blockquote class="report-pullquote">
+      Soils represent the largest terrestrial carbon pool globally — their health
+      is central to climate, food security, and biodiversity.
+    </blockquote>
+  </section>
+
+  <!-- SECTION 2: Bottlenecks -->
+  <section class="about-section">
+    <div class="section-eyebrow">Problem Statement</div>
+    <h2 class="section-title">Barriers to Routine SOC Monitoring</h2>
+
+    <p class="report-body">
+      Despite the recognized importance of SOC for sustainable soil management (SSM),
+      farmers continue to face substantial bottlenecks when attempting to integrate
+      carbon stock monitoring into their agricultural practices. To reliably assess
+      the impact of sustainable soil management practices, SOC has to be assessed
+      several times over a longer time period.
+    </p>
+
+    <p class="report-body">
+      However, conventional soil sampling approaches are associated with significant
+      cost barriers, labor requirements, and time-intensive field and laboratory
+      procedures, limiting their scalability and routine application across large
+      agricultural areas <a href="#ref4" class="ref-link">[4]</a>.
+    </p>
+
+    <!-- 3-column highlight cards -->
+    <div class="report-highlight-grid">
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">💸</div>
+        <div class="report-highlight-label">Cost Barriers</div>
+        <p>Conventional sampling is expensive and limits routine monitoring at scale.</p>
+      </div>
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">⏱</div>
+        <div class="report-highlight-label">Time-Intensive</div>
+        <p>Field and laboratory procedures demand significant time across seasons.</p>
+      </div>
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">📉</div>
+        <div class="report-highlight-label">Limited Scalability</div>
+        <p>Methods do not scale across large agricultural areas without major investment.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECTION 3: ML Approach -->
+  <section class="about-section">
+    <div class="section-eyebrow">Methodology</div>
+    <h2 class="section-title">Machine Learning &amp; Remote Sensing</h2>
+
+    <p class="report-body">
+      To address these limitations, machine learning-based remote sensing models
+      have emerged as a promising approach for predicting soil organic carbon content
+      on agricultural fields. By leveraging satellite-derived information and
+      data-driven methods, these models offer the potential for scalable and
+      cost-efficient SOC estimation. A baseline to assess the impact of SSM
+      practices can be established by utilizing historic satellite data.
+    </p>
+
+    <p class="report-body">
+      However, many existing tools and platforms remain restricted by paywalls,
+      limited accessibility, or insufficient methodological transparency, thereby
+      constraining their broader adoption and reproducibility within both research
+      and practical agricultural applications.
+    </p>
+  </section>
+
+  <!-- SECTION 4: AgroScan -->
+  <section class="about-section">
+    <div class="section-eyebrow">Platform</div>
+    <h2 class="section-title">What AgroScan Offers</h2>
+
+    <p class="report-body">
+      AgroScan provides a free, open-source platform to support farmers in assessing
+      the soil organic carbon content of their fields, monitoring the effectiveness
+      of SSM practices, and empowers them to advocate in front of policy-makers
+      responsible for soil initiatives.
+    </p>
+
+    <p class="report-body">
+      As an open-source tool it provides both transparency on the underlying
+      methodology and the option to personalize the tool for individual use cases
+      or expand and improve the platform for other users.
+    </p>
+
+    <!-- Feature pills -->
+    <div class="report-pill-row">
+      <span class="report-pill">🌍 Free &amp; Open Source</span>
+      <span class="report-pill">🛰 Satellite-Derived Data</span>
+      <span class="report-pill">🧠 ML-Based Prediction</span>
+      <span class="report-pill">📋 Policy-Ready Reporting</span>
+      <span class="report-pill">🔧 Customizable</span>
+    </div>
+  </section>
+
+  <!-- REFERENCES -->
+  <section class="about-section">
+    <div class="section-eyebrow">Sources</div>
+    <h2 class="section-title">References</h2>
+
+    <ol class="report-references">
+      <li id="ref1">
+        Paustian K, Larson E, Kent J, Marx E and Swan A (2019)
+        <em>Soil C Sequestration as a Biological Negative Emission Strategy.</em>
+        Front. Clim. 1:8.
+        <a href="https://doi.org/10.3389/fclim.2019.00008" target="_blank" class="ref-url">
+          doi:&nbsp;10.3389/fclim.2019.00008
+        </a>
+      </li>
+      <li id="ref2">
+        European Commission. (2021).
+        <em>EU Soil Strategy for 2030 — Reaping the benefits of healthy soils
+        for people, food, nature and climate</em> (COM/2021/699 final). EUR-Lex.
+        <a href="https://eur-lex.europa.eu/legal-content/EN/TXT/PDF/?uri=CELEX:52021DC0699"
+           target="_blank" class="ref-url">EUR-Lex PDF</a>
+      </li>
+      <li id="ref3">
+        European Parliament and Council of the European Union. (2025).
+        <em>Directive (EU) 2025/2360 — Soil Monitoring and Resilience (Soil Monitoring Law).</em>
+        Official Journal of the European Union.
+        <a href="http://data.europa.eu/eli/dir/2025/2360/oj" target="_blank" class="ref-url">
+          data.europa.eu/eli/dir/2025/2360/oj
+        </a>
+      </li>
+      <li id="ref4">
+        Ihasusta A, Al Bitar A, Batjes NH, van Egmond F, Cardinael R,
+        Karunaratne S, … Ceschia E. (2026).
+        <em>Choosing the appropriate methodology to monitor soil organic carbon (SOC)
+        in croplands: aligning methods with evolving MRV frameworks.</em>
+        Carbon Management, 17(1).
+        <a href="https://doi.org/10.1080/17583004.2026.2638317" target="_blank" class="ref-url">
+          doi:&nbsp;10.1080/17583004.2026.2638317
+        </a>
+      </li>
+    </ol>
   </section>
 
 </div>
 {% endblock %}
-

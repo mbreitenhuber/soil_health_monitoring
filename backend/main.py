@@ -72,6 +72,10 @@ def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = 
 
 def _missing_satellite_env_vars(env: dict[str, str]) -> list[str]:
     return [name for name in REQUIRED_SATELLITE_ENV_VARS if not env.get(name)]
+# Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
+STATIC_CSS_VERSION = "3"
+
+DB_PATH = ROOT / "agroscan.db"
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
@@ -80,18 +84,47 @@ def init_db():
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
+    # Tabelle erstellen
     c.execute("""
     CREATE TABLE IF NOT EXISTS analyses (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+
         date TEXT,
+        crop TEXT,
+
+        field_name TEXT,
+        notes TEXT,
+        location_name TEXT,
+
         polygon TEXT,
+
         avg_value REAL,
         min_value REAL,
         max_value REAL,
+
         zones TEXT,
-        crop TEXT
+
+        created_at TEXT
     )
     """)
+
+    # Fehlende Spalten ergänzen (für bestehende DB)
+    existing_columns = [
+        row[1]
+        for row in c.execute("PRAGMA table_info(analyses)")
+    ]
+
+    if "field_name" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN field_name TEXT")
+
+    if "notes" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN notes TEXT")
+
+    if "location_name" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN location_name TEXT")
+
+    if "created_at" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN created_at TEXT")
 
     conn.commit()
     conn.close()
@@ -118,17 +151,17 @@ NAV_PAGES = [
     {"id": "home",               "label": {"en": "Home",               "de": "Home"},               "href": "/",                   "group": "main"},
     {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
-    {"id": "users_experience",   "label": {"en": "Users Experience",   "de": "Nutzererfahrungen"},   "href": "/users_experience",   "group": "about"},
-    {"id": "about",              "label": {"en": "Research Background", "de": "Forschungshintergrund"}, "href": "/research_background",       "group": "about"},
-    {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "about"},
+    {"id": "users_experience",   "label": {"en": "Users Experience",   "de": "Nutzererfahrungen"},   "href": "/users_experience",   "group": "more"},
+    {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
+    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "middle"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
 ]
 
 HOME_STATS = [
-    {"value": "60m×60m", "label": "Datapoint acurracy"},
-    {"value": "<1s",  "label": "Analysezeit"},
-    {"value": "±5%",  "label": "Modell-Rauschen"},
-    {"value": "OSM",  "label": "Kartenbasis"},
+    {"value": "60m×60m", "label": {"en": "Minimum field size", "de": "Minimale Feldgrösse"}},
+    {"value": "5 days",  "label": {"en": "Data freshness", "de": "Datenaktualität"}},
+    {"value": "DE",  "label": {"en": "German-Focused", "de": "auf Deutschland fokussiert"}},
+    {"value": "Sentinel-2",  "label": {"en": "by ESA", "de": "von ESA gestellt"}},
 ]
 
 HOME_FEATURES = [
@@ -147,14 +180,18 @@ HOME_FEATURES = [
 ]
 
 ROADMAP = [
-    {"version": "v0.1", "title": "Starter-Template",  "done": True,
-     "desc": "Polygon-Zeichnung, FastAPI-Backend, Zonen-Visualisierung mit Platzhalter-Modell."},
-    {"version": "v0.2", "title": "ML-Integration",    "done": False,
-     "desc": "Echtes Bodenqualitäts-Modell, Feature-Extraktion, Shapely-Clipping."},
-    {"version": "v0.3", "title": "Satellitendaten",   "done": False,
-     "desc": "Sentinel-2 NDVI-Einbindung, historische Zeitreihen, Export als GeoJSON/CSV."},
-    {"version": "v1.0", "title": "Produktionsrelease","done": False,
-     "desc": "Auth, Multi-Tenant, mobile-optimiert, Deutschlandisches Amt für Landwirtschaft Daten."},
+    {"version": "v0.1", "title": {"en": "Ml-Model programming and training", "de": "Ml-Modell-Programmierung und -Training"}, "done": True,
+     "desc": {"en": "Literature research, programming and training of the Ml-model.", "de": "Literaturrecherche, Programmierung und Training des Ml-Modells."}},
+    {"version": "v0.2", "title": {"en": "Starting Web-App development", "de": "Start der Web-App-Entwicklung"},    "done": True,
+     "desc": {"en": "Web-App development with FastAPI and Jinja2. Focused on analysis and saving the results.", "de": "Web-App-Entwicklung mit FastAPI und Jinja2. Fokussiert auf Analyse und Speichern der Ergebnisse."}},
+    {"version": "v0.3", "title": {"en": "Integration of the Ml-model into the Web-App", "de": "Integration des Ml-Modells in die Web-App"},   "done": False,
+     "desc": {"en": "Connect the Web-App to the Ml-Model and make it usable.", "de": "Verbinde die Web-App mit dem Ml-Modell und macht es nutzbar."}},
+    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalizing the Web-App"},   "done": False,
+     "desc": {"en": "Finalizing the Web-App. Focused on the user experience and the design.", "de": "Die Web-App wird finalisiert. Fokussiert auf die Nutzungserfahrung und das Design."}},
+    {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": False,
+     "desc": {"en": "Final deployment and documentation of the project.", "de": "Finales Deployment und die Dokumentation des Projekts."}},
+     {"version": "v1.1", "title": {"en": "The Presentation", "de": "Die Präsentation"},"done": False,
+     "desc": {"en": "Final presentation of the project.", "de": "Finale Präsentation des Projekts."}},
 ]
 
 # Neue Teammitglieder: Eintrag hier ergänzen.
@@ -165,6 +202,8 @@ TEAM_MEMBERS = [
     {"name": "Teamkollege", "role": "Backend / GIS",  "photo": None,
      "bio": "FastAPI, PostGIS, Geodatenverarbeitung."},
     {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
+     "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
+     {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
      "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
 ]
 
@@ -187,6 +226,7 @@ def ctx(request: Request, page_id: str, lang: str = "en", **extra) -> dict:
         "current_year":  datetime.now().year,
         "api_url":       "http://localhost:8000",
         "lang":          lang,
+        "static_css_version": STATIC_CSS_VERSION,
         # analysis.html erwartet `leaflet_translations` (wird im JS geparst)
         "leaflet_translations": LEAFLET_DRAW_TRANSLATIONS.get(lang, {}),
         **extra,
@@ -273,7 +313,7 @@ async def home(request: Request, lang: str = Cookie(default="en")):
         hero_image=hero_image,
         hero_image_version=hero_image_version,
         roadmap=ROADMAP,
-        gallery_images=[{"file": "image/Europe.png", "alt": "European Field"}, {"file": "image/Sentinel-2.png", "alt": "Sentinel-2 Satellite Image"} ],     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
+        team=TEAM_MEMBERS,
     ))
 
 @app.get("/analyse", response_class=HTMLResponse)
@@ -282,10 +322,10 @@ async def analysis(request: Request, lang: str = Cookie(default="en")):
         request, "analysis", lang,
     ))
 
-@app.get("/research_background", response_class=HTMLResponse)
-async def research_background(request: Request, lang: str = Cookie(default="en")):
-    return templates.TemplateResponse("pages/research_background.html", ctx(
-        request, "research_background", lang,
+@app.get("/future_work", response_class=HTMLResponse)
+async def future_work(request: Request, lang: str = Cookie(default="en")):
+    return templates.TemplateResponse("pages/future_work.html", ctx(
+        request, "future_work", lang,
         roadmap=ROADMAP,
         team=TEAM_MEMBERS,
         gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
@@ -304,24 +344,29 @@ async def how_to(request: Request, lang: str = Cookie(default="en")):
 async def pers_dash(request: Request, lang: str = Cookie(default="en")):
 
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
+
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
     conn.close()
 
-    analyses = [
-        {
-            "id": r[0],
-            "date": r[1],
-            "polygon": json.loads(r[2]),
-            "avg_value": r[3],
-            "min_value": r[4],
-            "max_value": r[5],
-            "zones": json.loads(r[6]),
-            "crop": r[7] if len(r) > 7 else None
-        }
-        for r in rows
-    ]
+    analyses = []
+    for r in rows:
+        analyses.append({
+            "id": r["id"],
+            "date": r["date"],
+            "crop": r["crop"],
+            "field_name": r["field_name"],
+            "notes": r["notes"],
+            "location_name": r["location_name"],
+            "polygon": json.loads(r["polygon"]) if r["polygon"] else [],
+            "avg_value": r["avg_value"] or 0,
+            "min_value": r["min_value"] or 0,
+            "max_value": r["max_value"] or 0,
+            "zones": json.loads(r["zones"]) if r["zones"] else [],
+            "created_at": r["created_at"],
+        })
 
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
         request, "pers_dash", lang,
@@ -379,12 +424,19 @@ class PredictionResponse(BaseModel):
 
 class SaveRequest(BaseModel):
     date: str
+
+    crop: str | None = None
+    field_name: str | None = None
+    notes: str | None = None
+    location_name: str | None = None
+
     polygon: List[Coordinate]
+
     avg_value: float
     min_value: float
     max_value: float
+
     zones: list
-    crop: str | None = None
 
 
 def _pick_utm_epsg(lat: float, lng: float) -> int:
@@ -690,16 +742,36 @@ def save_analysis(req: SaveRequest):
     c = conn.cursor()
 
     c.execute("""
-        INSERT INTO analyses (date, polygon, avg_value, min_value, max_value, zones, crop)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO analyses (
+            date,
+            crop,
+            field_name,
+            notes,
+            location_name,
+            polygon,
+            avg_value,
+            min_value,
+            max_value,
+            zones,
+            created_at
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         req.date,
+        req.crop,
+        req.field_name,
+        req.notes,
+        req.location_name,
+
         json.dumps([p.dict() for p in req.polygon]),
+
         req.avg_value,
         req.min_value,
         req.max_value,
+
         json.dumps(req.zones),
-        req.crop
+
+        datetime.now().isoformat()
     ))
 
     conn.commit()
@@ -721,12 +793,20 @@ def get_analyses():
         {
             "id": r[0],
             "date": r[1],
-            "polygon": json.loads(r[2]),
-            "avg_value": r[3],
-            "min_value": r[4],
-            "max_value": r[5],
-            "zones": json.loads(r[6]),
-            "crop": r[7] if len(r) > 7 else None
+            "crop": r[2],
+            "field_name": r[3],
+            "notes": r[4],
+            "location_name": r[5],
+
+            "polygon": json.loads(r[6]),
+
+            "avg_value": r[7],
+            "min_value": r[8],
+            "max_value": r[9],
+
+            "zones": json.loads(r[10]),
+
+            "created_at": r[11]
         }
         for r in rows
     ]
@@ -741,3 +821,161 @@ def delete_analysis(id: int):
     conn.close()
 
     return {"status": "deleted"}
+
+# ══════════════════════════════════════════════════════
+# Download data function
+# ══════════════════════════════════════════════════════
+
+import csv
+from io import StringIO
+import json
+
+def _analysis_to_csv(analyses: list[dict]) -> str:
+    output = StringIO()
+    writer = csv.writer(output, delimiter=";")
+
+    writer.writerow([
+        "ID",
+        "Date",
+        "Crop",
+        "Field Name",
+        "Location",
+        "Notes",
+        "Avg (%)",
+        "Min (%)",
+        "Max (%)",
+        "Polygon Points",
+        "Zones Count",
+        "Created At"
+    ])
+
+    for a in analyses:
+
+        polygon = a.get("polygon") or []
+        zones = a.get("zones") or []
+
+        # SAFE guards (verhindert Internal Server Error)
+        poly_len = len(polygon) if isinstance(polygon, list) else 0
+        zone_len = len(zones) if isinstance(zones, list) else 0
+
+        writer.writerow([
+            a.get("id"),
+            a.get("date"),
+            a.get("crop"),
+            a.get("field_name"),
+            a.get("location_name"),
+            a.get("notes"),
+            round(a.get("avg_value", 0) * 100, 1),
+            round(a.get("min_value", 0) * 100, 1),
+            round(a.get("max_value", 0) * 100, 1),
+            poly_len,
+            zone_len,
+            a.get("created_at")
+        ])
+
+    output.seek(0)
+    return output.getvalue()
+
+from fastapi.responses import Response
+import sqlite3
+import json
+
+@app.get("/api/analyses/{id}/csv")
+def download_single_csv(id: int):
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM analyses WHERE id = ?", (id,))
+    r = c.fetchone()
+    conn.close()
+
+    if not r:
+        return {"error": "not found"}
+
+    analysis = {
+        "id": r[0],
+        "date": r[1],
+        "crop": r[2],
+        "field_name": r[3],
+        "notes": r[4],
+        "location_name": r[5],
+        "polygon": json.loads(r[6]) if r[6] else [],
+        "avg_value": r[7],
+        "min_value": r[8],
+        "max_value": r[9],
+        "zones": json.loads(r[10]) if r[10] else [],
+        "created_at": r[11]
+    }
+
+    csv_data = _analysis_to_csv([analysis])
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=analysis_{id}.csv"
+        }
+    )
+
+@app.get("/api/analyses/csv")
+def download_all_csv():
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("SELECT * FROM analyses ORDER BY id DESC")
+    rows = c.fetchall()
+    conn.close()
+
+    analyses = []
+    for r in rows:
+        analyses.append({
+            "id": r[0],
+            "date": r[1],
+            "crop": r[2],
+            "field_name": r[3],
+            "notes": r[4],
+            "location_name": r[5],
+            "polygon": json.loads(r[6]) if r[6] else [],
+            "avg_value": r[7],
+            "min_value": r[8],
+            "max_value": r[9],
+            "zones": json.loads(r[10]) if r[10] else [],
+            "created_at": r[11]
+        })
+
+    csv_data = _analysis_to_csv(analyses)
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": "attachment; filename=all_analyses.csv"
+        }
+    )
+
+@app.put("/api/update-analysis/{id}")
+def update_analysis(id: int, req: SaveRequest):
+
+    conn = sqlite3.connect(DB_PATH)
+    c = conn.cursor()
+
+    c.execute("""
+        UPDATE analyses
+        SET
+            field_name = ?,
+            location_name = ?,
+            crop = ?,
+            notes = ?
+        WHERE id = ?
+    """, (
+        req.field_name,
+        req.location_name,
+        req.crop,
+        req.notes,
+        id
+    ))
+
+    conn.commit()
+    conn.close()
+
+    return {"status": "updated"}

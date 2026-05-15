@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block head_styles %}
-  <link rel="stylesheet" href="/static/css/app.css" />
+  <link rel="stylesheet" href="/static/css/app.css?v={{ static_css_version }}" />
 {% endblock %}
 
 {% block content %}
@@ -129,6 +129,7 @@
 </div>
 
 <!-- SAVE POPUP -->
+<!-- SAVE POPUP -->
 <div class="save-popup" id="save-popup">
 
   <div class="save-popup-card">
@@ -140,14 +141,35 @@
 
     <div class="save-popup-content">
 
+      <!-- FIELD NAME -->
       <div class="save-field">
         <label>Field Name</label>
-        <input type="text" id="dashboard-field-name" placeholder="North Wheat Field">
+
+        <input
+          type="text"
+          id="dashboard-field-name"
+          placeholder="North Wheat Field"
+        >
       </div>
 
+      <!-- LOCATION -->
       <div class="save-field">
+        <label>Location</label>
+
+        <input
+          type="text"
+          id="dashboard-location-name"
+          placeholder="Zurich North"
+        >
+      </div>
+
+      <!-- CROP -->
+      <div class="save-field">
+
         <label>Crop</label>
+
         <select id="dashboard-crop">
+
           <option value="">Select crop</option>
 
           <option>Wheat</option>
@@ -157,7 +179,10 @@
           <option>Soybean</option>
           <option>Rice</option>
 
-          <option value="custom">Other / Custom</option>
+          <option value="custom">
+            Other / Custom
+          </option>
+
         </select>
 
         <input
@@ -166,14 +191,27 @@
           placeholder="Enter custom crop..."
           style="display:none;"
         >
+
       </div>
 
+      <!-- NOTES -->
       <div class="save-field">
+
         <label>Notes</label>
-        <textarea id="dashboard-notes" rows="4" placeholder="Optional notes..."></textarea>
+
+        <textarea
+          id="dashboard-notes"
+          rows="4"
+          placeholder="Optional notes..."
+        ></textarea>
+
       </div>
 
-      <button class="btn-dashboard-save" id="confirm-dashboard-save">
+      <!-- SAVE BUTTON -->
+      <button
+        class="btn-dashboard-save"
+        id="confirm-dashboard-save"
+      >
         Save Analysis
       </button>
 
