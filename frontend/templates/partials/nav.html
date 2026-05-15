@@ -17,16 +17,21 @@
 
     <div class="nav-dropdown" id="dd-about">
       <button class="nav-dropdown-btn" onclick="toggleDropdown('dd-about')">
-        {{ "About us" if lang == "en" else "Über uns" }}
+        {{ "More Information" if lang == "en" else "Mehr Informationen" }}
         <span class="nav-chevron">▾</span>
       </button>
       <div class="nav-dropdown-menu">
-        {% for page in nav_pages if page.group == "about" %}
+        {% for page in nav_pages if page.group == "more" %}
           <a class="nav-dropdown-item {% if current_page == page.id %}active{% endif %}"
              href="{{ page.href }}">{{ page.label }}</a>
         {% endfor %}
       </div>
     </div>
+
+    {% for page in nav_pages if page.group == "middle" %}
+      <a class="nav-link {% if current_page == page.id %}active{% endif %}"
+         href="{{ page.href }}">{{ page.label }}</a>
+    {% endfor %}
   </div>
 
   <div class="nav-spacer"></div>

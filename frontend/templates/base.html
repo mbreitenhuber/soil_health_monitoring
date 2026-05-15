@@ -11,9 +11,9 @@
   {# Seiten-spezifische <link> Tags (z.B. Leaflet CSS) #}
   {% block head_libs %}{% endblock %}
 
-  <link rel="stylesheet" href="/static/css/base.css" />
-  <link rel="stylesheet" href="/static/css/nav.css" />
-  <link rel="stylesheet" href="/static/css/pages.css" />
+  <link rel="stylesheet" href="/static/css/base.css?v={{ static_css_version }}" />
+  <link rel="stylesheet" href="/static/css/nav.css?v={{ static_css_version }}" />
+  <link rel="stylesheet" href="/static/css/pages.css?v={{ static_css_version }}" />
 
   {# Seiten-spezifisches CSS (z.B. app.css für Karte) #}
   {% block head_styles %}{% endblock %}

@@ -2,12 +2,26 @@
    dashboard.js
 ===================================================== */
 
-let allAnalyses        = window.__ANALYSES__ || [];
+function readDashboardConfig() {
+  const el = document.getElementById("dashboard-config");
+  if (!el) {
+    return { analyses: [], apiUrl: "http://127.0.0.1:8000", lang: "en" };
+  }
+  try {
+    return JSON.parse(el.textContent);
+  } catch {
+    return { analyses: [], apiUrl: "http://127.0.0.1:8000", lang: "en" };
+  }
+}
+
+const dashboardConfig  = readDashboardConfig();
+let allAnalyses        = dashboardConfig.analyses || [];
 let selectedForCompare = new Set();
 let currentItem        = null;
 let qualityChart       = null;
 
-const API_URL = window.API_URL || "http://127.0.0.1:8000";
+const API_URL = dashboardConfig.apiUrl || "http://127.0.0.1:8000";
+const LANG    = dashboardConfig.lang || "en";
 
 const COLORS = {
   min:     "#ef4444",

@@ -1,7 +1,7 @@
 /* ── How-To page specific styles ───────────────────── */
 .howto-steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-top: 8px;}
-.howto-step-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.2s;}
-.howto-step-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.howto-step-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 28px 24px; position: relative; overflow: hidden; transition: border-color 0.2s;}
+.howto-step-card:hover { border-color: var(--border2); }
 .howto-step-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 3.5rem; color: var(--border2); line-height: 1; position: absolute; top: 12px; right: 18px; letter-spacing: -0.05em; pointer-events: none;}
 .howto-step-icon { font-size: 1.6rem; margin-bottom: 16px;}
 .howto-step-card h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 10px;}
@@ -11,7 +11,7 @@
 .howto-detail { border-bottom: 1px solid var(--border); padding: 36px 0;}
 .howto-detail:first-of-type { padding-top: 0; }
 .howto-detail-header { display: flex; align-items: baseline; gap: 20px; margin-bottom: 20px;}
-.howto-detail-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); white-space: nowrap;}
+.howto-detail-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.1rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); white-space: nowrap;}
 .howto-detail-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.15rem; color: var(--text); letter-spacing: -0.02em;}
 .howto-detail-body p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.8; max-width: 720px;}
 .howto-list { margin: 16px 0 0 20px; display: flex; flex-direction: column; gap: 10px;}
@@ -22,8 +22,8 @@ kbd { font-family: 'DM Mono', monospace; font-size: 0.72rem; background: var(--s
 
 /* Model cards */
 .howto-model-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-top: 8px;}
-.howto-model-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; transition: border-color 0.2s, transform 0.2s;}
-.howto-model-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.howto-model-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; transition: border-color 0.2s;}
+.howto-model-card:hover { border-color: var(--border2); }
 .howto-model-icon { font-size: 1.4rem; margin-bottom: 14px;}
 .howto-model-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; color: var(--text); margin-bottom: 10px;}
 .howto-model-card p { font-size: 0.77rem; color: var(--text-dim); line-height: 1.75;}

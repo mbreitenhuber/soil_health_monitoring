@@ -33,19 +33,19 @@ body.page-app { height: 100%; overflow: hidden; }
   font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem;
   padding: 12px 28px; border-radius: 8px; border: none;
   background: var(--accent); color: var(--bg); cursor: pointer;
-  letter-spacing: 0.04em; transition: opacity 0.2s, transform 0.12s;
+  letter-spacing: 0.04em; transition: opacity 0.2s;
   text-decoration: none; display: inline-block;
 }
-.btn-primary:hover { opacity: 0.87; transform: translateY(-2px); }
+.btn-primary:hover { opacity: 0.87; transform: translateY(-2px);}
 
 .btn-outline {
   font-family: 'DM Mono', monospace; font-size: 0.82rem;
   padding: 12px 24px; border-radius: 8px; border: 1px solid var(--border2);
   background: transparent; color: var(--text-dim); cursor: pointer;
-  transition: border-color 0.2s, color 0.2s, transform 0.12s;
+  transition: border-color 0.2s, color 0.2s;
   text-decoration: none; display: inline-block;
 }
-.btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px);}
 
 .section-eyebrow { font-size: 0.65rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
 .section-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: clamp(1.6rem, 3vw, 2.4rem); letter-spacing: -0.03em; color: var(--text); margin-bottom: 48px; }

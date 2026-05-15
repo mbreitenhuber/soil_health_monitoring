@@ -3,7 +3,7 @@
 {% block title %}Personal Dashboard{% endblock %}
 
 {% block head_styles %}
-<link rel="stylesheet" href="/static/css/dashboard.css" />
+<link rel="stylesheet" href="/static/css/dashboard.css?v={{ static_css_version }}" />
 {% endblock %}
 
 {% block content %}
@@ -128,9 +128,8 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-  window.API_URL      = "http://127.0.0.1:8000";
-  window.__ANALYSES__ = {{ analyses | tojson }};
+<script type="application/json" id="dashboard-config">
+  {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang} | tojson }}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/js/dashboard.js"></script>

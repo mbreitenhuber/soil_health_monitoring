@@ -1,7 +1,7 @@
 /* Testimonials */
 .testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 40px; }
-.testimonial-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: border-color 0.2s, transform 0.2s; }
-.testimonial-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+.testimonial-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: border-color 0.2s; }
+.testimonial-card:hover { border-color: var(--border2); }
 .testimonial-top { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
 .testimonial-avatar { width: 54px; height: 54px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface2); object-fit: cover; flex-shrink: 0; }
 .testimonial-meta { display: flex; flex-direction: column; gap: 4px; }

@@ -39,14 +39,14 @@
   <div class="stats-bar">
     {% for stat in stats %}
       <div class="stat-item">
-        <div class="stat-num">{{ stat.value }}</div>
-        <div class="stat-label">{{ stat.label }}</div>
+        <div class="stat-num">{{ stat.value[lang] if stat.value is mapping and lang in stat.value else stat.value }}</div>
+        <div class="stat-label">{{ stat.label[lang] if stat.label is mapping and lang in stat.label else stat.label }}</div>
       </div>
     {% endfor %}
   </div>
 
   <!-- Features — Daten kommen aus HOME_FEATURES in main.py -->
-  <section class="features">
+  <!--<section class="features">
     <div class="section-eyebrow">What AgroScan delivers</div>
     <h2 class="section-title">Simple. Precise. Scalable.</h2>
     <div class="features-grid">
@@ -58,7 +58,7 @@
         </div>
       {% endfor %}
     </div>
-  </section>
+  </section>-->
 
   <!-- Showcase 1 -->
   <section class="showcase" style="border-top:1px solid var(--border);padding-top:80px;">
@@ -80,7 +80,7 @@
       <div class="section-eyebrow">Machine Learning Model</div>
       <h3>Plug in your own model</h3>
       <h3>Satellite driven decision support</h3>
-      <p>The machine learning model is trained on ESA's Sentinel-1 and Sentinel-2 data and uses the NDVI (Normalized Difference Vegetation Index) and other vegetation indices to predict the quality of the soil.</p>
+      <p>The machine learning model is trained on ESA's Sentinel-2 data. The Program splits the field in 60m x 60m cells and the model uses various vegetation indices to predict the quality for each cell. The result is a zone map with a quality score for each cell.</p>
       <a class="btn-outline" href="/research_background">Learn more about the project →</a>
     </div>
     <div class="img-placeholder" style="border-radius:10px;width:100%;height:100%;aspect-ratio:16/9;">
@@ -112,11 +112,11 @@
           <div class="tl-dot {% if not item.done %}tl-dot--future{% endif %}"></div>
             <div>
               <div class="tl-year {% if not item.done %}tl-year--future{% endif %}">
-                {{ item.version }}
+                {{ item.version[lang] if item.version is mapping and lang in item.version else item.version }}
               </div>
             <div class="tl-content">
-            <h4>{{ item.title }}</h4>
-            <p>{{ item.desc }}</p>
+            <h4>{{ item.title[lang] if item.title is mapping and lang in item.title else item.title }}</h4>
+            <p>{{ item.desc[lang] if item.desc is mapping and lang in item.desc else item.desc }}</p>
           </div>
         </div>
       </div>
@@ -124,30 +124,30 @@
     </div>
   </section>
 
-  <!-- Galerie -->
+  <!-- Team — Daten kommen aus TEAM_MEMBERS in main.py -->
   <section class="about-section">
-    <div class="section-eyebrow">The Project</div>
-    <h2 class="section-title">Pictures & Impressions</h2>
-    <div class="img-gallery">
-      {% if gallery_images %}
-        {% for img in gallery_images %}
-          <img src="/static/assets/{{ img.file }}" alt="{{ img.alt }}"
-               style="border-radius:10px;width:100%;object-fit:cover;" />
-        {% endfor %}
-      {% else %}
-        <div class="img-placeholder" style="aspect-ratio:16/9;border-radius:10px;">
-          <div class="icon">🌾</div>
-          <div>Photo — gallery_images in main.py setzen</div>
-        </div>
-        <div class="img-gallery-right">
-          <div class="img-placeholder" style="flex:1;border-radius:10px;min-height:120px;">
-            <div class="icon">🛰️</div><div style="font-size:0.72rem;">Satellite image</div>
+    <div class="section-eyebrow">Team</div>
+    <h2 class="section-title">Wer dahinter steckt</h2>
+    <div class="team-grid">
+      {% for member in team %}
+        <div class="team-card">
+          <div class="team-photo">
+            {% if member.photo %}
+              <img src="/static/assets/team/{{ member.photo }}"
+                   alt="{{ member.name }}"
+                   style="width:100%;height:100%;object-fit:cover;" />
+            {% else %}
+              <div class="photo-icon">👤</div>
+              <div style="font-size:0.72rem;">Foto → static/assets/team/</div>
+            {% endif %}
           </div>
-          <div class="img-placeholder" style="flex:1;border-radius:10px;min-height:120px;">
-            <div class="icon">📊</div><div style="font-size:0.72rem;">Result chart</div>
+          <div class="team-info">
+            <div class="team-name">{{ member.name }}</div>
+            <div class="team-role">{{ member.role }}</div>
+            <div class="team-bio">{{ member.bio }}</div>
           </div>
         </div>
-      {% endif %}
+      {% endfor %}
     </div>
   </section>
 
