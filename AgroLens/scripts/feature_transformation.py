@@ -59,12 +59,16 @@ def normalize_index(value, index_name, index_ranges):
 
 
 # Read Sentinel-2 bands from CSV (project-relative by default).
-project_root = Path(__file__).resolve().parents[2]
-model_path = Path(
-    os.environ.get("MODEL_PATH", project_root / "data" / "datasets" / "Model_A.csv")
+project_root = Path(__file__).resolve().parents[1]
+input_path = Path(
+    os.environ.get(
+        "MODEL_INPUT_PATH",
+        os.environ.get("MODEL_PATH", project_root / "data" / "datasets" / "Model_A.csv"),
+    )
 )
-if not model_path.is_file():
-    raise FileNotFoundError(f"Model file not found: {model_path}")
+
+if not input_path.is_file():
+    raise FileNotFoundError(f"Input file not found: {input_path}")
 
 output_path = Path(
     os.environ.get(
@@ -73,7 +77,8 @@ output_path = Path(
     )
 )
 
-sentinel2 = pd.read_csv(model_path)
+print(f"[features] reading input CSV from {input_path}", flush=True)
+sentinel2 = pd.read_csv(input_path)
 
 # Dataset structure:
 ## at each location a 9x9 pixel was evaluated for 10 bands, values were flattened & normalized s.t. for each Band 81 values exist
@@ -199,5 +204,6 @@ sentinel2.drop(columns=columns_unnamed, inplace=True)
 
 output_path.parent.mkdir(parents=True, exist_ok=True)
 sentinel2.to_csv(output_path, index=False)
+print(f"[features] wrote transformed CSV to {output_path}", flush=True)
 
 print("Feature transformation complete.")

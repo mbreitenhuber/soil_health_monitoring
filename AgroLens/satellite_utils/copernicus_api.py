@@ -30,13 +30,20 @@ class CopernicusApi:
     AWS_BUCKET = "eodata.dataspace.copernicus.eu"
 
     session = boto3.session.Session()
-    s3 = boto3.client(
-        "s3",
-        endpoint_url=AWS_ENDPOINT_URL,
-        aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
-        aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
-        region_name="default",
-    )
+
+    s3 = None
+
+    @classmethod
+    def _get_s3_client(cls):
+        if cls.s3 is None:
+            cls.s3 = boto3.client(
+                "s3",
+                endpoint_url=cls.AWS_ENDPOINT_URL,
+                aws_access_key_id=os.environ["AWS_ACCESS_KEY_ID"],
+                aws_secret_access_key=os.environ["AWS_SECRET_ACCESS_KEY"],
+                region_name="default",
+            )
+        return cls.s3
 
     @classmethod
     def get_data(
@@ -467,7 +474,8 @@ class CopernicusApi:
 
         try:
             if not image_file.is_file():
-                response = cls.s3.list_objects_v2(
+                s3_client = cls._get_s3_client()
+                response = s3_client.list_objects_v2(
                     Bucket="eodata",
                     Prefix=feature["properties"]["productIdentifier"].split("/", 2)[2],
                 )
@@ -479,7 +487,7 @@ class CopernicusApi:
                             cloud_mask = obj["Key"]
 
                 os.makedirs(image_file.parent, exist_ok=True)
-                cls.s3.download_file("eodata", cloud_mask, image_file)
+                s3_client.download_file("eodata", cloud_mask, image_file)
 
             x, y = ImageUtils.location_to_pixel(image_file, latitude, longitude)
             result = cls._check_cloud_pixel(image_file, x, y)

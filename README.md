@@ -1,3 +1,17 @@
+# 🛰️ Soil health monitoring
+
+*Empowering farmers worldwide with satellite-driven soil insights.*
+
+This is an open-source platform designed to monitor soil health using Earth Observation data. By bridging the gap between complex satellite imagery and actionable agricultural data, we help farmers identify crop stress, optimize moisture, and monitor salinity from space.
+
+---
+
+## 🌍 The Mission
+Precision agriculture is often locked behind expensive paywalls. Our goal is to provide a free, open-source tool where any farmer can:
+1.⁠ ⁠*Pinpoint their field* on a global map.
+2.⁠ ⁠*Analyze soil health factors* (Moisture, Salinity, Nutrient stress).
+3.⁠ ⁠*Track historical trends* to see how their land is changing over time.
+
 # Nebula – Sentinel‑basierte Feldanalyse (ML) + Web-App
 
 Nebula ist ein Open-Source Projekt für **satelliten-gestütztes Monitoring von Bodengesundheit**.
@@ -80,3 +94,41 @@ Diese Variablen müssen im GitLab Projekt (oder in der Gruppe) gesetzt sein:
 - `BASE_URL`: Basis-Domain für die generierte URL
 
 Wenn alles gesetzt ist und ihr auf `main` pusht, sollte GitLab die Webseite automatisch deployen. 
+
+# Project Setup
+
+This project uses a **hybrid Conda + Pip environment** to ensure compatibility between geospatial libraries, machine learning dependencies, and web API tooling.
+
+---
+
+## 🧪 Environment Setup
+
+### 1. Create Conda environment
+
+```bash
+conda env create -f environment.yml
+conda activate ai4good
+```
+
+---
+
+### 2. Install Python dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+### 3. Install PyTorch (choose one option)
+
+#### CPU version
+
+```bash
+pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0
+```
+
+#### CUDA (GPU version, recommended if supported)
+
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121

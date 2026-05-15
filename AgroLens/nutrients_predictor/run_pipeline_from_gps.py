@@ -35,6 +35,7 @@ def parse_args():
     p.add_argument("--flatten", action="store_true", help="Flatten pixel matrices when extracting")
     p.add_argument("--normalize", action="store_true", help="Normalize band values when loading to .csv")
     p.add_argument("--mapping", help="Path to write mapping CSV (optional)")
+    p.add_argument("--model-base", help="Base directory containing trained models (optional)")
     p.add_argument("--model", help="Path to trained .pth model (optional)")
     p.add_argument("--output","-o",help="Path for the final predictions CSV (default: <input>_predicted.csv)")
     p.add_argument("--start", help="First CSV row to download", nargs="?", default="1")
@@ -53,9 +54,14 @@ def main():
     if not gps_input.is_file():
         raise FileNotFoundError(f"GPS input file not found: {gps_input}")
 
+
+    print("[pipeline] starting GPS -> Sentinel -> features -> NN pipeline", flush=True)
+    print(f"[pipeline] gps input: {gps_input}", flush=True)
+
     # Resolve dataset path (DATASET_PATH env or default)
     dataset_path = Path(os.environ.get("DATASET_PATH", project_root / "data" / "datasets"))
     dataset_path.mkdir(parents=True, exist_ok=True)
+    model_base = Path(args.model_base) if args.model_base else project_root / "data" / "models"
 
     mapping_file = Path(args.mapping) if args.mapping else dataset_path / "mapping_from_gps.csv"
     sentinel_csv = dataset_path / f"{args.model_config}.csv"
@@ -63,12 +69,21 @@ def main():
     predictions_csv = (
         Path(args.output)
         if args.output
-        else input_dir.parent / f"{gps_input.stem}_predicted.csv"
+        else dataset_path / f"{gps_input.stem}_predicted.csv"
     )
 
     env = os.environ.copy()
     # ensure scripts see the same dataset path
     env["DATASET_PATH"] = str(dataset_path)
+    env["MODEL_PATH"] = str(model_base)
+    env["MODEL_INPUT_PATH"] = str(sentinel_csv)
+    env["MODEL_TRANSFORMED_PATH"] = str(transformed_csv)
+
+    print(f"[pipeline] dataset path: {dataset_path}", flush=True)
+    print(f"[pipeline] sentinel csv: {sentinel_csv}", flush=True)
+    print(f"[pipeline] transformed csv: {transformed_csv}", flush=True)
+    print(f"[pipeline] model base: {model_base}", flush=True)
+
 
     # 1) Download sentinel data (creates mapping CSV)
     sentinel_download = input_dir / "sentinel_download.py"
@@ -80,6 +95,7 @@ def main():
     if args.end and args.end != "0":  # Only add if not the default
         cmd.append("--end")
         cmd.append(str(args.end))
+    print("[pipeline] step 1/4: downloading Sentinel data", flush=True)
     run_cmd(cmd, env=env)
 
     # 2) Extract pixel values to CSV
@@ -89,6 +105,7 @@ def main():
         csv_cmd.append("--flatten")
     if args.normalize:
         csv_cmd.append("--normalize")
+    print("[pipeline] step 2/4: extracting Sentinel pixels to CSV", flush=True)
     run_cmd(csv_cmd, env=env)
 
     # 3) Normalize dataset (normalize_data.py expects DATASET_PATH environment variable)
@@ -99,8 +116,9 @@ def main():
     # 4) Feature transformation (feature_transformation.py reads MODEL_PATH env variable)
     # set MODEL_PATH to the normalized csv so the transformer picks it up
     #env["MODEL_PATH"] = str(dataset_path / f"{args.model_config}_norm.csv")
-    env["MODEL_PATH"] = str(dataset_path / f"{args.model_config}.csv")
+    #env["MODEL_PATH"] = str(dataset_path / f"{args.model_config}.csv")
     feature_transform = scripts_dir / "feature_transformation.py"
+    print("[pipeline] step 3/4: computing feature transformations", flush=True)
     run_cmd([sys.executable, str(feature_transform)], env=env)
 
     # Reset MODEL_PATH to the correct models directory for prediction
@@ -122,6 +140,7 @@ def main():
     ]
     if args.model:
         predict_cmd += ["--model", args.model]
+    print("[pipeline] step 4/4: running neural network prediction", flush=True)
     run_cmd(predict_cmd, env=env)
 
     print("Pipeline finished. Predictions written to:", predictions_csv)
