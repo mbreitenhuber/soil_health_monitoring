@@ -25,10 +25,8 @@
 }
 
 .analysis-card:hover {
-  transform: translateY(-3px);
+  border-color: var(--border2);
   box-shadow: 0 8px 24px rgba(0,0,0,0.09);
-  border-radius: 18px;
-  padding: 22px;
 }
 
 /* =========================
