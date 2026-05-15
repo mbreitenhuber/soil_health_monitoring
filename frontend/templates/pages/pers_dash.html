@@ -129,8 +129,8 @@
 
 {% block scripts %}
 <script>
-  window.API_URL      = "http://127.0.0.1:8000";
-  window.__ANALYSES__ = {{ analyses | tojson }};
+  window.API_URL = "http://127.0.0.1:8000";
+  window.__ANALYSES__ = JSON.parse('{{ analyses | tojson | safe }}');
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="/static/js/dashboard.js"></script>
