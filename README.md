@@ -72,6 +72,7 @@ pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0
 
 ```bash
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
 
 ---
 
