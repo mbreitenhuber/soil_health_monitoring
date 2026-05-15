@@ -1,0 +1,197 @@
+/* =========================
+   report.css
+   Orientiert an pages.css + base.css Design-Tokens
+========================= */
+
+/* ── Body text ─────────────────────────────────── */
+
+.report-body {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  line-height: 1.9;
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+
+.report-body:last-of-type {
+  margin-bottom: 0;
+}
+
+/* ── Pull quote ────────────────────────────────── */
+
+.report-pullquote {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+  color: var(--text);
+  line-height: 1.65;
+  letter-spacing: -0.02em;
+  border-left: 3px solid var(--accent);
+  padding: 20px 28px;
+  margin: 36px 0 8px;
+  background: var(--surface);
+  border-radius: 0 10px 10px 0;
+  max-width: 680px;
+}
+
+/* ── Highlight cards (3-col) ───────────────────── */
+
+.report-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
+  margin-top: 36px;
+}
+
+.report-highlight-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px 20px;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.report-highlight-card:hover {
+  border-color: var(--border2);
+  transform: translateY(-3px);
+}
+
+.report-highlight-icon {
+  font-size: 1.6rem;
+  margin-bottom: 10px;
+}
+
+.report-highlight-label {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.report-highlight-card p {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+}
+
+/* ── Feature pills ─────────────────────────────── */
+
+.report-pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 32px;
+}
+
+.report-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 7px 16px;
+  letter-spacing: 0.02em;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.report-pill:hover {
+  border-color: var(--accent);
+  background: var(--surface2);
+}
+
+/* ── References ────────────────────────────────── */
+
+.report-references {
+  list-style: none;
+  counter-reset: ref-counter;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 760px;
+  padding: 0;
+}
+
+.report-references li {
+  counter-increment: ref-counter;
+  position: relative;
+  padding: 16px 20px 16px 52px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  line-height: 1.75;
+  transition: border-color 0.2s;
+}
+
+.report-references li:hover {
+  border-color: var(--border2);
+}
+
+.report-references li::before {
+  content: counter(ref-counter);
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--accent);
+  width: 22px;
+  text-align: center;
+}
+
+.report-references li em {
+  color: var(--text);
+  font-style: italic;
+}
+
+/* ── Inline reference links ────────────────────── */
+
+.ref-link {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  vertical-align: super;
+  line-height: 0;
+  transition: opacity 0.15s;
+}
+
+.ref-link:hover {
+  opacity: 0.7;
+}
+
+/* ── External URL links in reference list ──────── */
+
+.ref-url {
+  display: inline-block;
+  margin-top: 4px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.73rem;
+  color: var(--accent);
+  text-decoration: none;
+  word-break: break-all;
+  opacity: 0.85;
+  transition: opacity 0.15s;
+}
+
+.ref-url:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ── Responsive ────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .report-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+  .report-pullquote {
+    font-size: 0.92rem;
+    padding: 16px 20px;
+  }
+}
