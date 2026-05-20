@@ -70,8 +70,9 @@ def run_model(model_var, model_config, target, validation, include_optional_data
 
     elif model_var == "nn":
         print("-----Start model training: Neuronal Network-----")
-        train_loader, test_loader = dataloader_creator.create_dataloaders()
-        nn_pred.run_nn_train(input_size, train_loader, test_loader, f"{model_path}.pth")
+        # Pass the DataloaderCreator to the NN training routine so Optuna
+        # trials can recreate DataLoaders with trial-specific batch sizes.
+        nn_pred.run_nn_train(input_size, dataloader_creator, f"{model_path}.pth")
         print("-----End model training: Neuronal Network-----")
 
     elif model_var == "rf":
