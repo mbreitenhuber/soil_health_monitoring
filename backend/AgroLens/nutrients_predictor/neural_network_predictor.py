@@ -244,7 +244,7 @@ class TrainingPipeline:
         return model
 
 
-def objective(input_size, trial, train_loader, test_loader, model_savepath) -> float:
+def objective(input_size, trial, dataloader_creator, model_savepath) -> float:
     """
     Defines the objective function for hyperparameter optimization using Optuna.
 
@@ -279,6 +279,12 @@ def objective(input_size, trial, train_loader, test_loader, model_savepath) -> f
         input_size=input_size, hidden_sizes=hidden_sizes, dropout_rates=dropout_rates
     )
 
+    # Recreate DataLoaders with the sampled batch_size so the trial actually
+    # uses the suggested batch size. DataloaderCreator stores `batch_size`
+    # as an attribute that is used by `create_dataloaders()`.
+    dataloader_creator.batch_size = batch_size
+    train_loader, test_loader = dataloader_creator.create_dataloaders()
+
     pipeline = TrainingPipeline(
         train_loader=train_loader,
         test_loader=test_loader,
@@ -302,7 +308,7 @@ def objective(input_size, trial, train_loader, test_loader, model_savepath) -> f
     return test_loss
 
 
-def run_nn_train(input_size, train_loader, test_loader, model_savepath):
+def run_nn_train(input_size, dataloader_creator, model_savepath):
     """
     Runs the training of a regression neuronal network using Optuna and manages model files.
 
@@ -313,11 +319,12 @@ def run_nn_train(input_size, train_loader, test_loader, model_savepath):
 
     """
 
-    # Create optuna study
+    # Create optuna study. We pass the DataloaderCreator so each trial can
+    # recreate DataLoaders with its sampled `batch_size`.
     study = optuna.create_study(direction="minimize")
     study.optimize(
         lambda trial: objective(
-            input_size, trial, train_loader, test_loader, model_savepath
+            input_size, trial, dataloader_creator, model_savepath
         ),
         n_trials=20,
         timeout=600,
