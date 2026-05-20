@@ -53,7 +53,6 @@
 
 .report-highlight-card:hover {
   border-color: var(--border2);
-  transform: translateY(-3px);
 }
 
 .report-highlight-icon {
