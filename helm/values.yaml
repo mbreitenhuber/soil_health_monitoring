@@ -25,3 +25,7 @@ components:
     ingress:
       enabled: true
       url: null  # set via --set in CI
+    pvcs:
+      - storageClassName: longhorn
+        storage: 5G
+        accessMode: ReqdWriteOnce
