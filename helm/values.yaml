@@ -1,17 +1,4 @@
 components:
-  frontend:
-    enabled: false
-    image:
-      repository: null  # set via --set in CI
-      tag: latest
-      pullPolicy: Always
-    port: 80
-    health: /healthz
-    readinessProbe: null
-    livenessProbe: null
-    ingress:
-      enabled: false
-      url: null  # set via --set in CI
 
   backend:
     enabled: true
@@ -26,6 +13,8 @@ components:
       enabled: true
       url: null  # set via --set in CI
     pvcs:
-      - storageClassName: longhorn
+      - name: data
+        mountPath: /data
+        storageClassName: longhorn
         storage: 5G
         accessMode: ReadWriteOnce
