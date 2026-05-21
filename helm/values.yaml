@@ -28,4 +28,4 @@ components:
     pvcs:
       - storageClassName: longhorn
         storage: 5G
-        accessMode: ReqdWriteOnce
+        accessMode: ReadWriteOnce
