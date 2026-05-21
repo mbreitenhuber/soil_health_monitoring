@@ -9,13 +9,13 @@ components:
     port: 8000
     health: /healthz
     extraEnv:
-      AGROSCAN_MODEL_PATH: /data
+      AGROSCAN_MODEL_PATH: /persistent-data
     ingress:
       enabled: true
       url: null  # set via --set in CI
     pvcs:
       - name: data
-        mountPath: /data
+        mountPath: /persistent-data
         storageClassName: longhorn
         storage: 5G
         accessMode: ReadWriteOnce

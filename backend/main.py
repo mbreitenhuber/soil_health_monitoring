@@ -7,7 +7,7 @@ FastAPI + Jinja2: Seiten werden serverseitig gerendert.
 ║  1. NAV_PAGES: Eintrag ergänzen                      ║
 ║  2. Route mit @app.get("/pfad") anlegen              ║
 ║  3. templates/pages/_template.html kopieren          ║
-║     → templates/pages/meinname.html                 ║
+║     → templates/pages/meinname.html                  ║
 ╚══════════════════════════════════════════════════════╝
 """
 
@@ -45,7 +45,7 @@ TEMPLATE_DIR = ROOT / "frontend" / "templates"
 STATIC_DIR   = ROOT / "frontend" / "static"
 PROJECT_ROOT  = ROOT  # Fixed: was ROOT.parent, now ROOT (the Nebula directory)
 
-DB_PATH = ROOT / "backend" / "agroscan.db"  # Also fixed: database should be in backend/
+DB_PATH = PROJECT_ROOT / "agroscan.db"  # Also fixed: database should be in backend/
 
 PIPELINE_SCRIPT = PROJECT_ROOT / "AgroLens" / "nutrients_predictor" / "run_pipeline_from_gps.py"
 PIPELINE_WORK_DIR = PROJECT_ROOT / "data" / "pipeline_runs"
