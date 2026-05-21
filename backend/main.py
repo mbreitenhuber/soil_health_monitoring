@@ -40,7 +40,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ── Pfade ──────────────────────────────────────────────
-ROOT         = Path(__file__).parent.parent          # → Nebula/
+ROOT         = "."
 TEMPLATE_DIR = ROOT / "frontend" / "templates"
 STATIC_DIR   = ROOT / "frontend" / "static"
 PROJECT_ROOT  = ROOT  # Fixed: was ROOT.parent, now ROOT (the Nebula directory)
