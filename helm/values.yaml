@@ -9,6 +9,7 @@ components:
     port: 8000
     health: /healthz
     extraEnv:
+      AGROSCAN_DB_PATH: /persistent-data/agroscan.db
       AGROSCAN_MODEL_PATH: /persistent-data
     ingress:
       enabled: true

@@ -39,13 +39,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Pfade ──────────────────────────────────────────────
-ROOT         = Path(__file__)
-TEMPLATE_DIR = ROOT / "frontend" / "templates"
-STATIC_DIR   = ROOT / "frontend" / "static"
-PROJECT_ROOT  = ROOT  # Fixed: was ROOT.parent, now ROOT (the Nebula directory)
-
-DB_PATH = PROJECT_ROOT / "agroscan.db"  # Also fixed: database should be in backend/
+# ── Pfade (backend root = directory containing main.py, /app in Docker) ──
+PROJECT_ROOT = Path(__file__).resolve().parent
+TEMPLATE_DIR = PROJECT_ROOT / "frontend" / "templates"
+STATIC_DIR = PROJECT_ROOT / "frontend" / "static"
+DB_PATH = Path(os.environ.get("AGROSCAN_DB_PATH", PROJECT_ROOT / "agroscan.db"))
 
 PIPELINE_SCRIPT = PROJECT_ROOT / "AgroLens" / "nutrients_predictor" / "run_pipeline_from_gps.py"
 PIPELINE_WORK_DIR = PROJECT_ROOT / "data" / "pipeline_runs"
@@ -63,24 +61,30 @@ REQUIRED_SATELLITE_ENV_VARS = [
 
 
 def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = DEFAULT_TARGET) -> Path:
-    return Path(
-        os.environ.get(
-            "AGROSCAN_MODEL_PATH",
-            PROJECT_ROOT / "data" / "models" / model_config / "nn" / f"{model_config}_nn_{target}.pth",
-        )
+    override = os.environ.get("AGROSCAN_MODEL_PATH")
+    if override:
+        return Path(override)
+    return (
+        PROJECT_ROOT
+        / "data"
+        / "models"
+        / model_config
+        / "nn"
+        / f"{model_config}_nn_{target}.pth"
     )
+
 
 def _missing_satellite_env_vars(env: dict[str, str]) -> list[str]:
     return [name for name in REQUIRED_SATELLITE_ENV_VARS if not env.get(name)]
+
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
 STATIC_CSS_VERSION = "3"
-
-DB_PATH = ROOT / "agroscan.db"
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
 
 def init_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
 
