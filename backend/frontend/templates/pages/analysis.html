@@ -275,7 +275,7 @@
     L.drawLocal.edit.handlers.edit.tooltip.subtext = "Click cancel to undo changes";
     L.drawLocal.edit.handlers.remove.tooltip.text = "Click on a feature to remove";
     
-    const API_URL = "{{ api_url }}";
+    const API_URL = "{{ api_url }}" || window.location.origin;
   </script>
   <script src="/static/js/map.js"></script>
 {% endblock %}

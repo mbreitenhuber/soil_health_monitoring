@@ -5,12 +5,12 @@
 function readDashboardConfig() {
   const el = document.getElementById("dashboard-config");
   if (!el) {
-    return { analyses: [], apiUrl: "http://127.0.0.1:8000", lang: "en" };
+    return { analyses: [], apiUrl: "http://localhost:8000", lang: "en" };
   }
   try {
     return JSON.parse(el.textContent);
   } catch {
-    return { analyses: [], apiUrl: "http://127.0.0.1:8000", lang: "en" };
+    return { analyses: [], apiUrl: "http://localhost:8000", lang: "en" };
   }
 }
 
@@ -20,7 +20,7 @@ let selectedForCompare = new Set();
 let currentItem        = null;
 let qualityChart       = null;
 
-const API_URL = dashboardConfig.apiUrl || "http://127.0.0.1:8000";
+const API_URL = dashboardConfig.apiUrl || window.location.origin || "http://localhost:8000";
 const LANG    = dashboardConfig.lang || "en";
 
 const COLORS = {

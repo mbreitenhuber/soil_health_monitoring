@@ -77,6 +77,12 @@ def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = 
 def _missing_satellite_env_vars(env: dict[str, str]) -> list[str]:
     return [name for name in REQUIRED_SATELLITE_ENV_VARS if not env.get(name)]
 
+
+def _api_base_url() -> str:
+    """Base URL for browser API calls (empty = same origin in templates/JS)."""
+    return os.environ.get("AGROSCAN_API_URL", "http://localhost:8000").rstrip("/")
+
+
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
 STATIC_CSS_VERSION = "3"
 
@@ -228,7 +234,7 @@ def ctx(request: Request, page_id: str, lang: str = "en", **extra) -> dict:
         "nav_pages":     translated_pages,   # ← direkt übersetzt
         "current_page":  page_id,
         "current_year":  datetime.now().year,
-        "api_url":       "http://localhost:8000",
+        "api_url":       _api_base_url(),
         "lang":          lang,
         "static_css_version": STATIC_CSS_VERSION,
         # analysis.html erwartet `leaflet_translations` (wird im JS geparst)
