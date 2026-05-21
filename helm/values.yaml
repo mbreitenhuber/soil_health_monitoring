@@ -8,7 +8,8 @@ components:
       pullPolicy: Always
     port: 8000
     health: /healthz
-    extraEnv: {}
+    extraEnv:
+      AGROSCAN_MODEL_PATH: /data
     ingress:
       enabled: true
       url: null  # set via --set in CI
