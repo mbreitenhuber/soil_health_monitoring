@@ -100,18 +100,13 @@ def main():
 
     #model_vars = ["xgboost", "nn", "rf"]
     model_vars = ["nn"]
-    # model_configs = ["Model_A", "Model_A+"]
     targets = ["OC"]
-
     model_config = "Model_A"  # Select model Model_A or Model_A+ (Differs in the used feature columns)
-    model_var = "xgboost"  # Specify the model variant to be used: xgboost, nn, rf
-    target = "OC"  # Select target nutrient for OC-only training
-    include_optional_data = True  # Currently comprises Clay data
+    include_optional_data = True  # Currently optional list is empty
     validation = "Single"  # Select validation method 'Single' or 'Spatial' (Spatial Cross Validation is only available for XGBoost)
 
     # Loop over model variants and target nutrients
     for model_var in model_vars:
-        # for model_config in model_configs:
         for target in targets:
             print("-" * 30)
             print(
