@@ -59,7 +59,7 @@ def normalize_index(value, index_name, index_ranges):
 
 
 # Read Sentinel-2 bands from CSV (project-relative by default).
-project_root = Path(__file__).resolve().parents[1]
+project_root = Path(__file__).resolve().parents[2]
 input_path = Path(
     os.environ.get(
         "MODEL_INPUT_PATH",
