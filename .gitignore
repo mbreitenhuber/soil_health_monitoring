@@ -22,7 +22,6 @@ __pycache__/
 venv/
 ENV/
 env/
-.env
 .pytest_cache/
 .ipynb_checkpoints/
 .idea/
@@ -38,12 +37,6 @@ yarn-debug.log*
 yarn-error.log*
 
 # --- Environment & Secrets (SECURITY) ---
-# Never commit API keys for Sentinel Hub, Mapbox, or Earth Engine
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
 *.pem
 credentials.json
 
