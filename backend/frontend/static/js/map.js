@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", () => {
 let analysisMode = false;
 let searchMarker = null;
 let latestAnalysisData = null;
+let ocClassification = window.OC_CLASSIFICATION || null;
 
 // =====================
 // BASE LAYERS
@@ -232,10 +233,28 @@ function calcArea(latlngs) {
 // UI HELPERS
 // =====================
 
-function valueToColor(v) {
-  if (v >= 0.66) return `hsl(${120 * v},70%,45%)`;
-  if (v >= 0.33) return `hsl(${120 * v},80%,48%)`;
-  return `hsl(${120 * v},75%,45%)`;
+const OC_TIER_COLORS = {
+  low: "#ef4444",
+  medium: "#f59e0b",
+  high: "#22c55e"
+};
+
+function ocTier(value, classification) {
+  const c = classification || ocClassification;
+  if (!c) return "medium";
+  if (value < c.threshold_low_gkg) return "low";
+  if (value < c.threshold_high_gkg) return "medium";
+  return "high";
+}
+
+function valueToColor(value, classification) {
+  const c = classification || ocClassification;
+  const tier = ocTier(value, c);
+  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+}
+
+function formatOcValue(value) {
+  return `${Number(value).toFixed(1)} g/kg`;
 }
 
 function setStep(n) {
@@ -331,11 +350,14 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
+    if (data.classification) {
+      ocClassification = data.classification;
+    }
 
     const allBounds = [];
 
     data.zones.forEach(zone => {
-      const color = valueToColor(zone.value);
+      const color = valueToColor(zone.value, data.classification);
 
       const poly = L.polygon(
         zone.sub_polygon.map(c => [c.lat, c.lng]),
@@ -349,7 +371,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
       );
 
       poly.bindTooltip(
-        `<b>${zone.label}</b><br>${data.unit}: ${(zone.value * 100).toFixed(1)}%`,
+        `<b>${zone.label}</b><br>${formatOcValue(zone.value)}`,
         { sticky: true }
       );
 
@@ -391,9 +413,9 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     };
 
     document.getElementById("res-zones").textContent = data.zones.length;
-    document.getElementById("res-avg").textContent = (avg * 100).toFixed(1) + "%";
-    document.getElementById("res-max").textContent = (Math.max(...values) * 100).toFixed(1) + "%";
-    document.getElementById("res-min").textContent = (Math.min(...values) * 100).toFixed(1) + "%";
+    document.getElementById("res-avg").textContent = formatOcValue(avg);
+    document.getElementById("res-max").textContent = formatOcValue(Math.max(...values));
+    document.getElementById("res-min").textContent = formatOcValue(Math.min(...values));
 
     document.getElementById("result-box").classList.add("visible");
     btnSaveDashboard.classList.add("visible");
@@ -592,5 +614,70 @@ dashboardCropSelect.addEventListener("change", () => {
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeSavePopup();
+    closeClassInfoPopup();
   }
+});
+
+// =====================
+// OC CLASSIFICATION INFO
+// =====================
+
+const classInfoPopup = document.getElementById("class-info-popup");
+const btnClassInfo = document.getElementById("btn-class-info");
+const closeClassInfoBtn = document.getElementById("close-class-info");
+
+function renderClassInfoPopup(classification) {
+  const c = classification || ocClassification;
+  if (!c) return;
+
+  const noteEl = document.getElementById("class-info-note");
+  const tiersEl = document.getElementById("class-info-tiers");
+  const datasetEl = document.getElementById("class-info-dataset");
+  const linkEl = document.getElementById("class-info-link");
+
+  if (noteEl) noteEl.textContent = c.dataset_note || "";
+  if (datasetEl) {
+    datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
+  }
+  if (linkEl && c.reference_url) linkEl.href = c.reference_url;
+
+  if (tiersEl && c.tier_descriptions) {
+    const order = ["low", "medium", "high"];
+    tiersEl.innerHTML = order
+      .map(tier => {
+        const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
+        const text = c.tier_descriptions[tier] || "";
+        return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+      })
+      .join("");
+  }
+}
+
+function openClassInfoPopup() {
+  if (!classInfoPopup) return;
+  renderClassInfoPopup(ocClassification);
+  classInfoPopup.classList.add("visible");
+  classInfoPopup.setAttribute("aria-hidden", "false");
+}
+
+function closeClassInfoPopup() {
+  if (!classInfoPopup) return;
+  classInfoPopup.classList.remove("visible");
+  classInfoPopup.setAttribute("aria-hidden", "true");
+}
+
+if (btnClassInfo) {
+  btnClassInfo.addEventListener("click", openClassInfoPopup);
+}
+if (closeClassInfoBtn) {
+  closeClassInfoBtn.addEventListener("click", closeClassInfoPopup);
+}
+if (classInfoPopup) {
+  classInfoPopup.addEventListener("click", (e) => {
+    if (e.target === classInfoPopup) closeClassInfoPopup();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderClassInfoPopup(ocClassification);
 });

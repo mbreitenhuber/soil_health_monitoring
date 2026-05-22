@@ -209,25 +209,25 @@
     <div class="howto-legend-block">
 
       <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#22c55e,#4ade80);"></div>
+        <div class="howto-legend-swatch" style="background:#22c55e;"></div>
         <div>
-          <div class="howto-legend-label">High quality — Score 0.66 to 1.0</div>
+          <div class="howto-legend-label">High — top 30 % of LUCAS (DE), OC ≥ {{ oc_classification.threshold_high_gkg }} g/kg</div>
           <p>These zones show strong indicators of healthy soil conditions: good moisture retention, dense and active vegetation cover, and favorable spectral reflectance patterns. Fields or sub-areas in this range are performing well and generally require no immediate intervention. [Placeholder — detailed agronomic interpretation to be added by the project team.]</p>
         </div>
       </div>
 
       <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#f59e0b,#facc15);"></div>
+        <div class="howto-legend-swatch" style="background:#f59e0b;"></div>
         <div>
-          <div class="howto-legend-label">Medium quality — Score 0.33 to 0.66</div>
+          <div class="howto-legend-label">Medium — middle 40 %, {{ oc_classification.threshold_low_gkg }} – {{ oc_classification.threshold_high_gkg }} g/kg</div>
           <p>These zones are within an acceptable range but show some variability. Possible causes include uneven irrigation, localized compaction, or transitional vegetation states. Monitoring these areas over successive analyses can help identify whether quality is improving or declining. [Placeholder — to be refined with field-specific thresholds.]</p>
         </div>
       </div>
 
       <div class="howto-legend-row" style="border-bottom:none;">
-        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#ef4444,#f87171);"></div>
+        <div class="howto-legend-swatch" style="background:#ef4444;"></div>
         <div>
-          <div class="howto-legend-label">Low quality — Score 0.0 to 0.33</div>
+          <div class="howto-legend-label">Low — bottom 30 % of LUCAS (DE), OC &lt; {{ oc_classification.threshold_low_gkg }} g/kg</div>
           <p>These zones flag areas that may require attention. Low scores can indicate moisture stress, bare soil, erosion risk, or compacted layers. This does not replace a physical soil assessment, but can help you prioritize which areas of a large field to investigate first. [Placeholder — actionable recommendations to be added.]</p>
         </div>
       </div>

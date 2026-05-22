@@ -37,6 +37,13 @@ from shapely.geometry import Point, Polygon
 from pyproj import CRS, Transformer#
 from dotenv import load_dotenv
 
+from oc_classification import (
+    lucas_oc_percentile_thresholds,
+    oc_classification_meta,
+    oc_tier,
+    oc_tier_label,
+)
+
 load_dotenv()
 
 # ── Pfade (backend root = directory containing main.py, /app in Docker) ──
@@ -84,7 +91,7 @@ def _api_base_url() -> str:
 
 
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
-STATIC_CSS_VERSION = "3"
+STATIC_CSS_VERSION = "5"
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
@@ -158,10 +165,10 @@ app.add_middleware(
 
 # Neue Seite: Eintrag hier ergänzen + Route unten anlegen
 NAV_PAGES = [
-    {"id": "home",               "label": {"en": "Home",               "de": "Home"},               "href": "/",                   "group": "main"},
+    {"id": "home",               "label": {"en": "Home",               "de": "Home"},                "href": "/",                   "group": "main"},
     {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
-    {"id": "users_experience",   "label": {"en": "Users Experience",   "de": "Nutzererfahrungen"},   "href": "/users_experience",   "group": "more"},
+    {"id": "unser_analysis",     "label": {"en": "Users Analysis",     "de": "Nutzeralysis"},        "href": "/users_analysis",     "group": "more"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
     {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "middle"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
@@ -190,15 +197,15 @@ HOME_FEATURES = [
 ]
 
 ROADMAP = [
-    {"version": "v0.1", "title": {"en": "Ml-Model programming and training", "de": "Ml-Modell-Programmierung und -Training"}, "done": True,
-     "desc": {"en": "Literature research, programming and training of the Ml-model.", "de": "Literaturrecherche, Programmierung und Training des Ml-Modells."}},
+    {"version": "v0.1", "title": {"en": "ML-Model programming and training", "de": "ML-Modell-Programmierung und -Training"}, "done": True,
+     "desc": {"en": "Literature research, programming and training of the ML-model.", "de": "Literaturrecherche, Programmierung und Training des ML-Modells."}},
     {"version": "v0.2", "title": {"en": "Starting Web-App development", "de": "Start der Web-App-Entwicklung"},    "done": True,
      "desc": {"en": "Web-App development with FastAPI and Jinja2. Focused on analysis and saving the results.", "de": "Web-App-Entwicklung mit FastAPI und Jinja2. Fokussiert auf Analyse und Speichern der Ergebnisse."}},
-    {"version": "v0.3", "title": {"en": "Integration of the Ml-model into the Web-App", "de": "Integration des Ml-Modells in die Web-App"},   "done": False,
-     "desc": {"en": "Connect the Web-App to the Ml-Model and make it usable.", "de": "Verbinde die Web-App mit dem Ml-Modell und macht es nutzbar."}},
-    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalizing the Web-App"},   "done": False,
+    {"version": "v0.3", "title": {"en": "Integration of the ML-Model into the Web-App", "de": "Integration des ML-Modells in die Web-App"},   "done": True,
+     "desc": {"en": "Connect the Web-App to the ML-Model and make it usable.", "de": "Verbinde die Web-App mit dem ML-Modell und macht es nutzbar."}},
+    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalizing the Web-App"},   "done": True,
      "desc": {"en": "Finalizing the Web-App. Focused on the user experience and the design.", "de": "Die Web-App wird finalisiert. Fokussiert auf die Nutzungserfahrung und das Design."}},
-    {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": False,
+    {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": True,
      "desc": {"en": "Final deployment and documentation of the project.", "de": "Finales Deployment und die Dokumentation des Projekts."}},
      {"version": "v1.1", "title": {"en": "The Presentation", "de": "Die Präsentation"},"done": False,
      "desc": {"en": "Final presentation of the project.", "de": "Finale Präsentation des Projekts."}},
@@ -207,13 +214,13 @@ ROADMAP = [
 # Neue Teammitglieder: Eintrag hier ergänzen.
 # photo: Dateiname in static/assets/team/ — oder None für Platzhalter
 TEAM_MEMBERS = [
-    {"name": "Dein Name",   "role": "ML Engineer",   "photo": None,
+    {"name": "Clara Buller",   "role": "ML Engineer, Data Scientist",   "photo": "clara.jpeg",
      "bio": "Kurze Bio — Spezialgebiet, Uni, Erfahrung mit Agrardaten."},
-    {"name": "Teamkollege", "role": "Backend / GIS",  "photo": None,
+    {"name": "Margarete Breitenhuber", "role": "ML Engineer, Data Scientist",  "photo": None,
      "bio": "FastAPI, PostGIS, Geodatenverarbeitung."},
-    {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
+    {"name": "Jerome Reiter", "role": "Backend, Frontend, UX",  "photo": None,
      "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
-     {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
+     {"name": "Claudio Bussinger", "role": "Backend, Frontend, UX",  "photo": None,
      "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
 ]
 
@@ -330,6 +337,7 @@ async def home(request: Request, lang: str = Cookie(default="en")):
 async def analysis(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/analysis.html", ctx(
         request, "analysis", lang,
+        oc_classification=oc_classification_meta(lang),
     ))
 
 @app.get("/future_work", response_class=HTMLResponse)
@@ -345,8 +353,7 @@ async def future_work(request: Request, lang: str = Cookie(default="en")):
 async def how_to(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/how_to.html", ctx(
         request, "how_to", lang,
-        # seitenspezifische Daten hier:
-        # my_data=MY_DATA,
+        oc_classification=oc_classification_meta(lang),
     ))
 
 
@@ -391,10 +398,10 @@ async def report(request: Request, lang: str = Cookie(default="en")):
         # my_data=MY_DATA,
     ))
 
-@app.get("/users_experience", response_class=HTMLResponse)
+@app.get("/users_analysis", response_class=HTMLResponse)
 async def users_experience(request: Request, lang: str = Cookie(default="en")):
-    return templates.TemplateResponse("pages/users_experience.html", ctx(
-        request, "users_experience", lang,
+    return templates.TemplateResponse("pages/users_analysis.html", ctx(
+        request, "users_analysis", lang,
         # seitenspezifische Daten hier:
         # my_data=MY_DATA,
     ))
@@ -425,10 +432,28 @@ class ZoneResult(BaseModel):
     sub_polygon: List[Coordinate]
     value: float
     label: str
+    tier: str
+
+class OCClassificationMeta(BaseModel):
+    unit: str
+    parameter: str
+    depth_cm: str
+    percentile_low: int
+    percentile_high: int
+    threshold_low_gkg: float
+    threshold_high_gkg: float
+    n_samples: int
+    dataset_name: str
+    reference_url: str
+    reference_title: str
+    dataset_note: str
+    tier_descriptions: dict[str, str]
+    colors: dict[str, str]
 
 class PredictionResponse(BaseModel):
-    zones:     List[ZoneResult]
-    unit:      str
+    zones: List[ZoneResult]
+    unit: str
+    classification: OCClassificationMeta
     min_value: float
     max_value: float
 
@@ -660,10 +685,11 @@ def run_model(
     return predictions_df[prediction_column].to_numpy(dtype=float)
 
 
-def value_to_label(value: float) -> str: # TODO: adjust with relevant OC content thresholds
-    if value >= 0.66: return "Hoch"
-    if value >= 0.33: return "Mittel"
-    return "Niedrig"
+@app.get("/api/oc-classification")
+def api_oc_classification(lang: str = "en"):
+    if lang not in ("en", "de"):
+        lang = "en"
+    return oc_classification_meta(lang)
 
 
 @app.get("/api/health")
@@ -678,7 +704,9 @@ def healthz():
 
 
 @app.post("/api/predict", response_model=PredictionResponse)
-def predict(request: FieldRequest):
+def predict(request: FieldRequest, lang: str = Cookie(default="de")):
+    if lang not in ("en", "de"):
+        lang = "de"
     print(
         f"[backend] /api/predict: received request with {len(request.polygon)} polygon points "
         f"and analysis_date={request.analysis_date}",
@@ -721,8 +749,12 @@ def predict(request: FieldRequest):
     y = run_model(grid_csv, analysis_date=request.analysis_date)
 
     # 5) Convert predictions into polygons for the frontend (each cell as a zone)
+    t_low, t_high, _ = lucas_oc_percentile_thresholds()
     zones = []
+    values = []
     for p, value in zip(grid_points, y):
+        v = float(value)
+        values.append(v)
         cell_poly = _cell_polygon_latlng_from_center(
             center_x_m=p["center_x_m"],
             center_y_m=p["center_y_m"],
@@ -732,17 +764,21 @@ def predict(request: FieldRequest):
         zones.append(
             ZoneResult(
                 sub_polygon=cell_poly,
-                value=round(float(value), 3),
-                label=value_to_label(float(value)),
+                value=round(v, 2),
+                label=oc_tier_label(v, t_low, t_high, lang=lang),
+                tier=oc_tier(v, t_low, t_high),
             )
         )
     print(f"[backend] /api/predict: created {len(zones)} prediction zones", flush=True)
 
+    classification = OCClassificationMeta(**oc_classification_meta(lang))
+
     return PredictionResponse(
         zones=zones,
-        unit="Bodenqualität",
-        min_value=0.0,
-        max_value=1.0,
+        unit="g/kg OC",
+        classification=classification,
+        min_value=round(min(values), 2) if values else 0.0,
+        max_value=round(max(values), 2) if values else 0.0,
     )
 
 

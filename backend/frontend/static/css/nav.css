@@ -2,7 +2,7 @@
 nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 32px; z-index: 9999; }
 .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; color: var(--accent); display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .nav-logo span { color: var(--text-dim); font-weight: 400; }
-.nav-logo-mark { height: 32px; width: 32px; flex-shrink: 0; display: block; }
+.nav-logo-mark { height: 2.25rem; width: auto; min-width: 0; flex: 0 0 auto; display: block; }
 .nav-badge { font-size: 0.6rem; padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border2); color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
 .nav-links { display: flex; align-items: center; gap: 4px; margin-left: 16px; }
 .nav-link { font-size: 0.78rem; padding: 6px 14px; border-radius: 6px; color: var(--text-dim); transition: color 0.18s, background 0.18s; letter-spacing: 0.03em; border: 1px solid transparent; text-decoration: none; }

@@ -2,6 +2,10 @@
    dashboard.js
 ===================================================== */
 
+function formatOcGkg(value) {
+  return `${Number(value).toFixed(1)} g/kg`;
+}
+
 function readDashboardConfig() {
   const el = document.getElementById("dashboard-config");
   if (!el) {
@@ -181,9 +185,9 @@ function renderDashboard(analyses) {
         <div class="analysis-meta">
           📅 ${a.date || "–"}<br>
           ${a.crop ? `🌾 ${a.crop}<br>` : ""}
-          📊 Avg: <b>${(a.avg_value * 100).toFixed(1)}%</b> &nbsp;
-          🔴 ${(a.min_value * 100).toFixed(1)}% &nbsp;
-          🟢 ${(a.max_value * 100).toFixed(1)}%
+          📊 Avg: <b>${formatOcGkg(a.avg_value)}</b> &nbsp;
+          🔴 ${formatOcGkg(a.min_value)} &nbsp;
+          🟢 ${formatOcGkg(a.max_value)}
         </div>
         <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:0.83rem;color:#555;">
           <input type="checkbox" class="compare-checkbox" data-id="${a.id}" ${checked}>
@@ -269,8 +273,8 @@ function showCompareChart() {
     data: {
       labels: selected.map(a => a.field_name || "Unnamed"),
       datasets: [{
-        label: "Average Soil Quality (%)",
-        data: selected.map(a => +(a.avg_value * 100).toFixed(1)),
+        label: "Average OC (g/kg)",
+        data: selected.map(a => +Number(a.avg_value).toFixed(1)),
         backgroundColor: selected.map((_, i) =>
           COLORS.compare[i % COLORS.compare.length]
         ),
@@ -285,7 +289,7 @@ function showCompareChart() {
         y: {
           beginAtZero: true, max: 100,
           grid: { color: "rgba(0,0,0,0.06)" },
-          ticks: { callback: v => v + "%" }
+          ticks: { callback: v => v + " g/kg" }
         },
         x: { grid: { display: false } }
       }
@@ -301,9 +305,9 @@ function openDetailModal(item) {
   document.getElementById("edit-location").value    = item.location_name || "";
   document.getElementById("edit-crop").value        = item.crop          || "";
   document.getElementById("edit-notes").value       = item.notes         || "";
-  document.getElementById("detail-avg").textContent = (item.avg_value * 100).toFixed(1) + "%";
-  document.getElementById("detail-min").textContent = (item.min_value * 100).toFixed(1) + "%";
-  document.getElementById("detail-max").textContent = (item.max_value * 100).toFixed(1) + "%";
+  document.getElementById("detail-avg").textContent = formatOcGkg(item.avg_value);
+  document.getElementById("detail-min").textContent = formatOcGkg(item.min_value);
+  document.getElementById("detail-max").textContent = formatOcGkg(item.max_value);
   document.getElementById("detail-modal").style.display = "flex";
   renderDetailChart(item);
 }
@@ -350,11 +354,11 @@ function renderDetailChart(item) {
     data: {
       labels: ["Minimum", "Average", "Maximum"],
       datasets: [{
-        label: "Soil Quality (%)",
+        label: "OC (g/kg)",
         data: [
-          +(item.min_value * 100).toFixed(1),
-          +(item.avg_value * 100).toFixed(1),
-          +(item.max_value * 100).toFixed(1)
+          +Number(item.min_value).toFixed(1),
+          +Number(item.avg_value).toFixed(1),
+          +Number(item.max_value).toFixed(1)
         ],
         backgroundColor: [COLORS.min, COLORS.avg, COLORS.max],
         borderRadius: 8,

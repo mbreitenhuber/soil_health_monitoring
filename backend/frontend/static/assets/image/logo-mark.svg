@@ -1,29 +1,29 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="AgroScan">
-  <defs>
-    <clipPath id="field-shape">
-      <path d="M24 7.5 36.2 15.8 34.2 38.5 13.8 38.5 11.8 15.8Z"/>
-    </clipPath>
-  </defs>
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="42 52 218 148" preserveAspectRatio="xMidYMid meet" role="img" aria-hidden="true">
 
-  <!-- Orbit (gestrichelt) -->
-  <ellipse cx="24" cy="23" rx="21" ry="13.5" fill="none" stroke="#3D7543" stroke-width="1.1" stroke-dasharray="2.2 2.8" opacity="0.85"/>
+  <!-- === ICON: Hexagon field grid + satellite dot === -->
+  <!-- Hexagon outline -->
+  <polygon points="150,60 210,80 230,145 190,200 110,200 70,145 90,80" fill="none" stroke="rgba(31,30,29,0.15)" stroke-width="1.5"/>
+  <!-- Field segments inside hex -->
+  <!-- Top field -->
+  <polygon points="150,60 210,80 200,130 150,115 100,130 90,80" fill="#EAF3DE"/>
+  <!-- Bottom left field -->
+  <polygon points="100,130 150,115 150,200 110,200 70,145" fill="#E1F5EE"/>
+  <!-- Bottom right field -->
+  <polygon points="150,115 200,130 228,148 190,200 150,200" fill="#C0DD97"/>
 
-  <!-- Feld-Pentagon: vier Quadranten -->
-  <g clip-path="url(#field-shape)">
-    <rect x="0" y="0" width="24" height="22.5" fill="#C5E6C9"/>
-    <rect x="24" y="0" width="24" height="22.5" fill="#A8D4AE"/>
-    <rect x="0" y="22.5" width="24" height="26" fill="#8BC892"/>
-    <rect x="24" y="22.5" width="24" height="26" fill="#5FA764"/>
-  </g>
-  <path d="M24 7.5 36.2 15.8 34.2 38.5 13.8 38.5 11.8 15.8Z" fill="none" stroke="#3D7543" stroke-width="1.35" stroke-linejoin="round"/>
-  <line x1="24" y1="7.5" x2="24" y2="38.5" stroke="#3D7543" stroke-width="0.7" opacity="0.9"/>
-  <line x1="11.8" y1="22.5" x2="36.2" y2="22.5" stroke="#3D7543" stroke-width="0.7" opacity="0.9"/>
+  <!-- Grid lines (field divisions) -->
+  <line x1="150" y1="60" x2="150" y2="200" stroke="#639922" stroke-width="0.8" opacity="0.5"/>
+  <line x1="90" y1="81" x2="210" y2="81" stroke="#639922" stroke-width="0.8" opacity="0.5"/>
+  <line x1="72" y1="148" x2="228" y2="148" stroke="#639922" stroke-width="0.8" opacity="0.5"/>
 
-  <!-- Satellit: zwei Solar-Panels + Körper (oben rechts auf der Umlaufbahn) -->
-  <g transform="translate(36.8 10.2) rotate(32)">
-    <rect x="-7.2" y="0.6" width="3.4" height="2.2" rx="0.35" fill="#8BC892" stroke="#3D7543" stroke-width="0.45"/>
-    <rect x="-1.9" y="0.2" width="3.8" height="2.8" rx="0.4" fill="#4A8F51" stroke="#3D7543" stroke-width="0.5"/>
-    <rect x="3.8" y="0.6" width="3.4" height="2.2" rx="0.35" fill="#6FB876" stroke="#3D7543" stroke-width="0.45"/>
-  </g>
+  <!-- Satellite orbit -->
+  <ellipse cx="150" cy="130" rx="105" ry="60" fill="none" stroke="#137b36" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.7"/>
+
+  <!-- Satellite dot + rings -->
+  <circle cx="225" cy="88" r="7" fill="#085041"/>
+  <circle cx="225" cy="88" r="13" fill="none" stroke="#1D9E75" stroke-width="1" opacity="0.5"/>
+  <circle cx="225" cy="88" r="19" fill="none" stroke="#1D9E75" stroke-width="0.5" opacity="0.25"/>
+  
+  <!-- Hexagon border (top layer) -->
+  <polygon points="150,60 210,80 230,145 190,200 110,200 70,145 90,80" fill="none" stroke="#1D9E75" stroke-width="2"/>
 </svg>
