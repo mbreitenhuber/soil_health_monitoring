@@ -1,3 +1,4 @@
+# Web backend
 fastapi==0.111.0
 uvicorn[standard]==0.29.0
 jinja2==3.1.4
@@ -5,7 +6,35 @@ python-multipart==0.0.9
 pydantic==2.7.1
 openpyxl
 
+# Core data / geospatial stack
 numpy==1.26.4
 pandas==2.2.3
+scipy==1.15.3
 shapely==2.0.6
 pyproj==3.6.1
+geopandas
+rasterio
+pyogrio
+gdal==3.10.3
+
+# ML / analysis pipeline
+python-dotenv==1.0.1
+requests==2.32.3
+boto3==1.35.81
+opencv-python-headless==4.10.0.84
+scikit-learn==1.5.2
+joblib==1.4.2
+xgboost==2.1.3
+optuna==4.1.0
+optuna-dashboard==0.17.0
+torch
+
+# Utilities used across scripts
+matplotlib==3.9.2
+seaborn==0.13.2
+plotly==5.24.1
+pyyaml==6.0.3
+tqdm==4.67.3
+SQLAlchemy==2.0.49
+rich==15.0.0
+typer==0.25.1

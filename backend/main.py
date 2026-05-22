@@ -637,7 +637,7 @@ def run_model(
         "--target",
         target,
         "--shape",
-        "9x9",
+        "1x1",
         "--flatten",
         "--normalize",
         "--model",

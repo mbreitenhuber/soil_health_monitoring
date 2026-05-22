@@ -31,7 +31,7 @@ def parse_args():
     p.add_argument("--gps", "-g", required=True, help="Input GPS CSV (POINTID,SURVEY_DATE,TH_LAT,TH_LONG)")
     p.add_argument("--model-config", default="Model_A", help="Model config name (default: Model_A)")
     p.add_argument("--target", default="OC", help="Target column name (default: OC)")
-    p.add_argument("--shape", default="9x9", help="Sentinel pixel shape for extraction (default: 9x9)")
+    p.add_argument("--shape", default="1x1", help="Sentinel pixel shape for extraction (default: 1x1)")
     p.add_argument("--flatten", action="store_true", help="Flatten pixel matrices when extracting")
     p.add_argument("--normalize", action="store_true", help="Normalize band values when loading to .csv")
     p.add_argument("--mapping", help="Path to write mapping CSV (optional)")
