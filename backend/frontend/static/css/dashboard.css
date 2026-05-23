@@ -10,7 +10,7 @@
 }
 
 /* =========================
-   ANALYSIS CARD
+   ANALYSIS CARD  (base)
 ========================= */
 
 .analysis-card {
@@ -27,6 +27,77 @@
 .analysis-card:hover {
   border-color: var(--border2);
   box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+}
+
+/* =========================
+   FIELD GROUP CARD
+========================= */
+
+.field-group-card {
+  cursor: pointer;
+  position: relative;
+}
+
+.field-group-card:hover {
+  transform: translateY(-2px);
+  border-color: #C94F4F;
+  box-shadow: 0 8px 28px rgba(201,79,79,0.10);
+}
+
+.field-group-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* Small pill showing analysis count */
+.field-count-badge {
+  flex-shrink: 0;
+  background: #C94F4F;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 3px 8px;
+  border-radius: 999px;
+  margin-top: 3px;
+}
+
+/* Trend indicator */
+.field-trend {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-left: 4px;
+}
+.trend-up   { color: #22c55e; }
+.trend-down { color: #ef4444; }
+.trend-flat { color: #9ca3af; }
+
+/* Footer hint + chevron */
+.field-group-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.field-analyses-hint {
+  font-size: 0.78rem;
+  color: #aaa;
+}
+
+.field-chevron {
+  font-size: 1.2rem;
+  color: #C94F4F;
+  font-weight: 700;
+  transition: transform 0.15s;
+}
+.field-group-card:hover .field-chevron {
+  transform: translateX(3px);
 }
 
 /* =========================
@@ -103,6 +174,23 @@
 }
 .btn-danger:hover { background: #b34040; }
 
+/* New-analysis CTA inside field modal */
+.btn-new-analysis {
+  background: #111827;
+  color: #f1f5f9;
+  border: 1px solid #374151;
+  padding: 0.75rem 1.4rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+.btn-new-analysis:hover {
+  background: #C94F4F;
+  border-color: #C94F4F;
+}
+
 /* =========================
    ACTION BAR
 ========================= */
@@ -141,6 +229,9 @@
   padding: 16px;
 }
 
+/* Stack modals: detail-modal (edit) sits above field-modal */
+#detail-modal { z-index: 1000; }
+
 /* =========================
    DETAIL MODAL — CARD
 ========================= */
@@ -160,11 +251,16 @@
 .detail-card::-webkit-scrollbar { width: 6px; }
 .detail-card::-webkit-scrollbar-thumb { background: #374151; border-radius: 4px; }
 
+/* Field modal card is a bit wider */
+.field-modal-card {
+  width: min(820px, 100%);
+}
+
 /* Header */
 .detail-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 28px;
 }
 
@@ -172,7 +268,15 @@
   font-size: 1.4rem;
   font-weight: 700;
   color: #f1f5f9;
+  margin: 0 0 4px;
+}
+
+/* Meta line below the title in field modal */
+.field-modal-meta {
+  font-size: 0.83rem;
+  color: #9ca3af;
   margin: 0;
+  line-height: 1.5;
 }
 
 .btn-close-x {
@@ -188,6 +292,7 @@
   align-items: center;
   justify-content: center;
   transition: background 0.2s, color 0.2s;
+  flex-shrink: 0;
 }
 .btn-close-x:hover { background: #374151; color: #f1f5f9; }
 
@@ -230,18 +335,24 @@
 }
 
 .detail-field input:focus,
-.detail-field textarea:focus {
-  border-color: #C94F4F;
-}
+.detail-field textarea:focus { border-color: #C94F4F; }
 
 .detail-field textarea { min-height: 80px; }
 
-/* Stat cards */
+/* =========================
+   STAT CARDS
+========================= */
+
 .detail-stats-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
   margin-bottom: 28px;
+}
+
+/* Field modal: 4 stat cards in a 2×2 grid on small, 4-col on wide */
+.field-stats-grid {
+  grid-template-columns: repeat(4, 1fr);
 }
 
 .detail-stat-card {
@@ -272,7 +383,10 @@
 .stat-avg { border-top-color: #f59e0b; }
 .stat-max { border-top-color: #22c55e; }
 
-/* Chart wrapper inside modal */
+/* =========================
+   CHART WRAPPER (inside modals)
+========================= */
+
 .detail-chart-wrapper {
   background: #1f2937;
   border-radius: 16px;
@@ -280,7 +394,94 @@
   margin-bottom: 28px;
 }
 
-/* Action buttons */
+/* =========================
+   FIELD SECTION LABELS
+========================= */
+
+.field-section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #9ca3af;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   ANALYSES LIST (field modal)
+========================= */
+
+.field-analyses-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 28px;
+}
+
+.field-analysis-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #1f2937;
+  border: 1px solid #374151;
+  border-radius: 12px;
+  padding: 12px 16px;
+  flex-wrap: wrap;
+  transition: border-color 0.15s;
+}
+.field-analysis-row:hover { border-color: #4b5563; }
+
+.field-analysis-row-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.row-date {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f1f5f9;
+  min-width: 96px;
+}
+
+.row-badges {
+  display: flex;
+  gap: 6px;
+}
+
+/* Value badges: min / avg / max */
+.badge-min,
+.badge-avg,
+.badge-max {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.badge-min { background: rgba(239,68,68,0.15);  color: #ef4444; }
+.badge-avg { background: rgba(245,158,11,0.15); color: #f59e0b; }
+.badge-max { background: rgba(34,197,94,0.15);  color: #22c55e; }
+
+.field-analysis-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Smaller action buttons inside the list */
+.field-analysis-row-actions .btn-secondary,
+.field-analysis-row-actions .btn-danger {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.8rem;
+}
+
+/* =========================
+   DETAIL MODAL — ACTIONS
+========================= */
+
 .detail-actions {
   display: flex;
   gap: 12px;
@@ -314,18 +515,7 @@
 .btn-close-modal:hover { background: #374151; color: #f1f5f9; }
 
 /* =========================
-   RESPONSIVE
-========================= */
-
-@media (max-width: 600px) {
-  .detail-grid { grid-template-columns: 1fr; }
-  .detail-stats-grid { grid-template-columns: 1fr; }
-  .detail-card { padding: 20px; }
-  .dashboard-actions { flex-direction: column; align-items: stretch; }
-}
-
-/* =========================
-   FILTER BAR — updated
+   FILTER BAR
 ========================= */
 
 .dashboard-filters {
@@ -375,9 +565,7 @@
 }
 
 .filter-input:focus,
-.filter-select:focus {
-  border-color: #C94F4F;
-}
+.filter-select:focus { border-color: #C94F4F; }
 
 .btn-reset {
   padding: 9px 14px;
@@ -405,4 +593,22 @@
   background: #fff8f0;
   border-left: 3px solid #f59e0b;
   border-radius: 6px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 600px) {
+  .detail-grid           { grid-template-columns: 1fr; }
+  .detail-stats-grid     { grid-template-columns: 1fr 1fr; }
+  .field-stats-grid      { grid-template-columns: 1fr 1fr; }
+  .detail-card           { padding: 20px; }
+  .dashboard-actions     { flex-direction: column; align-items: stretch; }
+  .field-analysis-row    { flex-direction: column; align-items: flex-start; }
+  .field-analysis-row-actions { width: 100%; justify-content: flex-start; }
+}
+
+@media (max-width: 400px) {
+  .field-stats-grid { grid-template-columns: 1fr; }
 }

@@ -43,7 +43,6 @@
         <label class="filter-label">Crop</label>
         <select id="filter-crop" class="filter-select">
           <option value="">All crops</option>
-          <!-- populated dynamically from data -->
         </select>
       </div>
 
@@ -70,12 +69,70 @@
   </section>
 </div>
 
-<!-- ===================== DETAIL MODAL ===================== -->
+
+<!-- ═══════════════════════════════════════════════════
+     FIELD MODAL  —  history + compare for one field
+════════════════════════════════════════════════════ -->
+<div id="field-modal" class="detail-modal">
+  <div class="detail-card field-modal-card">
+
+    <!-- Header -->
+    <div class="detail-header">
+      <div>
+        <h2 id="field-modal-name">–</h2>
+        <p id="field-modal-meta" class="field-modal-meta"></p>
+      </div>
+      <button class="btn-close-x" onclick="closeFieldModal()">✕</button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="detail-stats-grid field-stats-grid">
+      <div class="detail-stat-card">
+        <span>Analyses</span>
+        <strong id="field-stat-count">–</strong>
+      </div>
+      <div class="detail-stat-card stat-min">
+        <span>All-time Min</span>
+        <strong id="field-stat-min">–</strong>
+      </div>
+      <div class="detail-stat-card stat-max">
+        <span>All-time Max</span>
+        <strong id="field-stat-max">–</strong>
+      </div>
+      <div class="detail-stat-card stat-avg">
+        <span>Latest Avg</span>
+        <strong id="field-stat-latest">–</strong>
+      </div>
+    </div>
+
+    <!-- Line chart — development & compare (always visible) -->
+    <div class="field-section-label">Development &amp; Comparison</div>
+    <div class="detail-chart-wrapper">
+      <canvas id="field-line-chart"></canvas>
+    </div>
+
+    <!-- Analyses list -->
+    <div class="field-section-label">All Analyses</div>
+    <div id="field-analyses-list" class="field-analyses-list"></div>
+
+    <!-- Actions -->
+    <div class="detail-actions">
+      <button class="btn-close-modal" onclick="closeFieldModal()">Close</button>
+      <button class="btn-new-analysis" id="field-new-analysis-btn">+ New Analysis</button>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════
+     DETAIL MODAL  —  edit a single analysis
+════════════════════════════════════════════════════ -->
 <div id="detail-modal" class="detail-modal">
   <div class="detail-card">
 
     <div class="detail-header">
-      <h2>Field Details</h2>
+      <h2>Analysis Details</h2>
       <button class="btn-close-x" onclick="closeDetailModal()">✕</button>
     </div>
 
@@ -124,6 +181,7 @@
 
   </div>
 </div>
+
 
 {% endblock %}
 

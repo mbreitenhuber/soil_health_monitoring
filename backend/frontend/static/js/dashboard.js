@@ -1,5 +1,5 @@
 /* =====================================================
-   dashboard.js
+   dashboard.js  —  grouped field view
 ===================================================== */
 
 function formatOcGkg(value) {
@@ -8,24 +8,22 @@ function formatOcGkg(value) {
 
 function readDashboardConfig() {
   const el = document.getElementById("dashboard-config");
-  if (!el) {
-    return { analyses: [], apiUrl: "http://localhost:8000", lang: "en" };
-  }
-  try {
-    return JSON.parse(el.textContent);
-  } catch {
-    return { analyses: [], apiUrl: "http://localhost:8000", lang: "en" };
-  }
+  if (!el) return { analyses: [], apiUrl: "http://127.0.0.1:8000", lang: "en" };
+  try { return JSON.parse(el.textContent); }
+  catch { return { analyses: [], apiUrl: "http://127.0.0.1:8000", lang: "en" }; }
 }
 
 const dashboardConfig  = readDashboardConfig();
 let allAnalyses        = dashboardConfig.analyses || [];
-let selectedForCompare = new Set();
+let selectedForCompare = new Set();   // stores field names (strings)
 let currentItem        = null;
+let currentFieldName   = null;
 let qualityChart       = null;
+let fieldLineChart     = null;
+let compareChart       = null;
 
-const API_URL = dashboardConfig.apiUrl || window.location.origin || "http://localhost:8000";
-const LANG    = dashboardConfig.lang || "en";
+const API_URL = dashboardConfig.apiUrl || "http://127.0.0.1:8000";
+const LANG    = dashboardConfig.lang   || "en";
 
 const COLORS = {
   min:     "#ef4444",
@@ -34,7 +32,27 @@ const COLORS = {
   compare: ["#C94F4F","#f59e0b","#22c55e","#3b82f6","#a855f7","#ec4899"],
 };
 
-/* ── INIT ─────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   GROUPING
+══════════════════════════════════════════════════════ */
+
+function groupByField(analyses) {
+  const groups = {};
+  analyses.forEach(a => {
+    const key = (a.field_name || "Unnamed Field").trim();
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(a);
+  });
+  // Sort each group chronologically by date
+  Object.values(groups).forEach(g =>
+    g.sort((a, b) => (a.date || "").localeCompare(b.date || ""))
+  );
+  return groups;
+}
+
+/* ══════════════════════════════════════════════════════
+   INIT
+══════════════════════════════════════════════════════ */
 
 document.addEventListener("DOMContentLoaded", () => {
   renderDashboard(allAnalyses);
@@ -49,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("save-details")
     .addEventListener("click", saveDetails);
 
-  // Filters — fire on every keystroke / change
+  // Filters
   document.getElementById("filter-name")
     .addEventListener("input", applyFilters);
   document.getElementById("filter-crop")
@@ -61,63 +79,390 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("filter-reset")
     .addEventListener("click", resetFilters);
 
-  // Event delegation on card container
+  // Event delegation on card grid
   const c = document.getElementById("dashboard-container");
   c.addEventListener("click",  onCardClick);
   c.addEventListener("change", onCardChange);
+
+  // Close modals by clicking overlay
+  document.getElementById("field-modal").addEventListener("click", e => {
+    if (e.target.id === "field-modal") closeFieldModal();
+  });
+  document.getElementById("detail-modal").addEventListener("click", e => {
+    if (e.target.id === "detail-modal") closeDetailModal();
+  });
 });
 
-/* ── CROP FILTER — dynamic from data ─────────────── */
+/* ══════════════════════════════════════════════════════
+   RENDER  —  one card per unique field name
+══════════════════════════════════════════════════════ */
+
+function renderDashboard(analyses) {
+  const container = document.getElementById("dashboard-container");
+
+  if (!analyses || analyses.length === 0) {
+    container.innerHTML =
+      "<p style='color:#888;padding:16px 0'>No analyses match your filters.</p>";
+    return;
+  }
+
+  const groups = groupByField(analyses);
+
+  container.innerHTML = Object.entries(groups).map(([fieldName, items]) => {
+    const latest   = items[items.length - 1];
+    const first    = items[0];
+    const dateRange = items.length > 1
+      ? `${first.date} – ${latest.date}`
+      : (latest.date || "–");
+
+    // Trend vs. first recorded analysis
+    const trend = items.length > 1
+      ? (latest.avg_value - first.avg_value) * 100
+      : null;
+
+    const trendHTML = trend !== null
+      ? `<span class="field-trend ${
+          trend >  0.05 ? "trend-up"   :
+          trend < -0.05 ? "trend-down" : "trend-flat"
+        }">${
+          trend >  0.05 ? "↑" :
+          trend < -0.05 ? "↓" : "→"
+        } ${Math.abs(trend).toFixed(1)}%</span>`
+      : "";
+
+    const checked = selectedForCompare.has(fieldName) ? "checked" : "";
+
+    return `
+      <div class="analysis-card field-group-card"
+           data-field="${encodeURIComponent(fieldName)}">
+
+        <div class="field-group-header">
+          <div class="analysis-title">${fieldName}</div>
+          <span class="field-count-badge"
+                title="${items.length} ${items.length === 1 ? "analysis" : "analyses"}">
+            ${items.length}
+          </span>
+        </div>
+
+        <div class="analysis-meta">
+          📅 ${dateRange}<br>
+          ${latest.crop          ? `🌾 ${latest.crop}<br>`          : ""}
+          ${latest.location_name ? `📍 ${latest.location_name}<br>` : ""}
+          📊 Latest Avg: <b>${(latest.avg_value * 100).toFixed(1)}%</b>
+          ${trendHTML}
+        </div>
+
+        <label class="compare-label"
+               onclick="event.stopPropagation()"
+               style="display:flex;gap:8px;align-items:center;cursor:pointer;
+                      font-size:0.83rem;color:#555;">
+          <input type="checkbox"
+                 class="compare-checkbox"
+                 data-field="${encodeURIComponent(fieldName)}"
+                 ${checked}
+                 onclick="event.stopPropagation()">
+          Select for comparison
+        </label>
+
+        <div class="field-group-footer">
+          <span class="field-analyses-hint">
+            ${items.length === 1 ? "1 analysis" : `${items.length} analyses`}
+            &nbsp;— click to explore
+          </span>
+          <span class="field-chevron">›</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/* ══════════════════════════════════════════════════════
+   EVENT DELEGATION
+══════════════════════════════════════════════════════ */
+
+function onCardClick(e) {
+  // Ignore clicks that originate from the checkbox / its label
+  if (e.target.closest(".compare-label")) return;
+  if (e.target.closest(".compare-checkbox")) return;
+
+  const card = e.target.closest(".field-group-card");
+  if (!card) return;
+
+  const fieldName = decodeURIComponent(card.dataset.field);
+  openFieldModal(fieldName);
+}
+
+function onCardChange(e) {
+  const cb = e.target.closest(".compare-checkbox");
+  if (!cb) return;
+  const field = decodeURIComponent(cb.dataset.field);
+  cb.checked
+    ? selectedForCompare.add(field)
+    : selectedForCompare.delete(field);
+}
+
+/* ══════════════════════════════════════════════════════
+   FIELD MODAL
+══════════════════════════════════════════════════════ */
+
+function openFieldModal(fieldName) {
+  currentFieldName = fieldName;
+
+  const items = allAnalyses
+    .filter(a => (a.field_name || "Unnamed Field").trim() === fieldName)
+    .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+
+  if (!items.length) return;
+
+  const latest = items[items.length - 1];
+
+  // ── Header ──────────────────────────────────────────
+  document.getElementById("field-modal-name").textContent = fieldName;
+  const metaParts = [
+    latest.location_name ? `📍 ${latest.location_name}` : null,
+    latest.crop          ? `🌾 ${latest.crop}`           : null,
+  ].filter(Boolean);
+  document.getElementById("field-modal-meta").textContent =
+    metaParts.join("  ·  ");
+
+  // ── Stats ────────────────────────────────────────────
+  const allMin = Math.min(...items.map(a => a.min_value * 100));
+  const allMax = Math.max(...items.map(a => a.max_value * 100));
+
+  document.getElementById("field-stat-count").textContent =
+    items.length;
+  document.getElementById("field-stat-min").textContent =
+    allMin.toFixed(1) + "%";
+  document.getElementById("field-stat-max").textContent =
+    allMax.toFixed(1) + "%";
+  document.getElementById("field-stat-latest").textContent =
+    (latest.avg_value * 100).toFixed(1) + "%";
+
+  // ── Charts & list ────────────────────────────────────
+  renderFieldLineChart(items);
+  renderFieldAnalysesList(items);
+
+  // ── New-analysis button ──────────────────────────────
+  document.getElementById("field-new-analysis-btn").onclick = () => {
+    window.location.href = "/analyse";
+  };
+
+  document.getElementById("field-modal").style.display = "flex";
+}
+
+window.closeFieldModal = function () {
+  document.getElementById("field-modal").style.display = "none";
+  if (fieldLineChart) { fieldLineChart.destroy(); fieldLineChart = null; }
+};
+
+/* ── Field line chart  (Min / Avg / Max over time) ── */
+
+function renderFieldLineChart(items) {
+  const ctx = document.getElementById("field-line-chart").getContext("2d");
+  if (fieldLineChart) fieldLineChart.destroy();
+
+  const labels = items.map(a => a.date || "–");
+  const sharedOpts = {
+    tension: 0.35,
+    pointRadius: items.length === 1 ? 7 : 5,
+    pointHoverRadius: 8,
+    borderWidth: 2.5,
+    fill: false,
+  };
+
+  fieldLineChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          ...sharedOpts,
+          label: "Maximum",
+          data: items.map(a => +(a.max_value * 100).toFixed(1)),
+          borderColor:         COLORS.max,
+          pointBackgroundColor: COLORS.max,
+        },
+        {
+          ...sharedOpts,
+          label: "Average",
+          data: items.map(a => +(a.avg_value * 100).toFixed(1)),
+          borderColor:         COLORS.avg,
+          pointBackgroundColor: COLORS.avg,
+        },
+        {
+          ...sharedOpts,
+          label: "Minimum",
+          data: items.map(a => +(a.min_value * 100).toFixed(1)),
+          borderColor:         COLORS.min,
+          pointBackgroundColor: COLORS.min,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { color: "#9ca3af", font: { size: 12 }, boxWidth: 16 },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx =>
+              ` ${ctx.dataset.label}: ${ctx.parsed.y}%`,
+          },
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: false,
+          min: 0,
+          max: 100,
+          grid:  { color: "rgba(255,255,255,0.07)" },
+          ticks: { color: "#9ca3af", callback: v => v + "%" },
+        },
+        x: {
+          grid:  { display: false },
+          ticks: { color: "#9ca3af" },
+        },
+      },
+    },
+  });
+}
+
+/* ── Analyses list inside field modal ─────────────── */
+
+function renderFieldAnalysesList(items) {
+  const list = document.getElementById("field-analyses-list");
+
+  // Newest first
+  const sorted = [...items].reverse();
+
+  list.innerHTML = sorted.map(a => `
+    <div class="field-analysis-row">
+      <div class="field-analysis-row-info">
+        <span class="row-date">${a.date || "–"}</span>
+        <div class="row-badges">
+          <span class="badge-min" title="Min">${(a.min_value * 100).toFixed(1)}%</span>
+          <span class="badge-avg" title="Avg">${(a.avg_value * 100).toFixed(1)}%</span>
+          <span class="badge-max" title="Max">${(a.max_value * 100).toFixed(1)}%</span>
+        </div>
+      </div>
+      <div class="field-analysis-row-actions">
+        <button class="btn-secondary field-detail-btn"   data-id="${a.id}">Details</button>
+        <button class="btn-secondary field-download-btn" data-id="${a.id}">⬇</button>
+        <button class="btn-danger    field-delete-btn"   data-id="${a.id}">Delete</button>
+      </div>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".field-detail-btn").forEach(btn =>
+    btn.addEventListener("click", () => {
+      const item = allAnalyses.find(a => String(a.id) === btn.dataset.id);
+      if (item) openDetailModal(item);
+    })
+  );
+  list.querySelectorAll(".field-download-btn").forEach(btn =>
+    btn.addEventListener("click", () => downloadAnalysis(btn.dataset.id))
+  );
+  list.querySelectorAll(".field-delete-btn").forEach(btn =>
+    btn.addEventListener("click", () => deleteAnalysisFromField(btn.dataset.id))
+  );
+}
+
+/* ── Delete from inside field modal ──────────────── */
+
+async function deleteAnalysisFromField(id) {
+  if (!confirm("Delete this analysis?")) return;
+  try {
+    const res = await fetch(`${API_URL}/api/analyses/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    allAnalyses = allAnalyses.filter(a => String(a.id) !== id);
+    selectedForCompare.delete(id);
+    applyFilters();
+    refreshCropFilter();
+
+    // Refresh or close the field modal
+    const remaining = allAnalyses
+      .filter(a => (a.field_name || "Unnamed Field").trim() === currentFieldName)
+      .sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+
+    if (remaining.length === 0) {
+      closeFieldModal();
+    } else {
+      renderFieldLineChart(remaining);
+      renderFieldAnalysesList(remaining);
+
+      // Update stats
+      const latest = remaining[remaining.length - 1];
+      const allMin = Math.min(...remaining.map(a => a.min_value * 100));
+      const allMax = Math.max(...remaining.map(a => a.max_value * 100));
+      document.getElementById("field-stat-count").textContent = remaining.length;
+      document.getElementById("field-stat-min").textContent   = allMin.toFixed(1) + "%";
+      document.getElementById("field-stat-max").textContent   = allMax.toFixed(1) + "%";
+      document.getElementById("field-stat-latest").textContent =
+        (latest.avg_value * 100).toFixed(1) + "%";
+    }
+  } catch (err) {
+    alert("Delete failed: " + err.message);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   CROP FILTER
+══════════════════════════════════════════════════════ */
 
 function populateCropFilter() {
   const crops = [...new Set(
-    allAnalyses
-      .map(a => (a.crop || "").trim())
-      .filter(Boolean)
+    allAnalyses.map(a => (a.crop || "").trim()).filter(Boolean)
   )].sort();
 
   const select = document.getElementById("filter-crop");
-  // Keep the "All crops" option, append the rest
   crops.forEach(crop => {
     const opt = document.createElement("option");
-    opt.value = crop.toLowerCase();
+    opt.value       = crop.toLowerCase();
     opt.textContent = crop.charAt(0).toUpperCase() + crop.slice(1);
     select.appendChild(opt);
   });
 }
 
-/* ── FILTERS ──────────────────────────────────────── */
+function refreshCropFilter() {
+  const select     = document.getElementById("filter-crop");
+  const currentVal = select.value;
+  while (select.options.length > 1) select.remove(1);
+
+  const crops = [...new Set(
+    allAnalyses.map(a => (a.crop || "").trim()).filter(Boolean)
+  )].sort();
+  crops.forEach(crop => {
+    const opt = document.createElement("option");
+    opt.value       = crop.toLowerCase();
+    opt.textContent = crop.charAt(0).toUpperCase() + crop.slice(1);
+    select.appendChild(opt);
+  });
+  select.value = currentVal;
+}
+
+/* ══════════════════════════════════════════════════════
+   FILTERS
+══════════════════════════════════════════════════════ */
 
 function applyFilters() {
   const name     = document.getElementById("filter-name").value.trim().toLowerCase();
   const crop     = document.getElementById("filter-crop").value.toLowerCase();
-  const dateFrom = document.getElementById("filter-date-from").value; // "YYYY-MM-DD" or ""
+  const dateFrom = document.getElementById("filter-date-from").value;
   const dateTo   = document.getElementById("filter-date-to").value;
 
   let filtered = [...allAnalyses];
 
-  if (name) {
-    filtered = filtered.filter(a =>
-      (a.field_name || "").toLowerCase().includes(name)
-    );
-  }
-
-  if (crop) {
-    filtered = filtered.filter(a =>
-      (a.crop || "").toLowerCase() === crop
-    );
-  }
-
-  if (dateFrom) {
-    filtered = filtered.filter(a => a.date >= dateFrom);
-  }
-
-  if (dateTo) {
-    filtered = filtered.filter(a => a.date <= dateTo);
-  }
+  if (name)     filtered = filtered.filter(a => (a.field_name || "").toLowerCase().includes(name));
+  if (crop)     filtered = filtered.filter(a => (a.crop || "").toLowerCase() === crop);
+  if (dateFrom) filtered = filtered.filter(a => a.date >= dateFrom);
+  if (dateTo)   filtered = filtered.filter(a => a.date <= dateTo);
 
   renderDashboard(filtered);
-  updateFilterSummary(filtered.length, name, crop, dateFrom, dateTo);
+  updateFilterSummary(filtered, name, crop, dateFrom, dateTo);
 }
 
 function resetFilters() {
@@ -129,20 +474,21 @@ function resetFilters() {
   document.getElementById("filter-summary").style.display = "none";
 }
 
-function updateFilterSummary(count, name, crop, from, to) {
+function updateFilterSummary(filtered, name, crop, from, to) {
   const el     = document.getElementById("filter-summary");
   const active = [name, crop, from, to].some(Boolean);
-
   if (!active) { el.style.display = "none"; return; }
 
-  const total = allAnalyses.length;
-  const parts = [];
-  if (name)  parts.push(`name contains "<b>${name}</b>"`);
-  if (crop)  parts.push(`crop = "<b>${crop}</b>"`);
-  if (from)  parts.push(`from <b>${from}</b>`);
-  if (to)    parts.push(`to <b>${to}</b>`);
+  const filteredFields = Object.keys(groupByField(filtered)).length;
+  const totalFields    = Object.keys(groupByField(allAnalyses)).length;
 
-  el.innerHTML  = `Showing <b>${count}</b> of <b>${total}</b> analyses — ${parts.join(", ")}`;
+  const parts = [];
+  if (name) parts.push(`name contains "<b>${name}</b>"`);
+  if (crop) parts.push(`crop = "<b>${crop}</b>"`);
+  if (from) parts.push(`from <b>${from}</b>`);
+  if (to)   parts.push(`to <b>${to}</b>`);
+
+  el.innerHTML     = `Showing <b>${filteredFields}</b> of <b>${totalFields}</b> fields — ${parts.join(", ")}`;
   el.style.display = "block";
 }
 
@@ -204,6 +550,9 @@ function renderDashboard(analyses) {
 }
 
 /* ── DELETE ───────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   DELETE (standalone, from outside the field modal)
+══════════════════════════════════════════════════════ */
 
 async function deleteAnalysis(id) {
   if (!confirm("Delete this analysis?")) return;
@@ -212,48 +561,28 @@ async function deleteAnalysis(id) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     allAnalyses = allAnalyses.filter(a => String(a.id) !== id);
     selectedForCompare.delete(id);
-    // Re-apply current filters after delete
     applyFilters();
-    // Also refresh crop dropdown
     refreshCropFilter();
   } catch (err) {
     alert("Delete failed: " + err.message);
   }
 }
 
-function refreshCropFilter() {
-  const select      = document.getElementById("filter-crop");
-  const currentVal  = select.value;
-  // Remove all options except first ("All crops")
-  while (select.options.length > 1) select.remove(1);
-  // Re-populate
-  const crops = [...new Set(
-    allAnalyses.map(a => (a.crop || "").trim()).filter(Boolean)
-  )].sort();
-  crops.forEach(crop => {
-    const opt = document.createElement("option");
-    opt.value = crop.toLowerCase();
-    opt.textContent = crop.charAt(0).toUpperCase() + crop.slice(1);
-    select.appendChild(opt);
-  });
-  // Restore selection if still valid
-  select.value = currentVal;
-}
-
-/* ── DOWNLOAD SINGLE ──────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   DOWNLOAD SINGLE
+══════════════════════════════════════════════════════ */
 
 function downloadAnalysis(id) {
   window.open(`${API_URL}/api/analyses/${id}/csv`, "_blank");
 }
 
-/* ── COMPARE CHART ────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   COMPARE CHART  —  cross-field, one line per field
+══════════════════════════════════════════════════════ */
 
 function showCompareChart() {
-  const selected = allAnalyses.filter(a =>
-    selectedForCompare.has(String(a.id))
-  );
-  if (selected.length < 2) {
-    alert("Please select at least 2 fields first.");
+  if (selectedForCompare.size < 2) {
+    alert("Please select at least 2 fields for comparison.");
     return;
   }
 
@@ -262,6 +591,13 @@ function showCompareChart() {
 
   const wrapper = document.createElement("div");
   wrapper.id = "compare-chart-wrapper";
+
+  const title = document.createElement("p");
+  title.style.cssText =
+    "font-weight:700;font-size:0.95rem;margin:0 0 16px;color:#333;";
+  title.textContent = "Field Comparison — Average Soil Quality over Time";
+  wrapper.appendChild(title);
+
   const canvas = document.createElement("canvas");
   wrapper.appendChild(canvas);
 
@@ -282,25 +618,78 @@ function showCompareChart() {
         borderSkipped: false,
       }]
     },
+  // Build datasets — one line per selected field
+  const groups = groupByField(allAnalyses);
+
+  // Collect all dates across selected fields (union, sorted)
+  const dateSet = new Set();
+  selectedForCompare.forEach(name => {
+    (groups[name] || []).forEach(a => { if (a.date) dateSet.add(a.date); });
+  });
+  const allDates = [...dateSet].sort();
+
+  const datasets = [...selectedForCompare].map((fieldName, i) => {
+    const items   = groups[fieldName] || [];
+    const byDate  = Object.fromEntries(items.map(a => [a.date, a]));
+
+    return {
+      label:                fieldName,
+      data:                 allDates.map(d => byDate[d] ? +(byDate[d].avg_value * 100).toFixed(1) : null),
+      borderColor:          COLORS.compare[i % COLORS.compare.length],
+      pointBackgroundColor: COLORS.compare[i % COLORS.compare.length],
+      tension:              0.35,
+      pointRadius:          5,
+      pointHoverRadius:     7,
+      borderWidth:          2.5,
+      fill:                 false,
+      spanGaps:             false,
+    };
+  });
+
+  if (compareChart) compareChart.destroy();
+
+  compareChart = new Chart(canvas, {
+    type: "line",
+    data: { labels: allDates, datasets },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: {
+          display: true,
+          labels: { font: { size: 12 }, boxWidth: 16 },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx =>
+              ` ${ctx.dataset.label}: ${ctx.parsed.y !== null ? ctx.parsed.y + "%" : "–"}`,
+          },
+        },
+      },
       scales: {
         y: {
-          beginAtZero: true, max: 100,
-          grid: { color: "rgba(0,0,0,0.06)" },
-          ticks: { callback: v => v + " g/kg" }
+          beginAtZero: true,
+          min: 0,
+          max: 100,
+          grid:  { color: "rgba(0,0,0,0.06)" },
+          ticks: { callback: v => v + " g/kg" },
         },
-        x: { grid: { display: false } }
-      }
-    }
+        x: { grid: { display: false } },
+      },
+    },
   });
+
+  // Scroll to chart
+  wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-/* ── DETAIL MODAL ─────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   DETAIL MODAL  —  single-analysis edit view
+══════════════════════════════════════════════════════ */
 
 function openDetailModal(item) {
   currentItem = item;
+
   document.getElementById("edit-field-name").value  = item.field_name    || "";
   document.getElementById("edit-location").value    = item.location_name || "";
   document.getElementById("edit-crop").value        = item.crop          || "";
@@ -316,39 +705,58 @@ window.closeDetailModal = function () {
   document.getElementById("detail-modal").style.display = "none";
 };
 
-/* ── SAVE ─────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   SAVE  —  update from detail modal
+══════════════════════════════════════════════════════ */
 
 async function saveDetails() {
   if (!currentItem) return;
+
   const payload = {
     ...currentItem,
     field_name:    document.getElementById("edit-field-name").value,
     location_name: document.getElementById("edit-location").value,
     crop:          document.getElementById("edit-crop").value,
-    notes:         document.getElementById("edit-notes").value
+    notes:         document.getElementById("edit-notes").value,
   };
+
   try {
-    const res = await fetch(`${API_URL}/api/update-analysis/${currentItem.id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
-    });
+    const res = await fetch(
+      `${API_URL}/api/update-analysis/${currentItem.id}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }
+    );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const idx = allAnalyses.findIndex(a => String(a.id) === String(currentItem.id));
+
+    const idx = allAnalyses.findIndex(
+      a => String(a.id) === String(currentItem.id)
+    );
     if (idx !== -1) allAnalyses[idx] = { ...allAnalyses[idx], ...payload };
+
     closeDetailModal();
     applyFilters();
     refreshCropFilter();
+
+    // If field modal is still open, refresh it too
+    if (document.getElementById("field-modal").style.display === "flex") {
+      openFieldModal(currentFieldName);
+    }
   } catch (err) {
     alert("Save failed: " + err.message);
   }
 }
 
-/* ── DETAIL CHART ─────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   DETAIL CHART  —  bar chart for single-analysis min/avg/max
+══════════════════════════════════════════════════════ */
 
 function renderDetailChart(item) {
   const ctx = document.getElementById("quality-chart").getContext("2d");
   if (qualityChart) qualityChart.destroy();
+
   qualityChart = new Chart(ctx, {
     type: "bar",
     data: {
@@ -363,19 +771,23 @@ function renderDetailChart(item) {
         backgroundColor: [COLORS.min, COLORS.avg, COLORS.max],
         borderRadius: 8,
         borderSkipped: false,
-      }]
+      }],
     },
     options: {
       responsive: true,
       plugins: { legend: { display: false } },
       scales: {
         y: {
-          beginAtZero: true, max: 100,
-          grid: { color: "rgba(255,255,255,0.08)" },
-          ticks: { color: "#9ca3af", callback: v => v + "%" }
+          beginAtZero: true,
+          max: 100,
+          grid:  { color: "rgba(255,255,255,0.08)" },
+          ticks: { color: "#9ca3af", callback: v => v + "%" },
         },
-        x: { grid: { display: false }, ticks: { color: "#9ca3af" } }
-      }
-    }
+        x: {
+          grid:  { display: false },
+          ticks: { color: "#9ca3af" },
+        },
+      },
+    },
   });
 }
