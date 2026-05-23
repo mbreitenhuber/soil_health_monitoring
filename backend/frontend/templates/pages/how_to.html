@@ -13,7 +13,7 @@
   <div class="about-hero">
     <div class="section-eyebrow">User Guide</div>
     <h1>How to use <em>AgroScan</em></h1>
-    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil quality zone map.</p>
+    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil organic carbon level on the map.</p>
   </div>
 
   <!-- Quick Steps Overview -->
@@ -40,7 +40,7 @@
         <div class="howto-step-num">03</div>
         <div class="howto-step-icon">🗺️</div>
         <h3>Read your zone map</h3>
-        <p>Your field is divided into color-coded zones. Green means high soil quality, yellow is medium, and red indicates areas that may need attention.</p>
+        <p>Your field is divided into color-coded zones. Green means high soil organic carbon levels, yellow is medium, and red indicates areas that may need attention.</p>
       </div>
 
     </div>
@@ -61,7 +61,8 @@
         <p>Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">💡 Tip</span>
-          Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
+          Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points. 
+          To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
         </div>
       </div>
     </div>
@@ -97,7 +98,8 @@
         <p>Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">⚠️ Note</span>
-          The analysis requires an active internet connection to download the satellite data. If the button remains inactive, make sure your polygon is properly closed on the map.
+          The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis. 
+          <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
         </div>
       </div>
     </div>
@@ -109,8 +111,8 @@
         <h3>Read your results</h3>
       </div>
       <div class="howto-detail-body">
-        <p>After the analysis completes, colored zones will appear on top of your drawn polygon. The sidebar also shows a summary with the number of zones analyzed, the average soil quality score, and the highest and lowest zone values.</p>
-        <p style="margin-top:12px;">To start fresh, click the <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
+        <p>After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.</p>
+        <p style="margin-top:12px;">To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
       </div>
     </div>
 
@@ -158,8 +160,52 @@
     <div class="howto-tip" style="margin-top:28px;">
       <span class="howto-tip-label">📌 Tip</span>
       <p>If you frequently analyze the same field, use saving to create a timeline of results. This is especially useful to track changes after management actions (e.g., irrigation, fertilization, cover crops).</p>
-      <a class="btn-primary" href="/personal_dashboard" style="margin-top:16px;">⟶ Go to Personal Dashboard</a>
+      <a class="btn-primary" href="/personal_dashboard">⟶ Go to Personal Dashboard</a>
     </div>
+  </section>
+
+  <!-- Reading the Results -->
+  <section class="about-section">
+    <div class="section-eyebrow">Interpreting results</div>
+    <h2 class="section-title">How to read the SOC map</h2>
+
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
+      TThe zone map divides your fields into a regular grid of cells. For each cell the soil organic carbon (SOC) is predicted in g/kg in the topsoil and visualized with a color-code. The color-code was designed based on the SOC value distribution in the LUCAS topsoil dataset in Germany. The following guide explains what each color range means in practice and how you can act on the results.
+    </p>
+
+    <div class="howto-legend-block">
+
+      <div class="howto-legend-row">
+        <div class="howto-legend-swatch" style="background:#22c55e;"></div>
+        <div>
+          <div class="howto-legend-label">High SOC content — top 30 % of LUCAS (DE), SOC ≥ {{ oc_classification.threshold_high_gkg }} g/kg</div>
+            <p>These zones show strong indicators of high soil organic carbon content. They are in the top 30th percentile of the SOC distribution agricultural fields in Germany. Fields or sub-areas in this range are performing well. Your sustainable soil management practices are likely to be working. Feel free to share your experience in the upcoming community forum for farmers in your area!</p>
+        </div>
+      </div>
+
+      <div class="howto-legend-row">
+        <div class="howto-legend-swatch" style="background:#f59e0b;"></div>
+        <div>
+          <div class="howto-legend-label">Medium SOC content — middle 40 %, {{ oc_classification.threshold_low_gkg }} – {{ oc_classification.threshold_high_gkg }} g/kg</div>
+          <p>These zones are within an acceptable range, but some show some variability. Try implementing sustainable soil management practices (SSM) like reduced tillage, crop diversification and cover cropping. Monitoring these areas over successive analyses can help identify whether SOC content is increasing or decreasing. We are in the process of implementing a community forum where you can find out what farmers in your area are doing to increase their SOC level and share your progress.</p>
+        </div>
+      </div>
+
+      <div class="howto-legend-row" style="border-bottom:none;">
+        <div class="howto-legend-swatch" style="background:#ef4444;"></div>
+        <div>
+          <div class="howto-legend-label">Low SOC content — bottom 30 % of LUCAS (DE), SOC &lt; {{ oc_classification.threshold_low_gkg }} g/kg</div>
+          <p>These zones flag areas that may require attention. They are in the bottom 30th percentile of the SOC distribution of agricultural fields in Germany. Try implementing sustainable soil management practices and continuous monitoring to assess their impact. In the upcoming community forum, you can learn about SSM practices that farmers in your area are employing.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="howto-tip" style="margin-top:40px;">
+      <span class="howto-tip-label">📌 Important</span>
+      The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
+    </div>
+
   </section>
 
   <!-- About the ML Model -->
@@ -192,54 +238,8 @@
     <div class="howto-tip" style="margin-top:40px;">
       <span class="howto-tip-label">💡 Tip</span>
       <p>If you want to learn more about how the ML-Model exactely works and are interested in the research background you can visit the Report page.</p>
-      <a class="btn-primary" href="/report" style="margin-top:20px;"> ⟶ Report </a>
+      <a class="btn-primary" href="/report">⟶ Report</a>
     </div>
-
-  </section>
-
-  <!-- Reading the Results -->
-  <section class="about-section">
-    <div class="section-eyebrow">Interpreting results</div>
-    <h2 class="section-title">How to read the zone map</h2>
-
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
-      The zone map divides your field into a regular grid of cells. Each cell is assigned a soil quality score and colored accordingly. The following guide explains what each color range means in practice and how you can act on the results.
-    </p>
-
-    <div class="howto-legend-block">
-
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:#22c55e;"></div>
-        <div>
-          <div class="howto-legend-label">High — top 30 % of LUCAS (DE), OC ≥ {{ oc_classification.threshold_high_gkg }} g/kg</div>
-          <p>These zones show strong indicators of healthy soil conditions: good moisture retention, dense and active vegetation cover, and favorable spectral reflectance patterns. Fields or sub-areas in this range are performing well and generally require no immediate intervention. [Placeholder — detailed agronomic interpretation to be added by the project team.]</p>
-        </div>
-      </div>
-
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:#f59e0b;"></div>
-        <div>
-          <div class="howto-legend-label">Medium — middle 40 %, {{ oc_classification.threshold_low_gkg }} – {{ oc_classification.threshold_high_gkg }} g/kg</div>
-          <p>These zones are within an acceptable range but show some variability. Possible causes include uneven irrigation, localized compaction, or transitional vegetation states. Monitoring these areas over successive analyses can help identify whether quality is improving or declining. [Placeholder — to be refined with field-specific thresholds.]</p>
-        </div>
-      </div>
-
-      <div class="howto-legend-row" style="border-bottom:none;">
-        <div class="howto-legend-swatch" style="background:#ef4444;"></div>
-        <div>
-          <div class="howto-legend-label">Low — bottom 30 % of LUCAS (DE), OC &lt; {{ oc_classification.threshold_low_gkg }} g/kg</div>
-          <p>These zones flag areas that may require attention. Low scores can indicate moisture stress, bare soil, erosion risk, or compacted layers. This does not replace a physical soil assessment, but can help you prioritize which areas of a large field to investigate first. [Placeholder — actionable recommendations to be added.]</p>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="howto-tip" style="margin-top:40px;">
-      <span class="howto-tip-label">📌 Important</span>
-      The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
-    </div>
-
-  
 
   </section>
 
@@ -281,7 +281,7 @@
   <!-- CTA -->
   <div class="home-cta">
     <h2>Ready to analyze your field?</h2>
-    <p>Head to the Analysis page and draw your first polygon — results in under a second.</p>
+    <p>Head to the Analysis page and draw your first polygon — find out your carbon content.</p>
     <a class="btn-primary" href="/analyse">⟶ Go to Analysis</a>
   </div>
 

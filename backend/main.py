@@ -704,7 +704,7 @@ def healthz():
 
 
 @app.post("/api/predict", response_model=PredictionResponse)
-def predict(request: FieldRequest, lang: str = Cookie(default="de")):
+def predict(request: FieldRequest, lang: str = Cookie(default="en")):
     if lang not in ("en", "de"):
         lang = "de"
     print(
