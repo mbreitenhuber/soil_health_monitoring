@@ -228,7 +228,7 @@ class TrainingPipeline:
         Returns:
             nn.Module: The reconstructed model.
         """
-        checkpoint = torch.load(file_path)
+        checkpoint = torch.load(file_path, map_location=torch.device("cpu"))
         model_info = checkpoint["model_info"]
 
         model = RegressionNet(
