@@ -225,6 +225,8 @@ class CopernicusApi:
         longitude: float,
         product: str = "Sentinel2",
         parent_path: str = None,
+        source_path: str = None,
+        target_path: str = None,
     ) -> None:
         """
         Crops all satellite images in the dataset to 100px around the given location to save disk space
@@ -247,20 +249,26 @@ class CopernicusApi:
                 parent_path = os.environ.get("SENTINEL_DIR", "")
             extension = "jp2"
 
-        path = Path(parent_path) / dataset_name / "IMG_DATA"
+        source_root = Path(source_path) if source_path else Path(parent_path) / dataset_name
+        path = source_root / "IMG_DATA"
+        output_root = Path(target_path) if target_path else source_root
 
         print(f"Cropping images in '{path}'...")
 
         for file in glob.glob(f"**/*.{extension}", root_dir=path, recursive=True):
             file_path = str(path / file)
-            ImageUtils.crop_location(file_path, file_path, latitude, longitude, 50)
+            target_file_path = str(output_root / "IMG_DATA" / file)
+            Path(target_file_path).parent.mkdir(parents=True, exist_ok=True)
+            ImageUtils.crop_location(file_path, target_file_path, latitude, longitude, 50)
 
         if landsat:
-            path = Path(parent_path) / dataset_name / "QI_DATA"
+            path = source_root / "QI_DATA"
             print(f"Cropping images in '{path}'...")
             for file in glob.glob(f"**/*.{extension}", root_dir=path, recursive=True):
                 file_path = str(path / file)
-                ImageUtils.crop_location(file_path, file_path, latitude, longitude, 50)
+                target_file_path = str(output_root / "QI_DATA" / file)
+                Path(target_file_path).parent.mkdir(parents=True, exist_ok=True)
+                ImageUtils.crop_location(file_path, target_file_path, latitude, longitude, 50)
 
     @staticmethod
     def _productTimestampDiff(product: dict, date: datetime) -> int:

@@ -9,6 +9,7 @@
 # test with 2 rows: python ./AgroLens/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv --start 4 --end 5
 
 import argparse
+import json
 import os
 import shutil
 import sys
@@ -75,6 +76,74 @@ data_length = 0
 
 api_finished = False
 download_finished = False
+
+
+def _result_path(date: str, latitude: float, longitude: float) -> Path:
+    return Path(os.environ["SENTINEL_DIR"]) / date / f"{latitude} {longitude}"
+
+
+def _raw_cache_root(date: str) -> Path:
+    # Raw, un-cropped Sentinel scenes are cached separately from the final
+    # per-point cropped outputs so nearby points can reuse the same download.
+    return Path(os.environ["SENTINEL_DIR"]) / "_raw" / date
+
+
+def _raw_scene_path(date: str, scene_id: str) -> Path:
+    return _raw_cache_root(date) / scene_id
+
+
+def _metadata_path(result_path: Path) -> Path:
+    return result_path / "metadata.json"
+
+
+def _read_cached_sentinel_id(result_path: Path) -> str:
+    metadata_file = _metadata_path(result_path)
+    if not metadata_file.is_file():
+        return "cached"
+
+    try:
+        with open(metadata_file, "r") as file:
+            metadata = json.load(file)
+        return str(metadata.get("sentinel_id", "cached"))
+    except Exception:
+        return "cached"
+
+
+def _write_metadata(result_path: Path, job: dict) -> None:
+    metadata = {
+        "point_id": job["point"],
+        "survey_date": job.get("survey_date", ""),
+        "latitude": job["lat"],
+        "longitude": job["lon"],
+        "sentinel_date": job["date"],
+        "sentinel_id": job["id"],
+    }
+    with open(_metadata_path(result_path), "w") as file:
+        json.dump(metadata, file, indent=2)
+
+
+def _ensure_raw_scene(job: dict) -> Path:
+    raw_scene_path = _raw_scene_path(job["date"], job["id"])
+    if raw_scene_path.is_dir():
+        print(f"Using cached raw scene: {raw_scene_path}")
+        return raw_scene_path
+
+    os.makedirs(_raw_cache_root(job["date"]), exist_ok=True)
+    print(f"Downloading raw scene: {job['id']} -> {raw_scene_path}")
+    CopernicusApi.download_data(job["id"], job["id"], target_path=str(_raw_cache_root(job["date"])))
+    return raw_scene_path
+
+
+def _append_mapping_row(point_id: str, survey_date: str, latitude: float, longitude: float, sentinel_date: str, sentinel_id: str) -> None:
+    if not mapping_file:
+        return
+
+    with file_lock:
+        with open(mapping_file, "a") as file:
+            print(
+                f"{point_id},{survey_date},{latitude},{longitude},{sentinel_date},{sentinel_id}",
+                file=file,
+            )
 
 
 def validate_environment_variables() -> None:
@@ -219,19 +288,35 @@ def api_thread(thread_index: int) -> None:
             sentinel_date = data["properties"]["startDate"].split("T")[0]
             print(f"Best dataset: {data['id']} ({sentinel_date})")
 
+            result_path = _result_path(sentinel_date, latitude, longitude)
+            if result_path.is_dir():
+                print(f"Dataset already downloaded: {result_path}")
+                _append_mapping_row(
+                    str(row["POINTID"]),
+                    date,
+                    latitude,
+                    longitude,
+                    sentinel_date,
+                    _read_cached_sentinel_id(result_path),
+                )
+                continue
+
             if mapping_file:
-                with file_lock:  # Synchronize file write access
-                    with open(mapping_file, "a") as file:
-                        print(
-                            f"{row['POINTID']},{date},{latitude},{longitude},{sentinel_date},{data['id']}",
-                            file=file,
-                        )
+                _append_mapping_row(
+                    str(row["POINTID"]),
+                    date,
+                    latitude,
+                    longitude,
+                    sentinel_date,
+                    data["id"],
+                )
 
             download_jobs.append(
                 {
                     "point": str(row["POINTID"]),
                     "id": data["id"],
                     "date": sentinel_date,
+                    "survey_date": date,
                     "lat": latitude,
                     "lon": longitude,
                 }
@@ -266,17 +351,14 @@ def download_thread(thread_index: int) -> None:
 
         job = download_jobs.pop(0)
 
-        result_path = (
-            Path(os.environ["SENTINEL_DIR"])
-            / job["date"]
-            / f"{job['lat']} {job['lon']}"
-        )
+        result_path = _result_path(job["date"], job["lat"], job["lon"])
         if result_path.is_dir():
-            print("Dataset already downloaded")
+            print(f"Using existing cropped dataset: {result_path}")
             continue
 
         try:
-            CopernicusApi.download_data(job["id"], job["point"], target_path=os.environ["TMP_DIR"])
+            raw_scene_path = _ensure_raw_scene(job)
+            print(f"Cropping point {job['point']} from raw scene: {raw_scene_path}")
             crop_jobs.append(job)
         except Exception as e:
             print(e, file=sys.stderr)
@@ -313,13 +395,23 @@ def crop_thread(thread_index: int) -> None:
             / job["date"]
             / f"{job['lat']} {job['lon']}"
         )
+        raw_scene_path = _raw_scene_path(job["date"], job["id"])
+        tmp_point_path = Path(os.environ["TMP_DIR"]) / job["point"]
 
         try:
             CopernicusApi.crop_images(
-                job["point"], job["lat"], job["lon"], parent_path=os.environ["TMP_DIR"]
+                job["point"],
+                job["lat"],
+                job["lon"],
+                parent_path=os.environ["TMP_DIR"],
+                source_path=str(raw_scene_path),
+                target_path=str(tmp_point_path),
             )
             os.makedirs(Path(os.environ["SENTINEL_DIR"]) / job["date"], exist_ok=True)
-            shutil.move(Path(os.environ["TMP_DIR"]) / job["point"], result_path)
+            if result_path.exists():
+                shutil.rmtree(result_path, True)
+            shutil.move(tmp_point_path, result_path)
+            _write_metadata(result_path, job)
             print(f"Point {job['point']} finished.")
         except Exception as e:
             print(e, file=sys.stderr)
