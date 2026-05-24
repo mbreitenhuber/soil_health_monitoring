@@ -91,7 +91,7 @@ def _api_base_url() -> str:
 
 
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
-STATIC_CSS_VERSION = "5"
+STATIC_CSS_VERSION = "6"
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
