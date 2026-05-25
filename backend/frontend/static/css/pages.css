@@ -11,6 +11,14 @@
 .stat-item { text-align: center; }
 .stat-num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem; color: var(--accent); letter-spacing: -0.04em; }
 .stat-label { font-size: 0.72rem; color: var(--text-dim); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.1em; }
+.home-quote-bar { flex-direction: column; align-items: center; padding: 40px 48px; }
+.home-quote-figure { margin: 0; max-width: 820px; text-align: center; }
+.home-quote { margin: 0; border: none; padding: 0; }
+.home-quote p { font-family: 'Syne', sans-serif; font-size: clamp(1.15rem, 2.4vw, 1.5rem); font-weight: 600; color: var(--accent); line-height: 1.7; letter-spacing: -0.02em; margin: 0; }
+.home-quote p::before { content: '\201C'; }
+.home-quote p::after { content: '\201D'; }
+.home-quote-cite { margin-top: 16px; font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
+.home-quote-cite::before { content: '\2014\00a0'; }
 .features { padding: 80px 32px; max-width: 1100px; margin: 0 auto; }
 .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
 .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; transition: border-color 0.2s; }

@@ -35,13 +35,22 @@
   </div>
 
   <!-- Stats — Daten kommen aus HOME_STATS in main.py -->
-  <div class="stats-bar">
+  <!--<div class="stats-bar">
     {% for stat in stats %}
       <div class="stat-item">
         <div class="stat-num">{{ stat.value[lang] if stat.value is mapping and lang in stat.value else stat.value }}</div>
         <div class="stat-label">{{ stat.label[lang] if stat.label is mapping and lang in stat.label else stat.label }}</div>
       </div>
     {% endfor %}
+  </div>-->
+
+  <div class="stats-bar home-quote-bar">
+    <figure class="home-quote-figure">
+      <blockquote class="home-quote">
+        <p>Soil carbon monitoring has long been expensive and out of reach, but this needs to change. Agroscan is fully open-source and powered by weekly satellite data. It is also free for everyone to use. After all, understanding our soil should not be a privilege.</p>
+      </blockquote>
+      <figcaption class="home-quote-cite">AgroScan Team</figcaption>
+    </figure>
   </div>
 
   <!-- Features — Daten kommen aus HOME_FEATURES in main.py -->
