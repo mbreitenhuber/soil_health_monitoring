@@ -6,6 +6,18 @@ const map = L.map("map", {
   markerZoomAnimation: true
 }).setView([51.1657, 10.4515], 7);
 
+// Prefill data set by Personal Dashboard when re-analysing an existing field
+let _prefill = null;
+try {
+  const _raw = sessionStorage.getItem("dashboard_prefill");
+  if (_raw) {
+    _prefill = JSON.parse(_raw);
+    sessionStorage.removeItem("dashboard_prefill"); // consume immediately
+  }
+} catch(e) {
+  _prefill = null;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const dateInput = document.getElementById("analysis-date");
   if (dateInput) {
@@ -14,6 +26,44 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // ❗ no future dates allowed
     dateInput.max = today.toISOString().split("T")[0];
+  }
+  // ── Restore polygon + save-popup fields from Personal Dashboard ─────────────
+  if (_prefill) {
+    const _coords = _prefill.polygon;
+
+    // Draw the stored polygon on the map
+    if (Array.isArray(_coords) && _coords.length >= 3) {
+      drawnItems.clearLayers();
+      const _latlngs = _coords.map(p => L.latLng(p.lat, p.lng));
+      const _layer   = L.polygon(_latlngs, {
+        color: "#C94F4F",
+        fillOpacity: 0.15,
+      });
+      drawnItems.addLayer(_layer);
+      currentPolygon = _layer.getLatLngs()[0];
+      updateStats(currentPolygon);
+      map.fitBounds(_layer.getBounds(), { padding: [40, 40] });
+    }
+
+    // Pre-fill the Save popup fields
+    if (_prefill.field_name    && dashboardFieldName)    dashboardFieldName.value    = _prefill.field_name;
+    if (_prefill.location_name && dashboardLocationName) dashboardLocationName.value = _prefill.location_name;
+    if (_prefill.crop          && dashboardCropSelect) {
+      const _cropVal = _prefill.crop;
+      const _opt = [...dashboardCropSelect.options].find(
+        o => o.value.toLowerCase()    === _cropVal.toLowerCase() ||
+            o.textContent.toLowerCase() === _cropVal.toLowerCase()
+      );
+      if (_opt) {
+        dashboardCropSelect.value = _opt.value;
+      } else {
+        dashboardCropSelect.value = "custom";
+        if (dashboardCustomCrop) {
+          dashboardCustomCrop.style.display = "block";
+          dashboardCustomCrop.value = _cropVal;
+        }
+      }
+    }
   }
 });
 
@@ -681,3 +731,4 @@ if (classInfoPopup) {
 document.addEventListener("DOMContentLoaded", () => {
   renderClassInfoPopup(ocClassification);
 });
+

@@ -4,6 +4,8 @@
 
 {% block head_styles %}
 <link rel="stylesheet" href="/static/css/dashboard.css?v={{ static_css_version }}" />
+<!-- Leaflet CSS — needed for the mini satellite map in the detail modal -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
 {% block content %}
@@ -21,22 +23,49 @@
     <div class="dashboard-actions">
       <button class="btn-primary"   id="download-csv-btn">⬇ Download All</button>
       <button class="btn-secondary" id="compare-btn">⚖ Compare Fields</button>
+      <!-- hidden until a comparison is active -->
+      <button class="btn-end-compare" id="end-compare-btn" style="display:none;">
+        ✕ End Comparison
+      </button>
     </div>
 
-    <div class="section-eyebrow">History</div>
-    <h2 class="section-title">Saved Analyses</h2>
+    <!-- KPI SUMMARY -->
+    <div class="dashboard-kpis">
+
+      <div class="kpi-card">
+        <span class="kpi-label">Total Fields</span>
+        <strong class="kpi-value" id="kpi-total-fields">0</strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Total Analyses</span>
+        <strong class="kpi-value" id="kpi-total-analyses">0</strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Average Field</span>
+        <strong class="kpi-value" id="kpi-average-oc">–</strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Best Field</span>
+        <strong class="kpi-value" id="kpi-best-field">–</strong>
+      </div>
+
+      <div class="kpi-card">
+        <span class="kpi-label">Worst Field</span>
+        <strong class="kpi-value" id="kpi-worst-field">–</strong>
+      </div>
+
+    </div>
 
     <!-- FILTER BAR -->
     <div class="dashboard-filters">
 
       <div class="filter-group">
         <label class="filter-label">Field Name</label>
-        <input
-          id="filter-name"
-          type="text"
-          class="filter-input"
-          placeholder="Search field name…"
-        >
+        <input id="filter-name" type="text" class="filter-input"
+               placeholder="Search field name…">
       </div>
 
       <div class="filter-group">
@@ -70,13 +99,12 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════
-     FIELD MODAL  —  history + compare for one field
-════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════
+     FIELD MODAL — history + line chart for one field
+═══════════════════════════════════════════════════ -->
 <div id="field-modal" class="detail-modal">
   <div class="detail-card field-modal-card">
 
-    <!-- Header -->
     <div class="detail-header">
       <div>
         <h2 id="field-modal-name">–</h2>
@@ -85,7 +113,7 @@
       <button class="btn-close-x" onclick="closeFieldModal()">✕</button>
     </div>
 
-    <!-- Stat cards -->
+    <!-- 4 stat cards -->
     <div class="detail-stats-grid field-stats-grid">
       <div class="detail-stat-card">
         <span>Analyses</span>
@@ -105,17 +133,16 @@
       </div>
     </div>
 
-    <!-- Line chart — development & compare (always visible) -->
-    <div class="field-section-label">Development &amp; Comparison</div>
+    <!-- Line chart — OC development over time -->
+    <div class="field-section-label">OC Development over Time</div>
     <div class="detail-chart-wrapper">
       <canvas id="field-line-chart"></canvas>
     </div>
 
-    <!-- Analyses list -->
+    <!-- Per-analysis list -->
     <div class="field-section-label">All Analyses</div>
     <div id="field-analyses-list" class="field-analyses-list"></div>
 
-    <!-- Actions -->
     <div class="detail-actions">
       <button class="btn-close-modal" onclick="closeFieldModal()">Close</button>
       <button class="btn-new-analysis" id="field-new-analysis-btn">+ New Analysis</button>
@@ -125,9 +152,9 @@
 </div>
 
 
-<!-- ═══════════════════════════════════════════════════
-     DETAIL MODAL  —  edit a single analysis
-════════════════════════════════════════════════════ -->
+<!-- ════════════════════════════════════════════════
+     DETAIL MODAL — single analysis edit + map view
+═══════════════════════════════════════════════════ -->
 <div id="detail-modal" class="detail-modal">
   <div class="detail-card">
 
@@ -136,6 +163,7 @@
       <button class="btn-close-x" onclick="closeDetailModal()">✕</button>
     </div>
 
+    <!-- Editable fields -->
     <div class="detail-grid">
       <div class="detail-field">
         <label>Field Name</label>
@@ -155,6 +183,7 @@
       </div>
     </div>
 
+    <!-- Stat cards -->
     <div class="detail-stats-grid">
       <div class="detail-stat-card stat-min">
         <span>Minimum</span>
@@ -170,8 +199,17 @@
       </div>
     </div>
 
+    <!-- Bar chart (min / avg / max for this snapshot) -->
     <div class="detail-chart-wrapper">
       <canvas id="quality-chart"></canvas>
+    </div>
+
+    <!-- ── Mini satellite map ── -->
+    <div class="detail-map-section">
+      <div class="field-section-label">Field Map — Soil Quality Zones</div>
+      <div class="detail-map-wrapper">
+        <div id="detail-map"></div>
+      </div>
     </div>
 
     <div class="detail-actions">
@@ -190,5 +228,7 @@
   {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang} | tojson }}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Leaflet JS — for the mini satellite map -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/static/js/dashboard.js"></script>
 {% endblock %}
