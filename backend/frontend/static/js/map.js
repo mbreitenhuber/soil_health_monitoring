@@ -179,7 +179,7 @@ L.control.layers(baseLayers, overlays).addTo(map);
 // =====================
 
 map.addControl(new L.Control.Draw({
-  edit: { featureGroup: drawnItems },
+  edit: { featureGroup: drawnItems, remove: false },
   draw: {
     polygon: { shapeOptions: { color: "#C94F4F", fillOpacity: 0.15 } },
     polyline: false,

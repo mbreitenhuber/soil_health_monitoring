@@ -55,8 +55,6 @@
 .leaflet-draw-toolbar a:before { background-image: inherit !important; }
 .leaflet-draw-draw-polygon:before { content: "⬡"; color: var(--text); font-size: 14px; line-height: 1; }
 .leaflet-draw-edit-edit:before { content: "✎"; color: var(--text); font-size: 14px; line-height: 1; }
-.leaflet-draw-edit-remove:before { content: "🗑"; color: var(--text); font-size: 14px; line-height: 1; }
-/*path.leaflet-interactive {stroke: var(--text) !important; stroke-opacity: 0.5 ; fill: var(--text-dim) !important; fill-opacity: 0.15 !important; } */
 .leaflet-tile {transition: opacity 0.35s ease-in-out;}
 .leaflet-control-geocoder {border-radius: 12px !important; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
 .leaflet-control-geocoder-form input {font-size: 14px; padding: 6px 10px;}
