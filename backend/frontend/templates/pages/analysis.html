@@ -19,7 +19,8 @@
 {% block content %}
 {% set t = {
   "instructions": ("Instructions" if lang == "en" else "Anleitung"),
-  "step1": ("Draw your agricultural field on the map (use the Polygon tool)" if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte (Polygon-Werkzeug)"),
+  "step1_lead": ("Draw your agricultural field on the map (use the " if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte ("),
+  "step1_tail": (" tool)" if lang == "en" else "-Werkzeug)"),
   "step2": ("Check the detected vertices and area" if lang == "en" else "Prüfe die erkannten Eckpunkte und die Fläche"),
   "step3": ("Choose the date — Start the analysis — the ML model calculates the zone map" if lang == "en" else "Wähle das Datum — Starte die Analyse — das ML-Modell berechnet die Zonenkarte"),
   "area": ("Area" if lang == "en" else "Fläche"),
@@ -46,6 +47,11 @@
   "class_info_source": ("Data source" if lang == "en" else "Datenquelle"),
   "class_info_open": ("Open LUCAS soil data (ESDAC)" if lang == "en" else "LUCAS-Bodendaten öffnen (ESDAC)"),
   "res_unit_label": ("g/kg OC (predicted)" if lang == "en" else "g/kg OC (vorhergesagt)"),
+  "select_field_hint": ("Select first a field using the polygon tool" if lang == "en" else "Wähle zuerst ein Feld mit dem Polygon-Werkzeug"),
+  "save_success_title": ("Analysis saved" if lang == "en" else "Analyse gespeichert"),
+  "save_success_message": ("Your analysis was saved to the Personal Dashboard." if lang == "en" else "Deine Analyse wurde im Personal Dashboard gespeichert."),
+  "save_success_close": ("Close" if lang == "en" else "Schließen"),
+  "save_success_go_dash": ("Go to Personal Dashboard" if lang == "en" else "Zum Personal Dashboard"),
 } %}
 <div class="app-layout">
 
@@ -56,7 +62,7 @@
       <div class="steps" id="steps-container">
         <div class="step active" id="step-1">
           <div class="step-num">1</div>
-          <div class="step-text">{{ t.step1 }}</div>
+          <div class="step-text">{{ t.step1_lead }}<span class="step-polygon-icon" aria-hidden="true" title="Polygon"></span>{{ t.step1_tail }}</div>
         </div>
         <div class="step" id="step-2">
           <div class="step-num">2</div>
@@ -87,7 +93,8 @@
       </div>
 
       <!-- ANALYSE BUTTON -->
-      <button class="btn-analyse" id="btn-analyse" disabled>
+      <p class="analysis-hint" id="analysis-hint" role="alert" hidden>{{ t.select_field_hint }}</p>
+      <button class="btn-analyse" id="btn-analyse" type="button">
         ⟶ {{ t.start_analysis }}
       </button>
 
@@ -139,7 +146,6 @@
 
 </div>
 
-<!-- SAVE POPUP -->
 <!-- SAVE POPUP -->
 <div class="save-popup" id="save-popup">
 
@@ -232,6 +238,23 @@
 
 </div>
 
+<!-- SAVE SUCCESS POPUP -->
+<div class="save-popup" id="save-success-popup" aria-hidden="true">
+  <div class="save-popup-card save-success-card">
+    <div class="save-popup-header">
+      <h3>{{ t.save_success_title }}</h3>
+      <button type="button" id="close-save-success-popup" aria-label="{{ t.save_success_close }}">✕</button>
+    </div>
+    <div class="save-popup-content">
+      <p class="save-success-message">{{ t.save_success_message }}</p>
+      <div class="save-success-actions">
+        <button type="button" class="btn-save-success-secondary" id="btn-save-success-close">{{ t.save_success_close }}</button>
+        <a href="/personal_dashboard" class="btn-save-success-primary">{{ t.save_success_go_dash }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- OC CLASSIFICATION INFO -->
 <div class="save-popup" id="class-info-popup" aria-hidden="true">
   <div class="save-popup-card class-info-card">
@@ -312,5 +335,6 @@
       ? JSON.parse(ocDataEl.textContent)
       : null;
   </script>
+  <script src="/static/js/field-gradient-overlay.js"></script>
   <script src="/static/js/map.js"></script>
 {% endblock %}

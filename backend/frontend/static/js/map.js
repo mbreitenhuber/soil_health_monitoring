@@ -316,11 +316,21 @@ function setStep(n) {
   });
 }
 
+function hideAnalysisHint() {
+  const hint = document.getElementById("analysis-hint");
+  if (hint) hint.hidden = true;
+}
+
+function showAnalysisHint() {
+  const hint = document.getElementById("analysis-hint");
+  if (hint) hint.hidden = false;
+}
+
 function updateStats(latlngs) {
   document.getElementById("stat-points").textContent = latlngs.length;
   document.getElementById("stat-area").textContent = calcArea(latlngs).toFixed(2) + " ha";
   document.getElementById("stat-status").textContent = "Bereit ✓";
-  document.getElementById("btn-analyse").disabled = false;
+  hideAnalysisHint();
   setStep(2);
 }
 
@@ -362,7 +372,7 @@ map.on(L.Draw.Event.DELETED, () => {
   );
 
   document.getElementById("stat-status").textContent = "Kein Polygon";
-  document.getElementById("btn-analyse").disabled = true;
+  hideAnalysisHint();
 
   resultLayer.clearLayers();
   document.getElementById("result-box").classList.remove("visible");
@@ -376,8 +386,12 @@ map.on(L.Draw.Event.DELETED, () => {
 // =====================
 
 document.getElementById("btn-analyse").addEventListener("click", async () => {
-  if (!currentPolygon) return;
+  if (!currentPolygon) {
+    showAnalysisHint();
+    return;
+  }
 
+  hideAnalysisHint();
   document.getElementById("btn-analyse").disabled = true;
   document.getElementById("loader").classList.add("visible");
   document.getElementById("result-box").classList.remove("visible");
@@ -404,38 +418,23 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
       ocClassification = data.classification;
     }
 
-    const allBounds = [];
-
-    data.zones.forEach(zone => {
-      const color = valueToColor(zone.value, data.classification);
-
-      const poly = L.polygon(
-        zone.sub_polygon.map(c => [c.lat, c.lng]),
-        {
-          color,
-          fillColor: color,
-          fillOpacity: 0.65,
-          weight: 0.5,
-          opacity: 0.4
-        }
-      );
-
-      poly.bindTooltip(
+    const fieldRing = currentPolygon.map(p => ({ lat: p.lat, lng: p.lng }));
+    const viz = FieldGradientOverlay.addFieldVisualization({
+      map,
+      polygon: fieldRing,
+      zones: data.zones,
+      layerGroup: resultLayer,
+      classification: data.classification,
+      valueToColor,
+      formatTooltip: (zone) =>
         `<b>${zone.label}</b><br>${formatOcValue(zone.value)}`,
-        { sticky: true }
-      );
-
-      resultLayer.addLayer(poly);
-      allBounds.push(poly.getBounds());
     });
 
-    const fieldBorder = L.polygon(
-      currentPolygon.map(p => [p.lat, p.lng]),
-      { color: "#C94F4F", fill: false, weight: 2.5 }
-    );
-
-    resultLayer.addLayer(fieldBorder);
-    allBounds.push(fieldBorder.getBounds());
+    const allBounds = [];
+    if (viz.borderLayer) allBounds.push(viz.borderLayer.getBounds());
+    else if (fieldRing.length >= 3) {
+      allBounds.push(L.latLngBounds(fieldRing.map(p => [p.lat, p.lng])));
+    }
 
     // =====================
     // SWITCH MODE AFTER SUCCESS
@@ -497,7 +496,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   );
 
   document.getElementById("stat-status").textContent = "Kein Polygon";
-  document.getElementById("btn-analyse").disabled = true;
+  hideAnalysisHint();
   document.getElementById("result-box").classList.remove("visible");
   document.getElementById("btn-save-dashboard").style.display = "none";
 
@@ -543,6 +542,10 @@ const dashboardNotes = document.getElementById("dashboard-notes");
 
 const dashboardLocationName = document.getElementById("dashboard-location-name");
 
+const saveSuccessPopup = document.getElementById("save-success-popup");
+const closeSaveSuccessPopupBtn = document.getElementById("close-save-success-popup");
+const btnSaveSuccessClose = document.getElementById("btn-save-success-close");
+
 
 // =====================
 // SAVE POPUP FUNCTIONS
@@ -558,6 +561,18 @@ function closeSavePopup() {
   if (!savePopup) return;
 
   savePopup.classList.remove("visible");
+}
+
+function openSaveSuccessPopup() {
+  if (!saveSuccessPopup) return;
+  saveSuccessPopup.classList.add("visible");
+  saveSuccessPopup.setAttribute("aria-hidden", "false");
+}
+
+function closeSaveSuccessPopup() {
+  if (!saveSuccessPopup) return;
+  saveSuccessPopup.classList.remove("visible");
+  saveSuccessPopup.setAttribute("aria-hidden", "true");
 }
 
 // =====================
@@ -633,8 +648,7 @@ if (confirmDashboardSaveBtn) {
       }
 
       closeSavePopup();
-
-      alert("Analysis saved to dashboard ✓");
+      openSaveSuccessPopup();
 
     } catch (err) {
 
@@ -660,10 +674,23 @@ dashboardCropSelect.addEventListener("change", () => {
 
 });
 
+if (closeSaveSuccessPopupBtn) {
+  closeSaveSuccessPopupBtn.addEventListener("click", closeSaveSuccessPopup);
+}
+if (btnSaveSuccessClose) {
+  btnSaveSuccessClose.addEventListener("click", closeSaveSuccessPopup);
+}
+if (saveSuccessPopup) {
+  saveSuccessPopup.addEventListener("click", (e) => {
+    if (e.target === saveSuccessPopup) closeSaveSuccessPopup();
+  });
+}
+
 // ESC close
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeSavePopup();
+    closeSaveSuccessPopup();
     closeClassInfoPopup();
   }
 });
@@ -689,8 +716,9 @@ function renderClassInfoPopup(classification) {
   if (datasetEl) {
     datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
   }
-  if (linkEl && c.reference_url) linkEl.href = c.reference_url;
-
+  if (linkEl && c.reference_url) {
+    linkEl.href = c.reference_url;
+  }
   if (tiersEl && c.tier_descriptions) {
     const order = ["low", "medium", "high"];
     tiersEl.innerHTML = order

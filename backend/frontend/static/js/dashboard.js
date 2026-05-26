@@ -26,13 +26,6 @@ function relativeTrendPct(firstVal, latestVal) {
   return ((latest - first) / first) * 100;
 }
 
-/* ── Zone colour (mirrors map.js) ───────────────── */
-function valueToColor(v) {
-  if (v >= 0.66) return `hsl(${120 * v},70%,45%)`;
-  if (v >= 0.33) return `hsl(${120 * v},80%,48%)`;
-  return `hsl(${120 * v},75%,45%)`;
-}
-
 /* ── Y-axis: 30 % padding above + below data range ── */
 function ocYAxisOptions(values, { dark = true } = {}) {
   const nums  = values.filter(v => v != null && Number.isFinite(v));
@@ -89,6 +82,25 @@ function readDashboardConfig() {
 }
 
 const dashboardConfig  = readDashboardConfig();
+const ocClassification = dashboardConfig.ocClassification || null;
+
+/* ── Zone colour (LUCAS tiers, mirrors map.js) ──── */
+const OC_TIER_COLORS = FieldGradientOverlay.TIER_COLORS;
+
+function ocTier(value) {
+  const c = ocClassification;
+  if (!c) return "medium";
+  if (value < c.threshold_low_gkg) return "low";
+  if (value < c.threshold_high_gkg) return "medium";
+  return "high";
+}
+
+function valueToColor(value) {
+  const c = ocClassification;
+  const tier = ocTier(value);
+  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+}
+
 let allAnalyses        = dashboardConfig.analyses || [];
 let selectedForCompare = new Set();
 let currentItem        = null;
@@ -971,26 +983,19 @@ function renderDetailMap(item) {
 
   const bounds = [];
 
-  zones.forEach(zone => {
-    const color  = valueToColor(zone.value);
-    const coords = (zone.sub_polygon || []).map(c => [c.lat, c.lng]);
-    if (!coords.length) return;
-    const poly = L.polygon(coords, {
-      color, fillColor: color, fillOpacity: 0.65, weight: 0.5, opacity: 0.4,
-    });
-    poly.bindTooltip(
-      `<b>${zone.label || "–"}</b><br>OC: ${Number(zone.value).toFixed(3)} g/kg`,
-      { sticky: true }
-    );
-    poly.addTo(detailMap);
-    bounds.push(poly.getBounds());
+  const viz = FieldGradientOverlay.addFieldVisualization({
+    map: detailMap,
+    polygon,
+    zones,
+    classification: ocClassification,
+    valueToColor,
+    formatTooltip: (zone) =>
+      `<b>${zone.label || "–"}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`,
   });
 
-  if (polygon.length) {
-    const coords  = polygon.map(p => [p.lat, p.lng]);
-    const border  = L.polygon(coords, { color: "#C94F4F", fill: false, weight: 2.5 });
-    border.addTo(detailMap);
-    bounds.push(border.getBounds());
+  if (viz.borderLayer) bounds.push(viz.borderLayer.getBounds());
+  else if (polygon.length >= 3) {
+    bounds.push(L.latLngBounds(polygon.map(p => [p.lat, p.lng])));
   }
 
   if (bounds.length) {

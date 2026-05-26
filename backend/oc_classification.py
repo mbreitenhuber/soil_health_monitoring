@@ -16,7 +16,7 @@ import pandas as pd
 Tier = Literal["low", "medium", "high"]
 
 LUCAS_DE_DATASET = Path(__file__).resolve().parent / "data" / "datasets" / "LUCAS_SOIL_processed_DE.csv"
-LUCAS_REFERENCE_URL = "https://esdac.jrc.ec.europa.eu/content/lucas-soil-data"
+LUCAS_REFERENCE_URL = "https://esdac.jrc.ec.europa.eu/content/lucas-2018-topsoil-data"
 LUCAS_REFERENCE_TITLE = "LUCAS Soil Data (ESDAC, European Commission JRC)"
 
 # Fallback if the CSV is missing (computed from LUCAS_SOIL_processed_DE.csv, n=332)

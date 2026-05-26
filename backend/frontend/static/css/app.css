@@ -11,6 +11,29 @@
 .step.done .step-num   { background: var(--muted); border-color: var(--muted); color: var(--text); }
 .step-text { font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); }
 .step.active .step-text { color: var(--text); }
+/* Shared with .leaflet-draw-draw-polygon — filled hexagon, 14px */
+:root {
+  --polygon-tool-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpolygon points='8,2 13.2,5 13.2,11 8,14 2.8,11 2.8,5' fill='%231A0D0C'/%3E%3C/svg%3E");
+}
+.step-polygon-icon {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin: 0 2px;
+  vertical-align: -2px;
+  background: var(--polygon-tool-icon) center / contain no-repeat;
+}
+.analysis-hint {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--danger);
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--danger);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+.analysis-hint:not([hidden]) { display: block; }
 .poly-info { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
 .poly-stat { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
 .poly-stat:last-child { border-bottom: none; }
@@ -50,10 +73,18 @@
 .class-info-meta a { color: var(--accent); text-decoration: none; }
 .class-info-meta a:hover { text-decoration: underline; }
 #map { width: 100%; height: 100%; }
+.leaflet-field-gradient { pointer-events: none; }
 .leaflet-control-zoom a, .leaflet-bar a { background-color: var(--surface) !important; color: var(--text) !important; border-color: var(--border) !important; }
 .leaflet-draw-toolbar a { background-color: var(--surface) !important; }
 .leaflet-draw-toolbar a:before { background-image: inherit !important; }
-.leaflet-draw-draw-polygon:before { content: "⬡"; color: var(--text); font-size: 14px; line-height: 1; }
+.leaflet-draw-draw-polygon:before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 0 auto;
+  background: var(--polygon-tool-icon) center / contain no-repeat;
+}
 .leaflet-draw-edit-edit:before { content: "✎"; color: var(--text); font-size: 14px; line-height: 1; }
 .leaflet-tile {transition: opacity 0.35s ease-in-out;}
 .leaflet-control-geocoder {border-radius: 12px !important; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15);}
@@ -122,22 +153,21 @@
   padding: 12px;
   border-radius: 8px;
 
-  border: 1px solid var(--border);
-  background: var(--surface);
+  border: none;
+  background: var(--accent);
 
-  color: var(--text);
+  color: var(--bg);
   font-family: 'Syne', sans-serif;
-  font-weight: 600;
+  font-weight: 700;
 
   font-size: 0.85rem;
 
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: opacity 0.2s ease;
 }
 
 .btn-save:hover {
-  border-color: var(--accent);
-  color: var(--accent);
+  opacity: 0.88;
 }
 
 .steps {
@@ -308,8 +338,8 @@
 
   padding: 14px;
 
-  background: #C94F4F;
-  color: white;
+  background: var(--accent);
+  color: var(--bg);
 
   font-family: 'Syne', sans-serif;
   font-weight: 700;
@@ -321,5 +351,50 @@
 }
 
 .btn-dashboard-save:hover {
-  opacity: 0.92;
+  opacity: 0.88;
+}
+
+/* Save success confirmation */
+.save-success-card { width: 400px; }
+.save-success-message {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-dim);
+}
+.save-success-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+.btn-save-success-secondary,
+.btn-save-success-primary {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  text-align: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+  text-decoration: none;
+}
+.btn-save-success-secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-dim);
+}
+.btn-save-success-secondary:hover {
+  border-color: var(--text-dim);
+  color: var(--text);
+}
+.btn-save-success-primary {
+  border: none;
+  background: var(--accent);
+  color: var(--bg);
+}
+.btn-save-success-primary:hover {
+  opacity: 0.88;
+  color: var(--bg);
 }

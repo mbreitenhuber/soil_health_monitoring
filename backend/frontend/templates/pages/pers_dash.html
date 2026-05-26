@@ -225,10 +225,11 @@
 
 {% block scripts %}
 <script type="application/json" id="dashboard-config">
-  {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang} | tojson }}
+  {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang, "ocClassification": oc_classification} | tojson }}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Leaflet JS — for the mini satellite map -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/static/js/field-gradient-overlay.js"></script>
 <script src="/static/js/dashboard.js"></script>
 {% endblock %}

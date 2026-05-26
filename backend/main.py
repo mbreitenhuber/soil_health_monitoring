@@ -170,7 +170,7 @@ NAV_PAGES = [
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
     {"id": "unser_analysis",     "label": {"en": "Users Analysis",     "de": "Nutzeralysis"},        "href": "/users_analysis",     "group": "more"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
-    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "middle"},
+    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "main"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
 ]
 
@@ -387,7 +387,8 @@ async def pers_dash(request: Request, lang: str = Cookie(default="en")):
 
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
         request, "pers_dash", lang,
-        analyses=analyses
+        analyses=analyses,
+        oc_classification=oc_classification_meta(lang),
     ))
 
 @app.get("/report", response_class=HTMLResponse)
