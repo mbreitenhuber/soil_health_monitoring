@@ -64,10 +64,10 @@ function xAxisOpts({ dark = true } = {}) {
     grid: { display: false },
     ticks: {
       color: dark ? "#9ca3af" : undefined,
-      // suppress the empty padding labels
-      callback: (val, idx, ticks) => {
+      maxRotation: 30,
+      callback: function(val, idx, ticks) {
         if (idx === 0 || idx === ticks.length - 1) return "";
-        return ticks[idx].label ?? val;
+        return this.getLabelForValue(val);
       },
     },
   };
