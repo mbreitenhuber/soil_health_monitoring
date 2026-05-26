@@ -74,6 +74,18 @@
   line-height: 1.7;
 }
 
+.report-highlight-card ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.75;
+}
+
+.report-highlight-card li + li {
+  margin-top: 8px;
+}
+
 /* ── Feature pills ─────────────────────────────── */
 
 .report-pill-row {
@@ -97,7 +109,6 @@
 
 .report-pill:hover {
   border-color: var(--accent);
-  background: var(--surface2);
 }
 
 /* ── References ────────────────────────────────── */
