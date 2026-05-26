@@ -15,21 +15,11 @@
   <div class="about-hero">
     <div class="section-eyebrow">Dashboard</div>
     <h1>Personal Dashboard</h1>
-    <p>Manage, analyze and compare your saved field analyses.</p>
   </div>
 
   <section class="about-section">
 
-    <div class="dashboard-actions">
-      <button class="btn-primary"   id="download-csv-btn">⬇ Download All</button>
-      <button class="btn-secondary" id="compare-btn">⚖ Compare Fields</button>
-      <!-- hidden until a comparison is active -->
-      <button class="btn-end-compare" id="end-compare-btn" style="display:none;">
-        ✕ End Comparison
-      </button>
-    </div>
-
-    <!-- KPI SUMMARY -->
+      <!-- KPI SUMMARY -->
     <div class="dashboard-kpis">
 
       <div class="kpi-card">
@@ -59,34 +49,112 @@
 
     </div>
 
-    <!-- FILTER BAR -->
-    <div class="dashboard-filters">
+    <div class="dashboard-controls">
 
-      <div class="filter-group">
-        <label class="filter-label">Field Name</label>
-        <input id="filter-name" type="text" class="filter-input"
-               placeholder="Search field name…">
+      <!-- LEFT SIDE -->
+      <div class="controls-left">
+
+        <!-- SORT (looks like filter box now) -->
+        <div class="sort-wrapper">
+          <button id="sort-toggle" class="btn-filter-toggle">
+            Sort ▾
+          </button>
+
+          <div id="sort-panel" class="sort-panel" style="display:none;">
+
+            <!-- wichtig: hidden select für bestehende JS-Logik -->
+            <select id="sort-fields" style="display:none;">
+              <option value="latest">Latest OC</option>
+              <option value="best">Best OC</option>
+              <option value="worst">Worst OC</option>
+              <option value="trend">Most Improved</option>
+            </select>
+
+            <!-- UI Buttons -->
+            <div class="sort-option" onclick="
+              document.getElementById('sort-fields').value='latest';
+              document.getElementById('sort-fields').dispatchEvent(new Event('change'));
+            ">
+              Latest OC
+            </div>
+
+            <div class="sort-option" onclick="
+              document.getElementById('sort-fields').value='best';
+              document.getElementById('sort-fields').dispatchEvent(new Event('change'));
+            ">
+              Best OC
+            </div>
+
+            <div class="sort-option" onclick="
+              document.getElementById('sort-fields').value='worst';
+              document.getElementById('sort-fields').dispatchEvent(new Event('change'));
+            ">
+              Worst OC
+            </div>
+
+            <div class="sort-option" onclick="
+              document.getElementById('sort-fields').value='trend';
+              document.getElementById('sort-fields').dispatchEvent(new Event('change'));
+            ">
+              Most Improved
+            </div>
+
+          </div>
+        </div>
+
+        <!-- FILTER BAR -->
+
+        <button id="toggle-filters" class="btn-secondary">
+          Filters ▾
+        </button>
+
+        <div id="filter-panel" style="display:none; margin-top:10px;">
+
+          <div class="dashboard-filters">
+
+            <div class="filter-group">
+              <label class="filter-label">Field Name</label>
+              <input id="filter-name" type="text" class="filter-input"
+                    placeholder="Search field name…">
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">Crop</label>
+              <select id="filter-crop" class="filter-select">
+                <option value="">All crops</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">From</label>
+              <input id="filter-date-from" type="date" class="filter-input">
+            </div>
+
+            <div class="filter-group">
+              <label class="filter-label">To</label>
+              <input id="filter-date-to" type="date" class="filter-input">
+            </div>
+
+            <div class="filter-group filter-group--btn">
+              <button id="filter-reset" class="btn-reset">✕ Reset</button>
+            </div>
+
+          </div>
+
+        </div>
+
       </div>
 
-      <div class="filter-group">
-        <label class="filter-label">Crop</label>
-        <select id="filter-crop" class="filter-select">
-          <option value="">All crops</option>
-        </select>
-      </div>
+      <!-- RIGHT SIDE -->
+      <div class="controls-right">
 
-      <div class="filter-group">
-        <label class="filter-label">From</label>
-        <input id="filter-date-from" type="date" class="filter-input">
-      </div>
+        <button class="btn-control" id="download-csv-btn">⬇ Download All</button>
+        <button class="btn-control" id="compare-btn">⚖ Compare Fields</button>
 
-      <div class="filter-group">
-        <label class="filter-label">To</label>
-        <input id="filter-date-to" type="date" class="filter-input">
-      </div>
+        <button class="btn-end-compare" id="end-compare-btn" style="display:none;">
+          ✕ End Comparison
+        </button>
 
-      <div class="filter-group filter-group--btn">
-        <button id="filter-reset" class="btn-reset">✕ Reset</button>
       </div>
 
     </div>
@@ -199,11 +267,6 @@
       </div>
     </div>
 
-    <!-- Bar chart (min / avg / max for this snapshot) -->
-    <div class="detail-chart-wrapper">
-      <canvas id="quality-chart"></canvas>
-    </div>
-
     <!-- ── Mini satellite map ── -->
     <div class="detail-map-section">
       <div class="field-section-label">Field Map — Soil Quality Zones</div>
@@ -232,4 +295,52 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/static/js/field-gradient-overlay.js"></script>
 <script src="/static/js/dashboard.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("sort-toggle");
+  const panel = document.getElementById("sort-panel");
+
+  if (!toggle || !panel) return;
+
+  toggle.addEventListener("click", (e) => {
+    e.stopPropagation();
+    panel.style.display =
+      panel.style.display === "block" ? "none" : "block";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+      panel.style.display = "none";
+    }
+  });
+});
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const toggle = document.getElementById("toggle-filters");
+  const panel = document.getElementById("filter-panel");
+
+  if (!toggle || !panel) return;
+
+  document.addEventListener("click", (e) => {
+    const clickedInsidePanel = panel.contains(e.target);
+    const clickedToggle = toggle.contains(e.target);
+
+    if (!clickedInsidePanel && !clickedToggle) {
+      panel.style.display = "none";
+      toggle.textContent = "Filters ▾";
+    }
+  });
+
+  // optional: ESC to close (UX upgrade)
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      panel.style.display = "none";
+      toggle.textContent = "Filters ▾";
+    }
+  });
+});
+</script>
 {% endblock %}

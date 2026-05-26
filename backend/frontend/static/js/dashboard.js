@@ -172,6 +172,27 @@ document.addEventListener("click", (e) => {
   if (field) openFieldModal(field);
 });
 
+function computeFieldMetrics(items) {
+  const sorted = [...items].sort((a, b) =>
+    new Date(a.date || 0) - new Date(b.date || 0)
+  );
+
+  const values = sorted
+    .map(i => parseFloat(String(i.avg_value).replace(",", ".")))
+    .filter(v => Number.isFinite(v));
+
+  if (!values.length) return null;
+
+  const latest = values[values.length - 1];
+  const first  = values[0];
+
+  const avg = values.reduce((a, b) => a + b, 0) / values.length;
+
+  const trend = first ? ((latest - first) / first) * 100 : 0;
+
+  return { latest, avg, trend };
+}
+
 /* ══════════════════════════════════════════════════
    GROUPING
 ══════════════════════════════════════════════════ */
@@ -318,6 +339,21 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("filter-reset")
     ?.addEventListener("click", resetFilters);
 
+  document.getElementById("sort-fields")
+  ?.addEventListener("change", () => {
+    renderDashboard(allAnalyses, { filtered: false });
+  });
+
+  const toggleBtn = document.getElementById("toggle-filters");
+  const panel = document.getElementById("filter-panel");
+
+  toggleBtn?.addEventListener("click", () => {
+    const isOpen = panel.style.display === "block";
+
+    panel.style.display = isOpen ? "none" : "block";
+    toggleBtn.textContent = isOpen ? "Filters ▾" : "Filters ▴";
+  });
+
   const container = document.getElementById("dashboard-container");
   container?.addEventListener("click",  onCardClick);
   container?.addEventListener("change", onCardChange);
@@ -377,68 +413,76 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
   const groups = groupByField(analyses);
   fieldIndexMap = buildFieldIndexMap(groups);
-  container.innerHTML = Object.entries(groups)
-  .sort(([a], [b]) => a.localeCompare(b))
-  .map(([fieldName, items]) => {
-    const latest    = items[items.length - 1];
-    const first     = items[0];
-    const dateRange = items.length > 1
-      ? `${escapeHtml(first.date)} – ${escapeHtml(latest.date)}`
-      : escapeHtml(latest.date || "–");
+  
+  const sortMode = document.getElementById("sort-fields")?.value || "latest";
 
-    const firstVal  = parseOc(first.avg_value);
-    const latestVal = parseOc(latest.avg_value);
+  const sortedGroups = sortGroups(groups, sortMode);
 
-    const trend = (firstVal != null && latestVal != null && firstVal !== 0)
-      ? ((latestVal - firstVal) / firstVal) * 100
-      : null;
-    const trendHTML = trend !== null
-      ? `<span class="field-trend ${
-          trend >  TREND_FLAT_PCT ? "trend-up"   :
-          trend < -TREND_FLAT_PCT ? "trend-down" : "trend-flat"
-        }">${
-          trend >  TREND_FLAT_PCT ? "↑" :
-          trend < -TREND_FLAT_PCT ? "↓" : "→"
-        } ${Math.abs(trend).toFixed(1)}%</span>` : "";
+  container.innerHTML = sortedGroups.map(({ name, items }) => {
+  const latest    = items[items.length - 1];
+  const first     = items[0];
 
-    const checked   = selectedForCompare.has(fieldName) ? "checked" : "";
-    const safeField = encodeURIComponent(fieldName);
+  const dateRange = items.length > 1
+    ? `${escapeHtml(first.date)} – ${escapeHtml(latest.date)}`
+    : escapeHtml(latest.date || "–");
 
-    return `
-      <div class="analysis-card field-group-card" data-field="${safeField}">
-        <div class="field-group-header">
-          <div class="analysis-title">
-            ${fieldIndexMap[fieldName] ?? "–"}. ${escapeHtml(fieldName)}
-          </div>
-          <span class="field-count-badge"
-                title="${items.length} ${items.length === 1 ? "analysis" : "analyses"}">
-            ${items.length}
-          </span>
+  const firstVal  = parseOc(first.avg_value);
+  const latestVal = parseOc(latest.avg_value);
+
+  const trend = (firstVal != null && latestVal != null && firstVal !== 0)
+    ? ((latestVal - firstVal) / firstVal) * 100
+    : null;
+
+  const trendHTML = trend !== null
+    ? `<span class="field-trend ${
+        trend >  TREND_FLAT_PCT ? "trend-up"   :
+        trend < -TREND_FLAT_PCT ? "trend-down" : "trend-flat"
+      }">
+      ${
+        trend >  TREND_FLAT_PCT ? "↑" :
+        trend < -TREND_FLAT_PCT ? "↓" : "→"
+      } ${Math.abs(trend).toFixed(1)}%
+    </span>`
+    : "";
+
+  const checked   = selectedForCompare.has(name) ? "checked" : "";
+  const safeField = encodeURIComponent(name);
+
+  return `
+    <div class="analysis-card field-group-card" data-field="${safeField}">
+      <div class="field-group-header">
+        <div class="analysis-title">
+          ${fieldIndexMap[name] ?? "–"}. ${escapeHtml(name)}
         </div>
-        <div class="analysis-meta">
-          📅 ${dateRange}<br>
-          ${latest.crop          ? `🌾 ${escapeHtml(latest.crop)}<br>`          : ""}
-          ${latest.location_name ? `📍 ${escapeHtml(latest.location_name)}<br>` : ""}
-          📊 Latest Avg: <b>${formatOcGkg(latest.avg_value)}</b>
-          ${trendHTML}
-        </div>
-        <label class="compare-label"
-               style="display:flex;gap:8px;align-items:center;cursor:pointer;
-                      font-size:0.8rem;color:var(--text-dim);">
-          <input type="checkbox" class="compare-checkbox"
-                 data-field="${safeField}" ${checked}>
-          Select for comparison
-        </label>
-        <div class="field-group-footer">
-          <span class="field-analyses-hint">
-            ${items.length === 1 ? "1 analysis" : `${items.length} analyses`}
-            &nbsp;— click to explore
-          </span>
-          <span class="field-chevron">›</span>
-        </div>
+
       </div>
-    `;
-  }).join("");
+
+      <div class="analysis-meta">
+        📅 ${dateRange}<br>
+        ${latest.crop ? `🌾 ${escapeHtml(latest.crop)}<br>` : ""}
+        ${latest.location_name ? `📍 ${escapeHtml(latest.location_name)}<br>` : ""}
+        📊 Latest Avg: <b>${formatOcGkg(latest.avg_value)}</b>
+        ${trendHTML}
+      </div>
+
+      <label class="compare-label"
+             style="display:flex;gap:8px;align-items:center;cursor:pointer;
+                    font-size:0.8rem;color:var(--text-dim);">
+        <input type="checkbox" class="compare-checkbox"
+               data-field="${safeField}" ${checked}>
+        Select for comparison
+      </label>
+
+      <div class="field-group-footer">
+        <span class="field-analyses-hint">
+          ${items.length === 1 ? "1 analysis" : `${items.length} analyses`}
+          &nbsp;— click to explore
+        </span>
+        <span class="field-chevron">›</span>
+      </div>
+    </div>
+  `;
+}).join("");
 }
 
 /* ══════════════════════════════════════════════════
@@ -726,6 +770,13 @@ function updateFilterSummary(filtered, name, crop, from, to) {
   const active = [name, crop, from, to].some(Boolean);
   if (!active) { el.style.display = "none"; return; }
 
+  const toggleBtn = document.getElementById("toggle-filters");
+  if (toggleBtn) {
+    toggleBtn.textContent = active
+      ? "Filters (active) ▴"
+      : "Filters ▾";
+  }
+
   const filteredFields = Object.keys(groupByField(filtered)).length;
   const totalFields    = Object.keys(groupByField(allAnalyses)).length;
   const parts = [];
@@ -847,7 +898,6 @@ function openDetailModal(item) {
   document.getElementById("detail-max").textContent = formatOcGkg(item.max_value);
 
   document.getElementById("detail-modal").style.display = "flex";
-  renderDetailChart(item);
 
   if (typeof L !== "undefined") renderDetailMap(item);
 }
@@ -903,49 +953,6 @@ async function saveDetails() {
   } catch (err) {
     alert("Save failed: " + err.message);
   }
-}
-
-/* ── Detail bar chart ───────────────────────────── */
-
-function renderDetailChart(item) {
-  const ctx = document.getElementById("quality-chart").getContext("2d");
-  if (qualityChart) qualityChart.destroy();
-
-  const barData = [
-    roundOc(item.min_value),
-    roundOc(item.avg_value),
-    roundOc(item.max_value),
-  ];
-
-  qualityChart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Minimum", "Average", "Maximum"],
-      datasets: [{
-        label:           "OC (g/kg)",
-        data:            barData,
-        backgroundColor: [COLORS.min, COLORS.avg, COLORS.max],
-        borderRadius:    8,
-        borderSkipped:   false,
-      }],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: { callbacks: { label: ctx => ` ${ctx.parsed.y} g/kg` } },
-      },
-      scales: {
-        y: ocYAxisOptions(barData, { dark: true }),
-        x: {
-          // offset adds visual space on both ends of a bar chart's x-axis
-          offset: true,
-          grid:   { display: false },
-          ticks:  { color: "#9ca3af" },
-        },
-      },
-    },
-  });
 }
 
 /* ── Mini satellite map ──────────────────────────── */
@@ -1004,4 +1011,33 @@ function renderDetailMap(item) {
   }
 
   setTimeout(() => detailMap && detailMap.invalidateSize(), 120);
+}
+
+function sortGroups(groups, mode) {
+  const entries = Object.entries(groups);
+
+  const enriched = entries.map(([name, items]) => {
+    const metrics = computeFieldMetrics(items);
+    return { name, items, metrics };
+  }).filter(x => x.metrics);
+
+    switch (mode) {
+    case "latest":
+      enriched.sort((a, b) => b.metrics.latest - a.metrics.latest);
+      break;
+
+    case "best":
+      enriched.sort((a, b) => b.metrics.avg - a.metrics.avg);
+      break;
+
+    case "worst":
+      enriched.sort((a, b) => a.metrics.avg - b.metrics.avg);
+      break;
+
+    case "trend":
+      enriched.sort((a, b) => b.metrics.trend - a.metrics.trend);
+      break;
+  }
+
+  return enriched;
 }
