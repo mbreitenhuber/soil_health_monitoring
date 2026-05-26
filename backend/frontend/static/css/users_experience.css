@@ -1,6 +1,29 @@
+/* Tighter gap between hero intro and personas section */
+.page-content > .about-hero {
+  padding-bottom: 20px;
+}
+.page-content > .about-section {
+  padding-top: 28px;
+}
+
 /* Testimonials */
-.testimonials-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 40px; }
-.testimonial-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 22px; transition: border-color 0.2s; }
+.testimonials-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 22px;
+  margin-top: 40px;
+  align-items: start;
+  max-width: 980px;
+}
+.testimonials-grid { margin-left: auto; margin-right: auto; }
+.testimonial-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 16px 36px rgba(26, 13, 12, 0.08);
+}
 .testimonial-card:hover { border-color: var(--border2); }
 .testimonial-top { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
 .testimonial-avatar { width: 54px; height: 54px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface2); object-fit: cover; flex-shrink: 0; }
@@ -12,3 +35,79 @@
 .testimonial-impact { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
 .ti-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
 .ti-pill { font-size: 0.72rem; color: var(--text); background: var(--surface2); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; }
+
+/* Personas (User analysis) */
+.persona-card:hover {
+  box-shadow: 0 22px 48px rgba(26, 13, 12, 0.12);
+}
+.persona-card {
+  position: relative;
+  overflow: hidden;
+}
+.persona-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(600px 260px at 15% 0%, rgba(95, 167, 100, 0.12), transparent 60%);
+  pointer-events: none;
+}
+.persona-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+  color: var(--text);
+  margin-bottom: 16px;
+  position: relative;
+}
+.persona-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  position: relative;
+}
+@media (max-width: 720px) { .testimonials-grid { max-width: 100%; } }
+
+/* This is the “box” that should stand out from page background */
+.persona-box {
+  background: #ffffff;
+  border: 1px solid rgba(199, 204, 209, 0.9);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 10px 20px rgba(26, 13, 12, 0.06);
+}
+.persona-box--use {
+  background: linear-gradient(180deg, rgba(95, 167, 100, 0.12), rgba(95, 167, 100, 0.06));
+  border-color: rgba(95, 167, 100, 0.35);
+}
+.persona-list {
+  margin: 0;
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: 10px;
+  color: var(--text-dim);
+  font-size: 0.84rem;
+  line-height: 1.55;
+}
+.persona-list li { display: flex; gap: 8px; }
+.persona-list li::before {
+  content: "•";
+  color: rgba(95, 167, 100, 0.75);
+  line-height: 1.2;
+  margin-top: 2px;
+}
+.persona-list strong { color: var(--text); font-weight: 700; }
+.persona-q {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.persona-a {
+  margin: 0;
+  color: var(--text);
+  font-size: 0.88rem;
+  line-height: 1.75;
+}
