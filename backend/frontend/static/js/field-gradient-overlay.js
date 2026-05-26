@@ -371,6 +371,8 @@
     formatTooltip,
     borderColor = "#C94F4F",
     borderWeight = 2.5,
+    /** Extra options for FieldGradientLayer (e.g. renderMaxPx for small maps). */
+    gradientOptions = {},
   }) {
     const ring = normalizePolygon(polygon);
     const samples = (zones || []).map(zoneSample).filter(Boolean);
@@ -379,6 +381,7 @@
     const gradientLayer = new FieldGradientLayer(ring, zones, {
       classification,
       valueToColor,
+      ...gradientOptions,
     });
     target.addLayer(gradientLayer);
 

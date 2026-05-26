@@ -1,37 +1,169 @@
 {% extends "base.html" %}
 
-{% block title %}About us{% endblock %}
+{% block title %}Future Work{% endblock %}
+
+{% block head_styles %}
+  <link rel="stylesheet" href="/static/css/users_experience.css?v={{ static_css_version }}" />
+{% endblock %}
 
 {% block content %}
 <div class="page-content">
 
-  <h2>Diese Seite ist noch in Arbeit</h2>
-
   <div class="about-hero">
-    <div class="section-eyebrow">About AgroScan</div>
-    <h1>We connect <em>Agriculture</em> with modern AI.</h1>
-    <p>AgroScan is an open-source starter template for machine learning-based soil analysis,
-        developed for scientists, agri-tech startups, and farmers.</p>
+    <div class="section-eyebrow">
+      {{ "Future Work" if lang == "en" else "Zukünftige Arbeiten" }}
+    </div>
+    <h1>
+      {{ "What we want to build next" if lang == "en" else "Was wir als Nächstes weiterentwickeln wollen" }}
+    </h1>
+    <p>
+      {% if lang == "en" %}
+        AgroScan is an early-stage prototype. The points below outline the most impactful next steps — grouped by theme to keep the roadmap clear.
+      {% else %}
+        AgroScan ist ein früher Prototyp. Die Punkte unten zeigen die wichtigsten nächsten Schritte — thematisch gebündelt, damit die Roadmap klar bleibt.
+      {% endif %}
+    </p>
   </div>
 
-  <!-- Mission -->
   <section class="about-section">
-    <div class="section-eyebrow">Mission</div>
-    <h2 class="section-title">Why AgroScan?</h2>
-    <div class="mission-block">
-      <blockquote>
-        "Precision agriculture shouldn’t fail because of technical complexity.
-        Our goal is a template that becomes production-ready in hours — not weeks."
-      </blockquote>
+    <div class="section-eyebrow">{{ "Roadmap themes" if lang == "en" else "Roadmap-Themen" }}</div>
+    <h2 class="section-title">{{ "Next steps at a glance" if lang == "en" else "Nächste Schritte im Überblick" }}</h2>
+
+    <div class="testimonials-grid">
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">🌍 {{ "Global expansion & localization" if lang == "en" else "Globale Skalierung & Lokalisierung" }}</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            {% if lang == "en" %}
+              <p class="persona-a">Make AgroScan usable beyond Germany by scaling coverage and supporting international users end-to-end.</p>
+            {% else %}
+              <p class="persona-a">AgroScan über Deutschland hinaus nutzbar machen – mit größerer Abdeckung und besserer Unterstützung für internationale Nutzer:innen.</p>
+            {% endif %}
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">{{ "Planned directions" if lang == "en" else "Geplante Schritte" }}</div>
+            <ul class="persona-list">
+              <li>
+                {% if lang == "en" %}
+                  Expand the ML model training to other countries in Europe and then eventually worldwide.
+                {% else %}
+                  Das Training des ML-Modells auf weitere Länder in Europa ausweiten und später weltweit.
+                {% endif %}
+              </li>
+              <li>
+                {% if lang == "en" %}
+                  Offer the service worldwide (coverage, onboarding, and support).
+                {% else %}
+                  Den Service weltweit anbieten (Abdeckung, Onboarding und Support).
+                {% endif %}
+              </li>
+              <li>
+                {% if lang == "en" %}
+                  Add more website languages to support international users.
+                {% else %}
+                  Mehr Sprachen auf der Website anbieten, um internationale Nutzer:innen zu unterstützen.
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">🧠 {{ "Model quality & efficiency" if lang == "en" else "Modellqualität & Effizienz" }}</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            {% if lang == "en" %}
+              <p class="persona-a">Improve accuracy and robustness while making both training and inference more resource-efficient.</p>
+            {% else %}
+              <p class="persona-a">Genauigkeit und Robustheit verbessern – und gleichzeitig Training und Inferenz ressourcenschonender machen.</p>
+            {% endif %}
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">{{ "Planned directions" if lang == "en" else "Geplante Schritte" }}</div>
+            <ul class="persona-list">
+              <li>
+                {% if lang == "en" %}
+                  Use more and more diverse data to improve prediction quality and robustness.
+                {% else %}
+                  Mehr und vielfältigere Daten nutzen, um Vorhersagen genauer und robuster zu machen.
+                {% endif %}
+              </li>
+              <li>
+                {% if lang == "en" %}
+                  Improve the ML pipeline to run faster and more efficiently (training and inference).
+                {% else %}
+                  Die ML-Pipeline schneller und effizienter machen (Training und Inferenz).
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">⚡ {{ "Performance & user experience" if lang == "en" else "Performance & User Experience" }}</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            {% if lang == "en" %}
+              <p class="persona-a">Make the analysis feel instant by optimizing server-side computation, network calls, and UI rendering.</p>
+            {% else %}
+              <p class="persona-a">Die Analyse soll sich möglichst schnell anfühlen – durch Optimierung von Server-Rechenzeit, Netzwerkanfragen und UI-Rendering.</p>
+            {% endif %}
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">{{ "Planned directions" if lang == "en" else "Geplante Schritte" }}</div>
+            <ul class="persona-list">
+              <li>
+                {% if lang == "en" %}
+                  Reduce loading time for the analysis flow (API latency, rendering, caching).
+                {% else %}
+                  Ladezeiten im Analyse-Flow reduzieren (API-Latenz, Rendering, Caching).
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">🗄️ {{ "Data storage & scalability" if lang == "en" else "Datenspeicherung & Skalierbarkeit" }}</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            {% if lang == "en" %}
+              <p class="persona-a">Strengthen the backend foundation so datasets and results can grow reliably with usage.</p>
+            {% else %}
+              <p class="persona-a">Das Backend-Fundament stärken, damit Datensätze und Ergebnisse mit der Nutzung zuverlässig skalieren.</p>
+            {% endif %}
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">{{ "Planned directions" if lang == "en" else "Geplante Schritte" }}</div>
+            <ul class="persona-list">
+              <li>
+                {% if lang == "en" %}
+                  Add a better data storage solution to support growth (datasets, results, users).
+                {% else %}
+                  Eine bessere Storage-Lösung einführen, die Wachstum unterstützt (Datensätze, Ergebnisse, Nutzer:innen).
+                {% endif %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </article>
     </div>
-    <p style="margin-top:24px;font-size:0.82rem;color:var(--text-dim);line-height:1.8;max-width:680px;">
-      Satellite data, soil sensors, weather services — the data already exists.
-      What’s missing is a simple framework that connects cartographic visualization
-      with a plug-and-play ML backend. AgroScan fills that gap.
-    </p>
   </section>
 
-  
+  <div class="home-cta" style="border-top:1px solid var(--border);">
+    <h2>{{ "Until then, explore the current version" if lang == "en" else "Bis dahin:,entdeckt unseren aktuellen Stand" }}</h2>
+    <p>
+      {% if lang == "en" %}
+        Until these improvements land, you can already explore what AgroScan can do today by startint an analysis and view the SOC levels of your field.
+      {% else %}
+        Bis diese Verbesserungen umgesetzt sind, könnt ihr AgroScan schon jetzt ausprobieren und eine Analyse starten und euch die SOC Levels für euer Feld anschauen.
+      {% endif %}
+    </p>
+    <a class="btn-primary" href="/analyse">{{ "⟶ Explore the analysis" if lang == "en" else "⟶ Aktuellen Stand erkunden" }}</a>
+  </div>
 
 </div>
 {% endblock %}

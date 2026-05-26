@@ -108,7 +108,8 @@ let currentFieldName   = null;
 let qualityChart       = null;
 let fieldLineChart     = null;
 let compareChart       = null;
-let detailMap          = null;
+let detailMap                 = null;
+let detailMapInvalidateTimer = null;
 let fieldIndexMap = {};
 
 const API_URL        = dashboardConfig.apiUrl || "http://127.0.0.1:8000";
@@ -899,13 +900,36 @@ function openDetailModal(item) {
 
   document.getElementById("detail-modal").style.display = "flex";
 
-  if (typeof L !== "undefined") renderDetailMap(item);
+  if (typeof L === "undefined") return;
+
+  /* Leaflet in modals: tear down first, then init after layout has real size. */
+  destroyDetailMap();
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => renderDetailMap(item));
+  });
+}
+
+function destroyDetailMap() {
+  if (detailMapInvalidateTimer) {
+    clearTimeout(detailMapInvalidateTimer);
+    detailMapInvalidateTimer = null;
+  }
+  if (detailMap) {
+    try {
+      detailMap.remove();
+    } catch (_e) {
+      /* ignore */
+    }
+    detailMap = null;
+  }
+  const mount = document.getElementById("detail-map");
+  if (mount) mount.innerHTML = "";
 }
 
 window.closeDetailModal = function () {
   document.getElementById("detail-modal").style.display = "none";
   if (qualityChart) { qualityChart.destroy(); qualityChart = null; }
-  if (detailMap)    { detailMap.remove();     detailMap    = null; }
+  destroyDetailMap();
 };
 
 /* ── Save edits ─────────────────────────────────── */
@@ -961,12 +985,23 @@ function renderDetailMap(item) {
   const container = document.getElementById("detail-map");
   if (!container) return;
 
-  if (detailMap) { detailMap.remove(); detailMap = null; }
+  destroyDetailMap();
 
-  detailMap = L.map("detail-map", {
+  const zones   = item.zones   || [];
+  const polygon = item.polygon || [];
+
+  if (!polygon.length && !zones.length) {
+    if (container.parentElement)
+      container.parentElement.style.display = "none";
+    return;
+  }
+  if (container.parentElement) container.parentElement.style.display = "";
+
+  detailMap = L.map(container, {
     zoomControl:        true,
     attributionControl: false,
     scrollWheelZoom:    true,
+    preferCanvas:       true,
   });
 
   L.tileLayer(
@@ -979,15 +1014,6 @@ function renderDetailMap(item) {
     { opacity: 0.8 }
   ).addTo(detailMap);
 
-  const zones   = item.zones   || [];
-  const polygon = item.polygon || [];
-
-  if (!polygon.length && !zones.length) {
-    container.parentElement.style.display = "none";
-    return;
-  }
-  container.parentElement.style.display = "";
-
   const bounds = [];
 
   const viz = FieldGradientOverlay.addFieldVisualization({
@@ -998,6 +1024,10 @@ function renderDetailMap(item) {
     valueToColor,
     formatTooltip: (zone) =>
       `<b>${zone.label || "–"}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`,
+    gradientOptions: {
+      renderMaxPx: 280,
+      idwMaxNeighbors: 8,
+    },
   });
 
   if (viz.borderLayer) bounds.push(viz.borderLayer.getBounds());
@@ -1010,7 +1040,18 @@ function renderDetailMap(item) {
     detailMap.fitBounds(combined, { padding: [24, 24] });
   }
 
-  setTimeout(() => detailMap && detailMap.invalidateSize(), 120);
+  function scheduleInvalidate() {
+    if (!detailMap) return;
+    detailMap.invalidateSize();
+    detailMap.invalidateSize(false);
+    if (bounds.length)
+      detailMap.fitBounds(bounds.reduce((acc, b) => acc.extend(b), bounds[0].pad(0)), {
+        padding: [24, 24],
+      });
+  }
+
+  requestAnimationFrame(scheduleInvalidate);
+  detailMapInvalidateTimer = setTimeout(scheduleInvalidate, 200);
 }
 
 function sortGroups(groups, mode) {
