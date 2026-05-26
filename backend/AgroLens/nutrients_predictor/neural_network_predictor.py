@@ -112,6 +112,7 @@ class TrainingPipeline:
         self.num_epochs = num_epochs
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = model.to(self.device)
+        self.history = {"train_rmse": [], "val_rmse": []}
 
     def _get_optimizer(self) -> optim.SGD | optim.Adam:
         if self.optimizer_type == "SGD":
@@ -146,10 +147,13 @@ class TrainingPipeline:
                 loss.backward()
                 optimizer.step()
                 running_loss += loss.item()
+            train_rmse = running_loss / len(self.train_loader)
+            val_rmse = self.evaluate()
+            self.history["train_rmse"].append(float(train_rmse))
+            self.history["val_rmse"].append(float(val_rmse))
             print(
-                f"Epoch {epoch + 1}/{self.num_epochs}, Loss: {running_loss / len(self.train_loader):.4f}"
+                f"Epoch {epoch + 1}/{self.num_epochs}, Train RMSE: {train_rmse:.4f}, Val RMSE: {val_rmse:.4f}"
             )
-            self.evaluate()
 
         print("Overview trained model:", self.model)
         total_params = sum(p.numel() for p in self.model.parameters())
@@ -158,6 +162,7 @@ class TrainingPipeline:
         )
         print(f"Total parameters: {total_params}")
         print(f"Trainable parameters: {trainable_params}")
+        return self.history
 
     def evaluate(self):
         """
@@ -180,7 +185,7 @@ class TrainingPipeline:
         print(f"Test Loss: {avg_test_loss:.4f}")
         return avg_test_loss
 
-    def save_model(self, file_path):
+    def save_model(self, file_path, training_history=None):
         """
         Saves the trained model to the specified file path, along with its architecture and metadata.
 
@@ -212,8 +217,15 @@ class TrainingPipeline:
             "loss_function": save_loss,
         }
 
+        history = training_history if training_history is not None else self.history
+
         torch.save(
-            {"model_info": model_info, "state_dict": self.model.state_dict()}, file_path
+            {
+                "model_info": model_info,
+                "state_dict": self.model.state_dict(),
+                "training_history": history,
+            },
+            file_path,
         )
         print(f"Model saved to {file_path}")
 
@@ -297,12 +309,12 @@ def objective(input_size, trial, dataloader_creator, model_savepath) -> float:
     )
 
     # Train the model and evaluate its performance
-    pipeline.train()
+    history = pipeline.train()
     test_loss = pipeline.evaluate()
 
     # Save model with the best performance
     if trial.number == 0 or test_loss < trial.study.best_value:
-        pipeline.save_model(model_savepath)
+        pipeline.save_model(model_savepath, training_history=history)
         print(f"Model with Loss {test_loss} saved.")
 
     return test_loss
