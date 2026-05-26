@@ -146,6 +146,35 @@ def init_db():
     conn.commit()
     conn.close()
 
+
+def _json_list(value) -> list:
+    if not value:
+        return []
+    try:
+        parsed = json.loads(value)
+        return parsed if isinstance(parsed, list) else []
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
+def _analysis_from_row(row: sqlite3.Row) -> dict:
+    """Spaltennamen nutzen — physische Reihenfolge in älteren DBs weicht ab."""
+    return {
+        "id": row["id"],
+        "date": row["date"],
+        "crop": row["crop"],
+        "field_name": row["field_name"],
+        "notes": row["notes"],
+        "location_name": row["location_name"],
+        "polygon": _json_list(row["polygon"]),
+        "avg_value": row["avg_value"] or 0,
+        "min_value": row["min_value"] or 0,
+        "max_value": row["max_value"] or 0,
+        "zones": _json_list(row["zones"]),
+        "created_at": row["created_at"],
+    }
+
+
 init_db()
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -215,13 +244,13 @@ ROADMAP = [
 # photo: Dateiname in static/assets/team/ — oder None für Platzhalter
 TEAM_MEMBERS = [
     {"name": "Clara Buller",   "role": "Master Student in Energy Science and Technology",   "photo": "clara.jpeg",
-     "bio": "Kurze Bio — Spezialgebiet, Uni, Erfahrung mit Agrardaten."},
+     "bio": "ML-Model programming and training, Data analysis and ML implementation."},
     {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": None,
-     "bio": "FastAPI, PostGIS, Geodatenverarbeitung."},
+     "bio": "ML-Model programming and training, Data analysis and ML implementation."},
     {"name": "Jerome Reiter", "role": "2nd Semester Bachelor CSE-Student",  "photo": None,
-     "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
+     "bio": "Backend and frontend development, Map design and personal dashboard."},
      {"name": "Claudio Bussinger", "role": "2nd Semester Bachelor CSE-Student",  "photo": "Claudio.jpg",
-     "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
+     "bio": "Backend and frontend development, Map design and website design."},
 ]
 
 
@@ -368,22 +397,7 @@ async def pers_dash(request: Request, lang: str = Cookie(default="en")):
     rows = c.fetchall()
     conn.close()
 
-    analyses = []
-    for r in rows:
-        analyses.append({
-            "id": r["id"],
-            "date": r["date"],
-            "crop": r["crop"],
-            "field_name": r["field_name"],
-            "notes": r["notes"],
-            "location_name": r["location_name"],
-            "polygon": json.loads(r["polygon"]) if r["polygon"] else [],
-            "avg_value": r["avg_value"] or 0,
-            "min_value": r["min_value"] or 0,
-            "max_value": r["max_value"] or 0,
-            "zones": json.loads(r["zones"]) if r["zones"] else [],
-            "created_at": r["created_at"],
-        })
+    analyses = [_analysis_from_row(r) for r in rows]
 
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
         request, "pers_dash", lang,
@@ -829,34 +843,14 @@ def save_analysis(req: SaveRequest):
 @app.get("/api/analyses")
 def get_analyses():
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
-
     conn.close()
 
-    return [
-        {
-            "id": r[0],
-            "date": r[1],
-            "crop": r[2],
-            "field_name": r[3],
-            "notes": r[4],
-            "location_name": r[5],
-
-            "polygon": json.loads(r[6]),
-
-            "avg_value": r[7],
-            "min_value": r[8],
-            "max_value": r[9],
-
-            "zones": json.loads(r[10]),
-
-            "created_at": r[11]
-        }
-        for r in rows
-    ]
+    return [_analysis_from_row(r) for r in rows]
 
 @app.delete("/api/analyses/{id}")
 def delete_analysis(id: int):
@@ -888,9 +882,9 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
         "Field Name",
         "Location",
         "Notes",
-        "Avg (%)",
-        "Min (%)",
-        "Max (%)",
+        "Avg (g/kg OC)",
+        "Min (g/kg OC)",
+        "Max (g/kg OC)",
         "Polygon Points",
         "Zones Count",
         "Created At"
@@ -912,9 +906,9 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             a.get("field_name"),
             a.get("location_name"),
             a.get("notes"),
-            round(a.get("avg_value", 0) * 100, 1),
-            round(a.get("min_value", 0) * 100, 1),
-            round(a.get("max_value", 0) * 100, 1),
+            round(a.get("avg_value", 0), 1),
+            round(a.get("min_value", 0), 1),
+            round(a.get("max_value", 0), 1),
             poly_len,
             zone_len,
             a.get("created_at")
@@ -924,12 +918,11 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
     return output.getvalue()
 
 from fastapi.responses import Response
-import sqlite3
-import json
 
 @app.get("/api/analyses/{id}/csv")
 def download_single_csv(id: int):
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     c.execute("SELECT * FROM analyses WHERE id = ?", (id,))
@@ -939,22 +932,7 @@ def download_single_csv(id: int):
     if not r:
         return {"error": "not found"}
 
-    analysis = {
-        "id": r[0],
-        "date": r[1],
-        "crop": r[2],
-        "field_name": r[3],
-        "notes": r[4],
-        "location_name": r[5],
-        "polygon": json.loads(r[6]) if r[6] else [],
-        "avg_value": r[7],
-        "min_value": r[8],
-        "max_value": r[9],
-        "zones": json.loads(r[10]) if r[10] else [],
-        "created_at": r[11]
-    }
-
-    csv_data = _analysis_to_csv([analysis])
+    csv_data = _analysis_to_csv([_analysis_from_row(r)])
 
     return Response(
         content=csv_data,
@@ -967,30 +945,14 @@ def download_single_csv(id: int):
 @app.get("/api/analyses/csv")
 def download_all_csv():
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
     conn.close()
 
-    analyses = []
-    for r in rows:
-        analyses.append({
-            "id": r[0],
-            "date": r[1],
-            "crop": r[2],
-            "field_name": r[3],
-            "notes": r[4],
-            "location_name": r[5],
-            "polygon": json.loads(r[6]) if r[6] else [],
-            "avg_value": r[7],
-            "min_value": r[8],
-            "max_value": r[9],
-            "zones": json.loads(r[10]) if r[10] else [],
-            "created_at": r[11]
-        })
-
-    csv_data = _analysis_to_csv(analyses)
+    csv_data = _analysis_to_csv([_analysis_from_row(r) for r in rows])
 
     return Response(
         content=csv_data,

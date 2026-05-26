@@ -9,6 +9,14 @@
   padding: 8px 0 32px;
 }
 
+/* Tighter gap between hero intro and personas section */
+.page-content > .about-hero {
+  padding-bottom: 20px;
+}
+.page-content > .about-section {
+  padding-top: 28px;
+}
+
 /* =========================
    ANALYSIS CARD (base)
 ========================= */
