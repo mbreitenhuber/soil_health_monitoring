@@ -33,7 +33,7 @@ import random
 import math
 
 import pandas as pd
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point, Polygon, box
 from pyproj import CRS, Transformer#
 from dotenv import load_dotenv
 
@@ -50,6 +50,8 @@ load_dotenv()
 PROJECT_ROOT = Path(__file__).resolve().parent
 TEMPLATE_DIR = PROJECT_ROOT / "frontend" / "templates"
 STATIC_DIR = PROJECT_ROOT / "frontend" / "static"
+DEFAULT_GRID_CELL_SIZE_M = 60.0
+DEFAULT_GRID_MATCH_RADIUS_M = 10.0
 
 
 def _default_db_path() -> Path:
@@ -533,8 +535,154 @@ def _polygon_to_utm_polygon(polygon_latlng: List[Coordinate], utm_epsg: int) -> 
     return poly
 
 
+def _metadata_path(result_path: Path) -> Path:
+    return result_path / "metadata.json"
+
+
+def _sentinel_output_root() -> Path:
+    override = os.environ.get("SENTINEL_DIR")
+    if override:
+        return Path(override)
+    return PROJECT_ROOT.parent / "persistent-data" / "sentinel_output"
+
+
+def _grid_match_radius_m() -> float:
+    raw_value = os.environ.get("AGROSCAN_GRID_MATCH_RADIUS_M", str(DEFAULT_GRID_MATCH_RADIUS_M))
+    try:
+        return float(raw_value)
+    except ValueError:
+        return DEFAULT_GRID_MATCH_RADIUS_M
+
+
+def _cached_sentinel_points_for_date(analysis_date: str | None) -> list[dict]:
+    if not analysis_date:
+        return []
+
+    date_root = _sentinel_output_root() / analysis_date
+    if not date_root.is_dir():
+        return []
+
+    points: list[dict] = []
+    for entry in sorted(date_root.iterdir(), key=lambda item: item.name):
+        if not entry.is_dir() or entry.name.startswith("_"):
+            continue
+        if not _metadata_path(entry).is_file():
+            continue
+
+        try:
+            lat_str, lng_str = entry.name.split(" ", 1)
+            points.append(
+                {
+                    "center_lat": float(lat_str),
+                    "center_lng": float(lng_str),
+                    "center_lat_text": lat_str,
+                    "center_lng_text": lng_str,
+                    "result_path": entry,
+                }
+            )
+        except ValueError:
+            continue
+
+    return points
+
+
+def _anchor_reuse_score(
+    anchor_x: float,
+    anchor_y: float,
+    cached_points: list[dict],
+    cell_size_m: float,
+    match_radius_m: float,
+) -> tuple[int, float]:
+    match_count = 0
+    total_distance = 0.0
+
+    for point in cached_points:
+        offset_x = point["center_x_m"] - anchor_x
+        offset_y = point["center_y_m"] - anchor_y
+
+        grid_x = anchor_x + round(offset_x / cell_size_m) * cell_size_m
+        grid_y = anchor_y + round(offset_y / cell_size_m) * cell_size_m
+        distance = math.hypot(point["center_x_m"] - grid_x, point["center_y_m"] - grid_y)
+
+        if distance <= match_radius_m:
+            match_count += 1
+            total_distance += distance
+
+    return match_count, total_distance
+
+
+def _choose_best_grid_anchor(
+    poly_m: Polygon,
+    cached_points: list[dict],
+    cell_size_m: float,
+    match_radius_m: float,
+) -> tuple[float, float]:
+    half = cell_size_m / 2.0
+    minx, miny, _, _ = poly_m.bounds
+    base_x = minx + half
+    base_y = miny + half
+
+    if not cached_points:
+        return base_x, base_y
+
+    search_step_m = 1.0
+    search_steps = int(round(cell_size_m / search_step_m))
+    centroid = poly_m.centroid
+
+    best_anchor_x = base_x
+    best_anchor_y = base_y
+    best_score = (-1, float("inf"), float("inf"))
+
+    for offset_x_step in range(search_steps):
+        anchor_x = base_x + offset_x_step * search_step_m
+        for offset_y_step in range(search_steps):
+            anchor_y = base_y + offset_y_step * search_step_m
+
+            match_count, total_distance = _anchor_reuse_score(
+                anchor_x,
+                anchor_y,
+                cached_points,
+                cell_size_m,
+                match_radius_m,
+            )
+
+            if match_count == 0:
+                continue
+
+            centroid_distance = math.hypot(anchor_x - centroid.x, anchor_y - centroid.y)
+            score = (match_count, -total_distance, -centroid_distance)
+            if score > best_score:
+                best_score = score
+                best_anchor_x = anchor_x
+                best_anchor_y = anchor_y
+
+    return best_anchor_x, best_anchor_y
+
+
+def _nearest_cached_point(
+    x_m: float,
+    y_m: float,
+    cached_points: list[dict],
+    match_radius_m: float,
+) -> dict | None:
+    best_match: dict | None = None
+    best_distance = match_radius_m
+
+    for point in cached_points:
+        distance = math.hypot(point["center_x_m"] - x_m, point["center_y_m"] - y_m)
+        if distance <= best_distance:
+            best_distance = distance
+            best_match = point
+
+    if best_match is None:
+        return None
+
+    return {**best_match, "distance_m": best_distance}
+
+
 def _grid_center_points_in_polygon(
     polygon_latlng: List[Coordinate],
+    analysis_date: str | None = None,
     cell_size_m: float = 60.0,
     include_border: bool = True,
 ):
@@ -548,32 +696,73 @@ def _grid_center_points_in_polygon(
 
     poly_m = _polygon_to_utm_polygon(polygon_latlng, utm_epsg)
     minx, miny, maxx, maxy = poly_m.bounds
+    match_radius_m = _grid_match_radius_m()
 
     half = cell_size_m / 2.0
-    nx = int(math.ceil((maxx - minx) / cell_size_m))
-    ny = int(math.ceil((maxy - miny) / cell_size_m))
 
+    t_forward = _transformer(4326, utm_epsg)
     t_back = _transformer(utm_epsg, 4326)
 
+    cached_points = _cached_sentinel_points_for_date(analysis_date)
+    cached_points_utm: list[dict] = []
+    for cached_point in cached_points:
+        x_m, y_m = t_forward.transform(cached_point["center_lng"], cached_point["center_lat"])
+        cached_geom = Point(x_m, y_m)
+        if poly_m.distance(cached_geom) > match_radius_m:
+            continue
+        cached_points_utm.append(
+            {
+                **cached_point,
+                "center_x_m": float(x_m),
+                "center_y_m": float(y_m),
+            }
+        )
+
+    anchor_x, anchor_y = _choose_best_grid_anchor(poly_m, cached_points_utm, cell_size_m, match_radius_m)
+
     points = []
-    for r in range(ny):
-        y = miny + half + r * cell_size_m
-        for c in range(nx):
-            x = minx + half + c * cell_size_m
+
+    min_row = math.floor((miny - anchor_y) / cell_size_m) - 1
+    max_row = math.ceil((maxy - anchor_y) / cell_size_m) + 1
+    min_col = math.floor((minx - anchor_x) / cell_size_m) - 1
+    max_col = math.ceil((maxx - anchor_x) / cell_size_m) + 1
+
+    for r in range(min_row, max_row + 1):
+        y = anchor_y + r * cell_size_m
+        for c in range(min_col, max_col + 1):
+            x = anchor_x + c * cell_size_m
+            cell_poly = box(x - half, y - half, x + half, y + half)
             pt = Point(x, y)
-            inside = poly_m.covers(pt) if include_border else poly_m.contains(pt)
+            inside = cell_poly.intersects(poly_m) if include_border else poly_m.contains(pt)
             if not inside:
                 continue
+
+            snapped_point = _nearest_cached_point(x, y, cached_points_utm, match_radius_m)
 
             lng, lat = t_back.transform(x, y)
             points.append(
                 {
-                    "row": r,
-                    "col": c,
+                    "row": int(r - min_row),
+                    "col": int(c - min_col),
                     "center_x_m": float(x),
                     "center_y_m": float(y),
                     "center_lat": float(lat),
                     "center_lng": float(lng),
+                    "center_lat_text": repr(float(lat)),
+                    "center_lng_text": repr(float(lng)),
+                    "source_x_m": float(snapped_point["center_x_m"] if snapped_point is not None else x),
+                    "source_y_m": float(snapped_point["center_y_m"] if snapped_point is not None else y),
+                    "source_lat": float(t_back.transform(
+                        snapped_point["center_x_m"] if snapped_point is not None else x,
+                        snapped_point["center_y_m"] if snapped_point is not None else y,
+                    )[1]),
+                    "source_lng": float(t_back.transform(
+                        snapped_point["center_x_m"] if snapped_point is not None else x,
+                        snapped_point["center_y_m"] if snapped_point is not None else y,
+                    )[0]),
+                    "source_lat_text": snapped_point["center_lat_text"] if snapped_point is not None else repr(float(lat)),
+                    "source_lng_text": snapped_point["center_lng_text"] if snapped_point is not None else repr(float(lng)),
+                    "uses_cached_image": bool(snapped_point is not None),
                 }
             )
 
@@ -616,12 +805,18 @@ def get_field_elevation_m(center_lat: float, center_lng: float) -> float | None:
 
 def _build_gps_input_csv(grid_csv: pd.DataFrame, analysis_date: str, work_dir: Path) -> Path:
     gps_input = work_dir / "gps_input.csv"
+    lat_series = grid_csv["source_lat_text"] if "source_lat_text" in grid_csv.columns else (
+        grid_csv["source_lat"] if "source_lat" in grid_csv.columns else grid_csv["center_lat"]
+    )
+    lng_series = grid_csv["source_lng_text"] if "source_lng_text" in grid_csv.columns else (
+        grid_csv["source_lng"] if "source_lng" in grid_csv.columns else grid_csv["center_lng"]
+    )
     gps_input_df = pd.DataFrame(
         {
             "POINTID": [f"pt_{index + 1}" for index in range(len(grid_csv))],
             "SURVEY_DATE": analysis_date,
-            "TH_LAT": grid_csv["center_lat"].astype(float).to_list(),
-            "TH_LONG": grid_csv["center_lng"].astype(float).to_list(),
+            "TH_LAT": lat_series.astype(str).to_list(),
+            "TH_LONG": lng_series.astype(str).to_list(),
         }
     )
     gps_input_df.to_csv(gps_input, index=False)
@@ -733,15 +928,21 @@ def healthz():
 def predict(request: FieldRequest, lang: str = Cookie(default="en")):
     if lang not in ("en", "de"):
         lang = "de"
+    grid_cell_size_m = DEFAULT_GRID_CELL_SIZE_M
     print(
         f"[backend] /api/predict: received request with {len(request.polygon)} polygon points "
         f"and analysis_date={request.analysis_date}",
         flush=True,
     )
+    print(
+        f"[backend] /api/predict: building fixed grid with cell_size_m={grid_cell_size_m} and reuse_radius_m={_grid_match_radius_m()}",
+        flush=True,
+    )
     # 1) Build 60m grid centers (this is your "CSV" table)
     utm_epsg, grid_points = _grid_center_points_in_polygon(
         request.polygon,
-        cell_size_m=60.0,
+        analysis_date=request.analysis_date,
+        cell_size_m=grid_cell_size_m,
         include_border=True,
     )
     print(
@@ -762,6 +963,13 @@ def predict(request: FieldRequest, lang: str = Cookie(default="en")):
             {
                 "center_lat": p["center_lat"],
                 "center_lng": p["center_lng"],
+                "center_lat_text": p.get("center_lat_text", repr(float(p["center_lat"]))),
+                "center_lng_text": p.get("center_lng_text", repr(float(p["center_lng"]))),
+                "source_lat": p.get("source_lat", p["center_lat"]),
+                "source_lng": p.get("source_lng", p["center_lng"]),
+                "source_lat_text": p.get("source_lat_text", p.get("center_lat_text", repr(float(p["center_lat"])))),
+                "source_lng_text": p.get("source_lng_text", p.get("center_lng_text", repr(float(p["center_lng"])))),
+                "uses_cached_image": p.get("uses_cached_image", False),
                 "analysis_date": request.analysis_date,
                 "field_elevation_m": field_elevation_m,
                 "row": p["row"],
@@ -784,7 +992,7 @@ def predict(request: FieldRequest, lang: str = Cookie(default="en")):
         cell_poly = _cell_polygon_latlng_from_center(
             center_x_m=p["center_x_m"],
             center_y_m=p["center_y_m"],
-            cell_size_m=60.0,
+            cell_size_m=grid_cell_size_m,
             utm_epsg=utm_epsg,
         )
         zones.append(

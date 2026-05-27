@@ -160,16 +160,30 @@ def main():
     # hide pandas warnings when creating columns
     simplefilter(action="ignore", category=pd.errors.PerformanceWarning)
 
-    input = pd.read_csv(args.input, sep=",", header=0)
-    mapping = pd.read_csv(args.mapping, sep=",", header=0)
+    input = pd.read_csv(args.input, sep=",", header=0, dtype=str)
+    mapping = pd.read_csv(args.mapping, sep=",", header=0, dtype=str)
 
     shape = args.shape.split("x")
     shape = tuple([int(x) for x in shape])
 
-    # drop duplicate columns
-    mapping.drop(columns=["SURVEY_DATE", "TH_LAT", "TH_LONG"], inplace=True)
+    # Keep the mapped crop coordinates so reused cached folders can be resolved exactly.
+    mapping.rename(
+        columns={
+            "SURVEY_DATE": "MAPPING_SURVEY_DATE",
+            "TH_LAT": "MAPPING_TH_LAT",
+            "TH_LONG": "MAPPING_TH_LONG",
+        },
+        inplace=True,
+    )
 
     output = pd.merge(input, mapping, on="POINTID", how="inner")
+
+    if "MAPPING_TH_LAT" in output.columns:
+        output["TH_LAT"] = output["MAPPING_TH_LAT"]
+    if "MAPPING_TH_LONG" in output.columns:
+        output["TH_LONG"] = output["MAPPING_TH_LONG"]
+
+    output.drop(columns=["MAPPING_SURVEY_DATE", "MAPPING_TH_LAT", "MAPPING_TH_LONG"], inplace=True, errors="ignore")
 
     bands = [
         "B01",

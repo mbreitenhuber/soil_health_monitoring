@@ -16,6 +16,7 @@ import sys
 import threading
 import time
 import traceback
+import math
 from pathlib import Path
 
 import pandas as pd
@@ -108,6 +109,53 @@ def _metadata_path(result_path: Path) -> Path:
     return result_path / "metadata.json"
 
 
+def _distance_meters(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Approximate distance in meters between two GPS points."""
+    radius_m = 6371000.0
+    lat1_rad = math.radians(lat1)
+    lat2_rad = math.radians(lat2)
+    delta_lat = math.radians(lat2 - lat1)
+    delta_lon = math.radians(lon2 - lon1)
+    a = (
+        math.sin(delta_lat / 2) ** 2
+        + math.cos(lat1_rad) * math.cos(lat2_rad) * math.sin(delta_lon / 2) ** 2
+    )
+    return 2 * radius_m * math.asin(math.sqrt(a))
+
+
+def _find_cached_result_path(date: str, latitude: float, longitude: float, tolerance_m: float = 10.0) -> Path | None:
+    """Find an existing cropped result within tolerance for the same Sentinel date."""
+    date_root = Path(os.environ["SENTINEL_DIR"]) / date
+    if not date_root.is_dir():
+        return None
+
+    best_match: Path | None = None
+    best_distance = tolerance_m
+
+    for entry in date_root.iterdir():
+        if not entry.is_dir() or entry.name.startswith("_"):
+            continue
+
+        metadata_file = _metadata_path(entry)
+        if not metadata_file.is_file():
+            continue
+
+        try:
+            with open(metadata_file, "r") as file:
+                metadata = json.load(file)
+            cached_lat = float(metadata.get("latitude"))
+            cached_lon = float(metadata.get("longitude"))
+        except Exception:
+            continue
+
+        distance = _distance_meters(latitude, longitude, cached_lat, cached_lon)
+        if distance <= best_distance:
+            best_distance = distance
+            best_match = entry
+
+    return best_match
+
+
 def _read_cached_sentinel_id(result_path: Path) -> str:
     metadata_file = _metadata_path(result_path)
     if not metadata_file.is_file():
@@ -119,6 +167,14 @@ def _read_cached_sentinel_id(result_path: Path) -> str:
         return str(metadata.get("sentinel_id", "cached"))
     except Exception:
         return "cached"
+
+
+def _result_path_coordinates(result_path: Path) -> tuple[str, str]:
+    try:
+        lat_text, lon_text = result_path.name.split(" ", 1)
+        return lat_text, lon_text
+    except ValueError:
+        return "", ""
 
 
 def _write_metadata(result_path: Path, job: dict) -> None:
@@ -308,13 +364,28 @@ def api_thread(thread_index: int) -> None:
             result_path = _result_path(sentinel_date, latitude, longitude)
             if result_path.is_dir():
                 print(f"Dataset already downloaded: {result_path}")
+                lat_text, lon_text = _result_path_coordinates(result_path)
                 _append_mapping_row(
                     str(row["POINTID"]),
                     date,
-                    latitude,
-                    longitude,
+                    lat_text or latitude,
+                    lon_text or longitude,
                     sentinel_date,
                     _read_cached_sentinel_id(result_path),
+                )
+                continue
+
+            cached_result_path = _find_cached_result_path(sentinel_date, latitude, longitude)
+            if cached_result_path is not None:
+                print(f"Reusing cached dataset within tolerance: {cached_result_path}")
+                lat_text, lon_text = _result_path_coordinates(cached_result_path)
+                _append_mapping_row(
+                    str(row["POINTID"]),
+                    date,
+                    lat_text or latitude,
+                    lon_text or longitude,
+                    sentinel_date,
+                    _read_cached_sentinel_id(cached_result_path),
                 )
                 continue
 
@@ -373,6 +444,11 @@ def download_thread(thread_index: int) -> None:
             print(f"Using existing cropped dataset: {result_path}")
             continue
 
+        cached_result_path = _find_cached_result_path(job["date"], job["lat"], job["lon"])
+        if cached_result_path is not None:
+            print(f"Using cached cropped dataset within tolerance: {cached_result_path}")
+            continue
+
         try:
             raw_scene_path = _ensure_raw_scene(job)
             print(f"Cropping point {job['point']} from raw scene: {raw_scene_path}")
@@ -412,6 +488,12 @@ def crop_thread(thread_index: int) -> None:
             / job["date"]
             / f"{job['lat']} {job['lon']}"
         )
+        cached_result_path = _find_cached_result_path(job["date"], job["lat"], job["lon"])
+        if cached_result_path is not None:
+            print(f"Using cached cropped dataset within tolerance: {cached_result_path}")
+            _write_metadata(cached_result_path, job)
+            continue
+
         raw_scene_path = _raw_scene_path(job["date"], job["id"])
         tmp_point_path = Path(os.environ["TMP_DIR"]) / job["point"]
 
@@ -445,8 +527,8 @@ def main():
     
     args = setup_parser()
 
-    # create Sentinel mapping file
-    if mapping_file and not os.path.isfile(mapping_file):
+    # create a fresh Sentinel mapping file for this run
+    if mapping_file:
         with open(mapping_file, "w") as file:
             print(
                 "POINTID,SURVEY_DATE,TH_LAT,TH_LONG,SENTINEL_DATE,SENTINEL_ID",
