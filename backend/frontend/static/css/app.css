@@ -398,3 +398,19 @@
   opacity: 0.88;
   color: var(--bg);
 }
+
+/* Field-wide OC hover (analysis map) */
+.field-hover-hit {
+  cursor: crosshair;
+}
+
+.leaflet-tooltip.field-value-tooltip {
+  font-family: "DM Mono", monospace;
+  font-size: 0.8rem;
+  padding: 8px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+}

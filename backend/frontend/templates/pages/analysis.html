@@ -52,6 +52,8 @@
   "save_success_message": ("Your analysis was saved to the Personal Dashboard." if lang == "en" else "Deine Analyse wurde im Personal Dashboard gespeichert."),
   "save_success_close": ("Close" if lang == "en" else "Schließen"),
   "save_success_go_dash": ("Go to Personal Dashboard" if lang == "en" else "Zum Personal Dashboard"),
+  "model_info_title": ("Important note" if lang == "en" else "Wichtiger Hinweis"),
+  "model_info_close": ("Close" if lang == "en" else "Schließen"),
 } %}
 <div class="app-layout">
 
@@ -238,6 +240,29 @@
 
 </div>
 
+<!-- MODEL INFO POPUP (shown on page load) -->
+<div class="save-popup" id="model-info-popup" aria-hidden="true">
+  <div class="save-popup-card">
+    <div class="save-popup-header">
+      <h3>{{ t.model_info_title }}</h3>
+      <button type="button" id="close-model-info-popup" aria-label="{{ t.model_info_close }}">✕</button>
+    </div>
+    <div class="save-popup-content">
+      <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:10px;line-height:1.6;">
+        <li>The model works best in germany</li>
+        <li>Only select agricultural fields</li>
+        <li>Do not use large fields</li>
+        <li>Do not leave this page while to model is running</li>
+      </ul>
+      <div class="save-success-actions">
+        <button type="button" class="btn-save-success-primary" id="model-info-ok">
+          {{ t.model_info_close }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- SAVE SUCCESS POPUP -->
 <div class="save-popup" id="save-success-popup" aria-hidden="true">
   <div class="save-popup-card save-success-card">
@@ -334,6 +359,30 @@
     window.OC_CLASSIFICATION = ocDataEl
       ? JSON.parse(ocDataEl.textContent)
       : null;
+
+    // Show model info popup on page load
+    document.addEventListener("DOMContentLoaded", () => {
+      const popup = document.getElementById("model-info-popup");
+      if (!popup) return;
+
+      const closeButtons = [
+        document.getElementById("close-model-info-popup"),
+        document.getElementById("model-info-ok"),
+      ];
+
+      const closePopup = () => {
+        popup.classList.remove("visible");
+        popup.setAttribute("aria-hidden", "true");
+      };
+
+      closeButtons.forEach((btn) => {
+        if (btn) btn.addEventListener("click", closePopup);
+      });
+
+      // Open immediately when the analysis page loads
+      popup.classList.add("visible");
+      popup.setAttribute("aria-hidden", "false");
+    });
   </script>
   <script src="/static/js/field-gradient-overlay.js"></script>
   <script src="/static/js/map.js"></script>

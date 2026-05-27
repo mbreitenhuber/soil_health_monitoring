@@ -33,6 +33,8 @@
       lng: lng / poly.length,
       value: Number(zone.value),
       label: zone.label || "",
+      // Used for "value under cursor": sub-polygon of the 60×60 m cell.
+      cellRing: normalizePolygon(poly),
       zone,
     };
   }
@@ -334,28 +336,106 @@
     },
   });
 
-  function addZoneTooltips(samples, formatTooltip, layerGroup) {
-    const group = L.layerGroup();
+  /** Find the zone cell under the cursor (fallback: nearest). */
+  function sampleForPointer(lat, lng, samples) {
+    // First try exact "cell under cursor"
+    for (const s of samples) {
+      if (s.cellRing && s.cellRing.length >= 3 && pointInPolygon(lat, lng, s.cellRing)) {
+        return s;
+      }
+    }
+
+    // Fallback to nearest cell center (more forgiving at borders / gaps)
+    let best = null;
+    let bestD = Infinity;
+    for (const s of samples) {
+      const d = distanceMeters(lat, lng, s.lat, s.lng);
+      if (d < bestD) {
+        bestD = d;
+        best = s;
+      }
+    }
+    return best;
+  }
+
+  /**
+   * One tooltip for the whole field: follows the cursor, shows nearest cell value.
+   * Avoids tiny per-point hit circles and flicker between overlapping tooltips.
+   */
+  function addFieldHoverTooltip(polygon, samples, formatTooltip, layerGroup) {
+    const ring = normalizePolygon(polygon);
+    if (ring.length < 3 || !samples.length) return null;
+
     const fmt =
       typeof formatTooltip === "function"
         ? formatTooltip
-        : (s) =>
-            `<b>${s.label || "–"}</b><br>OC: ${Number(s.value).toFixed(1)} g/kg`;
+        : (zone) =>
+            `<b>${zone.label || "–"}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`;
 
-    samples.forEach((s) => {
-      const marker = L.circleMarker([s.lat, s.lng], {
-        radius: 10,
-        fillOpacity: 0,
-        opacity: 0,
+    let hoverTooltip = null;
+    let hideTimer = null;
+    const HIDE_DELAY_MS = 550;
+
+    const hitLayer = L.polygon(
+      ring.map((p) => [p.lat, p.lng]),
+      {
+        fill: true,
+        fillOpacity: 0.02,
+        color: "transparent",
         weight: 0,
         interactive: true,
-      });
-      marker.bindTooltip(fmt(s.zone || s), { sticky: true });
-      group.addLayer(marker);
+        className: "field-hover-hit",
+      }
+    );
+
+    function clearHideTimer() {
+      if (hideTimer) {
+        clearTimeout(hideTimer);
+        hideTimer = null;
+      }
+    }
+
+    function showTooltip(latlng, sample) {
+      const map = hitLayer._map;
+      if (!map || !sample) return;
+
+      const html = fmt(sample.zone || sample);
+      if (!hoverTooltip) {
+        hoverTooltip = L.tooltip({
+          sticky: true,
+          opacity: 0.96,
+          className: "field-value-tooltip",
+        })
+          .setContent(html)
+          .setLatLng(latlng);
+        hoverTooltip.addTo(map);
+      } else {
+        hoverTooltip.setContent(html).setLatLng(latlng);
+        if (!map.hasLayer(hoverTooltip)) hoverTooltip.addTo(map);
+      }
+    }
+
+    function hideTooltip() {
+      const map = hitLayer._map;
+      if (hoverTooltip && map) {
+        map.removeLayer(hoverTooltip);
+      }
+      hoverTooltip = null;
+    }
+
+    hitLayer.on("mousemove", (e) => {
+      clearHideTimer();
+      const sample = sampleForPointer(e.latlng.lat, e.latlng.lng, samples);
+      if (sample) showTooltip(e.latlng, sample);
     });
 
-    (layerGroup || group).addLayer(group);
-    return group;
+    hitLayer.on("mouseout", () => {
+      clearHideTimer();
+      hideTimer = setTimeout(hideTooltip, HIDE_DELAY_MS);
+    });
+
+    (layerGroup || hitLayer).addLayer(hitLayer);
+    return hitLayer;
   }
 
   /**
@@ -385,16 +465,21 @@
     });
     target.addLayer(gradientLayer);
 
-    const tooltipLayer = addZoneTooltips(samples, formatTooltip, target);
-
     let borderLayer = null;
     if (ring.length >= 3) {
       borderLayer = L.polygon(
         ring.map((p) => [p.lat, p.lng]),
-        { color: borderColor, fill: false, weight: borderWeight }
+        { color: borderColor, fill: false, weight: borderWeight, interactive: false }
       );
       target.addLayer(borderLayer);
     }
+
+    const tooltipLayer = addFieldHoverTooltip(
+      ring,
+      samples,
+      formatTooltip,
+      target
+    );
 
     return { gradientLayer, tooltipLayer, borderLayer, samples };
   }

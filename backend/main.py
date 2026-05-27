@@ -256,14 +256,14 @@ ROADMAP = [
 # Neue Teammitglieder: Eintrag hier ergänzen.
 # photo: Dateiname in static/assets/team/ — oder None für Platzhalter
 TEAM_MEMBERS = [
-    {"name": "Clara Buller",   "role": "Master Student in Energy Science and Technology",   "photo": "clara.jpeg",
+    {"name": "Clara Buller",   "role": "Master Student in Energy Science and Technology",   "photo": "Clara.jpg",
      "bio": "Interactive ML model development, Website UX design support, Website content development, Project report, Literature review"},
-    {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": None,
+    {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": "Maggie.jpg",
      "bio": "Interactive ML model development, Website-ML model communication, Website UX design support, User case research, Literature review"},
-    {"name": "Jerome Reiter", "role": "2nd Semester Bachelor CSE-Student",  "photo": None,
-     "bio": "Backend and frontend development, Map design and personal dashboard"},
-     {"name": "Claudio Bussinger", "role": "2nd Semester Bachelor CSE-Student",  "photo": "Claudio.jpg",
-     "bio": "Backend and frontend development, Map design and website design"},
+    {"name": "Jerome Reiter", "role": "Bachelor Student in Computational Science and Engineering",  "photo": "Jerome.jpg",
+     "bio": "Backend and frontend development, Map design and personal dashboard."},
+     {"name": "Claudio Bussinger", "role": "Bachelor Student in Computational Science and Engineering",  "photo": "Claudio.jpg",
+     "bio": "Backend and frontend development, Map design and website design."},
 ]
 
 
