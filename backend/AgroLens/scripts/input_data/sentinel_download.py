@@ -62,6 +62,8 @@ api_counter = 0
 errors = 0
 counter_lock = threading.Lock()
 file_lock = threading.Lock()  # Lock for thread-safe file writing
+raw_scene_lock_guard = threading.Lock()
+raw_scene_locks: dict[tuple[str, str], threading.Lock] = {}
 
 download_jobs = []
 crop_jobs = []
@@ -90,6 +92,16 @@ def _raw_cache_root(date: str) -> Path:
 
 def _raw_scene_path(date: str, scene_id: str) -> Path:
     return _raw_cache_root(date) / scene_id
+
+
+def _raw_scene_lock(date: str, scene_id: str) -> threading.Lock:
+    key = (date, scene_id)
+    with raw_scene_lock_guard:
+        lock = raw_scene_locks.get(key)
+        if lock is None:
+            lock = threading.Lock()
+            raw_scene_locks[key] = lock
+        return lock
 
 
 def _metadata_path(result_path: Path) -> Path:
@@ -124,14 +136,19 @@ def _write_metadata(result_path: Path, job: dict) -> None:
 
 def _ensure_raw_scene(job: dict) -> Path:
     raw_scene_path = _raw_scene_path(job["date"], job["id"])
-    if raw_scene_path.is_dir():
-        print(f"Using cached raw scene: {raw_scene_path}")
-        return raw_scene_path
+    lock = _raw_scene_lock(job["date"], job["id"])
 
-    os.makedirs(_raw_cache_root(job["date"]), exist_ok=True)
-    print(f"Downloading raw scene: {job['id']} -> {raw_scene_path}")
-    CopernicusApi.download_data(job["id"], job["id"], target_path=str(_raw_cache_root(job["date"])))
-    return raw_scene_path
+    # Multiple grid points can resolve to the same Sentinel scene. Guard the
+    # download/extract step so only one thread creates the shared cache entry.
+    with lock:
+        if raw_scene_path.is_dir():
+            print(f"Using cached raw scene: {raw_scene_path}")
+            return raw_scene_path
+
+        os.makedirs(_raw_cache_root(job["date"]), exist_ok=True)
+        print(f"Downloading raw scene: {job['id']} -> {raw_scene_path}")
+        CopernicusApi.download_data(job["id"], job["id"], target_path=str(_raw_cache_root(job["date"])))
+        return raw_scene_path
 
 
 def _append_mapping_row(point_id: str, survey_date: str, latitude: float, longitude: float, sentinel_date: str, sentinel_id: str) -> None:
