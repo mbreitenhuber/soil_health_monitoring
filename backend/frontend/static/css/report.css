@@ -26,6 +26,7 @@
   color: var(--text);
   line-height: 1.65;
   letter-spacing: -0.02em;
+  border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   padding: 20px 28px;
   margin: 36px 0 8px;
@@ -48,11 +49,6 @@
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 24px 20px;
-  transition: border-color 0.2s, transform 0.2s;
-}
-
-.report-highlight-card:hover {
-  border-color: var(--border2);
 }
 
 .report-highlight-icon {
@@ -104,11 +100,6 @@
   border-radius: 999px;
   padding: 7px 16px;
   letter-spacing: 0.02em;
-  transition: border-color 0.2s, background 0.2s;
-}
-
-.report-pill:hover {
-  border-color: var(--accent);
 }
 
 /* ── References ────────────────────────────────── */
@@ -133,11 +124,6 @@
   font-size: 0.8rem;
   color: var(--text-dim);
   line-height: 1.75;
-  transition: border-color 0.2s;
-}
-
-.report-references li:hover {
-  border-color: var(--border2);
 }
 
 .report-references li::before {

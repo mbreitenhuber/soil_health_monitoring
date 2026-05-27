@@ -1,85 +1,174 @@
-/* Tighter gap between hero intro and personas section */
+/* ── User Experience page specific styles ──────────────────────────────── */
+
+/* ── Hero / section spacing ────────────────────── */
+
 .page-content > .about-hero {
   padding-bottom: 20px;
 }
+
 .page-content > .about-section {
   padding-top: 28px;
 }
 
-/* Testimonials */
+/* ── Testimonials grid ──────────────────────────── */
+
 .testimonials-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 22px;
-  margin-top: 40px;
+  margin-top: 8px;
   align-items: start;
   max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
 }
-.testimonials-grid { margin-left: auto; margin-right: auto; }
+
+@media (max-width: 720px) {
+  .testimonials-grid {
+    max-width: 100%;
+  }
+}
+
+/* ── Testimonial card ───────────────────────────── */
+
 .testimonial-card {
-  background: var(--surface2);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
-  padding: 24px;
-  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
-  box-shadow: 0 16px 36px rgba(26, 13, 12, 0.08);
+  padding: 28px 24px;
 }
-.testimonial-card:hover { border-color: var(--border2); }
-.testimonial-top { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
-.testimonial-avatar { width: 54px; height: 54px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface2); object-fit: cover; flex-shrink: 0; }
-.testimonial-meta { display: flex; flex-direction: column; gap: 4px; }
-.testimonial-name { font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; color: var(--text); line-height: 1.1; }
-.testimonial-role { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
-.testimonial-stars { font-family: 'DM Mono', monospace; font-size: 0.86rem; color: var(--accent); letter-spacing: 0.08em; }
-.testimonial-text { font-size: 0.82rem; color: var(--text-dim); line-height: 1.85; margin: 0; }
-.testimonial-impact { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
-.ti-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
-.ti-pill { font-size: 0.72rem; color: var(--text); background: var(--surface2); border: 1px solid var(--border); padding: 6px 10px; border-radius: 999px; }
 
-/* Personas (User analysis) */
-.persona-card:hover {
-  box-shadow: 0 22px 48px rgba(26, 13, 12, 0.12);
+/* ── Card header: avatar + meta ─────────────────── */
+
+.testimonial-top {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
 }
+
+.testimonial-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.testimonial-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.testimonial-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: -0.02em;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.testimonial-role {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.testimonial-stars {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  letter-spacing: 0.08em;
+}
+
+/* ── Card body text ─────────────────────────────── */
+
+.testimonial-text {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  line-height: 1.8;
+  margin: 0;
+  max-width: 720px;
+}
+
+/* ── Impact footer ──────────────────────────────── */
+
+.testimonial-impact {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.ti-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.ti-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--accent);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 6px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.02em;
+}
+
+/* ── Personas ───────────────────────────────────── */
+
 .persona-card {
-  position: relative;
-  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 28px 24px;
 }
-.persona-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(600px 260px at 15% 0%, rgba(95, 167, 100, 0.12), transparent 60%);
-  pointer-events: none;
-}
+
+/* ── Persona name ───────────────────────────────── */
+
 .persona-name {
   font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.5rem;
-  letter-spacing: -0.03em;
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.02em;
   color: var(--text);
   margin-bottom: 16px;
-  position: relative;
 }
+
+/* ── Persona content grid ───────────────────────── */
+
 .persona-content {
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;
-  position: relative;
 }
-@media (max-width: 720px) { .testimonials-grid { max-width: 100%; } }
 
-/* This is the “box” that should stand out from page background */
+/* ── Persona detail boxes ───────────────────────── */
+
 .persona-box {
-  background: #ffffff;
-  border: 1px solid rgba(199, 204, 209, 0.9);
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 10px 20px rgba(26, 13, 12, 0.06);
+  padding: 0;
 }
+
 .persona-box--use {
-  background: linear-gradient(180deg, rgba(95, 167, 100, 0.12), rgba(95, 167, 100, 0.06));
-  border-color: rgba(95, 167, 100, 0.35);
+  border-left: 3px solid var(--accent);
+  padding-left: 16px;
 }
+
+/* ── Persona list ───────────────────────────────── */
+
 .persona-list {
   margin: 0;
   padding-left: 0;
@@ -87,27 +176,44 @@
   display: grid;
   gap: 10px;
   color: var(--text-dim);
-  font-size: 0.84rem;
-  line-height: 1.55;
+  font-size: 0.82rem;
+  line-height: 1.75;
 }
-.persona-list li { display: flex; gap: 8px; }
+
+.persona-list li {
+  display: flex;
+  gap: 10px;
+}
+
 .persona-list li::before {
   content: "•";
-  color: rgba(95, 167, 100, 0.75);
+  color: var(--accent);
   line-height: 1.2;
   margin-top: 2px;
+  flex-shrink: 0;
 }
-.persona-list strong { color: var(--text); font-weight: 700; }
+
+.persona-list strong {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ── Persona question / answer ──────────────────── */
+
 .persona-q {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
   font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--accent);
   margin-bottom: 8px;
 }
+
 .persona-a {
   margin: 0;
-  color: var(--text);
-  font-size: 0.88rem;
-  line-height: 1.75;
+  color: var(--text-dim);
+  font-size: 0.82rem;
+  line-height: 1.8;
+  max-width: 720px;
 }
