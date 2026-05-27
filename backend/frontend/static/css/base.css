@@ -52,6 +52,8 @@ body.page-app { height: 100%; overflow: hidden; }
 
 .img-placeholder { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; color: var(--text-dim); font-size: 0.78rem; padding: 32px; }
 .img-placeholder .icon { font-size: 2rem; opacity: 0.4; }
+.img-placeholder--media { padding: 16px; overflow: hidden; min-height: 0; box-sizing: border-box; }
+.img-placeholder--media img { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; flex: 0 0 auto; }
 
 footer { background: var(--surface); border-top: 1px solid var(--border); padding: 24px 32px; display: flex; align-items: center; justify-content: space-between; font-size: 0.72rem; color: var(--text-dim); flex-wrap: wrap; gap: 12px; }
 .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; color: var(--accent); letter-spacing: -0.03em; text-decoration: none; }

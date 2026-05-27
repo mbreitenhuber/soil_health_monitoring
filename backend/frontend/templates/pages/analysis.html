@@ -19,7 +19,8 @@
 {% block content %}
 {% set t = {
   "instructions": ("Instructions" if lang == "en" else "Anleitung"),
-  "step1": ("Draw your agricultural field on the map (use the Polygon tool)" if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte (Polygon-Werkzeug)"),
+  "step1_lead": ("Draw your agricultural field on the map (use the " if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte ("),
+  "step1_tail": (" tool)" if lang == "en" else "-Werkzeug)"),
   "step2": ("Check the detected vertices and area" if lang == "en" else "Prüfe die erkannten Eckpunkte und die Fläche"),
   "step3": ("Choose the date — Start the analysis — the ML model calculates the zone map" if lang == "en" else "Wähle das Datum — Starte die Analyse — das ML-Modell berechnet die Zonenkarte"),
   "area": ("Area" if lang == "en" else "Fläche"),
@@ -36,9 +37,21 @@
   "highest_zone": ("Highest Zone" if lang == "en" else "Beste Zone"),
   "lowest_zone": ("Lowest Zone" if lang == "en" else "Schlechteste Zone"),
   "legend_title": ("Legend – Soil Quality" if lang == "en" else "Legende – Bodenqualität"),
-  "high": ("High" if lang == "en" else "Hoch"),
-  "medium": ("Medium" if lang == "en" else "Mittel"),
-  "low": ("Low" if lang == "en" else "Niedrig")
+  "high": ("High (top 30 %)" if lang == "en" else "Hoch (oberes 30 %)"),
+  "medium": ("Medium (40 %)" if lang == "en" else "Mittel (mittleres 40 %)"),
+  "low": ("Low (bottom 30 %)" if lang == "en" else "Niedrig (unteres 30 %)"),
+  "legend_lucas": ("vs. LUCAS Germany reference" if lang == "en" else "vs. LUCAS-Referenz Deutschland"),
+  "class_info_btn": ("Classification details" if lang == "en" else "Einteilung & Schwellen"),
+  "class_info_title": ("OC classification thresholds" if lang == "en" else "Schwellen der OC-Einteilung"),
+  "class_info_close": ("Close" if lang == "en" else "Schließen"),
+  "class_info_source": ("Data source" if lang == "en" else "Datenquelle"),
+  "class_info_open": ("Open LUCAS soil data (ESDAC)" if lang == "en" else "LUCAS-Bodendaten öffnen (ESDAC)"),
+  "res_unit_label": ("g/kg OC (predicted)" if lang == "en" else "g/kg OC (vorhergesagt)"),
+  "select_field_hint": ("Select first a field using the polygon tool" if lang == "en" else "Wähle zuerst ein Feld mit dem Polygon-Werkzeug"),
+  "save_success_title": ("Analysis saved" if lang == "en" else "Analyse gespeichert"),
+  "save_success_message": ("Your analysis was saved to the Personal Dashboard." if lang == "en" else "Deine Analyse wurde im Personal Dashboard gespeichert."),
+  "save_success_close": ("Close" if lang == "en" else "Schließen"),
+  "save_success_go_dash": ("Go to Personal Dashboard" if lang == "en" else "Zum Personal Dashboard"),
 } %}
 <div class="app-layout">
 
@@ -49,7 +62,7 @@
       <div class="steps" id="steps-container">
         <div class="step active" id="step-1">
           <div class="step-num">1</div>
-          <div class="step-text">{{ t.step1 }}</div>
+          <div class="step-text">{{ t.step1_lead }}<span class="step-polygon-icon" aria-hidden="true" title="Polygon"></span>{{ t.step1_tail }}</div>
         </div>
         <div class="step" id="step-2">
           <div class="step-num">2</div>
@@ -80,7 +93,8 @@
       </div>
 
       <!-- ANALYSE BUTTON -->
-      <button class="btn-analyse" id="btn-analyse" disabled>
+      <p class="analysis-hint" id="analysis-hint" role="alert" hidden>{{ t.select_field_hint }}</p>
+      <button class="btn-analyse" id="btn-analyse" type="button">
         ⟶ {{ t.start_analysis }}
       </button>
 
@@ -105,19 +119,23 @@
     </div>
 
     <div>
-      <div class="section-label">{{ t.legend_title }}</div>
+      <div class="legend-header">
+        <div class="section-label" style="margin-bottom:0;">{{ t.legend_title }}</div>
+        <button type="button" class="btn-class-info" id="btn-class-info" title="{{ t.class_info_btn }}" aria-label="{{ t.class_info_btn }}">i</button>
+      </div>
+      <p class="legend-sub">{{ t.legend_lucas }}</p>
       <div class="legend">
         <div class="legend-item">
-          <div class="legend-swatch" style="background:linear-gradient(to right,#22c55e,#4ade80);"></div>
-          <span>{{ t.high }} (0.66 – 1.0)</span>
+          <div class="legend-swatch" style="background:#22c55e;"></div>
+          <span>{{ t.high }}</span>
         </div>
         <div class="legend-item">
-          <div class="legend-swatch" style="background:linear-gradient(to right,#f59e0b,#facc15);"></div>
-          <span>{{ t.medium }} (0.33 – 0.66)</span>
+          <div class="legend-swatch" style="background:#f59e0b;"></div>
+          <span>{{ t.medium }}</span>
         </div>
         <div class="legend-item">
-          <div class="legend-swatch" style="background:linear-gradient(to right,#ef4444,#f87171);"></div>
-          <span>{{ t.low }} (0.0 – 0.33)</span>
+          <div class="legend-swatch" style="background:#ef4444;"></div>
+          <span>{{ t.low }}</span>
         </div>
       </div>
     </div>
@@ -128,7 +146,6 @@
 
 </div>
 
-<!-- SAVE POPUP -->
 <!-- SAVE POPUP -->
 <div class="save-popup" id="save-popup">
 
@@ -220,9 +237,46 @@
   </div>
 
 </div>
+
+<!-- SAVE SUCCESS POPUP -->
+<div class="save-popup" id="save-success-popup" aria-hidden="true">
+  <div class="save-popup-card save-success-card">
+    <div class="save-popup-header">
+      <h3>{{ t.save_success_title }}</h3>
+      <button type="button" id="close-save-success-popup" aria-label="{{ t.save_success_close }}">✕</button>
+    </div>
+    <div class="save-popup-content">
+      <p class="save-success-message">{{ t.save_success_message }}</p>
+      <div class="save-success-actions">
+        <button type="button" class="btn-save-success-secondary" id="btn-save-success-close">{{ t.save_success_close }}</button>
+        <a href="/personal_dashboard" class="btn-save-success-primary">{{ t.save_success_go_dash }}</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OC CLASSIFICATION INFO -->
+<div class="save-popup" id="class-info-popup" aria-hidden="true">
+  <div class="save-popup-card class-info-card">
+    <div class="save-popup-header">
+      <h3>{{ t.class_info_title }}</h3>
+      <button type="button" id="close-class-info" aria-label="{{ t.class_info_close }}">✕</button>
+    </div>
+    <div class="save-popup-content class-info-content">
+      <p class="class-info-note" id="class-info-note"></p>
+      <ul class="class-info-tiers" id="class-info-tiers"></ul>
+      <div class="class-info-meta">
+        <span class="class-info-meta-label">{{ t.class_info_source }}</span>
+        <span id="class-info-dataset"></span>
+        <a href="{{ oc_classification.reference_url }}" target="_blank" rel="noopener noreferrer" id="class-info-link">{{ t.class_info_open }}</a>
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
 
   {% block scripts %}
+  <script type="application/json" id="oc-classification-data">{{ oc_classification | tojson }}</script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
   <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -276,6 +330,11 @@
     L.drawLocal.edit.handlers.remove.tooltip.text = "Click on a feature to remove";
     
     const API_URL = "{{ api_url }}" || window.location.origin;
+    const ocDataEl = document.getElementById("oc-classification-data");
+    window.OC_CLASSIFICATION = ocDataEl
+      ? JSON.parse(ocDataEl.textContent)
+      : null;
   </script>
+  <script src="/static/js/field-gradient-overlay.js"></script>
   <script src="/static/js/map.js"></script>
 {% endblock %}

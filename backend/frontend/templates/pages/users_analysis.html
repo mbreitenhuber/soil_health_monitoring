@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}User Experiences{% endblock %}
+
+{% block head_styles %}
+  <link rel="stylesheet" href="/static/css/users_experience.css?v={{ static_css_version }}" />
+{% endblock %}
+
+{% block content %}
+<div class="page-content">
+
+  <div class="about-hero">
+    <div class="section-eyebrow">User analysis</div>
+    <h1>
+      Developed with the user in <em>mind</em>
+    </h1>
+    <p>
+      We designed AgroScan around real users and their experience. These three archetypes shaped how we structured the website and prioritized features.
+    </p>
+  </div>
+
+  <section class="about-section">
+    <div class="section-eyebrow">Archetype users</div>
+    <h2 class="section-title">Three different perspectives on one product</h2>
+
+    <div class="testimonials-grid">
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">Johannes</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            <ul class="persona-list">
+              <li><strong>Age:</strong> 27</li>
+              <li><strong>Occupation:</strong> Public sector employee</li>
+              <li><strong>Connection to farming:</strong> Studied agricultural science, inherited parents’ farm, part-time farming</li>
+            </ul>
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">How could our tool be useful?</div>
+            <p class="persona-a">A cost-effective and time-saving way to plan and estimate fertilizer use.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">Anton</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            <ul class="persona-list">
+              <li><strong>Age:</strong> 48</li>
+              <li><strong>Occupation:</strong> Organic farmer</li>
+              <li><strong>Connection to farming:</strong> Runs his own farm, trained as a farmer</li>
+            </ul>
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">How could our tool be useful?</div>
+            <p class="persona-a">Supports soil organic matter (humus) building and helps argue for more flexible fertilization regulations.</p>
+          </div>
+        </div>
+      </article>
+
+      <article class="testimonial-card persona-card">
+        <div class="persona-name">Dr. Laura</div>
+        <div class="persona-content">
+          <div class="persona-box persona-box--facts">
+            <ul class="persona-list">
+              <li><strong>Age:</strong> 42</li>
+              <li><strong>Occupation:</strong> Climate policy maker</li>
+              <li><strong>Connection to farming:</strong> Works at the Federal Environment Office (agriculture &amp; climate protection), evaluates measures for CO₂ storage in soils</li>
+            </ul>
+          </div>
+          <div class="persona-box persona-box--use">
+            <div class="persona-q">How could our tool be useful?</div>
+            <p class="persona-a">A data-driven basis for designing and evaluating soil carbon storage programs. Helps target programs (e.g., voluntary carbon credits) and improve policy design by incentivizing actual soil organic matter build-up.</p>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <div class="home-cta" style="border-top:1px solid var(--border);">
+    <h2>Curious to try it?</h2>
+    <p>Start an analysis and view the zone map of the SOC levels of your field.</p>
+    <a class="btn-primary" href="/analyse">⟶ Go to analysis</a>
+  </div>
+
+</div>
+{% endblock %}

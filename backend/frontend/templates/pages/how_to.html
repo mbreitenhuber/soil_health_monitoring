@@ -13,7 +13,7 @@
   <div class="about-hero">
     <div class="section-eyebrow">User Guide</div>
     <h1>How to use <em>AgroScan</em></h1>
-    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil quality zone map.</p>
+    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil organic carbon level on the map.</p>
   </div>
 
   <!-- Quick Steps Overview -->
@@ -40,7 +40,7 @@
         <div class="howto-step-num">03</div>
         <div class="howto-step-icon">🗺️</div>
         <h3>Read your zone map</h3>
-        <p>Your field is divided into color-coded zones. Green means high soil quality, yellow is medium, and red indicates areas that may need attention.</p>
+        <p>Your field is divided into color-coded zones. Green means high soil organic carbon levels, yellow is medium, and red indicates areas that may need attention.</p>
       </div>
 
     </div>
@@ -61,7 +61,8 @@
         <p>Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">💡 Tip</span>
-          Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
+          Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points. 
+          To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
         </div>
       </div>
     </div>
@@ -73,16 +74,18 @@
         <h3>Draw your field polygon</h3>
       </div>
       <div class="howto-detail-body">
-        <p>In the top-left corner of the map you will find the drawing toolbar. Select the <strong>Polygon</strong> tool (the pentagon icon). Then:</p>
+        <p>In the top-left corner of the map you will find the drawing toolbar. Select the <strong>Polygon</strong> tool (the pentagon icon, second from the top). Then:</p>
         <ol class="howto-list">
           <li>Click once on the map to place the first corner of your field.</li>
           <li>Continue clicking along the field boundary to add more points.</li>
-          <li>Close the polygon by clicking on the first point again, or press <kbd>Finish</kbd> in the toolbar.</li>
+          <li>Placed a corner in the wrong spot? Click <strong>Undo last point</strong> in the toolbar to remove the most recent point and try again.</li>
+          <li>Close the polygon by clicking on the first point again, or press <strong>Finish</strong> in the toolbar.</li>
+          <li>To adjust the shape afterwards, select <strong>Edit layers</strong> (pencil icon), drag the corner handles to move them, then click <strong>Save changes</strong> to apply the new outline.</li>
         </ol>
-        <p style="margin-top:16px;">The sidebar will update automatically, showing you the number of vertices and the approximate area of your drawn field.</p>
+        <p style="margin-top:16px;">The sidebar updates automatically with the number of vertices and the approximate area. If you need to start over, use <strong>Reset</strong> in the sidebar after an analysis, or draw a new polygon once the field is cleared.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">💡 Tip</span>
-          You do not need to be pixel-perfect. A rough outline of your field is enough for the model to produce a meaningful zone map. You can always edit or delete the polygon and redraw it using the toolbar.
+          You do not need to be pixel-perfect. A rough outline is enough for a meaningful zone map. You can use <strong>Undo last point</strong> while drawing and <strong>Edit layers</strong> / <strong>Save changes</strong> for small corrections without redrawing the whole field.
         </div>
       </div>
     </div>
@@ -97,7 +100,8 @@
         <p>Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.</p>
         <div class="howto-tip">
           <span class="howto-tip-label">⚠️ Note</span>
-          The analysis requires an active internet connection to download the satellite data. If the button remains inactive, make sure your polygon is properly closed on the map.
+          The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis. 
+          <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
         </div>
       </div>
     </div>
@@ -109,8 +113,8 @@
         <h3>Read your results</h3>
       </div>
       <div class="howto-detail-body">
-        <p>After the analysis completes, colored zones will appear on top of your drawn polygon. The sidebar also shows a summary with the number of zones analyzed, the average soil quality score, and the highest and lowest zone values.</p>
-        <p style="margin-top:12px;">To start fresh, click the <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
+        <p>After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.</p>
+        <p style="margin-top:12px;">To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
       </div>
     </div>
 
@@ -131,35 +135,100 @@
     <div class="section-eyebrow">Data management</div>
     <h2 class="section-title">Saving fields & managing your analyses</h2>
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:28px;">
-      AgroScan treats a “saved field” as a <strong>saved analysis</strong>: your drawn polygon plus the selected date and the computed zone statistics. Saving lets you build a history for the same field over time and compare different dates.
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:12px;">
+      Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each entry is one complete run: your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values.
+    </p>
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:32px;">
+      If you analyse the same parcel again later, save the new run under the <strong>same field name</strong>. AgroScan will group those runs together so you can track development over time, filter your history, and compare fields side by side.
     </p>
 
-    <div class="howto-steps-grid" style="margin-top:0;">
+    <div class="howto-steps-grid howto-dash-grid" style="margin-top:0;">
       <div class="howto-step-card">
         <div class="howto-step-icon">💾</div>
-        <h3>What gets saved?</h3>
-        <p>The field polygon (your drawn boundary), the analysis date, summary values (avg/min/max), and the computed zones. This makes it possible to revisit results later without re-running the analysis.</p>
+        <h3>Save from Analysis</h3>
+        <p>When your zone map is ready, the sidebar shows <strong>Save to Personal Dashboard</strong>. A short form opens where you enter a field name (required for grouping), plus optional location, crop, and notes. Confirm to store the run — you do not need to repeat the analysis to view it again later.</p>
+      </div>
+
+      <div class="howto-step-card">
+        <div class="howto-step-icon">🗃️</div>
+        <h3>What gets stored</h3>
+        <p>Besides your labels, AgroScan keeps the polygon geometry, analysis date, all zone polygons with SOC values and colour tiers, and the field-level min, average, and max in g/kg. That is enough to rebuild charts in the dashboard and export rows to CSV without re-running the model.</p>
       </div>
 
       <div class="howto-step-card">
         <div class="howto-step-icon">📂</div>
-        <h3>Where do I find it?</h3>
-        <p>Open the <strong>Personal Dashboard</strong> to see your saved analyses list. Each entry shows the crop (if provided), date, and summary statistics.</p>
+        <h3>Dashboard overview</h3>
+        <p>The <strong>Saved Analyses</strong> list is organised by field name: one card per field, with a badge for how many runs you have. Each card shows the date span, crop and location if you added them, the latest average SOC, and a small trend indicator when several dates exist. Use the filter bar to narrow by name, crop, or from/to date, and <strong>Reset</strong> to show everything again.</p>
       </div>
 
       <div class="howto-step-card">
-        <div class="howto-step-icon">🧹</div>
-        <h3>How can I manage saved items?</h3>
-        <p>You can delete saved analyses directly from the dashboard. If you want to re-analyze the same field, simply draw the polygon again (or reuse the same outline) and save a new entry for the new date.</p>
+        <div class="howto-step-icon">📈</div>
+        <h3>Field history &amp; charts</h3>
+        <p>Click any field card to open its history. You will see how many analyses are stored, all-time minimum and maximum SOC, the latest average, and a line chart of min, average, and max across dates for that field only. Below the chart, every single run is listed with its date and summary values.</p>
+      </div>
+
+      <div class="howto-step-card">
+        <div class="howto-step-icon">✏️</div>
+        <h3>One analysis at a time</h3>
+        <p>From the field history, open <strong>Details</strong> on a run to adjust field name, location, crop, or notes, then <strong>Save Changes</strong>. A bar chart shows that run’s min, average, and max. Use <strong>⬇</strong> to download that analysis as CSV, or <strong>Delete</strong> to remove it. <strong>+ New Analysis</strong> takes you back to the map where you can analyse the same field again.</p>
+      </div>
+
+      <div class="howto-step-card">
+        <div class="howto-step-icon">⚖️</div>
+        <h3>Compare &amp; export all</h3>
+        <p>At the top of the dashboard, <strong>Download All</strong> exports every saved run in one CSV file. To compare different fields, tick <strong>Select for comparison</strong> on at least two field cards and press <strong>Compare Fields</strong> — a chart plots average SOC over time, one line per field. This works best when each field name refers to one real parcel.</p>
       </div>
     </div>
 
     <div class="howto-tip" style="margin-top:28px;">
       <span class="howto-tip-label">📌 Tip</span>
-      <p>If you frequently analyze the same field, use saving to create a timeline of results. This is especially useful to track changes after management actions (e.g., irrigation, fertilization, cover crops).</p>
-      <a class="btn-primary" href="/personal_dashboard" style="margin-top:16px;">⟶ Go to Personal Dashboard</a>
+      <p>Use a consistent field name for each physical parcel and save after every new analysis date. That way your timeline and comparison charts reflect real changes on the ground — for example after irrigation, reduced tillage, or cover crops.</p>
+      <a class="btn-primary" href="/personal_dashboard">⟶ Go to Personal Dashboard</a>
     </div>
+  </section>
+
+  <!-- Reading the Results -->
+  <section class="about-section">
+    <div class="section-eyebrow">Interpreting results</div>
+    <h2 class="section-title">How to read the SOC map</h2>
+
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
+      TThe zone map divides your fields into a regular grid of cells. For each cell the soil organic carbon (SOC) is predicted in g/kg in the topsoil and visualized with a color-code. The color-code was designed based on the SOC value distribution in the LUCAS topsoil dataset in Germany. The following guide explains what each color range means in practice and how you can act on the results.
+    </p>
+
+    <div class="howto-legend-block">
+
+      <div class="howto-legend-row">
+        <div class="howto-legend-swatch" style="background:#22c55e;"></div>
+        <div>
+          <div class="howto-legend-label">High SOC content — top 30 % of LUCAS (DE), SOC ≥ {{ oc_classification.threshold_high_gkg }} g/kg</div>
+            <p>These zones show strong indicators of high soil organic carbon content. They are in the top 30th percentile of the SOC distribution agricultural fields in Germany. Fields or sub-areas in this range are performing well. Your sustainable soil management practices are likely to be working. Feel free to share your experience in the upcoming community forum for farmers in your area!</p>
+        </div>
+      </div>
+
+      <div class="howto-legend-row">
+        <div class="howto-legend-swatch" style="background:#f59e0b;"></div>
+        <div>
+          <div class="howto-legend-label">Medium SOC content — middle 40 %, {{ oc_classification.threshold_low_gkg }} – {{ oc_classification.threshold_high_gkg }} g/kg</div>
+          <p>These zones are within an acceptable range, but some show some variability. Try implementing sustainable soil management practices (SSM) like reduced tillage, crop diversification and cover cropping. Monitoring these areas over successive analyses can help identify whether SOC content is increasing or decreasing. We are in the process of implementing a community forum where you can find out what farmers in your area are doing to increase their SOC level and share your progress.</p>
+        </div>
+      </div>
+
+      <div class="howto-legend-row" style="border-bottom:none;">
+        <div class="howto-legend-swatch" style="background:#ef4444;"></div>
+        <div>
+          <div class="howto-legend-label">Low SOC content — bottom 30 % of LUCAS (DE), SOC &lt; {{ oc_classification.threshold_low_gkg }} g/kg</div>
+          <p>These zones flag areas that may require attention. They are in the bottom 30th percentile of the SOC distribution of agricultural fields in Germany. Try implementing sustainable soil management practices and continuous monitoring to assess their impact. In the upcoming community forum, you can learn about SSM practices that farmers in your area are employing.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="howto-tip" style="margin-top:40px;">
+      <span class="howto-tip-label">📌 Important</span>
+      The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
+    </div>
+
   </section>
 
   <!-- About the ML Model -->
@@ -172,74 +241,28 @@
       <div class="howto-model-card">
         <div class="howto-model-icon">🛰️</div>
         <h4>Sentinel-2</h4>
-        <p>The model is powered by satellite imagery from the European Space Agency's Copernicus programme. Sentinel-2 delivers high-resolution optical imagery including NDVI, NDWI, and other vegetation indices.</p>
+        <p>The model is powered by multispectral imagery from the European Space Agency’s Sentinel-2 satellite from the Copernicus program. For its prediction it can access publicly available data since 2015 allowing also for historic analyses.</p>
       </div>
 
       <div class="howto-model-card">
         <div class="howto-model-icon">📅</div>
         <h4>Data freshness</h4>
-        <p>Sentinel satellites revisit the same location every 5–6 days. In the worst case, the satellite data used for your analysis may therefore be up to <strong>5–6 days old</strong>. For most soil quality assessments this is well within an acceptable margin, but keep this in mind if you recently performed field operations such as irrigation or tilling.</p>
+        <p>Sentinel satellites revisit the same location every 5-6 days providing always the latest data for your soil analysis. </p>
       </div>
 
       <div class="howto-model-card">
         <div class="howto-model-icon">🧠</div>
         <h4>Model output</h4>
-        <p>The model produces a score between <strong>0.0</strong> and <strong>1.0</strong> for each grid cell inside your polygon. These scores represent relative soil quality based on spectral reflectance, vegetation density, and moisture content indicators derived from the satellite data.</p>
+        <p>The model predicts the soil organic carbon content in g/kg for each grid cell inside your polygon. </p>
       </div>
 
     </div>
 
     <div class="howto-tip" style="margin-top:40px;">
       <span class="howto-tip-label">💡 Tip</span>
-      <p>If you want to learn more about how the ML-Model exactely works and are interested in the research background you can visit the Report page.</p>
-      <a class="btn-primary" href="/report" style="margin-top:20px;"> ⟶ Report </a>
+      <p>If you would like to find out more about how the ML model works in detail, you can visit the report page for more information.</p>
+      <a class="btn-primary" href="/report">⟶ Report</a>
     </div>
-
-  </section>
-
-  <!-- Reading the Results -->
-  <section class="about-section">
-    <div class="section-eyebrow">Interpreting results</div>
-    <h2 class="section-title">How to read the zone map</h2>
-
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
-      The zone map divides your field into a regular grid of cells. Each cell is assigned a soil quality score and colored accordingly. The following guide explains what each color range means in practice and how you can act on the results.
-    </p>
-
-    <div class="howto-legend-block">
-
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#22c55e,#4ade80);"></div>
-        <div>
-          <div class="howto-legend-label">High quality — Score 0.66 to 1.0</div>
-          <p>These zones show strong indicators of healthy soil conditions: good moisture retention, dense and active vegetation cover, and favorable spectral reflectance patterns. Fields or sub-areas in this range are performing well and generally require no immediate intervention. [Placeholder — detailed agronomic interpretation to be added by the project team.]</p>
-        </div>
-      </div>
-
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#f59e0b,#facc15);"></div>
-        <div>
-          <div class="howto-legend-label">Medium quality — Score 0.33 to 0.66</div>
-          <p>These zones are within an acceptable range but show some variability. Possible causes include uneven irrigation, localized compaction, or transitional vegetation states. Monitoring these areas over successive analyses can help identify whether quality is improving or declining. [Placeholder — to be refined with field-specific thresholds.]</p>
-        </div>
-      </div>
-
-      <div class="howto-legend-row" style="border-bottom:none;">
-        <div class="howto-legend-swatch" style="background:linear-gradient(135deg,#ef4444,#f87171);"></div>
-        <div>
-          <div class="howto-legend-label">Low quality — Score 0.0 to 0.33</div>
-          <p>These zones flag areas that may require attention. Low scores can indicate moisture stress, bare soil, erosion risk, or compacted layers. This does not replace a physical soil assessment, but can help you prioritize which areas of a large field to investigate first. [Placeholder — actionable recommendations to be added.]</p>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="howto-tip" style="margin-top:40px;">
-      <span class="howto-tip-label">📌 Important</span>
-      The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
-    </div>
-
-  
 
   </section>
 
@@ -251,28 +274,48 @@
     <div class="howto-faq">
 
       <div class="howto-faq-item">
-        <div class="howto-faq-q">Can I analyze multiple fields in one session?</div>
-        <p>Currently, one polygon can be active on the map at a time. You can still analyze and save multiple fields by saving the result, clicking Reset, and drawing the next field polygon. Your saved analyses are listed in the Personal Dashboard.</p>
+        <details class="howto-faq-details">
+          <summary class="howto-faq-q">Can I analyze multiple fields in one session?</summary>
+          <div class="howto-faq-a">
+            <p>Currently, one polygon can be active on the map at a time. You can still analyze and save multiple fields by saving the result, clicking Reset, and drawing the next field polygon. Your saved analyses are listed in the Personal Dashboard.</p>
+          </div>
+        </details>
       </div>
 
       <div class="howto-faq-item">
-        <div class="howto-faq-q">How large can my polygon be?</div>
-        <p>There is no hard size limit, but very large areas (several hundred hectares) will result in a larger number of grid cells and a slightly longer analysis time. For best results, analyze individual fields or management zones separately.</p>
+        <details class="howto-faq-details">
+          <summary class="howto-faq-q">How large can my polygon be?</summary>
+          <div class="howto-faq-a">
+            <p>Although there is no hard size limit, larger areas result in a greater number of grid cells and a longer analysis time. To achieve the best results, we recommend analysing individual fields or management zones separately.</p>
+          </div>
+        </details>
       </div>
 
       <div class="howto-faq-item">
-        <div class="howto-faq-q">Why do my results look very similar across runs?</div>
-        <p>If you analyze the same polygon with the same date, results can be very similar because the same inputs are used. Try selecting a different date, or compare multiple saved runs in the Personal Dashboard to spot changes over time.</p>
+        <details class="howto-faq-details">
+          <summary class="howto-faq-q">Why do my results look very similar across runs?</summary>
+          <div class="howto-faq-a">
+            <p>If you analyze the same polygon with the same date, results can be very similar because the same inputs are used. Try selecting a different date, or compare multiple saved runs in the Personal Dashboard to spot changes over time.</p>
+          </div>
+        </details>
       </div>
 
       <div class="howto-faq-item">
-        <div class="howto-faq-q">Where are saved analyses stored and how do I delete them?</div>
-        <p>Saved analyses are stored in the app’s database and can be managed from the Personal Dashboard. Use the Delete button on an entry to remove it from your history.</p>
+        <details class="howto-faq-details">
+          <summary class="howto-faq-q">Where are saved analyses stored and how do I delete them?</summary>
+          <div class="howto-faq-a">
+            <p>Saved analyses are stored in the app’s database and can be managed from the Personal Dashboard. Use the Delete button on an entry to remove it from your history.</p>
+          </div>
+        </details>
       </div>
 
-      <div class="howto-faq-item" style="border-bottom:none;">
-        <div class="howto-faq-q">Can I export the results?</div>
-        <p> Yes, all stored data can be downloaded as CSV-Files. Go to the personal dashboard and use the Download all button or download fields independently.</p>
+      <div class="howto-faq-item howto-faq-item--last">
+        <details class="howto-faq-details">
+          <summary class="howto-faq-q">Can I export the results?</summary>
+          <div class="howto-faq-a">
+            <p>Yes, all stored data can be downloaded as CSV-Files. Go to the personal dashboard and use the Download all button or download fields independently.</p>
+          </div>
+        </details>
       </div>
 
     </div>
@@ -281,10 +324,14 @@
   <!-- CTA -->
   <div class="home-cta">
     <h2>Ready to analyze your field?</h2>
-    <p>Head to the Analysis page and draw your first polygon — results in under a second.</p>
+    <p>Head to the Analysis page and draw your first polygon and find out your carbon content.</p>
     <a class="btn-primary" href="/analyse">⟶ Go to Analysis</a>
   </div>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="/static/js/how_to.js?v={{ static_css_version }}"></script>
 {% endblock %}
 

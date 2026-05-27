@@ -6,6 +6,18 @@ const map = L.map("map", {
   markerZoomAnimation: true
 }).setView([51.1657, 10.4515], 7);
 
+// Prefill data set by Personal Dashboard when re-analysing an existing field
+let _prefill = null;
+try {
+  const _raw = sessionStorage.getItem("dashboard_prefill");
+  if (_raw) {
+    _prefill = JSON.parse(_raw);
+    sessionStorage.removeItem("dashboard_prefill"); // consume immediately
+  }
+} catch(e) {
+  _prefill = null;
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const dateInput = document.getElementById("analysis-date");
   if (dateInput) {
@@ -15,11 +27,50 @@ document.addEventListener("DOMContentLoaded", () => {
     // ❗ no future dates allowed
     dateInput.max = today.toISOString().split("T")[0];
   }
+  // ── Restore polygon + save-popup fields from Personal Dashboard ─────────────
+  if (_prefill) {
+    const _coords = _prefill.polygon;
+
+    // Draw the stored polygon on the map
+    if (Array.isArray(_coords) && _coords.length >= 3) {
+      drawnItems.clearLayers();
+      const _latlngs = _coords.map(p => L.latLng(p.lat, p.lng));
+      const _layer   = L.polygon(_latlngs, {
+        color: "#C94F4F",
+        fillOpacity: 0.15,
+      });
+      drawnItems.addLayer(_layer);
+      currentPolygon = _layer.getLatLngs()[0];
+      updateStats(currentPolygon);
+      map.fitBounds(_layer.getBounds(), { padding: [40, 40] });
+    }
+
+    // Pre-fill the Save popup fields
+    if (_prefill.field_name    && dashboardFieldName)    dashboardFieldName.value    = _prefill.field_name;
+    if (_prefill.location_name && dashboardLocationName) dashboardLocationName.value = _prefill.location_name;
+    if (_prefill.crop          && dashboardCropSelect) {
+      const _cropVal = _prefill.crop;
+      const _opt = [...dashboardCropSelect.options].find(
+        o => o.value.toLowerCase()    === _cropVal.toLowerCase() ||
+            o.textContent.toLowerCase() === _cropVal.toLowerCase()
+      );
+      if (_opt) {
+        dashboardCropSelect.value = _opt.value;
+      } else {
+        dashboardCropSelect.value = "custom";
+        if (dashboardCustomCrop) {
+          dashboardCustomCrop.style.display = "block";
+          dashboardCustomCrop.value = _cropVal;
+        }
+      }
+    }
+  }
 });
 
 let analysisMode = false;
 let searchMarker = null;
 let latestAnalysisData = null;
+let ocClassification = window.OC_CLASSIFICATION || null;
 
 // =====================
 // BASE LAYERS
@@ -128,7 +179,7 @@ L.control.layers(baseLayers, overlays).addTo(map);
 // =====================
 
 map.addControl(new L.Control.Draw({
-  edit: { featureGroup: drawnItems },
+  edit: { featureGroup: drawnItems, remove: false },
   draw: {
     polygon: { shapeOptions: { color: "#C94F4F", fillOpacity: 0.15 } },
     polyline: false,
@@ -232,10 +283,28 @@ function calcArea(latlngs) {
 // UI HELPERS
 // =====================
 
-function valueToColor(v) {
-  if (v >= 0.66) return `hsl(${120 * v},70%,45%)`;
-  if (v >= 0.33) return `hsl(${120 * v},80%,48%)`;
-  return `hsl(${120 * v},75%,45%)`;
+const OC_TIER_COLORS = {
+  low: "#ef4444",
+  medium: "#f59e0b",
+  high: "#22c55e"
+};
+
+function ocTier(value, classification) {
+  const c = classification || ocClassification;
+  if (!c) return "medium";
+  if (value < c.threshold_low_gkg) return "low";
+  if (value < c.threshold_high_gkg) return "medium";
+  return "high";
+}
+
+function valueToColor(value, classification) {
+  const c = classification || ocClassification;
+  const tier = ocTier(value, c);
+  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+}
+
+function formatOcValue(value) {
+  return `${Number(value).toFixed(1)} g/kg`;
 }
 
 function setStep(n) {
@@ -247,11 +316,21 @@ function setStep(n) {
   });
 }
 
+function hideAnalysisHint() {
+  const hint = document.getElementById("analysis-hint");
+  if (hint) hint.hidden = true;
+}
+
+function showAnalysisHint() {
+  const hint = document.getElementById("analysis-hint");
+  if (hint) hint.hidden = false;
+}
+
 function updateStats(latlngs) {
   document.getElementById("stat-points").textContent = latlngs.length;
   document.getElementById("stat-area").textContent = calcArea(latlngs).toFixed(2) + " ha";
   document.getElementById("stat-status").textContent = "Bereit ✓";
-  document.getElementById("btn-analyse").disabled = false;
+  hideAnalysisHint();
   setStep(2);
 }
 
@@ -293,7 +372,7 @@ map.on(L.Draw.Event.DELETED, () => {
   );
 
   document.getElementById("stat-status").textContent = "Kein Polygon";
-  document.getElementById("btn-analyse").disabled = true;
+  hideAnalysisHint();
 
   resultLayer.clearLayers();
   document.getElementById("result-box").classList.remove("visible");
@@ -307,8 +386,12 @@ map.on(L.Draw.Event.DELETED, () => {
 // =====================
 
 document.getElementById("btn-analyse").addEventListener("click", async () => {
-  if (!currentPolygon) return;
+  if (!currentPolygon) {
+    showAnalysisHint();
+    return;
+  }
 
+  hideAnalysisHint();
   document.getElementById("btn-analyse").disabled = true;
   document.getElementById("loader").classList.add("visible");
   document.getElementById("result-box").classList.remove("visible");
@@ -331,39 +414,27 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
+    if (data.classification) {
+      ocClassification = data.classification;
+    }
 
-    const allBounds = [];
-
-    data.zones.forEach(zone => {
-      const color = valueToColor(zone.value);
-
-      const poly = L.polygon(
-        zone.sub_polygon.map(c => [c.lat, c.lng]),
-        {
-          color,
-          fillColor: color,
-          fillOpacity: 0.65,
-          weight: 0.5,
-          opacity: 0.4
-        }
-      );
-
-      poly.bindTooltip(
-        `<b>${zone.label}</b><br>${data.unit}: ${(zone.value * 100).toFixed(1)}%`,
-        { sticky: true }
-      );
-
-      resultLayer.addLayer(poly);
-      allBounds.push(poly.getBounds());
+    const fieldRing = currentPolygon.map(p => ({ lat: p.lat, lng: p.lng }));
+    const viz = FieldGradientOverlay.addFieldVisualization({
+      map,
+      polygon: fieldRing,
+      zones: data.zones,
+      layerGroup: resultLayer,
+      classification: data.classification,
+      valueToColor,
+      formatTooltip: (zone) =>
+        `<b>${zone.label}</b><br>${formatOcValue(zone.value)}`,
     });
 
-    const fieldBorder = L.polygon(
-      currentPolygon.map(p => [p.lat, p.lng]),
-      { color: "#C94F4F", fill: false, weight: 2.5 }
-    );
-
-    resultLayer.addLayer(fieldBorder);
-    allBounds.push(fieldBorder.getBounds());
+    const allBounds = [];
+    if (viz.borderLayer) allBounds.push(viz.borderLayer.getBounds());
+    else if (fieldRing.length >= 3) {
+      allBounds.push(L.latLngBounds(fieldRing.map(p => [p.lat, p.lng])));
+    }
 
     // =====================
     // SWITCH MODE AFTER SUCCESS
@@ -391,9 +462,9 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     };
 
     document.getElementById("res-zones").textContent = data.zones.length;
-    document.getElementById("res-avg").textContent = (avg * 100).toFixed(1) + "%";
-    document.getElementById("res-max").textContent = (Math.max(...values) * 100).toFixed(1) + "%";
-    document.getElementById("res-min").textContent = (Math.min(...values) * 100).toFixed(1) + "%";
+    document.getElementById("res-avg").textContent = formatOcValue(avg);
+    document.getElementById("res-max").textContent = formatOcValue(Math.max(...values));
+    document.getElementById("res-min").textContent = formatOcValue(Math.min(...values));
 
     document.getElementById("result-box").classList.add("visible");
     btnSaveDashboard.classList.add("visible");
@@ -425,7 +496,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   );
 
   document.getElementById("stat-status").textContent = "Kein Polygon";
-  document.getElementById("btn-analyse").disabled = true;
+  hideAnalysisHint();
   document.getElementById("result-box").classList.remove("visible");
   document.getElementById("btn-save-dashboard").style.display = "none";
 
@@ -471,6 +542,10 @@ const dashboardNotes = document.getElementById("dashboard-notes");
 
 const dashboardLocationName = document.getElementById("dashboard-location-name");
 
+const saveSuccessPopup = document.getElementById("save-success-popup");
+const closeSaveSuccessPopupBtn = document.getElementById("close-save-success-popup");
+const btnSaveSuccessClose = document.getElementById("btn-save-success-close");
+
 
 // =====================
 // SAVE POPUP FUNCTIONS
@@ -486,6 +561,18 @@ function closeSavePopup() {
   if (!savePopup) return;
 
   savePopup.classList.remove("visible");
+}
+
+function openSaveSuccessPopup() {
+  if (!saveSuccessPopup) return;
+  saveSuccessPopup.classList.add("visible");
+  saveSuccessPopup.setAttribute("aria-hidden", "false");
+}
+
+function closeSaveSuccessPopup() {
+  if (!saveSuccessPopup) return;
+  saveSuccessPopup.classList.remove("visible");
+  saveSuccessPopup.setAttribute("aria-hidden", "true");
 }
 
 // =====================
@@ -561,8 +648,7 @@ if (confirmDashboardSaveBtn) {
       }
 
       closeSavePopup();
-
-      alert("Analysis saved to dashboard ✓");
+      openSaveSuccessPopup();
 
     } catch (err) {
 
@@ -588,9 +674,89 @@ dashboardCropSelect.addEventListener("change", () => {
 
 });
 
+if (closeSaveSuccessPopupBtn) {
+  closeSaveSuccessPopupBtn.addEventListener("click", closeSaveSuccessPopup);
+}
+if (btnSaveSuccessClose) {
+  btnSaveSuccessClose.addEventListener("click", closeSaveSuccessPopup);
+}
+if (saveSuccessPopup) {
+  saveSuccessPopup.addEventListener("click", (e) => {
+    if (e.target === saveSuccessPopup) closeSaveSuccessPopup();
+  });
+}
+
 // ESC close
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") {
     closeSavePopup();
+    closeSaveSuccessPopup();
+    closeClassInfoPopup();
   }
 });
+
+// =====================
+// OC CLASSIFICATION INFO
+// =====================
+
+const classInfoPopup = document.getElementById("class-info-popup");
+const btnClassInfo = document.getElementById("btn-class-info");
+const closeClassInfoBtn = document.getElementById("close-class-info");
+
+function renderClassInfoPopup(classification) {
+  const c = classification || ocClassification;
+  if (!c) return;
+
+  const noteEl = document.getElementById("class-info-note");
+  const tiersEl = document.getElementById("class-info-tiers");
+  const datasetEl = document.getElementById("class-info-dataset");
+  const linkEl = document.getElementById("class-info-link");
+
+  if (noteEl) noteEl.textContent = c.dataset_note || "";
+  if (datasetEl) {
+    datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
+  }
+  if (linkEl && c.reference_url) {
+    linkEl.href = c.reference_url;
+  }
+  if (tiersEl && c.tier_descriptions) {
+    const order = ["low", "medium", "high"];
+    tiersEl.innerHTML = order
+      .map(tier => {
+        const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
+        const text = c.tier_descriptions[tier] || "";
+        return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+      })
+      .join("");
+  }
+}
+
+function openClassInfoPopup() {
+  if (!classInfoPopup) return;
+  renderClassInfoPopup(ocClassification);
+  classInfoPopup.classList.add("visible");
+  classInfoPopup.setAttribute("aria-hidden", "false");
+}
+
+function closeClassInfoPopup() {
+  if (!classInfoPopup) return;
+  classInfoPopup.classList.remove("visible");
+  classInfoPopup.setAttribute("aria-hidden", "true");
+}
+
+if (btnClassInfo) {
+  btnClassInfo.addEventListener("click", openClassInfoPopup);
+}
+if (closeClassInfoBtn) {
+  closeClassInfoBtn.addEventListener("click", closeClassInfoPopup);
+}
+if (classInfoPopup) {
+  classInfoPopup.addEventListener("click", (e) => {
+    if (e.target === classInfoPopup) closeClassInfoPopup();
+  });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderClassInfoPopup(ocClassification);
+});
+

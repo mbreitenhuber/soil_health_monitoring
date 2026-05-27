@@ -12,8 +12,7 @@
       <span class="accent">Intelligently analyzed</span>
     </h1>
     <p class="hero-sub">
-      AgroScan combines satellite geospatial data with machine learning —
-    draw your agricultural area and receive a detailed zone map in seconds.
+      AgroScan combines remote sensing with machine learning – select your agricultural field and receive a detailed map of its soil organic carbon content!
     </p>
     <div class="hero-actions">
       <a class="btn-primary" href="/analyse">⟶ Analyze now</a>
@@ -36,13 +35,22 @@
   </div>
 
   <!-- Stats — Daten kommen aus HOME_STATS in main.py -->
-  <div class="stats-bar">
+  <!--<div class="stats-bar">
     {% for stat in stats %}
       <div class="stat-item">
         <div class="stat-num">{{ stat.value[lang] if stat.value is mapping and lang in stat.value else stat.value }}</div>
         <div class="stat-label">{{ stat.label[lang] if stat.label is mapping and lang in stat.label else stat.label }}</div>
       </div>
     {% endfor %}
+  </div>-->
+
+  <div class="stats-bar home-quote-bar">
+    <figure class="home-quote-figure">
+      <blockquote class="home-quote">
+        <p>Soil carbon monitoring has long been expensive and out of reach, but this needs to change. Agroscan is fully open-source and powered by weekly satellite data. It is also free for everyone to use. After all, understanding our soil should not be a privilege.</p>
+      </blockquote>
+      <figcaption class="home-quote-cite">AgroScan Team</figcaption>
+    </figure>
   </div>
 
   <!-- Features — Daten kommen aus HOME_FEATURES in main.py -->
@@ -67,9 +75,9 @@
     </div>
     <div class="showcase-text">
       <div class="section-eyebrow">How it works</div>
-      <h3>From polygon to zone map in seconds</h3>
+      <h3>One click to become a carbon connoisseur</h3>
       <p>Select the polygon drawing tool on the map, click around the edges of your field, and start the analysis.</p>
-      <p>The program splits the bounding box into a 60m x 60m grid and computes a quality score for each cell using a machine learning model.</p>
+      <p>The program splits the selected polygon into a 60x60 m grid and predicts the agricultural soil organic carbon content using a machine learning model.</p>
       <a class="btn-primary" href="/analyse">Try out now →</a>
     </div>
   </section>
@@ -78,27 +86,26 @@
   <section class="showcase">
     <div class="showcase-text">
       <div class="section-eyebrow">Machine Learning Model</div>
-      <h3>Plug in your own model</h3>
-      <h3>Satellite driven decision support</h3>
-      <p>The machine learning model is trained on ESA's Sentinel-2 data. The Program splits the field in 60m x 60m cells and the model uses various vegetation indices to predict the quality for each cell. The result is a zone map with a quality score for each cell.</p>
-      <a class="btn-outline" href="/report">Learn more about the project →</a>
+      <h3>Satellite driven decision support – make it your own</h3>
+      <p>The machine learning model is trained on Sentinel-2 data and vegetation and soil indices. 
+        It utilized only free, publicly available data and is fully open-source making it easy to customize to your own use case. Curious? Read our report or checkout our GitHub repository. </p>
+      <a class="btn-outline" href="/report">Read our report →</a>
+      <a class="btn-outline" style="margin-top: 4px;" href="https://github.com/mbreitenhuber/soil_health_monitoring">Checkout our GitHub repository →</a>
     </div>
-    <div class="img-placeholder" style="border-radius:10px;width:100%;height:100%;aspect-ratio:16/9;">
-      <img src="/static/assets/image/flow_chart_ML.png" alt="Flow chart of the machine learning model"
-      style="width:100%;height:100%;object-fit:cover;" />
+    <div class="img-placeholder img-placeholder--media" style="aspect-ratio:4/3;border-radius:10px;">
+      <img src="/static/assets/image/flow_chart_ML.png" alt="Flow chart of the machine learning model" />
     </div>
   </section>
 
-  <!-- Users Experience -->
+  <!-- Users analysis -->
   <section class="about-section" style="border-top:1px solid var(--border);">
-    <div class="section-eyebrow">Social proof</div>
-    <h2 class="section-title">Trusted by users in the field</h2>
+    <div class="section-eyebrow">User analysis</div>
+    <h2 class="section-title">Developed with the user in mind</h2>
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:720px;">
-      Read three short (placeholder) reviews from different types of farms and see how AgroScan helped them
-      move from intuition to clearer, data-supported decisions.
-    </p>
-    <div style="margin-top:18px;">
-      <a class="btn-primary" href="/users_experience">⟶ Read user experiences</a>
+      AgroScan is developed to fit the needs of the user. Find out more about the three archetype users we had in mind when designing our website. All of them are based on our interviews with farmers in the South of Germany. 
+    </p> 
+    <div style="margin-top: 18px;">
+      <a class="btn-primary" href="/users_analysis">⟶ User analysis</a>
     </div>
   </section>
 
@@ -133,7 +140,7 @@
         <div class="team-card">
           <div class="team-photo">
             {% if member.photo %}
-              <img src="/static/assets/team/{{ member.photo }}"
+              <img src="/static/assets/image/{{ member.photo }}"
                    alt="{{ member.name }}"
                    style="width:100%;height:100%;object-fit:cover;" />
             {% else %}

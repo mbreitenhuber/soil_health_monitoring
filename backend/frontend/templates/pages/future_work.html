@@ -1,37 +1,183 @@
 {% extends "base.html" %}
 
-{% block title %}About us{% endblock %}
+{% block title %}Future Work — AgroScan{% endblock %}
+
+{% block head_styles %}
+  <link rel="stylesheet" href="/static/css/report.css?v={{ static_css_version }}" />
+{% endblock %}
 
 {% block content %}
 <div class="page-content">
 
-  <h2>Diese Seite ist noch in Arbeit</h2>
-
+  <!-- HERO (wie report.html) -->
   <div class="about-hero">
-    <div class="section-eyebrow">About AgroScan</div>
-    <h1>We connect <em>Agriculture</em> with modern AI.</h1>
-    <p>AgroScan is an open-source starter template for machine learning-based soil analysis,
-        developed for scientists, agri-tech startups, and farmers.</p>
+    <div class="section-eyebrow">
+      {{ "Roadmap" if lang == "en" else "Roadmap" }}
+    </div>
+    <h1>
+      {% if lang == "en" %}
+        AgroScan <em>Future Work</em>
+      {% else %}
+        AgroScan <em>Zukünftige Arbeiten</em>
+      {% endif %}
+    </h1>
+    <p>
+      {% if lang == "en" %}
+        An early-stage prototype with a clear direction: scale coverage, improve the model, speed up the product, and grow the platform responsibly.
+      {% else %}
+        Ein früher Prototyp mit klarer Richtung: mehr Abdeckung, besseres Modell, schnellere Nutzung und verantwortungsvolles Wachstum der Plattform.
+      {% endif %}
+    </p>
   </div>
 
-  <!-- Mission -->
+  <!-- EINLEITUNG -->
   <section class="about-section">
-    <div class="section-eyebrow">Mission</div>
-    <h2 class="section-title">Why AgroScan?</h2>
-    <div class="mission-block">
-      <blockquote>
-        "Precision agriculture shouldn’t fail because of technical complexity.
-        Our goal is a template that becomes production-ready in hours — not weeks."
-      </blockquote>
-    </div>
-    <p style="margin-top:24px;font-size:0.82rem;color:var(--text-dim);line-height:1.8;max-width:680px;">
-      Satellite data, soil sensors, weather services — the data already exists.
-      What’s missing is a simple framework that connects cartographic visualization
-      with a plug-and-play ML backend. AgroScan fills that gap.
+    <div class="section-eyebrow">{{ "Overview" if lang == "en" else "Überblick" }}</div>
+    <h2 class="section-title">{{ "What we want to build next" if lang == "en" else "Was wir als Nächstes weiterentwickeln wollen" }}</h2>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        The list below groups the most impactful next steps by theme. Some items overlap by design (for example, global training and worldwide service) — together they describe how AgroScan could evolve from a focused prototype into a broadly useful tool.
+      {% else %}
+        Die folgende Liste bündelt die wichtigsten nächsten Schritte nach Themen. Einzelne Punkte überlappen bewusst (z.&nbsp;B. globales Training und weltweiter Service) — gemeinsam beschreiben sie, wie AgroScan von einem fokussierten Prototyp zu einem breit nutzbaren Werkzeug wachsen könnte.
+      {% endif %}
     </p>
+
+    <blockquote class="report-pullquote">
+      {% if lang == "en" %}
+        Better data, faster analysis, wider reach — without losing transparency and openness.
+      {% else %}
+        Mehr Daten, schnellere Analyse, größere Reichweite — ohne Transparenz und Offenheit zu verlieren.
+      {% endif %}
+    </blockquote>
   </section>
 
-  
+  <!-- THEMEN ALS HIGHLIGHT-GRID (wie report.html „Barriers“-Sektion) -->
+  <section class="about-section">
+    <div class="section-eyebrow">{{ "Themes" if lang == "en" else "Themen" }}</div>
+    <h2 class="section-title">{{ "Next steps at a glance" if lang == "en" else "Nächste Schritte im Überblick" }}</h2>
+
+    <div class="report-highlight-grid">
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">🌍</div>
+        <div class="report-highlight-label">{{ "Global expansion & localization" if lang == "en" else "Globale Skalierung & Lokalisierung" }}</div>
+        <p>
+          {% if lang == "en" %}
+            Scale beyond Germany: training, service coverage, and languages for international users.
+          {% else %}
+            Über Deutschland hinaus: Training, Service-Abdeckung und Sprachen für internationale Nutzer:innen.
+          {% endif %}
+        </p>
+        <ul>
+          <li>
+            {% if lang == "en" %}
+              Expand ML training to more European countries, then worldwide.
+            {% else %}
+              ML-Training auf weitere europäische Länder ausweiten, später weltweit.
+            {% endif %}
+          </li>
+          <li>
+            {% if lang == "en" %}
+              Offer the service worldwide (coverage, onboarding, support).
+            {% else %}
+              Service weltweit anbieten (Abdeckung, Onboarding, Support).
+            {% endif %}
+          </li>
+          <li>
+            {% if lang == "en" %}
+              Add more languages on the website.
+            {% else %}
+              Mehr Sprachen auf der Website.
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">🧠</div>
+        <div class="report-highlight-label">{{ "Model quality & efficiency" if lang == "en" else "Modellqualität & Effizienz" }}</div>
+        <p>
+          {% if lang == "en" %}
+            Stronger predictions with richer data and a leaner ML pipeline for training and inference.
+          {% else %}
+            Robustere Vorhersagen durch mehr Daten und eine schlankere ML-Pipeline für Training und Inferenz.
+          {% endif %}
+        </p>
+        <ul>
+          <li>
+            {% if lang == "en" %}
+              Use more diverse data for better prediction quality.
+            {% else %}
+              Vielfältigere Daten für bessere Vorhersagequalität.
+            {% endif %}
+          </li>
+          <li>
+            {% if lang == "en" %}
+              Make the ML pipeline faster and more resource-efficient.
+            {% else %}
+              ML-Pipeline schneller und ressourcenschonender machen.
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">⚡</div>
+        <div class="report-highlight-label">{{ "Performance & UX" if lang == "en" else "Performance & UX" }}</div>
+        <p>
+          {% if lang == "en" %}
+            Shorter waits in the analysis flow through backend, network, and UI optimizations.
+          {% else %}
+            Kürzere Wartezeiten im Analyse-Flow durch Backend-, Netzwerk- und UI-Optimierungen.
+          {% endif %}
+        </p>
+        <ul>
+          <li>
+            {% if lang == "en" %}
+              Reduce loading time (API latency, rendering, caching).
+            {% else %}
+              Ladezeiten reduzieren (API-Latenz, Rendering, Caching).
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <div class="report-highlight-card">
+        <div class="report-highlight-icon">🗄️</div>
+        <div class="report-highlight-label">{{ "Data storage & scale" if lang == "en" else "Speicherung & Skalierung" }}</div>
+        <p>
+          {% if lang == "en" %}
+            A storage layer that grows with datasets, results, and users.
+          {% else %}
+            Eine Speicher-Schicht, die mit Datensätzen, Ergebnissen und Nutzer:innen mitwächst.
+          {% endif %}
+        </p>
+        <ul>
+          <li>
+            {% if lang == "en" %}
+              Introduce a better data storage solution for long-term growth.
+            {% else %}
+              Bessere Datenhaltung für nachhaltiges Wachstum einführen.
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA: Abschluss im Report-Stil (Pullquote + Link) -->
+  <section class="about-section">
+    <blockquote class="report-pullquote">
+      {% if lang == "en" %}
+        Until these improvements land, you can already explore what AgroScan can do today — start an analysis and view the SOC map for your field.
+      {% else %}
+        Bis diese Verbesserungen umgesetzt sind, könnt ihr AgroScan schon jetzt ausprobieren — startet eine Analyse und schaut euch die SOC-Karte für euer Feld an.
+      {% endif %}
+    </blockquote>
+    <p class="report-body" style="margin-top: 20px;">
+      <a class="btn-primary" href="/analyse">{{ "⟶ Explore the analysis" if lang == "en" else "⟶ Aktuellen Stand erkunden" }}</a>
+    </p>
+  </section>
 
 </div>
 {% endblock %}

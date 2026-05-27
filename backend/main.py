@@ -37,6 +37,13 @@ from shapely.geometry import Point, Polygon
 from pyproj import CRS, Transformer#
 from dotenv import load_dotenv
 
+from oc_classification import (
+    lucas_oc_percentile_thresholds,
+    oc_classification_meta,
+    oc_tier,
+    oc_tier_label,
+)
+
 load_dotenv()
 
 # ── Pfade (backend root = directory containing main.py, /app in Docker) ──
@@ -84,7 +91,7 @@ def _api_base_url() -> str:
 
 
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
-STATIC_CSS_VERSION = "3"
+STATIC_CSS_VERSION = "6"
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
@@ -139,6 +146,35 @@ def init_db():
     conn.commit()
     conn.close()
 
+
+def _json_list(value) -> list:
+    if not value:
+        return []
+    try:
+        parsed = json.loads(value)
+        return parsed if isinstance(parsed, list) else []
+    except (json.JSONDecodeError, TypeError):
+        return []
+
+
+def _analysis_from_row(row: sqlite3.Row) -> dict:
+    """Spaltennamen nutzen — physische Reihenfolge in älteren DBs weicht ab."""
+    return {
+        "id": row["id"],
+        "date": row["date"],
+        "crop": row["crop"],
+        "field_name": row["field_name"],
+        "notes": row["notes"],
+        "location_name": row["location_name"],
+        "polygon": _json_list(row["polygon"]),
+        "avg_value": row["avg_value"] or 0,
+        "min_value": row["min_value"] or 0,
+        "max_value": row["max_value"] or 0,
+        "zones": _json_list(row["zones"]),
+        "created_at": row["created_at"],
+    }
+
+
 init_db()
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -158,12 +194,12 @@ app.add_middleware(
 
 # Neue Seite: Eintrag hier ergänzen + Route unten anlegen
 NAV_PAGES = [
-    {"id": "home",               "label": {"en": "Home",               "de": "Home"},               "href": "/",                   "group": "main"},
+    {"id": "home",               "label": {"en": "Home",               "de": "Home"},                "href": "/",                   "group": "main"},
     {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
-    {"id": "users_experience",   "label": {"en": "Users Experience",   "de": "Nutzererfahrungen"},   "href": "/users_experience",   "group": "more"},
+    {"id": "unser_analysis",     "label": {"en": "Users Analysis",     "de": "Nutzeralysis"},        "href": "/users_analysis",     "group": "more"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
-    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "middle"},
+    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "main"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
 ]
 
@@ -190,15 +226,15 @@ HOME_FEATURES = [
 ]
 
 ROADMAP = [
-    {"version": "v0.1", "title": {"en": "Ml-Model programming and training", "de": "Ml-Modell-Programmierung und -Training"}, "done": True,
-     "desc": {"en": "Literature research, programming and training of the Ml-model.", "de": "Literaturrecherche, Programmierung und Training des Ml-Modells."}},
+    {"version": "v0.1", "title": {"en": "ML-Model programming and training", "de": "ML-Modell-Programmierung und -Training"}, "done": True,
+     "desc": {"en": "Literature research, programming and training of the ML-model.", "de": "Literaturrecherche, Programmierung und Training des ML-Modells."}},
     {"version": "v0.2", "title": {"en": "Starting Web-App development", "de": "Start der Web-App-Entwicklung"},    "done": True,
      "desc": {"en": "Web-App development with FastAPI and Jinja2. Focused on analysis and saving the results.", "de": "Web-App-Entwicklung mit FastAPI und Jinja2. Fokussiert auf Analyse und Speichern der Ergebnisse."}},
-    {"version": "v0.3", "title": {"en": "Integration of the Ml-model into the Web-App", "de": "Integration des Ml-Modells in die Web-App"},   "done": False,
-     "desc": {"en": "Connect the Web-App to the Ml-Model and make it usable.", "de": "Verbinde die Web-App mit dem Ml-Modell und macht es nutzbar."}},
-    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalizing the Web-App"},   "done": False,
+    {"version": "v0.3", "title": {"en": "Integration of the ML-Model into the Web-App", "de": "Integration des ML-Modells in die Web-App"},   "done": True,
+     "desc": {"en": "Connect the Web-App to the ML-Model and make it usable.", "de": "Verbinde die Web-App mit dem ML-Modell und macht es nutzbar."}},
+    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalizing the Web-App"},   "done": True,
      "desc": {"en": "Finalizing the Web-App. Focused on the user experience and the design.", "de": "Die Web-App wird finalisiert. Fokussiert auf die Nutzungserfahrung und das Design."}},
-    {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": False,
+    {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": True,
      "desc": {"en": "Final deployment and documentation of the project.", "de": "Finales Deployment und die Dokumentation des Projekts."}},
      {"version": "v1.1", "title": {"en": "The Presentation", "de": "Die Präsentation"},"done": False,
      "desc": {"en": "Final presentation of the project.", "de": "Finale Präsentation des Projekts."}},
@@ -207,14 +243,14 @@ ROADMAP = [
 # Neue Teammitglieder: Eintrag hier ergänzen.
 # photo: Dateiname in static/assets/team/ — oder None für Platzhalter
 TEAM_MEMBERS = [
-    {"name": "Dein Name",   "role": "ML Engineer",   "photo": None,
-     "bio": "Kurze Bio — Spezialgebiet, Uni, Erfahrung mit Agrardaten."},
-    {"name": "Teamkollege", "role": "Backend / GIS",  "photo": None,
-     "bio": "FastAPI, PostGIS, Geodatenverarbeitung."},
-    {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
-     "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
-     {"name": "Teamkollege", "role": "Frontend / UX",  "photo": None,
-     "bio": "Karten-UX, Leaflet, agrarische Nutzerforschung."},
+    {"name": "Clara Buller",   "role": "Master Student in Energy Science and Technology",   "photo": "clara.jpeg",
+     "bio": "ML-Model programming and training, Data analysis and ML implementation."},
+    {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": None,
+     "bio": "ML-Model programming and training, Data analysis and ML implementation."},
+    {"name": "Jerome Reiter", "role": "2nd Semester Bachelor CSE-Student",  "photo": None,
+     "bio": "Backend and frontend development, Map design and personal dashboard."},
+     {"name": "Claudio Bussinger", "role": "2nd Semester Bachelor CSE-Student",  "photo": "Claudio.jpg",
+     "bio": "Backend and frontend development, Map design and website design."},
 ]
 
 
@@ -330,6 +366,7 @@ async def home(request: Request, lang: str = Cookie(default="en")):
 async def analysis(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/analysis.html", ctx(
         request, "analysis", lang,
+        oc_classification=oc_classification_meta(lang),
     ))
 
 @app.get("/future_work", response_class=HTMLResponse)
@@ -345,8 +382,7 @@ async def future_work(request: Request, lang: str = Cookie(default="en")):
 async def how_to(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/how_to.html", ctx(
         request, "how_to", lang,
-        # seitenspezifische Daten hier:
-        # my_data=MY_DATA,
+        oc_classification=oc_classification_meta(lang),
     ))
 
 
@@ -361,26 +397,12 @@ async def pers_dash(request: Request, lang: str = Cookie(default="en")):
     rows = c.fetchall()
     conn.close()
 
-    analyses = []
-    for r in rows:
-        analyses.append({
-            "id": r["id"],
-            "date": r["date"],
-            "crop": r["crop"],
-            "field_name": r["field_name"],
-            "notes": r["notes"],
-            "location_name": r["location_name"],
-            "polygon": json.loads(r["polygon"]) if r["polygon"] else [],
-            "avg_value": r["avg_value"] or 0,
-            "min_value": r["min_value"] or 0,
-            "max_value": r["max_value"] or 0,
-            "zones": json.loads(r["zones"]) if r["zones"] else [],
-            "created_at": r["created_at"],
-        })
+    analyses = [_analysis_from_row(r) for r in rows]
 
     return templates.TemplateResponse("pages/pers_dash.html", ctx(
         request, "pers_dash", lang,
-        analyses=analyses
+        analyses=analyses,
+        oc_classification=oc_classification_meta(lang),
     ))
 
 @app.get("/report", response_class=HTMLResponse)
@@ -391,10 +413,10 @@ async def report(request: Request, lang: str = Cookie(default="en")):
         # my_data=MY_DATA,
     ))
 
-@app.get("/users_experience", response_class=HTMLResponse)
+@app.get("/users_analysis", response_class=HTMLResponse)
 async def users_experience(request: Request, lang: str = Cookie(default="en")):
-    return templates.TemplateResponse("pages/users_experience.html", ctx(
-        request, "users_experience", lang,
+    return templates.TemplateResponse("pages/users_analysis.html", ctx(
+        request, "users_analysis", lang,
         # seitenspezifische Daten hier:
         # my_data=MY_DATA,
     ))
@@ -425,10 +447,28 @@ class ZoneResult(BaseModel):
     sub_polygon: List[Coordinate]
     value: float
     label: str
+    tier: str
+
+class OCClassificationMeta(BaseModel):
+    unit: str
+    parameter: str
+    depth_cm: str
+    percentile_low: int
+    percentile_high: int
+    threshold_low_gkg: float
+    threshold_high_gkg: float
+    n_samples: int
+    dataset_name: str
+    reference_url: str
+    reference_title: str
+    dataset_note: str
+    tier_descriptions: dict[str, str]
+    colors: dict[str, str]
 
 class PredictionResponse(BaseModel):
-    zones:     List[ZoneResult]
-    unit:      str
+    zones: List[ZoneResult]
+    unit: str
+    classification: OCClassificationMeta
     min_value: float
     max_value: float
 
@@ -660,10 +700,11 @@ def run_model(
     return predictions_df[prediction_column].to_numpy(dtype=float)
 
 
-def value_to_label(value: float) -> str: # TODO: adjust with relevant OC content thresholds
-    if value >= 0.66: return "Hoch"
-    if value >= 0.33: return "Mittel"
-    return "Niedrig"
+@app.get("/api/oc-classification")
+def api_oc_classification(lang: str = "en"):
+    if lang not in ("en", "de"):
+        lang = "en"
+    return oc_classification_meta(lang)
 
 
 @app.get("/api/health")
@@ -678,7 +719,9 @@ def healthz():
 
 
 @app.post("/api/predict", response_model=PredictionResponse)
-def predict(request: FieldRequest):
+def predict(request: FieldRequest, lang: str = Cookie(default="en")):
+    if lang not in ("en", "de"):
+        lang = "de"
     print(
         f"[backend] /api/predict: received request with {len(request.polygon)} polygon points "
         f"and analysis_date={request.analysis_date}",
@@ -721,8 +764,12 @@ def predict(request: FieldRequest):
     y = run_model(grid_csv, analysis_date=request.analysis_date)
 
     # 5) Convert predictions into polygons for the frontend (each cell as a zone)
+    t_low, t_high, _ = lucas_oc_percentile_thresholds()
     zones = []
+    values = []
     for p, value in zip(grid_points, y):
+        v = float(value)
+        values.append(v)
         cell_poly = _cell_polygon_latlng_from_center(
             center_x_m=p["center_x_m"],
             center_y_m=p["center_y_m"],
@@ -732,17 +779,21 @@ def predict(request: FieldRequest):
         zones.append(
             ZoneResult(
                 sub_polygon=cell_poly,
-                value=round(float(value), 3),
-                label=value_to_label(float(value)),
+                value=round(v, 2),
+                label=oc_tier_label(v, t_low, t_high, lang=lang),
+                tier=oc_tier(v, t_low, t_high),
             )
         )
     print(f"[backend] /api/predict: created {len(zones)} prediction zones", flush=True)
 
+    classification = OCClassificationMeta(**oc_classification_meta(lang))
+
     return PredictionResponse(
         zones=zones,
-        unit="Bodenqualität",
-        min_value=0.0,
-        max_value=1.0,
+        unit="g/kg OC",
+        classification=classification,
+        min_value=round(min(values), 2) if values else 0.0,
+        max_value=round(max(values), 2) if values else 0.0,
     )
 
 
@@ -792,34 +843,14 @@ def save_analysis(req: SaveRequest):
 @app.get("/api/analyses")
 def get_analyses():
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
-
     conn.close()
 
-    return [
-        {
-            "id": r[0],
-            "date": r[1],
-            "crop": r[2],
-            "field_name": r[3],
-            "notes": r[4],
-            "location_name": r[5],
-
-            "polygon": json.loads(r[6]),
-
-            "avg_value": r[7],
-            "min_value": r[8],
-            "max_value": r[9],
-
-            "zones": json.loads(r[10]),
-
-            "created_at": r[11]
-        }
-        for r in rows
-    ]
+    return [_analysis_from_row(r) for r in rows]
 
 @app.delete("/api/analyses/{id}")
 def delete_analysis(id: int):
@@ -851,9 +882,9 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
         "Field Name",
         "Location",
         "Notes",
-        "Avg (%)",
-        "Min (%)",
-        "Max (%)",
+        "Avg (g/kg OC)",
+        "Min (g/kg OC)",
+        "Max (g/kg OC)",
         "Polygon Points",
         "Zones Count",
         "Created At"
@@ -875,9 +906,9 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             a.get("field_name"),
             a.get("location_name"),
             a.get("notes"),
-            round(a.get("avg_value", 0) * 100, 1),
-            round(a.get("min_value", 0) * 100, 1),
-            round(a.get("max_value", 0) * 100, 1),
+            round(a.get("avg_value", 0), 1),
+            round(a.get("min_value", 0), 1),
+            round(a.get("max_value", 0), 1),
             poly_len,
             zone_len,
             a.get("created_at")
@@ -887,12 +918,11 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
     return output.getvalue()
 
 from fastapi.responses import Response
-import sqlite3
-import json
 
 @app.get("/api/analyses/{id}/csv")
 def download_single_csv(id: int):
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     c.execute("SELECT * FROM analyses WHERE id = ?", (id,))
@@ -902,22 +932,7 @@ def download_single_csv(id: int):
     if not r:
         return {"error": "not found"}
 
-    analysis = {
-        "id": r[0],
-        "date": r[1],
-        "crop": r[2],
-        "field_name": r[3],
-        "notes": r[4],
-        "location_name": r[5],
-        "polygon": json.loads(r[6]) if r[6] else [],
-        "avg_value": r[7],
-        "min_value": r[8],
-        "max_value": r[9],
-        "zones": json.loads(r[10]) if r[10] else [],
-        "created_at": r[11]
-    }
-
-    csv_data = _analysis_to_csv([analysis])
+    csv_data = _analysis_to_csv([_analysis_from_row(r)])
 
     return Response(
         content=csv_data,
@@ -930,30 +945,14 @@ def download_single_csv(id: int):
 @app.get("/api/analyses/csv")
 def download_all_csv():
     conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
     conn.close()
 
-    analyses = []
-    for r in rows:
-        analyses.append({
-            "id": r[0],
-            "date": r[1],
-            "crop": r[2],
-            "field_name": r[3],
-            "notes": r[4],
-            "location_name": r[5],
-            "polygon": json.loads(r[6]) if r[6] else [],
-            "avg_value": r[7],
-            "min_value": r[8],
-            "max_value": r[9],
-            "zones": json.loads(r[10]) if r[10] else [],
-            "created_at": r[11]
-        })
-
-    csv_data = _analysis_to_csv(analyses)
+    csv_data = _analysis_to_csv([_analysis_from_row(r) for r in rows])
 
     return Response(
         content=csv_data,
