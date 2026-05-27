@@ -375,7 +375,6 @@
   border-radius: 16px;
   padding: 18px 16px;
   text-align: center;
-  border-top: 3px solid transparent;
 }
 
 .detail-stat-card span {
@@ -393,10 +392,6 @@
   margin-top: 6px;
   color: var(--text);
 }
-
-.stat-min { border-top-color: #ef4444; }
-.stat-avg { border-top-color: #f59e0b; }
-.stat-max { border-top-color: #22c55e; }
 
 /* =========================
    CHART WRAPPER (modals)
