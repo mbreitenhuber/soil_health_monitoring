@@ -13,6 +13,7 @@
 data/raw/
 data/processed/
 data/sentinel_output/
+#persistent-data/
 
 # --- Python ---
 __pycache__/

@@ -50,7 +50,18 @@ load_dotenv()
 PROJECT_ROOT = Path(__file__).resolve().parent
 TEMPLATE_DIR = PROJECT_ROOT / "frontend" / "templates"
 STATIC_DIR = PROJECT_ROOT / "frontend" / "static"
-DB_PATH = Path(os.environ.get("AGROSCAN_DB_PATH", PROJECT_ROOT / "agroscan.db"))
+
+
+def _default_db_path() -> Path:
+    override = os.environ.get("AGROSCAN_DB_PATH")
+    if override:
+        return Path(override)
+
+    persistent_root = PROJECT_ROOT.parent / "persistent-data"
+    return persistent_root / "agroscan.db"
+
+
+DB_PATH = _default_db_path()
 
 PIPELINE_SCRIPT = PROJECT_ROOT / "AgroLens" / "nutrients_predictor" / "run_pipeline_from_gps.py"
 PIPELINE_WORK_DIR = PROJECT_ROOT / "data" / "pipeline_runs"
@@ -70,15 +81,15 @@ REQUIRED_SATELLITE_ENV_VARS = [
 def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = DEFAULT_TARGET) -> Path:
     override = os.environ.get("AGROSCAN_MODEL_PATH")
     if override:
-        return Path(override)
-    return (
-        PROJECT_ROOT
-        / "data"
-        / "models"
-        / model_config
-        / "nn"
-        / f"{model_config}_nn_{target}.pth"
-    )
+        model_root = Path(override)
+        if model_root.suffix == ".pth" and model_root.is_file():
+            return model_root
+        if model_root.name != "models":
+            model_root = model_root / "models"
+    else:
+        model_root = PROJECT_ROOT / "data" / "models"
+
+    return model_root / model_config / "nn" / f"{model_config}_nn_{target}.pth"
 
 
 def _missing_satellite_env_vars(env: dict[str, str]) -> list[str]:

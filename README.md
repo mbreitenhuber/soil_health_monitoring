@@ -22,7 +22,7 @@ The generated results can support farmers, agronomists, and researchers in both 
 │   ├── satellite_utils/      # Satellite data access and preprocessing utilities (Sentinel, USGS, etc.).
 │   └── scripts/              # Pipeline helper scripts for data preparation and execution.
 ├── backend/                  # FastAPI backend for the website, including API routes and server-side rendering.
-│   ├── agroscan.db           # Local SQLite database file used by the backend.
+│   ├── persistent-data/       # Mounted volume for durable runtime data, including agroscan.db.
 │   ├── main.py               # FastAPI application entrypoint and HTTP routes.
 │   └── Dockerfile
 ├── frontend/                 # Jinja templates and static assets for the web UI.
