@@ -19,8 +19,8 @@
   margin-top: 8px;
   align-items: start;
   max-width: 980px;
-  margin-left: auto;
-  margin-right: auto;
+  margin-left: 0;
+  margin-right: 0;
 }
 
 @media (max-width: 720px) {

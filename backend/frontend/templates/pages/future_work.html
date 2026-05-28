@@ -12,7 +12,7 @@
   <!-- HERO (wie report.html) -->
   <div class="about-hero">
     <div class="section-eyebrow">
-      {{ "Roadmap" if lang == "en" else "Roadmap" }}
+      {{ "Future Features" if lang == "en" else "Zukünftige Features" }}
     </div>
     <h1>
       {% if lang == "en" %}
@@ -23,159 +23,179 @@
     </h1>
     <p>
       {% if lang == "en" %}
-        An early-stage prototype with a clear direction: scale coverage, improve the model, speed up the product, and grow the platform responsibly.
+        This is just the beginning. Below you’ll find an overview of the next features we want to bring to you, on the website and in the underlying technology.
       {% else %}
-        Ein früher Prototyp mit klarer Richtung: mehr Abdeckung, besseres Modell, schnellere Nutzung und verantwortungsvolles Wachstum der Plattform.
+        Das ist erst der Anfang. Unten findet ihr einen Überblick über die nächsten Features, die wir umsetzen möchten, auf der Website und in der zugrunde liegenden Technologie.
       {% endif %}
     </p>
   </div>
 
-  <!-- EINLEITUNG -->
+  <!-- WEBSITE FEATURES -->
   <section class="about-section">
-    <div class="section-eyebrow">{{ "Overview" if lang == "en" else "Überblick" }}</div>
-    <h2 class="section-title">{{ "What we want to build next" if lang == "en" else "Was wir als Nächstes weiterentwickeln wollen" }}</h2>
+    <div class="section-eyebrow">{{ "Website features" if lang == "en" else "Website-Features" }}</div>
+    <h2 class="section-title">
+      {{ "What’s coming to the product" if lang == "en" else "Was als Nächstes ins Produkt kommt" }}
+    </h2>
 
     <p class="report-body">
       {% if lang == "en" %}
-        The list below groups the most impactful next steps by theme. Some items overlap by design (for example, global training and worldwide service) — together they describe how AgroScan could evolve from a focused prototype into a broadly useful tool.
+        These ideas focus on day-to-day usability, better guidance, and community. They’re written as a preview — the exact UX and implementation details will evolve.
       {% else %}
-        Die folgende Liste bündelt die wichtigsten nächsten Schritte nach Themen. Einzelne Punkte überlappen bewusst (z.&nbsp;B. globales Training und weltweiter Service) — gemeinsam beschreiben sie, wie AgroScan von einem fokussierten Prototyp zu einem breit nutzbaren Werkzeug wachsen könnte.
+        Diese Ideen fokussieren sich auf bessere Nutzbarkeit im Alltag, mehr Unterstützung und Community. Sie sind als Vorschau gedacht — UX und Details werden sich bei der Umsetzung weiterentwickeln.
       {% endif %}
     </p>
 
-    <blockquote class="report-pullquote">
-      {% if lang == "en" %}
-        Better data, faster analysis, wider reach — without losing transparency and openness.
-      {% else %}
-        Mehr Daten, schnellere Analyse, größere Reichweite — ohne Transparenz und Offenheit zu verlieren.
-      {% endif %}
-    </blockquote>
+    <div style="max-width: 820px;">
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 20px 0 10px;">
+        1. {{ "Community forum" if lang == "en" else "Community-Forum" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Connect with fellow farmers on their sustainable farming journey: profile + interest-based groups + direct messages, and a place to propose new AgroScan ideas.
+        {% else %}
+          Vernetzt euch mit anderen Landwirt:innen auf dem Weg zu nachhaltiger Landwirtschaft: Profil + themenbasierte Gruppen + Direktnachrichten und ein Ort, um neue AgroScan-Ideen vorzuschlagen.
+        {% endif %}
+      </p>
+    </div>
+
+    <figure style="margin: 16px 0 34px; max-width: 750px;">
+      <img
+        src="/static/assets/image/Community_forum_dash.png"
+        alt="{% if lang == 'en' %}Mockup: community forum dashboard{% else %}Mockup: Community-Forum Dashboard{% endif %}"
+        style="width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--border);"
+        loading="lazy"
+      />
+    </figure>
+
+    <div style="max-width: 820px;">
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 0 0 10px;">
+        2. {{ "Chatbot recommendations" if lang == "en" else "Chatbot-Empfehlungen" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          A chatbot for sustainable soil management practice recommendations — trained on academic knowledge and local farmer experience — including guidance on techniques, incentives, and carbon-credit ideas.
+        {% else %}
+          Ein Chatbot für Empfehlungen zu nachhaltigem Bodenmanagement — trainiert mit akademischem Wissen und lokalen Erfahrungen — inklusive Hilfe zu Techniken, Incentives und Carbon-Credit-Ideen.
+        {% endif %}
+      </p>
+
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
+        3. {{ "Baseline / historic analysis" if lang == "en" else "Baseline- & Historienanalyse" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Select your field and a time period, then automatically run historic quarterly analyses and summarize them in a simple line chart to establish a baseline.
+        {% else %}
+          Feld und Zeitraum auswählen, dann automatisch historische Quartals-Analysen durchführen und als einfache Liniengrafik zusammenfassen — als Baseline für den Start.
+        {% endif %}
+      </p>
+
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
+        4. {{ "Track your progress" if lang == "en" else "Fortschritt tracken" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Set SOC goals, track progress over time, and add a bit of fun via light gamification to stay motivated.
+        {% else %}
+          SOC-Ziele setzen, Fortschritt über Zeit verfolgen und mit leichter Gamification Motivation schaffen.
+        {% endif %}
+      </p>
+
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
+        5. {{ "Loading page reinvented" if lang == "en" else "Loading-Page neu gedacht" }}
+      </h3>
+      <p class="report-body" style="margin-bottom: 14px;">
+        {% if lang == "en" %}
+          A loading page that shows exactly which step the pipeline is currently running — so waiting feels transparent and predictable.
+        {% else %}
+          Eine Loading-Page, die transparent zeigt, in welchem Pipeline-Schritt die Analyse gerade steckt — damit Wartezeit nachvollziehbar wird.
+        {% endif %}
+      </p>
+    </div>
+
+    <figure style="margin: 0; max-width: 750px;">
+      <img
+        src="/static/assets/image/loading_page.png"
+        alt="{% if lang == 'en' %}Mockup: loading page with pipeline steps{% else %}Mockup: Loading-Page mit Pipeline-Schritten{% endif %}"
+        style="width: 100%; height: auto; display: block; border-radius: 12px; border: 1px solid var(--border);"
+        loading="lazy"
+      />
+    </figure>
   </section>
 
-  <!-- THEMEN ALS HIGHLIGHT-GRID (wie report.html „Barriers“-Sektion) -->
+  <!-- TECHNOLOGY FEATURES -->
   <section class="about-section">
-    <div class="section-eyebrow">{{ "Themes" if lang == "en" else "Themen" }}</div>
-    <h2 class="section-title">{{ "Next steps at a glance" if lang == "en" else "Nächste Schritte im Überblick" }}</h2>
+    <div class="section-eyebrow">{{ "Technology features" if lang == "en" else "Technologie-Features" }}</div>
+    <h2 class="section-title">{{ "Model improvement roadmap" if lang == "en" else "Roadmap für Modellverbesserungen" }}</h2>
 
-    <div class="report-highlight-grid">
-      <div class="report-highlight-card">
-        <div class="report-highlight-icon">🌍</div>
-        <div class="report-highlight-label">{{ "Global expansion & localization" if lang == "en" else "Globale Skalierung & Lokalisierung" }}</div>
-        <p>
-          {% if lang == "en" %}
-            Scale beyond Germany: training, service coverage, and languages for international users.
-          {% else %}
-            Über Deutschland hinaus: Training, Service-Abdeckung und Sprachen für internationale Nutzer:innen.
-          {% endif %}
-        </p>
-        <ul>
-          <li>
-            {% if lang == "en" %}
-              Expand ML training to more European countries, then worldwide.
-            {% else %}
-              ML-Training auf weitere europäische Länder ausweiten, später weltweit.
-            {% endif %}
-          </li>
-          <li>
-            {% if lang == "en" %}
-              Offer the service worldwide (coverage, onboarding, support).
-            {% else %}
-              Service weltweit anbieten (Abdeckung, Onboarding, Support).
-            {% endif %}
-          </li>
-          <li>
-            {% if lang == "en" %}
-              Add more languages on the website.
-            {% else %}
-              Mehr Sprachen auf der Website.
-            {% endif %}
-          </li>
-        </ul>
-      </div>
+    <p class="report-body">
+      {% if lang == "en" %}
+        In parallel, we want to improve the model and extend the scope of what we can estimate from remote sensing and local input.
+      {% else %}
+        Parallel wollen wir das Modell verbessern und den Umfang erweitern, was wir aus Fernerkundung und lokalem Input ableiten können.
+      {% endif %}
+    </p>
 
-      <div class="report-highlight-card">
-        <div class="report-highlight-icon">🧠</div>
-        <div class="report-highlight-label">{{ "Model quality & efficiency" if lang == "en" else "Modellqualität & Effizienz" }}</div>
-        <p>
-          {% if lang == "en" %}
-            Stronger predictions with richer data and a leaner ML pipeline for training and inference.
-          {% else %}
-            Robustere Vorhersagen durch mehr Daten und eine schlankere ML-Pipeline für Training und Inferenz.
-          {% endif %}
-        </p>
-        <ul>
-          <li>
-            {% if lang == "en" %}
-              Use more diverse data for better prediction quality.
-            {% else %}
-              Vielfältigere Daten für bessere Vorhersagequalität.
-            {% endif %}
-          </li>
-          <li>
-            {% if lang == "en" %}
-              Make the ML pipeline faster and more resource-efficient.
-            {% else %}
-              ML-Pipeline schneller und ressourcenschonender machen.
-            {% endif %}
-          </li>
-        </ul>
-      </div>
+    <div style="max-width: 820px;">
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 20px 0 10px;">
+        1. {{ "Enlarge feature input" if lang == "en" else "Mehr Input-Features" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Beyond Sentinel-2: include Sentinel-1, weather, and elevation data to improve accuracy.
+        {% else %}
+          Über Sentinel-2 hinaus: Sentinel-1, Wetter- und Höhendaten integrieren, um die Genauigkeit zu erhöhen.
+        {% endif %}
+      </p>
 
-      <div class="report-highlight-card">
-        <div class="report-highlight-icon">⚡</div>
-        <div class="report-highlight-label">{{ "Performance & UX" if lang == "en" else "Performance & UX" }}</div>
-        <p>
-          {% if lang == "en" %}
-            Shorter waits in the analysis flow through backend, network, and UI optimizations.
-          {% else %}
-            Kürzere Wartezeiten im Analyse-Flow durch Backend-, Netzwerk- und UI-Optimierungen.
-          {% endif %}
-        </p>
-        <ul>
-          <li>
-            {% if lang == "en" %}
-              Reduce loading time (API latency, rendering, caching).
-            {% else %}
-              Ladezeiten reduzieren (API-Latenz, Rendering, Caching).
-            {% endif %}
-          </li>
-        </ul>
-      </div>
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
+        2. {{ "Integrate local input" if lang == "en" else "Lokalen Input integrieren" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Bridge remote sensing and local knowledge: upload a soil photo, add measurements, and specify soil type.
+        {% else %}
+          Fernerkundung und lokales Wissen verbinden: Bodenfoto hochladen, Messwerte angeben und Bodentyp definieren.
+        {% endif %}
+      </p>
 
-      <div class="report-highlight-card">
-        <div class="report-highlight-icon">🗄️</div>
-        <div class="report-highlight-label">{{ "Data storage & scale" if lang == "en" else "Speicherung & Skalierung" }}</div>
-        <p>
-          {% if lang == "en" %}
-            A storage layer that grows with datasets, results, and users.
-          {% else %}
-            Eine Speicher-Schicht, die mit Datensätzen, Ergebnissen und Nutzer:innen mitwächst.
-          {% endif %}
-        </p>
-        <ul>
-          <li>
-            {% if lang == "en" %}
-              Introduce a better data storage solution for long-term growth.
-            {% else %}
-              Bessere Datenhaltung für nachhaltiges Wachstum einführen.
-            {% endif %}
-          </li>
-        </ul>
-      </div>
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
+        3. {{ "Predict more soil characteristics" if lang == "en" else "Mehr Bodenparameter vorhersagen" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Extend beyond SOC: soil moisture, pH value, and additional nutrient levels to support targeted irrigation and variable-rate fertilization.
+        {% else %}
+          Über SOC hinaus: Bodenfeuchte, pH-Wert und weitere Nährstoff-Level, um gezielte Bewässerung und variable Düngung zu unterstützen.
+        {% endif %}
+      </p>
+
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
+        4. {{ "Improve resolution" if lang == "en" else "Auflösung verbessern" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Reduce grid size from 60×60&nbsp;m to 10×10&nbsp;m to capture within-field SOC variability in more detail.
+        {% else %}
+          Die Zellgröße von 60×60&nbsp;m auf 10×10&nbsp;m reduzieren, um Intra-Feld-Variabilität detaillierter sichtbar zu machen.
+        {% endif %}
+      </p>
     </div>
   </section>
 
   <!-- CTA: Abschluss im Report-Stil (Pullquote + Link) -->
-  <section class="about-section">
+  <section class="about-section" style="padding-top: 28px;">
     <blockquote class="report-pullquote">
       {% if lang == "en" %}
-        Until these improvements land, you can already explore what AgroScan can do today — start an analysis and view the SOC map for your field.
+        Last but not least: if you’re missing a feature, tell us in the GitHub repository or later in the community forum’s “AgroScan Development” group.
       {% else %}
-        Bis diese Verbesserungen umgesetzt sind, könnt ihr AgroScan schon jetzt ausprobieren — startet eine Analyse und schaut euch die SOC-Karte für euer Feld an.
+        Last but not least: Falls euch ein Feature fehlt, sagt uns Bescheid im GitHub-Repository oder später im Community-Forum in der Gruppe „AgroScan Development“.
       {% endif %}
     </blockquote>
-    <p class="report-body" style="margin-top: 20px;">
-      <a class="btn-primary" href="/analyse">{{ "⟶ Explore the analysis" if lang == "en" else "⟶ Aktuellen Stand erkunden" }}</a>
+    <p class="report-body" style="margin-top: 10px;">
+      <a class="btn-outline" href="https://github.com/mbreitenhuber/soil_health_monitoring" target="_blank">
+        {{ "⟶ Open GitHub repository" if lang == "en" else "⟶ GitHub-Repository öffnen" }}
+      </a>
     </p>
   </section>
 

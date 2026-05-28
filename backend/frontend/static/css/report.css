@@ -13,6 +13,22 @@
   margin-bottom: 20px;
 }
 
+.report-note {
+  font-size: 0.78rem;
+  line-height: 1.75;
+  opacity: 0.9;
+}
+
+.report-body code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8em;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
 .report-body:last-of-type {
   margin-bottom: 0;
 }
@@ -33,6 +49,118 @@
   background: var(--surface);
   border-radius: 0 10px 10px 0;
   max-width: 680px;
+}
+
+/* ── Infobox ───────────────────────────────────── */
+
+.report-infobox {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 18px 18px 12px;
+  margin: 26px 0 28px;
+  max-width: 920px;
+}
+
+.report-infobox-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--text);
+  margin-bottom: 10px;
+  letter-spacing: -0.01em;
+}
+
+.report-infobox-body .report-body {
+  max-width: none;
+  margin-bottom: 12px;
+}
+
+.report-infobox-body .report-body:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Figures & placeholders ────────────────────── */
+
+.report-figure {
+  margin: 26px 0 30px;
+  max-width: 980px;
+}
+
+.report-figure-placeholder {
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 18px;
+}
+
+.report-figure-placeholder-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.report-figure-placeholder-meta {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+
+.report-figure-placeholder-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  opacity: 0.85;
+  line-height: 1.6;
+}
+
+.report-figure-caption {
+  margin-top: 10px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  max-width: 920px;
+}
+
+/* ── Tables ────────────────────────────────────── */
+
+.report-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.report-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 760px;
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.report-table thead th {
+  text-align: left;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.78rem;
+  color: var(--text);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.report-table tbody td {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.6;
+}
+
+.report-table tbody tr:last-child td {
+  border-bottom: 0;
 }
 
 /* ── Highlight cards (3-col) ───────────────────── */
@@ -189,5 +317,8 @@
   .report-pullquote {
     font-size: 0.92rem;
     padding: 16px 20px;
+  }
+  .report-table {
+    min-width: 640px;
   }
 }
