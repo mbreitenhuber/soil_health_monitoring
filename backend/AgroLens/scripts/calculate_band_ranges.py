@@ -8,7 +8,7 @@ and determines the min/max for each band across all 81 sample points and all row
 The output can be used to update BAND_REFERENCE_RANGES in sentinel_to_csv.py
 
 Usage:
-    python AgroLens/scripts/calculate_band_ranges.py --input ./data/datasets/Model_A.csv --output ./band_ranges.json
+    python AgroLens/scripts/calculate_band_ranges.py --input ./data/datasets/Model_A.csv --output ./AgroLens/scripts/band_ranges.json
 """
 
 import argparse
