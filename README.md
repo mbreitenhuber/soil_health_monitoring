@@ -51,11 +51,11 @@ The generated results can support farmers, agronomists, and researchers in both 
 
 2. Build the backend image:
 
-```powershell
+```powershell/bash
 docker build -f backend/Dockerfile -t nebula-backend:latest backend
 ```
 
-3. Start the container:
+3. Start the container
 
 ```powershell
 docker run --rm -d --name nebula-web -p 8000:8000 `
@@ -66,9 +66,18 @@ docker run --rm -d --name nebula-web -p 8000:8000 `
 	nebula-backend:latest
 ```
 
+```bash
+docker run --rm -d --name nebula-web -p 8000:8000 \
+	-v "$(pwd)/persistent-data:/persistent-data" \
+	-e SENTINEL_DIR=/persistent-data/sentinel_output \
+	-e TMP_DIR=/persistent-data/tmp \
+	--env-file backend/.env \
+	nebula-backend:latest
+```
+
 4. View the logs:
 
-```powershell
+```powershell/bash
 docker logs -f nebula-web
 ```
 
@@ -78,6 +87,6 @@ http://localhost:8000/
 
 6. Stop the container when you are done:
 
-```powershell
+```powershell/bash
 docker stop nebula-web
 ```
