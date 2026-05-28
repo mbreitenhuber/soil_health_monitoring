@@ -198,7 +198,7 @@ def _ensure_raw_scene(job: dict) -> Path:
     # download/extract step so only one thread creates the shared cache entry.
     with lock:
         if raw_scene_path.is_dir():
-            print(f"Using cached raw scene: {raw_scene_path}")
+            print(f"Using raw scene: {raw_scene_path}")
             return raw_scene_path
 
         os.makedirs(_raw_cache_root(job["date"]), exist_ok=True)

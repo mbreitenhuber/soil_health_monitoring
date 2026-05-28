@@ -45,68 +45,39 @@ The generated results can support farmers, agronomists, and researchers in both 
 
 ---
 
-## Environment Setup
+## Deployment in Docker
 
-### 1. Create Conda environment
+1. Start Docker Desktop and make sure the Docker engine is running.
 
-```bash
-conda env create -f environment.yml
-conda activate ai4good
+2. Build the backend image:
+
+```powershell
+docker build -f backend/Dockerfile -t nebula-backend:latest backend
 ```
 
-### 2. Install Python dependencies
+3. Start the container:
 
-```bash
-pip install -r requirements.txt
+```powershell
+docker run --rm -d --name nebula-web -p 8000:8000 `
+	-v "${PWD}\persistent-data:/persistent-data" `
+	-e SENTINEL_DIR=/persistent-data/sentinel_output `
+	-e TMP_DIR=/persistent-data/tmp `
+	--env-file backend\.env `
+	nebula-backend:latest
 ```
 
-### 3. Install PyTorch (choose one option)
+4. View the logs:
 
-#### CPU version
-
-```bash
-pip install torch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0
+```powershell
+docker logs -f nebula-web
 ```
 
-#### CUDA (GPU version, recommended if supported)
+5. Open the website in your browser:
 
-```bash
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+http://localhost:8000/
+
+6. Stop the container when you are done:
+
+```powershell
+docker stop nebula-web
 ```
-
----
-
-## Start locally
-
-```bash
-cd backend
-
-python3 -m venv .venv
-source .venv/bin/activate
-
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-Then open in browser: `http://localhost:8000`
-
----
-
-## GitLab Deployment (currently not working)
-
-Das Deployment läuft über GitLab CI + Helm und deployed **nur den Backend-Container**.
-
-- **Trigger**: Pipeline läuft nur bei Push/Merge auf den Branch `main`.
-- **Build**: baut das Docker-Image aus `backend/` und pushed es in die GitLab Container Registry.
-- **Deploy**: `helm upgrade --install` mit `helm/values.yaml`.
-
-### Notwendige GitLab CI/CD Variablen
-
-Diese Variablen müssen im GitLab Projekt (oder in der Gruppe) gesetzt sein:
-
-- `K8S_NAMESPACE`: Kubernetes Namespace für das Deployment
-- `KUBECONFIG_B64`: base64-encodierte kubeconfig
-- `CI_REGISTRY_USER`, `CI_REGISTRY_PWD`: Zugriff auf die Container Registry
-- `BASE_URL`: Basis-Domain für die generierte URL
-
-Wenn alles gesetzt ist und ihr auf `main` pusht, sollte GitLab die Webseite automatisch deployen. 
