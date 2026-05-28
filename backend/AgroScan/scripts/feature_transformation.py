@@ -13,7 +13,7 @@ warnings.filterwarnings('ignore', category=pd.errors.PerformanceWarning)
 # ============================================================================
 # FIXED REFERENCE NORMALIZATION VALUES FOR VEGETATION INDICES
 # ============================================================================
-# command to create fixed references: python AgroLens/scripts/calculate_index_ranges.py --input ./data/datasets/Model_A_trans.csv
+# command to create fixed references: python AgroScan/scripts/calculate_index_ranges.py --input ./data/datasets/Model_A_trans.csv
 # ============================================================================
 INDEX_REFERENCE_RANGES = {
     "RVI": {"min": 0.0,"max": 6.666666666666667},

@@ -3,8 +3,8 @@
 # More information with 'sentinel_to_csv.py -h'
 
 # command
-# python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
-# DE: python AgroLens/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_S2_DE.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
+# python AgroScan/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed.csv --mapping ./data/datasets/mapping.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
+# DE: python AgroScan/scripts/input_data/sentinel_to_csv.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_S2_DE.csv --output ./data/datasets/Model_A.csv --shape 9x9 --flatten --normalize
 
 import argparse
 import os
@@ -21,13 +21,13 @@ from sklearn import preprocessing
 load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-from satellite_utils.image_utils import ImageUtils # remove AgroLens if necessary
+from satellite_utils.image_utils import ImageUtils # remove AgroScan if necessary
 
 
 # ============================================================================
 # FIXED REFERENCE NORMALIZATION VALUES FOR SENTINEL-2 BANDS
 # create .json file with max & min values with:
-# python AgroLens/scripts/calculate_band_ranges.py --input ./data/datasets/Model_A_min_max_values.csv --output ./band_ranges.json
+# python AgroScan/scripts/calculate_band_ranges.py --input ./data/datasets/Model_A_min_max_values.csv --output ./band_ranges.json
 # ============================================================================
 BAND_REFERENCE_RANGES = {
   "B01": {"min": 0.0,"max": 15.0},

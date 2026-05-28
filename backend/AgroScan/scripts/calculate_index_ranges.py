@@ -8,7 +8,7 @@ and determines the min/max for each index across all 81 sample points and all ro
 The output can be used to update INDEX_REFERENCE_RANGES in feature_transformation.py
 
 Usage:
-    python AgroLens/scripts/calculate_index_ranges.py --input ./data/datasets/Model_A_trans.csv --output ./index_ranges.json
+    python AgroScan/scripts/calculate_index_ranges.py --input ./data/datasets/Model_A_trans.csv --output ./index_ranges.json
 """
 
 import argparse

@@ -3,10 +3,10 @@
 # More information with 'sentinel_download.py -h'
 
 ## command
-# python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
-# python .\AgroLens\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv --api-threads 1 --download-threads 1 --worker-threads 1  
-# python ./AgroLens/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv
-# test with 2 rows: python ./AgroLens/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv --start 4 --end 5
+# python .\AgroScan\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv
+# python .\AgroScan\scripts\input_data\sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed.csv --api-threads 1 --download-threads 1 --worker-threads 1  
+# python ./AgroScan/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv
+# test with 2 rows: python ./AgroScan/scripts/input_data/sentinel_download.py --input ./data/datasets/LUCAS_SOIL_processed_DE.csv --mapping ./data/mapping_test.csv --start 4 --end 5
 
 import argparse
 import json
@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 sys.path.append(str(Path(os.path.abspath(__file__)).parent.parent.parent))
-#from AgroLens.satellite_utils.copernicus_api import CopernicusApi # remove AgroLens if necessary
+#from AgroScan.satellite_utils.copernicus_api import CopernicusApi # remove AgroScan if necessary
 from satellite_utils.copernicus_api import CopernicusApi 
 
 class ThreadPrefix:

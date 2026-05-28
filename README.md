@@ -17,7 +17,7 @@ The generated results can support farmers, agronomists, and researchers in both 
 
 ```
 .
-├── AgroLens/                 # Core model and pipeline code for training, inference, and satellite-data processing.
+├── AgroScan/                 # Core model and pipeline code for training, inference, and satellite-data processing.
 │   ├── nutrients_predictor/  # Predictor modules and training/inference helpers for soil nutrients.
 │   ├── satellite_utils/      # Satellite data access and preprocessing utilities (Sentinel, USGS, etc.).
 │   └── scripts/              # Pipeline helper scripts for data preparation and execution.

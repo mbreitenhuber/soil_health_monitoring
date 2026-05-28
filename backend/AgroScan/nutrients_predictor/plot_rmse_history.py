@@ -10,7 +10,7 @@ Usage:
   python plot_rmse_history.py --model backend/data/models/Model_A/nn/Model_A_nn_OC.pth
   python plot_rmse_history.py --model backend/data/models/Model_A/nn/Model_A_nn_OC.pth --output rmse_plot.png
 """
-#docker exec -it nebula-web python /app/AgroLens/nutrients_predictor/plot_rmse_history.py --model /persistent-data/models/Model_A/nn/Model_A_nn_OC.pth --output /persistent-data/models/Model_A/nn/Model_A_nn_OC_rmse.png
+#docker exec -it nebula-web python /app/AgroScan/nutrients_predictor/plot_rmse_history.py --model /persistent-data/models/Model_A/nn/Model_A_nn_OC.pth --output /persistent-data/models/Model_A/nn/Model_A_nn_OC_rmse.png
 
 from __future__ import annotations
 

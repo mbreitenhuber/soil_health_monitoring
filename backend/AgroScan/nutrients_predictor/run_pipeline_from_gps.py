@@ -12,7 +12,7 @@ Steps performed:
 The script relies on environment variables set in the project's .env (SENTINEL_DIR, TMP_DIR, DATASET_PATH, MODEL_PATH, etc.).
 """
 
-# python AgroLens/nutrients_predictor/run_pipeline_from_gps.py --gps data/datasets/LUCAS_SOIL_processed_DE.csv --flatten --normalize --output data/datasets/sample_gps_input_predictions.csv --start 4 --end 5
+# python AgroScan/nutrients_predictor/run_pipeline_from_gps.py --gps data/datasets/LUCAS_SOIL_processed_DE.csv --flatten --normalize --output data/datasets/sample_gps_input_predictions.csv --start 4 --end 5
 
 from pathlib import Path
 import subprocess
@@ -47,7 +47,7 @@ def main():
     args = parse_args()
 
     project_root = Path(__file__).resolve().parents[2]
-    scripts_dir = project_root / "AgroLens" / "scripts"
+    scripts_dir = project_root / "AgroScan" / "scripts"
     input_dir = scripts_dir / "input_data"
 
     gps_input = Path(args.gps)
@@ -125,7 +125,7 @@ def main():
     env["MODEL_PATH"] = os.environ.get("MODEL_PATH", "./data/models")
 
     # 5) Predict with neural network
-    predict_script = project_root / "AgroLens" / "nutrients_predictor" / "predict_nn.py"
+    predict_script = project_root / "AgroScan" / "nutrients_predictor" / "predict_nn.py"
     predict_cmd = [
         sys.executable,
         str(predict_script),

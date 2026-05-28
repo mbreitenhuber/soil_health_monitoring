@@ -65,7 +65,7 @@ def _default_db_path() -> Path:
 
 DB_PATH = _default_db_path()
 
-PIPELINE_SCRIPT = PROJECT_ROOT / "AgroLens" / "nutrients_predictor" / "run_pipeline_from_gps.py"
+PIPELINE_SCRIPT = PROJECT_ROOT / "AgroScan" / "nutrients_predictor" / "run_pipeline_from_gps.py"
 PIPELINE_WORK_DIR = PROJECT_ROOT / "data" / "pipeline_runs"
 DEFAULT_MODEL_CONFIG = "Model_A"
 DEFAULT_TARGET = "OC"
