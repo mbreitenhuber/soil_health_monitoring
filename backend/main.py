@@ -555,33 +555,44 @@ def _grid_match_radius_m() -> float:
 
 
 def _cached_sentinel_points_for_date(analysis_date: str | None) -> list[dict]:
-    if not analysis_date:
-        return []
-
-    date_root = _sentinel_output_root() / analysis_date
-    if not date_root.is_dir():
-        return []
-
     points: list[dict] = []
-    for entry in sorted(date_root.iterdir(), key=lambda item: item.name):
-        if not entry.is_dir() or entry.name.startswith("_"):
-            continue
-        if not _metadata_path(entry).is_file():
-            continue
+    root = _sentinel_output_root()
 
-        try:
-            lat_str, lng_str = entry.name.split(" ", 1)
-            points.append(
-                {
-                    "center_lat": float(lat_str),
-                    "center_lng": float(lng_str),
-                    "center_lat_text": lat_str,
-                    "center_lng_text": lng_str,
-                    "result_path": entry,
-                }
-            )
-        except ValueError:
+    def _collect_points(date_root: Path) -> None:
+        for entry in sorted(date_root.iterdir(), key=lambda item: item.name):
+            if not entry.is_dir() or entry.name.startswith("_"):
+                continue
+            if not _metadata_path(entry).is_file():
+                continue
+
+            try:
+                lat_str, lng_str = entry.name.split(" ", 1)
+                points.append(
+                    {
+                        "center_lat": float(lat_str),
+                        "center_lng": float(lng_str),
+                        "center_lat_text": lat_str,
+                        "center_lng_text": lng_str,
+                        "result_path": entry,
+                    }
+                )
+            except ValueError:
+                continue
+
+    # The frontend analysis date is a survey date, while cache folders are keyed
+    # by Sentinel acquisition date. Search all cached date roots so older runs can
+    # still seed the grid anchor and nearest-point reuse logic.
+    if analysis_date:
+        preferred_root = root / analysis_date
+        if preferred_root.is_dir():
+            _collect_points(preferred_root)
+
+    for date_root in sorted(root.iterdir(), key=lambda item: item.name):
+        if not date_root.is_dir() or date_root.name.startswith("_"):
             continue
+        if analysis_date and date_root.name == analysis_date:
+            continue
+        _collect_points(date_root)
 
     return points
 
