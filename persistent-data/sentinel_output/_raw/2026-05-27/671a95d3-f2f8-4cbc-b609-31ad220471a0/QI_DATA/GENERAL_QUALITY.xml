@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Earth_Explorer_File xmlns="http://gs2.esa.int/DATA_STRUCTURE/olqcReport">
+    <Earth_Explorer_Header>
+        <Fixed_Header>
+            <File_Name>GENERAL_QUALITY.xml</File_Name>
+            <File_Description>Report produced by OLQC-SC</File_Description>
+            <Notes></Notes>
+            <Mission>S2C</Mission>
+            <File_Class>OPER</File_Class>
+            <File_Type>REP_OLQCPA</File_Type>
+            <Validity_Period>
+                <Validity_Start>UTC=2025-02-11T00:00:00</Validity_Start>
+                <Validity_Stop>UTC=2100-01-01T00:00:00</Validity_Stop>
+            </Validity_Period>
+            <File_Version>2</File_Version>
+            <Source>
+                <System>OLQC-SC</System>
+                <Creator>OLQC-SC</Creator>
+                <Creator_Version>06.05.00</Creator_Version>
+                <Creation_Date>UTC=2026-05-27T16:29:48</Creation_Date>
+            </Source>
+        </Fixed_Header>
+    </Earth_Explorer_Header>
+    <Data_Block type="xml">
+        <report gippVersion="1.0" globalStatus="PASSED" date="2026-05-27T16:29:48.087Z">
+            <checkList>
+                <parentID>S2C_OPER_GIP_OLQCPA_MPC__20250210T000044_V20250211T000000</parentID>
+                <name>GENERAL_QUALITY</name>
+                <version>1.0</version>
+                <item url="/mnt/nfs-l2-02/l2-processing/processing-id-52174-2026-05-27-15-26-03/TaskTable_20260527T152603/FORMAT_METADATA_TILE_L2A_ADAPT/output/PDI_DS_TILE_LIST/S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12/" className="PDI Level 2A Tile Folder" name="S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12" class="http://www.esa.int/s2#pdi_level_2a_tile_container"/>
+                <check>
+                    <inspection creation="2026-05-27T16:29:47.567Z" duration="395" execution="2026-05-27T16:29:47.690Z" id="Solar_Angle_Zenith" item="MTD_TL.xml" itemURL="/mnt/nfs-l2-02/l2-processing/processing-id-52174-2026-05-27-15-26-03/TaskTable_20260527T152603/FORMAT_METADATA_TILE_L2A_ADAPT/output/PDI_DS_TILE_LIST/S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12/MTD_TL.xml" name="Check the zenith solar angle. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">Zenith solar angle (29.9130179251057) is within the threshold limit (70.0) </message>
+                    <extraValues>
+                        <value name="EXPECTED">70.0</value>
+                        <value name="SOLAR_ZENITH_ANGLE">29.9130179251057</value>
+                    </extraValues>
+                </check>
+                <check>
+                    <inspection creation="2026-05-27T16:29:48.930Z" duration="23" execution="2026-05-27T16:29:48.990Z" id="checkMetadata" item="S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12" itemURL="/mnt/nfs-l2-02/l2-processing/processing-id-52174-2026-05-27-15-26-03/TaskTable_20260527T152603/FORMAT_METADATA_TILE_L2A_ADAPT/output/PDI_DS_TILE_LIST/S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12/" name="Metadata file check. " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">Metadata file is present.</message>
+                </check>
+                <check>
+                    <inspection creation="2026-05-27T16:29:49.318Z" duration="12048" execution="2026-05-27T16:29:49.350Z" id="Data_Loss" item="S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12" itemURL="/mnt/nfs-l2-02/l2-processing/processing-id-52174-2026-05-27-15-26-03/TaskTable_20260527T152603/FORMAT_METADATA_TILE_L2A_ADAPT/output/PDI_DS_TILE_LIST/S2C_OPER_MSI_L2A_TL_2CPS_20260527T152721_A009001_T32UPV_N05.12/" name="Check TECQUA for data loss " priority="5" processingStatus="done" status="PASSED"/>
+                    <message contentType="text/plain">No data loss in this tile.</message>
+                </check>
+            </checkList>
+        </report>
+    </Data_Block>
+</Earth_Explorer_File>
