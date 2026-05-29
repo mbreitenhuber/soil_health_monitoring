@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 
+from shapely.geometry import Polygon
 
 from fastapi import FastAPI, Request, Cookie, HTTPException
 import sqlite3
@@ -106,6 +107,16 @@ def _api_base_url() -> str:
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
 STATIC_CSS_VERSION = "6"
 
+def _calculate_area_ha(polygon: List["Coordinate"]) -> float:
+    if len(polygon) < 3:
+        return 0.0
+
+    coords = [(p.lng, p.lat) for p in polygon]
+    poly = Polygon(coords)
+
+    # grobe, aber brauchbare Fläche in m² -> ha
+    return round(poly.area * 111139 * 111139 / 10000, 3)
+
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
 
@@ -133,6 +144,8 @@ def init_db():
         max_value REAL,
 
         zones TEXT,
+              
+        field_area_ha REAL,
 
         created_at TEXT
     )
@@ -155,6 +168,9 @@ def init_db():
 
     if "created_at" not in existing_columns:
         c.execute("ALTER TABLE analyses ADD COLUMN created_at TEXT")
+
+    if "field_area_ha" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN field_area_ha REAL")
 
     conn.commit()
     conn.close()
@@ -184,6 +200,7 @@ def _analysis_from_row(row: sqlite3.Row) -> dict:
         "min_value": row["min_value"] or 0,
         "max_value": row["max_value"] or 0,
         "zones": _json_list(row["zones"]),
+        "field_area_ha": row["field_area_ha"] or 0,
         "created_at": row["created_at"],
     }
 
@@ -1044,6 +1061,7 @@ def save_analysis(req: SaveRequest):
             min_value,
             max_value,
             zones,
+            field_area_ha,
             created_at
         )
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -1059,6 +1077,8 @@ def save_analysis(req: SaveRequest):
         req.avg_value,
         req.min_value,
         req.max_value,
+
+        _calculate_area_ha(req.polygon),
 
         json.dumps(req.zones),
 
@@ -1117,6 +1137,7 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
         "Max (g/kg OC)",
         "Polygon Points",
         "Zones Count",
+        "Field Area (ha)",
         "Created At"
     ])
 
@@ -1141,6 +1162,7 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             round(a.get("max_value", 0), 1),
             poly_len,
             zone_len,
+            round(a.get("field_area_ha", 0), 3),
             a.get("created_at")
         ])
 

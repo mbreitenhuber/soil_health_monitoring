@@ -513,12 +513,27 @@ function onCardChange(e) {
 
 function updateFieldModalStats(items) {
   const latest = items[items.length - 1];
-  const allMin = Math.min(...items.map(a => a.min_value));
-  const allMax = Math.max(...items.map(a => a.max_value));
+
+  // Fläche berechnen
+  // Beispiel: latest.area_ha oder latest.area_m2
+  const fieldArea = `${latest.field_area_ha.toFixed(2)} ha`;
+
+  // Anzahl analysierter Zonen / Punkte
+  const datapoints =
+    Array.isArray(latest.zones)
+      ? latest.zones.length
+      : 0;
+
   document.getElementById("field-stat-count").textContent  = items.length;
-  document.getElementById("field-stat-min").textContent    = formatOcGkg(allMin);
-  document.getElementById("field-stat-max").textContent    = formatOcGkg(allMax);
-  document.getElementById("field-stat-latest").textContent = formatOcGkg(latest.avg_value);
+
+  document.getElementById("field-stat-min").textContent =
+    fieldArea;
+
+  document.getElementById("field-stat-max").textContent =
+    datapoints;
+
+  document.getElementById("field-stat-latest").textContent =
+    formatOcGkg(latest.avg_value);
 }
 
 function openFieldModal(fieldName) {
