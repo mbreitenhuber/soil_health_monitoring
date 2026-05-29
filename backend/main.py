@@ -257,13 +257,13 @@ ROADMAP = [
 # photo: Dateiname in static/assets/team/ — oder None für Platzhalter
 TEAM_MEMBERS = [
     {"name": "Clara Buller",   "role": "Master Student in Energy Science and Technology",   "photo": "clara.jpeg",
-     "bio": "ML-Model programming and training, Data analysis and ML implementation."},
+     "bio": "Interactive ML model development, Website UX design support, Website content development, Project report, Literature review"},
     {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": None,
-     "bio": "ML-Model programming and training, Data analysis and ML implementation."},
+     "bio": "Interactive ML model development, Website-ML model communication, Website UX design support, User case research, Literature review"},
     {"name": "Jerome Reiter", "role": "2nd Semester Bachelor CSE-Student",  "photo": None,
-     "bio": "Backend and frontend development, Map design and personal dashboard."},
+     "bio": "Backend and frontend development, Map design and personal dashboard"},
      {"name": "Claudio Bussinger", "role": "2nd Semester Bachelor CSE-Student",  "photo": "Claudio.jpg",
-     "bio": "Backend and frontend development, Map design and website design."},
+     "bio": "Backend and frontend development, Map design and website design"},
 ]
 
 
