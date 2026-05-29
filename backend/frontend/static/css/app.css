@@ -253,11 +253,35 @@
   color: var(--text);
 }
 
-/* Popup close — square format like pers_dash .btn-close-x (no hover) */
-.save-popup-header > button {
+/* Modal close controls (aligned with dashboard.css) */
+.btn-close-modal {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 12px 28px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text-dim);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  transition: opacity 0.2s, transform 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-close-modal:hover {
+  border-color: var(--border);
+  color: var(--text);
+  opacity: 0.87;
+  transform: translateY(-2px);
+}
+
+.btn-close-modal:active {
+  transform: translateY(0);
+}
+
+.btn-close-x {
   width: 32px;
   height: 32px;
-  padding: 0;
   border-radius: 8px;
   border: 1px solid var(--border2);
   background: var(--surface);
@@ -271,6 +295,32 @@
   line-height: 1;
   cursor: pointer;
   flex-shrink: 0;
+  padding: 0;
+  transition: opacity 0.2s, transform 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-close-x:hover {
+  border-color: var(--border);
+  color: var(--text);
+  opacity: 0.87;
+  transform: translateY(-2px);
+}
+
+.btn-close-x:active {
+  transform: translateY(0);
+}
+
+.save-popup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.save-popup-actions .btn-close-modal {
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .save-popup-content {
@@ -366,14 +416,12 @@
   line-height: 1.55;
   color: var(--text-dim);
 }
-.save-success-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 4px;
+.save-popup-actions .btn-save-success-primary {
+  width: 100%;
+  box-sizing: border-box;
 }
-.btn-save-success-secondary,
+
 .btn-save-success-primary {
-  flex: 1;
   padding: 12px 14px;
   border-radius: 10px;
   font-family: 'Syne', sans-serif;
@@ -383,15 +431,6 @@
   cursor: pointer;
   transition: opacity 0.2s ease;
   text-decoration: none;
-}
-.btn-save-success-secondary {
-  border: 1px solid var(--border);
-  background: transparent;
-  color: var(--text-dim);
-}
-.btn-save-success-secondary:hover {
-  border-color: var(--text-dim);
-  color: var(--text);
 }
 .btn-save-success-primary {
   border: none;

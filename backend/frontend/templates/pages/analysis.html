@@ -155,7 +155,7 @@
 
     <div class="save-popup-header">
       <h3>Save Analysis</h3>
-      <button id="close-save-popup">✕</button>
+      <button type="button" class="btn-close-x" id="close-save-popup" aria-label="Close">✕</button>
     </div>
 
     <div class="save-popup-content">
@@ -245,7 +245,7 @@
   <div class="save-popup-card">
     <div class="save-popup-header">
       <h3>{{ t.model_info_title }}</h3>
-      <button type="button" id="close-model-info-popup" aria-label="{{ t.model_info_close }}">✕</button>
+      <button type="button" class="btn-close-x" id="close-model-info-popup" aria-label="{{ t.model_info_close }}">✕</button>
     </div>
     <div class="save-popup-content">
       <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:10px;line-height:1.6;">
@@ -254,8 +254,8 @@
         <li>Do not use large fields</li>
         <li>Do not leave this page while to model is running</li>
       </ul>
-      <div class="save-success-actions">
-        <button type="button" class="btn-save-success-primary" id="model-info-ok">
+      <div class="save-popup-actions">
+        <button type="button" class="btn-close-modal" id="model-info-ok">
           {{ t.model_info_close }}
         </button>
       </div>
@@ -268,12 +268,12 @@
   <div class="save-popup-card save-success-card">
     <div class="save-popup-header">
       <h3>{{ t.save_success_title }}</h3>
-      <button type="button" id="close-save-success-popup" aria-label="{{ t.save_success_close }}">✕</button>
+      <button type="button" class="btn-close-x" id="close-save-success-popup" aria-label="{{ t.save_success_close }}">✕</button>
     </div>
     <div class="save-popup-content">
       <p class="save-success-message">{{ t.save_success_message }}</p>
-      <div class="save-success-actions">
-        <button type="button" class="btn-save-success-secondary" id="btn-save-success-close">{{ t.save_success_close }}</button>
+      <div class="save-popup-actions">
+        <button type="button" class="btn-close-modal" id="btn-save-success-close">{{ t.save_success_close }}</button>
         <a href="/personal_dashboard" class="btn-save-success-primary">{{ t.save_success_go_dash }}</a>
       </div>
     </div>
@@ -285,7 +285,7 @@
   <div class="save-popup-card class-info-card">
     <div class="save-popup-header">
       <h3>{{ t.class_info_title }}</h3>
-      <button type="button" id="close-class-info" aria-label="{{ t.class_info_close }}">✕</button>
+      <button type="button" class="btn-close-x" id="close-class-info" aria-label="{{ t.class_info_close }}">✕</button>
     </div>
     <div class="save-popup-content class-info-content">
       <p class="class-info-note" id="class-info-note"></p>

@@ -882,7 +882,7 @@
 .dashboard-controls {
   display: flex;
   justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
   gap: 16px;
   margin-bottom: 14px;
 }
@@ -891,9 +891,26 @@
 .controls-left,
 .controls-right {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+/* Toolbar row: same height as Download All / Compare Fields */
+.dashboard-controls .btn-filter-toggle,
+.dashboard-controls .btn-secondary,
+.dashboard-controls .btn-control,
+.dashboard-controls .btn-end-compare {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  box-sizing: border-box;
 }
 
 /* SORT box = identical to filters */
@@ -957,7 +974,7 @@
 .controls-left {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 12px;
 }
 
@@ -972,7 +989,7 @@
 .sort-wrapper {
   position: relative;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .sort-panel {
