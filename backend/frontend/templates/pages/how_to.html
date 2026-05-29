@@ -183,7 +183,7 @@
     <div class="howto-tip" style="margin-top:28px;">
       <span class="howto-tip-label">📌 Tip</span>
       <p>Use a consistent field name for each physical parcel and save after every new analysis date. That way your timeline and comparison charts reflect real changes on the ground — for example after irrigation, reduced tillage, or cover crops.</p>
-      <a class="btn-primary" href="/personal_dashboard">⟶ Go to Personal Dashboard</a>
+      <a class="btn-primary" href="/personal_dashboard">→ Go to Personal Dashboard</a>
     </div>
   </section>
 
@@ -236,24 +236,33 @@
     <div class="section-eyebrow">Under the hood</div>
     <h2 class="section-title">About the ML model & data</h2>
 
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:820px;margin-bottom:18px;">
+      Machine learning is a way of teaching a computer to recognize patterns without programming every rule by hand.
+      Instead of telling the computer exactly what to look for, you show it a lot of real examples with known answers.
+      It studies those examples, finds the patterns in the provided data, and uses them to make predictions on new data it has never seen before.
+      The more examples it learns from, the better its predictions become. And this exactly what we did with AgroScan!
+    </p>
+
     <div class="howto-model-grid">
 
       <div class="howto-model-card">
         <div class="howto-model-icon">🛰️</div>
-        <h4>Sentinel-2</h4>
-        <p>The model is powered by multispectral imagery from the European Space Agency’s Sentinel-2 satellite from the Copernicus program. For its prediction it can access publicly available data since 2015 allowing also for historic analyses.</p>
+        <h4>1. Satellites provide the data for our prediction</h4>
+        <p>Every five days, the European Sentinel-2 satellite passes over your field and records how it reflects sunlight not just in colors you can see, but in invisible wavelengths that reveal information about vegetation health, moisture levels, and soil composition. AgroScan analyses these spectral "fingerprints" to estimate how much organic carbon is stored in your topsoil.</p>
       </div>
 
       <div class="howto-model-card">
-        <div class="howto-model-icon">📅</div>
-        <h4>Data freshness</h4>
-        <p>Sentinel satellites revisit the same location every 5-6 days providing always the latest data for your soil analysis. </p>
+        <div class="howto-model-icon">🧪</div>
+        <h4>2. We train our model using real ground soil samples</h4>
+        <p>Before making any prediction, our system was trained on soil measurements collected across Germany as part of the EU-wide LUCAS soil survey, so samples that were physically taken from the ground and analyzed in a laboratory. By finding patterns between those confirmed measurements and the satellite images taken at the same locations, the model learned to recognized what high and low carbon soils look like from space.</p>
+        <p style="margin-top:12px;">Think of it like this: if you showed a system thousands of photos of cats and dogs with labels, it would learn to recognize the animal from visual cues alone. AgroScan does the same except it learned from soil, satellites, and the wavelengths of reflected light.</p>
       </div>
 
       <div class="howto-model-card">
         <div class="howto-model-icon">🧠</div>
-        <h4>Model output</h4>
-        <p>The model predicts the soil organic carbon content in g/kg for each grid cell inside your polygon. </p>
+        <h4>3. AgroScan estimates the SOC values for your field</h4>
+        <p>Using the patterns learned during training, AgroScan predicts the SOC value in your selected field. The value is only an estimate and not a lab measurement. It is good at prediction for fields similar to the training data from Germany. The model’s predictions become less accurate the more the test field differs from the training fields.</p>
+        <p style="margin-top:12px;">The model gives you an indication of your soil's carbon status and, more importantly, how that status changes over time. A single prediction tells you where you stand today. A series of predictions across seasons tells you whether your soil management practices are working.</p>
       </div>
 
     </div>
@@ -261,7 +270,7 @@
     <div class="howto-tip" style="margin-top:40px;">
       <span class="howto-tip-label">💡 Tip</span>
       <p>If you would like to find out more about how the ML model works in detail, you can visit the report page for more information.</p>
-      <a class="btn-primary" href="/report">⟶ Report</a>
+      <a class="btn-outline" href="/report">→ Report</a>
     </div>
 
   </section>
@@ -325,7 +334,7 @@
   <div class="home-cta">
     <h2>Ready to analyze your field?</h2>
     <p>Head to the Analysis page and draw your first polygon and find out your carbon content.</p>
-    <a class="btn-primary" href="/analyse">⟶ Go to Analysis</a>
+    <a class="btn-primary" href="/analyse">→ Go to Analysis</a>
   </div>
 
 </div>
