@@ -107,15 +107,30 @@ def _api_base_url() -> str:
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
 STATIC_CSS_VERSION = "6"
 
+import math
+
 def _calculate_area_ha(polygon: List["Coordinate"]) -> float:
     if len(polygon) < 3:
         return 0.0
 
-    coords = [(p.lng, p.lat) for p in polygon]
-    poly = Polygon(coords)
+    R = 6371000  # Erdradius in Metern
+    coords = [(p.lat, p.lng) for p in polygon]
+    area = 0.0
+    n = len(coords)
 
-    # grobe, aber brauchbare Fläche in m² -> ha
-    return round(poly.area * 111139 * 111139 / 10000, 3)
+    for i in range(n):
+        j = (i + 1) % n
+        lat_i, lng_i = coords[i]
+        lat_j, lng_j = coords[j]
+
+        xi = math.radians(lng_i) * R * math.cos(math.radians(lat_i))
+        yi = math.radians(lat_i) * R
+        xj = math.radians(lng_j) * R * math.cos(math.radians(lat_j))
+        yj = math.radians(lat_j) * R
+
+        area += xi * yj - xj * yi
+
+    return round(abs(area / 2) / 10000, 3)
 
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
@@ -227,7 +242,7 @@ NAV_PAGES = [
     {"id": "home",               "label": {"en": "Home",               "de": "Home"},                "href": "/",                   "group": "main"},
     {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
-    {"id": "unser_analysis",     "label": {"en": "Users Analysis",     "de": "Nutzeralysis"},        "href": "/users_analysis",     "group": "more"},
+    {"id": "unser_analysis",     "label": {"en": "Who We Built AgroScan For",     "de": "Für wen wir AgroScan entwickelt haben"},        "href": "/users_analysis",     "group": "more"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
     {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "main"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
@@ -1064,7 +1079,7 @@ def save_analysis(req: SaveRequest):
             field_area_ha,
             created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         req.date,
         req.crop,
@@ -1078,9 +1093,9 @@ def save_analysis(req: SaveRequest):
         req.min_value,
         req.max_value,
 
-        _calculate_area_ha(req.polygon),
-
         json.dumps(req.zones),
+
+        _calculate_area_ha(req.polygon),
 
         datetime.now().isoformat()
     ))
@@ -1163,7 +1178,7 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             poly_len,
             zone_len,
             round(a.get("field_area_ha", 0), 3),
-            a.get("created_at")
+            a.get("created_at"),
         ])
 
     output.seek(0)
