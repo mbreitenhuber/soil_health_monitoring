@@ -2,8 +2,11 @@
 
 {% block title %}Report — AgroScan{% endblock %}
 
+{% block body_class %}report-page{% endblock %}
+
 {% block head_styles %}
 <link rel="stylesheet" href="/static/css/report.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />
 {% endblock %}
 
 {% block content %}
@@ -73,16 +76,16 @@
     <h2 class="section-title">Remote sensing + ML for SOC prediction</h2>
 
     <p class="report-body">
-      Nguyen et al. (2022) demonstrated a multi-sensor data fusion model combining multispectral image data from Sentinel-2 and synthetic
+      Nguyen et al. (2022)<a href="#ref6" class="ref-link">[6]</a> demonstrated a multi-sensor data fusion model combining multispectral image data from Sentinel-2 and synthetic
       aperture radar data from Sentinel-1, achieving high prediction accuracy (R² = 0.870, RMSE = 1.818 t/ha). The study highlighted that
       incorporating derived predictor features — including vegetation and soil indices calculated from raw band values — significantly improved
       model performance.
     </p>
 
     <p class="report-body">
-      Guo et al. (2021) showed that Sentinel-2 optical data and crop-growth indices are particularly effective predictors for agricultural soils,
-      which typically exhibit lower topological variability than other land use types. Similar results were demonstrated by Yuzugullu et al. (2024),
-      Beisekenov et al. (2025), and Zhang et al. (2019). Taken together, these studies confirm that the technical foundation for remote sensing-based
+      Guo et al. (2021)<a href="#ref5" class="ref-link">[5]</a> showed that Sentinel-2 optical data and crop-growth indices are particularly effective predictors for agricultural soils,
+      which typically exhibit lower topological variability than other land use types. Similar results were demonstrated by Yuzugullu et al. (2024)<a href="#ref19" class="ref-link">[19]</a>,
+      Beisekenov et al. (2025)<a href="#ref20" class="ref-link">[20]</a>, and Zhang et al. (2019)<a href="#ref21" class="ref-link">[21]</a>. Taken together, these studies confirm that the technical foundation for remote sensing-based
       SOC prediction in agricultural contexts is well established.
     </p>
 
@@ -101,24 +104,18 @@
     <p class="report-body">
       <strong>1. Selection of case region</strong><br />
       Germany was selected as the case region due to its significant agricultural sector, strong policy relevance, and high soil data availability.
-      Around half of Germany’s land area is used for agriculture, making it one of the European Union’s largest agricultural producers (BMEL, 2023).
+      Around half of Germany’s land area is used for agriculture, making it one of the European Union’s largest agricultural producers (BMEL, 2023)<a href="#ref12" class="ref-link">[12]</a>.
       Germany must comply with the European Union Soil Monitoring Law by 2028, increasing the demand for scalable and cost-effective soil monitoring
-      methods (European Union, 2025). The LUCAS 2019 soil dataset has 332 agricultural sampling locations in Germany, of which 270 could be matched to
-      Sentinel-2 data (Fernández-Ugalde et al., 2022).
+      methods (European Union, 2025)<a href="#ref3" class="ref-link">[3]</a>. The LUCAS 2019 soil dataset has 332 agricultural sampling locations in Germany, of which 270 could be matched to
+      Sentinel-2 data (Fernández-Ugalde et al., 2022)<a href="#ref22" class="ref-link">[22]</a>.
     </p>
 
     <figure class="report-figure" id="fig-1">
-      <div class="report-figure-placeholder" data-kind="image" data-figure="1">
-        <div class="report-figure-placeholder-title">Fig. 1 placeholder</div>
-        <div class="report-figure-placeholder-meta">
-          Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et al., 2022)
-        </div>
-        <div class="report-figure-placeholder-hint">
-          Add image here later. Replace this placeholder with an <code>&lt;img&gt;</code> or <code>&lt;svg&gt;</code>.
-        </div>
+      <div class="report-figure-media">
+        <img src="/static/assets/image/LUCAS%20locations.png" alt="Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et al., 2022)" />
       </div>
       <figcaption class="report-figure-caption">
-        Fig.1: Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et al., 2022)
+        Fig.1: Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et al., 2022)<a href="#ref22" class="ref-link">[22]</a>
       </figcaption>
     </figure>
 
@@ -128,35 +125,30 @@
       barriers to adoption.
     </p>
 
-    <div class="report-infobox" id="infobox-data-sources">
-      <div class="report-infobox-title">Data sources</div>
-      <div class="report-infobox-body">
-        <p class="report-body">
-          <strong>Input data:</strong> Sentinel-2 multispectral imagery (Copernicus). Level-2A Bottom-of-Atmosphere reflectance values. Selected model input
-          bands: B2, B3, B4, B5, B6, B7, B8, B8A, B11, B12.
-        </p>
-        <p class="report-body">
-          <strong>Target variable:</strong> LUCAS Topsoil dataset (0–20 cm), filtered to cropland samples; harmonized EU-wide ground truth.
-        </p>
-      </div>
+    <div class="report-tip" id="infobox-data-sources">
+      <p>
+        <strong>Input data:</strong> Sentinel-2 multispectral imagery (Copernicus)<a href="#ref13" class="ref-link">[13]</a>. Level-2A Bottom-of-Atmosphere reflectance values. Selected model input
+        bands: B2, B3, B4, B5, B6, B7, B8, B8A, B11, B12.
+      </p>
+      <p>
+        <strong>Target variable:</strong> LUCAS Topsoil dataset (0–20 cm)<a href="#ref15" class="ref-link">[15]</a>, filtered to cropland samples; harmonized EU-wide ground truth.
+      </p>
     </div>
 
     <p class="report-body">
       <strong>3. Data collection and processing</strong><br />
-      The pipeline is based on the AgroLens repository (CVIMS, 2025) and was updated to the Copernicus OData protocol, extended with feature
+      The pipeline is based on the AgroLens repository (CVIMS, 2025)<a href="#ref16" class="ref-link">[16]</a> and was updated to the Copernicus OData protocol, extended with feature
       transformation, and adapted for interactive use.
     </p>
 
     <p class="report-body">
       <strong>Feature transformation</strong><br />
       13 additional predictor features were derived: 7 vegetation indices, 4 soil indices, and 2 cyclical temporal features encoding month of observation.
-      This follows Nguyen et al. (2022), where derived indices correlated more strongly with agricultural SOC than raw spectral bands, with SAVI identified
+      This follows Nguyen et al. (2022)<a href="#ref6" class="ref-link">[6]</a>, where derived indices correlated more strongly with agricultural SOC than raw spectral bands, with SAVI identified
       as the single most important predictor.
     </p>
 
-    <div class="report-infobox" id="infobox-predictor-features">
-      <div class="report-infobox-title">Overview of predictor features</div>
-      <div class="report-infobox-body">
+    <div class="report-table-block" id="infobox-predictor-features">
         <div class="report-table-wrap">
           <table class="report-table">
             <thead>
@@ -183,12 +175,11 @@
             </tbody>
           </table>
         </div>
-        <p class="report-body report-note">
+        <p class="report-note">
           Note: Band wavelengths of S-2: B2 = Blue (492 nm), B3 = Green (560 nm), B4 = Red (665 nm), B5 = Red-edge 1 (RE1) (704 nm), B6 = Red-edge 2
           (RE2) (740 nm), B7 = Red-edge 3 (RE3) (783 nm), B8 = Near-infrared (NIR) (833 nm), B8A = Narrow-NIR (865 nm), B11 = SWIR1 (1614 nm), B12 = SWIR2
-          (2202 nm). (Adapted from Nguyen et al., 2022)
+          (2202 nm). (Adapted from Nguyen et al., 2022)<a href="#ref6" class="ref-link">[6]</a>
         </p>
-      </div>
     </div>
 
     <p class="report-body">
@@ -198,15 +189,12 @@
       those constants consistently. This is required for the interactive use case where a farmer submits GPS coordinates and inference runs on a small location-specific file.
     </p>
 
-    <div class="report-infobox" id="infobox-normalization-logic">
-      <div class="report-infobox-title">Normalization logic</div>
-      <div class="report-infobox-body">
-        <p class="report-body">
-          The fixed reference minimum and maximum values are computed once and saved to JSON. Each raw value \(x\) is transformed to
-          \(x'=\frac{x-x_{\min}}{x_{\max}-x_{\min}}\) and then clipped to the unit interval: \(x' \leftarrow \min(1,\max(0,x'))\).
-          If \(x_{\max}=x_{\min}\) the implementation returns 0 to avoid division by zero and NaN/inf values are replaced with 0 afterwards.
-        </p>
-      </div>
+    <div class="report-tip" id="infobox-normalization-logic">
+      <p>
+        The fixed reference minimum and maximum values are computed once and saved to JSON. Each raw value \(x\) is transformed to
+        \(x'=\frac{x-x_{\min}}{x_{\max}-x_{\min}}\) and then clipped to the unit interval: \(x' \leftarrow \min(1,\max(0,x'))\).
+        If \(x_{\max}=x_{\min}\) the implementation returns 0 to avoid division by zero and NaN/inf values are replaced with 0 afterwards.
+      </p>
     </div>
   </section>
 
@@ -216,39 +204,31 @@
     <h2 class="section-title">Selection, training, employment</h2>
 
     <p class="report-body">
-      The model architecture and implementation are based on Kammerlander (2025), who evaluated XGBoost, Random Forest, and Fully Connected Neural Networks (FCNNs).
+      The model architecture and implementation are based on Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>, who evaluated XGBoost, Random Forest, and Fully Connected Neural Networks (FCNNs).
       The FCNN achieved the best overall performance and is well suited for learning nonlinear relationships in heterogeneous nutrient distributions.
     </p>
 
-    <div class="report-infobox" id="infobox-fcnn">
-      <div class="report-infobox-title">What is a FCNN</div>
-      <div class="report-infobox-body">
-        <p class="report-body">
-          FCNNs (multilayer perceptron) are feedforward neural networks in which each neuron of one layer is connected to all neurons of the subsequent layer. FCNNs are trained
-          using backpropagation (Rumelhart, 1986). Through multiple hidden layers and nonlinear activation functions, FCNNs can learn complex nonlinear relationships between
-          input features and target variables.
-        </p>
-      </div>
+    <div class="report-tip" id="infobox-fcnn">
+      <p>
+        FCNNs (multilayer perceptron) are feedforward neural networks in which each neuron of one layer is connected to all neurons of the subsequent layer. FCNNs are trained
+        using backpropagation (Rumelhart, 1986)<a href="#ref17" class="ref-link">[17]</a>. Through multiple hidden layers and nonlinear activation functions, FCNNs can learn complex nonlinear relationships between
+        input features and target variables.
+      </p>
     </div>
 
     <figure class="report-figure" id="fig-2">
-      <div class="report-figure-placeholder" data-kind="image" data-figure="2">
-        <div class="report-figure-placeholder-title">Fig. 2 placeholder</div>
-        <div class="report-figure-placeholder-meta">Structure of a fully connected dense neural network (Abueidda et al., 2022)</div>
-        <div class="report-figure-placeholder-hint">Add image here later.</div>
+      <div class="report-figure-media">
+        <img src="/static/assets/image/FCNN%20Structure.png" alt="Structure of a fully connected dense neural network (Abueidda et al., 2022)" />
       </div>
-      <figcaption class="report-figure-caption">Fig.2: Structure of a fully connected dense neural network (Abueidda et al., 2022)</figcaption>
+      <figcaption class="report-figure-caption">Fig.2: Structure of a fully connected dense neural network (Abueidda et al., 2022)<a href="#ref18" class="ref-link">[18]</a></figcaption>
     </figure>
 
-    <div class="report-infobox" id="infobox-ml-model">
-      <div class="report-infobox-title">The ML model behind AgroScan</div>
-      <div class="report-infobox-body">
-        <p class="report-body">
-          The network is constructed dynamically as a sequence of linear layers with ReLU activation and dropout after each hidden layer, followed by a single linear output
-          neuron for predicting OC. Training is performed in PyTorch with mini-batches and RMSE as objective; weight decay of 0.01 is applied for regularization. Hyperparameter
-          tuning is performed using Optuna (layers 3–9, neurons 8–128, dropout 0.1–0.5, learning rate 0.0001–0.01, optimizer SGD/Adam, batch size 16/32/64).
-        </p>
-      </div>
+    <div class="report-tip" id="infobox-ml-model">
+      <p>
+        The network is constructed dynamically as a sequence of linear layers with ReLU activation and dropout after each hidden layer, followed by a single linear output
+        neuron for predicting OC. Training is performed in PyTorch with mini-batches and RMSE as objective; weight decay of 0.01 is applied for regularization. Hyperparameter
+        tuning is performed using Optuna (layers 3–9, neurons 8–128, dropout 0.1–0.5, learning rate 0.0001–0.01, optimizer SGD/Adam, batch size 16/32/64).
+      </p>
     </div>
 
     <p class="report-body">
@@ -281,10 +261,8 @@
     </p>
 
     <figure class="report-figure" id="fig-3">
-      <div class="report-figure-placeholder" data-kind="flowchart" data-figure="3">
-        <div class="report-figure-placeholder-title">Fig. 3 flowchart placeholder</div>
-        <div class="report-figure-placeholder-meta">Flow diagram of user-model interaction on AgroScan Website</div>
-        <div class="report-figure-placeholder-hint">Add flow chart here later (SVG recommended).</div>
+      <div class="report-figure-media">
+        <img src="/static/assets/image/User%20Model%20Interaction%20Flow.png" alt="Flow diagram of user-model interaction on AgroScan Website" />
       </div>
       <figcaption class="report-figure-caption">Fig. 3: Flow diagram of user-model interaction on AgroScan Website</figcaption>
     </figure>
@@ -307,10 +285,8 @@
     </p>
 
     <figure class="report-figure" id="fig-4">
-      <div class="report-figure-placeholder" data-kind="flowchart" data-figure="4">
-        <div class="report-figure-placeholder-title">Fig. 4 flowchart placeholder</div>
-        <div class="report-figure-placeholder-meta">Core user flow to conduct analysis of field on AgroScan website</div>
-        <div class="report-figure-placeholder-hint">Add flow chart here later (SVG recommended).</div>
+      <div class="report-figure-media">
+        <img src="/static/assets/image/Core%20Analysis%20Flow.png" alt="Core user flow to conduct analysis of field on AgroScan website" />
       </div>
       <figcaption class="report-figure-caption">Fig. 4: Core user flow to conduct analysis of field on AgroScan website.</figcaption>
     </figure>
@@ -318,7 +294,7 @@
     <p class="report-body">
       <strong>ML explainability and information design</strong><br />
       Prediction results are communicated through a map displaying spatial variability of SOC across the selected field. A color gradient from green (high SOC) to red (low SOC)
-      provides intuitive encoding. Thresholds are based on the SOC distribution in the LUCAS dataset. Technical agency is supported via CSV export, plain-language explanations,
+      provides intuitive encoding. Thresholds are based on the SOC distribution in the LUCAS dataset<a href="#ref15" class="ref-link">[15]</a>. Technical agency is supported via CSV export, plain-language explanations,
       technical summaries, and the public GitHub repository.
     </p>
 
@@ -337,7 +313,7 @@
     <h2 class="section-title">Ethics of remote sensing</h2>
 
     <p class="report-body">
-      Remote sensing is widely used for environmental monitoring, agriculture, and climate research, but it also raises ethical concerns (Bennett et al., 2024). In AgroScan, two
+      Remote sensing is widely used for environmental monitoring, agriculture, and climate research, but it also raises ethical concerns (Bennett et al., 2024)<a href="#ref7" class="ref-link">[7]</a>. In AgroScan, two
       main concerns were identified: distance between data collection and affected communities, and limited transferability beyond Europe.
     </p>
 
@@ -518,4 +494,24 @@
   </section>
 
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (typeof renderMathInElement !== "function") return;
+    var root = document.querySelector(".page-content");
+    if (!root) return;
+    renderMathInElement(root, {
+      delimiters: [
+        { left: "$$", right: "$$", display: true },
+        { left: "\\(", right: "\\)", display: false },
+        { left: "\\[", right: "\\]", display: true },
+      ],
+      throwOnError: false,
+    });
+  });
+</script>
 {% endblock %}

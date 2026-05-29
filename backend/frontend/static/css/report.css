@@ -51,33 +51,77 @@
   max-width: 680px;
 }
 
-/* ── Infobox ───────────────────────────────────── */
+/* ── Tip-style explanation boxes (like how_to) ─── */
 
-.report-infobox {
+.report-tip {
+  margin: 26px 0 28px;
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 18px 18px 12px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  padding: 16px 20px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.75;
+  max-width: 920px;
+}
+
+.about-section > .report-tip {
+  max-width: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.report-tip > p,
+.report-tip .report-body {
+  margin: 10px 0 0;
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+  max-width: none;
+}
+
+.report-tip > p:first-child,
+.report-tip .report-body:first-child {
+  margin-top: 0;
+}
+
+.report-table-block {
   margin: 26px 0 28px;
   max-width: 920px;
 }
 
-.report-infobox-title {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 0.9rem;
-  color: var(--text);
-  margin-bottom: 10px;
-  letter-spacing: -0.01em;
-}
-
-.report-infobox-body .report-body {
+.about-section > .report-table-block {
   max-width: none;
-  margin-bottom: 12px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.report-infobox-body .report-body:last-child {
-  margin-bottom: 0;
+.report-table-block .report-note {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.75;
+  max-width: none;
+  opacity: 0.9;
+}
+
+.report-tip .katex {
+  font-size: 1.05em;
+}
+
+.report-tip .katex-display {
+  margin: 0.6em 0;
+}
+
+.report-tip .report-note {
+  margin-top: 12px;
+  font-size: inherit;
+  opacity: 0.9;
+}
+
+.report-figure-caption .ref-link {
+  margin-left: 2px;
 }
 
 /* ── Figures & placeholders ────────────────────── */
@@ -85,6 +129,20 @@
 .report-figure {
   margin: 26px 0 30px;
   max-width: 980px;
+}
+
+.report-figure-media {
+  overflow: hidden;
+  border-radius: 10px;
+  line-height: 0;
+}
+
+.report-figure-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: 0;
 }
 
 .report-figure-placeholder {
@@ -252,6 +310,47 @@
   font-size: 0.8rem;
   color: var(--text-dim);
   line-height: 1.75;
+  /* Keep target visible below fixed nav when jumping from [n] links */
+  scroll-margin-top: calc(var(--nav-h) + 20px);
+}
+
+.report-references li:target {
+  animation: report-ref-highlight 2.8s ease-out forwards;
+}
+
+@keyframes report-ref-highlight {
+  0% {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.45), 0 4px 18px rgba(74, 222, 128, 0.1);
+    background: rgba(74, 222, 128, 0.12);
+  }
+  15% {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px rgba(74, 222, 128, 0.35);
+    background: rgba(74, 222, 128, 0.07);
+  }
+  100% {
+    border-color: var(--border);
+    box-shadow: none;
+    background: var(--surface);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-references li:target {
+    animation: report-ref-highlight-reduced 0.4s ease-out forwards;
+  }
+
+  @keyframes report-ref-highlight-reduced {
+    0% {
+      border-color: var(--accent);
+      background: rgba(74, 222, 128, 0.08);
+    }
+    100% {
+      border-color: var(--border);
+      background: var(--surface);
+    }
+  }
 }
 
 .report-references li::before {
@@ -287,6 +386,11 @@
 
 .ref-link:hover {
   opacity: 0.7;
+  text-decoration: underline;
+}
+
+body.report-page {
+  scroll-behavior: smooth;
 }
 
 /* ── External URL links in reference list ──────── */
