@@ -2,7 +2,7 @@
 # Never commit raw satellite imagery or large datasets
 *.tif
 *.tiff
-*.jp2
+#*.jp2
 *.hdf
 *.nc
 *.geojson
