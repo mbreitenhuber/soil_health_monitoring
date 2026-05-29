@@ -3,6 +3,16 @@
    Orientiert an pages.css + base.css Design-Tokens
 ========================= */
 
+/* ── Hero / section spacing (match users_analysis, how_to) ─ */
+
+.page-content > .about-hero {
+  padding-bottom: 20px;
+}
+
+.page-content > .about-section {
+  padding-top: 28px;
+}
+
 /* ── Body text ─────────────────────────────────── */
 
 .report-body {
@@ -33,6 +43,16 @@
   margin-bottom: 0;
 }
 
+.report-internal-link {
+  color: var(--accent2);
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.report-internal-link:hover {
+  opacity: 0.85;
+}
+
 /* ── Pull quote ────────────────────────────────── */
 
 .report-pullquote {
@@ -45,7 +65,7 @@
   border: 1px solid var(--border);
   border-left: 3px solid var(--accent);
   padding: 20px 28px;
-  margin: 36px 0 8px;
+  margin: 28px 0 28px;
   background: var(--surface);
   border-radius: 0 10px 10px 0;
   max-width: 680px;
@@ -86,26 +106,6 @@
   margin-top: 0;
 }
 
-.report-table-block {
-  margin: 26px 0 28px;
-  max-width: 920px;
-}
-
-.about-section > .report-table-block {
-  max-width: none;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.report-table-block .report-note {
-  margin-top: 12px;
-  font-size: 0.78rem;
-  color: var(--text-dim);
-  line-height: 1.75;
-  max-width: none;
-  opacity: 0.9;
-}
-
 .report-tip .katex {
   font-size: 1.05em;
 }
@@ -120,6 +120,218 @@
   opacity: 0.9;
 }
 
+/* ── Collapsible infoboxes (PDF: ADD INFOBOX …) ─ */
+
+.report-infobox {
+  margin: 26px 0 28px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  max-width: 720px;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--surface);
+}
+
+.about-section > .report-infobox {
+  max-width: 720px;
+}
+
+.report-infobox-summary {
+  position: relative;
+  display: block;
+  padding: 14px 44px 14px 18px;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  background: var(--surface);
+  transition: background 0.15s;
+}
+
+.report-infobox-summary::-webkit-details-marker {
+  display: none;
+}
+
+.report-infobox-summary::marker {
+  content: '';
+}
+
+.report-infobox-summary:hover {
+  background: rgba(74, 222, 128, 0.04);
+}
+
+.report-infobox-summary::after {
+  content: '+';
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: 'DM Mono', monospace;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.report-infobox[open] .report-infobox-summary::after {
+  content: '−';
+  color: var(--text);
+}
+
+.report-infobox[open] .report-infobox-summary {
+  border-bottom: 1px solid var(--border);
+}
+
+.report-infobox-body {
+  padding: 16px 18px 18px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.75;
+}
+
+.report-infobox-body > p {
+  margin: 0 0 12px;
+}
+
+.report-infobox-body > p:last-child {
+  margin-bottom: 0;
+}
+
+.report-infobox-body .report-note {
+  margin-top: 12px;
+  opacity: 0.9;
+}
+
+.report-infobox-body .report-table-wrap {
+  margin-bottom: 0;
+  overflow-x: visible;
+}
+
+.report-infobox .report-table {
+  table-layout: fixed;
+  min-width: 0;
+}
+
+.report-infobox .report-table thead th,
+.report-infobox .report-table tbody td {
+  padding: 8px 10px;
+  vertical-align: top;
+}
+
+.report-infobox .report-table thead th {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-align: left;
+  word-break: normal;
+  overflow-wrap: normal;
+  hyphens: manual;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid var(--border);
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.report-infobox .report-table tbody td {
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: var(--text-dim);
+  word-break: break-word;
+}
+
+.report-infobox .report-table th:nth-child(1),
+.report-infobox .report-table td:nth-child(1) {
+  width: 33%;
+}
+
+.report-infobox .report-table th:nth-child(2),
+.report-infobox .report-table td:nth-child(2) {
+  width: 11%;
+}
+
+.report-infobox .report-table thead th:nth-child(2) {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.report-infobox .report-table tbody td:nth-child(2) {
+  text-align: center;
+  white-space: nowrap;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.68rem;
+  color: var(--text);
+}
+
+.report-infobox .report-table th:nth-child(3),
+.report-infobox .report-table td:nth-child(3) {
+  width: 56%;
+}
+
+.report-infobox .report-table thead th:nth-child(3) {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  text-align: right;
+}
+
+.report-infobox .report-table tbody td:nth-child(3) {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.64rem;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.report-infobox-list {
+  margin: 0 0 12px;
+  padding-left: 20px;
+}
+
+.report-infobox-list li {
+  margin-bottom: 6px;
+}
+
+.report-infobox-list li:last-child {
+  margin-bottom: 0;
+}
+
+.report-infobox-body code {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8em;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 2px 6px;
+}
+
+.report-infobox .katex {
+  font-size: 1.05em;
+}
+
+.report-infobox .katex-display {
+  margin: 0.75em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.report-infobox-body .report-math-block {
+  margin: 12px 0;
+  text-align: center;
+}
+
+.report-infobox-body .report-math .katex {
+  font-size: 1em;
+}
+
 .report-figure-caption .ref-link {
   margin-left: 2px;
 }
@@ -128,7 +340,8 @@
 
 .report-figure {
   margin: 26px 0 30px;
-  max-width: 980px;
+  max-width: 720px;
+  width: 100%;
 }
 
 .report-figure-media {
@@ -140,7 +353,9 @@
 .report-figure-media img {
   display: block;
   width: 100%;
+  max-width: 100%;
   height: auto;
+  object-fit: contain;
   border: 0;
   border-radius: 0;
 }
@@ -180,7 +395,7 @@
   font-size: 0.78rem;
   color: var(--text-dim);
   line-height: 1.6;
-  max-width: 920px;
+  max-width: 720px;
 }
 
 /* ── Tables ────────────────────────────────────── */
@@ -194,7 +409,7 @@
 .report-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 760px;
+  min-width: 0;
   background: rgba(255, 255, 255, 0.01);
 }
 
@@ -421,8 +636,5 @@ body.report-page {
   .report-pullquote {
     font-size: 0.92rem;
     padding: 16px 20px;
-  }
-  .report-table {
-    min-width: 640px;
   }
 }

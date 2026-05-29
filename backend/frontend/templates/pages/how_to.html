@@ -243,34 +243,25 @@
       The more examples it learns from, the better its predictions become. And this exactly what we did with AgroScan!
     </p>
 
-    <div class="howto-model-grid">
+    <div class="howto-model-body">
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">🛰️</div>
-        <h4>1. Satellites provide the data for our prediction</h4>
-        <p>Every five days, the European Sentinel-2 satellite passes over your field and records how it reflects sunlight not just in colors you can see, but in invisible wavelengths that reveal information about vegetation health, moisture levels, and soil composition. AgroScan analyses these spectral "fingerprints" to estimate how much organic carbon is stored in your topsoil.</p>
-      </div>
+      <h4 class="howto-model-heading">1. Satellites provide the data for our prediction</h4>
+      <p>Every five days, the European Sentinel-2 satellite passes over your field and records how it reflects sunlight not just in colors you can see, but in invisible wavelengths that reveal information about vegetation health, moisture levels, and soil composition. AgroScan analyses these spectral "fingerprints" to estimate how much organic carbon is stored in your topsoil.</p>
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">🧪</div>
-        <h4>2. We train our model using real ground soil samples</h4>
-        <p>Before making any prediction, our system was trained on soil measurements collected across Germany as part of the EU-wide LUCAS soil survey, so samples that were physically taken from the ground and analyzed in a laboratory. By finding patterns between those confirmed measurements and the satellite images taken at the same locations, the model learned to recognized what high and low carbon soils look like from space.</p>
-        <p style="margin-top:12px;">Think of it like this: if you showed a system thousands of photos of cats and dogs with labels, it would learn to recognize the animal from visual cues alone. AgroScan does the same except it learned from soil, satellites, and the wavelengths of reflected light.</p>
-      </div>
+      <h4 class="howto-model-heading">2. We train our model using real ground soil samples</h4>
+      <p>Before making any prediction, our system was trained on soil measurements collected across Germany as part of the EU-wide LUCAS soil survey, so samples that were physically taken from the ground and analyzed in a laboratory. By finding patterns between those confirmed measurements and the satellite images taken at the same locations, the model learned to recognized what high and low carbon soils look like from space.</p>
+      <p>Think of it like this: if you showed a system thousands of photos of cats and dogs with labels, it would learn to recognize the animal from visual cues alone. AgroScan does the same except it learned from soil, satellites, and the wavelengths of reflected light.</p>
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">🧠</div>
-        <h4>3. AgroScan estimates the SOC values for your field</h4>
-        <p>Using the patterns learned during training, AgroScan predicts the SOC value in your selected field. The value is only an estimate and not a lab measurement. It is good at prediction for fields similar to the training data from Germany. The model’s predictions become less accurate the more the test field differs from the training fields.</p>
-        <p style="margin-top:12px;">The model gives you an indication of your soil's carbon status and, more importantly, how that status changes over time. A single prediction tells you where you stand today. A series of predictions across seasons tells you whether your soil management practices are working.</p>
-      </div>
+      <h4 class="howto-model-heading">3. AgroScan estimates the SOC values for your field</h4>
+      <p>Using the patterns learned during training, AgroScan predicts the SOC value in your selected field. The value is only an estimate and not a lab measurement. It is good at prediction for fields similar to the training data from Germany. The model’s predictions become less accurate the more the test field differs from the training fields.</p>
+      <p>The model gives you an indication of your soil's carbon status and, more importantly, how that status changes over time. A single prediction tells you where you stand today. A series of predictions across seasons tells you whether your soil management practices are working.</p>
 
     </div>
 
     <div class="howto-tip" style="margin-top:40px;">
       <span class="howto-tip-label">💡 Tip</span>
       <p>If you would like to find out more about how the ML model works in detail, you can visit the report page for more information.</p>
-      <a class="btn-outline" href="/report">→ Report</a>
+      <a class="btn-outline" style="margin-top:18px;" href="/report">→ Report</a>
     </div>
 
   </section>

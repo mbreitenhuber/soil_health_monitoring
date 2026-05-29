@@ -19,6 +19,34 @@
 .home-quote p::after { content: '\201D'; }
 .home-quote-cite { margin-top: 16px; font-size: 0.72rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.12em; }
 .home-quote-cite::before { content: '\2014\00a0'; }
+.home-quote-bar + .showcase { border-top: none; }
+.showcase-partner-logos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 32px;
+}
+.showcase-partner-logos__stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  width: 100%;
+  max-width: 300px;
+}
+.showcase-partner-logos__ivia {
+  width: 100%;
+  max-width: 280px;
+  height: auto;
+  object-fit: contain;
+}
+.showcase-partner-logos__eth {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  object-fit: contain;
+}
 .features { padding: 80px 32px; max-width: 1100px; margin: 0 auto; }
 .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
 .feature-card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; transition: border-color 0.2s; }
@@ -30,6 +58,25 @@
 @media (max-width: 768px) { .showcase { grid-template-columns: 1fr; } }
 .showcase-text h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.6rem; letter-spacing: -0.03em; margin-bottom: 16px; color: var(--text); }
 .showcase-text p { font-size: 0.82rem; color: var(--text-dim); line-height: 1.8; margin-bottom: 24px; }
+.showcase-btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+  max-width: 100%;
+}
+.showcase-btn-row .btn-outline {
+  font-size: 0.76rem;
+  padding: 10px 14px;
+  line-height: 1.4;
+  text-align: center;
+  white-space: normal;
+}
+@media (max-width: 520px) {
+  .showcase-btn-row {
+    grid-template-columns: 1fr;
+  }
+}
 .home-cta { text-align: center; padding: 80px 32px; border-top: 1px solid var(--border); background: var(--surface); }
 .home-cta h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(1.8rem, 4vw, 3rem); letter-spacing: -0.04em; color: var(--text); margin-bottom: 16px; }
 .home-cta p { font-size: 0.85rem; color: var(--text-dim); margin-bottom: 32px; }

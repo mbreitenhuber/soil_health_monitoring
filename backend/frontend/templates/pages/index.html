@@ -69,7 +69,7 @@
   </section>-->
 
   <!-- Showcase 1 -->
-  <section class="showcase" style="border-top:1px solid var(--border);padding-top:80px;">
+  <section class="showcase">
     <div class="img-placeholder img-placeholder--media img-placeholder--cover" style="aspect-ratio:4/3;border-radius:10px;">
       <img src="/static/assets/image/Farmer_on_field.png" alt="Farmer on field" />
     </div>
@@ -89,23 +89,45 @@
       <h3>Satellite driven decision support – make it your own</h3>
       <p>The machine learning model is trained on Sentinel-2 data and vegetation and soil indices. 
         It utilized only free, publicly available data and is fully open-source making it easy to customize to your own use case. Curious? Read our report or checkout our GitHub repository. </p>
-      <a class="btn-outline" href="/report"> → Read our report</a>
-      <a class="btn-outline" style="margin-top: 4px;" href="https://github.com/mbreitenhuber/soil_health_monitoring">→ Checkout our GitHub repository</a>
+      <div class="showcase-btn-row">
+        <a class="btn-outline" href="/report">→ Read our report</a>
+        <a class="btn-outline" href="https://github.com/mbreitenhuber/soil_health_monitoring">→ Checkout our GitHub repo</a>
+      </div>
     </div>
     <div class="img-placeholder img-placeholder--media" style="aspect-ratio:4/3;border-radius:10px;">
       <img src="/static/assets/image/flow_chart_ML.png" alt="Flow chart of the machine learning model" />
     </div>
   </section>
 
-  <!-- Users analysis -->
+  <!-- Showcase 3 -->
+  <section class="showcase">
+    <div class="img-placeholder img-placeholder--media showcase-partner-logos" style="aspect-ratio:4/3;border-radius:10px;">
+      <div class="showcase-partner-logos__stack">
+        <img src="/static/assets/image/ivia-logo.svg" alt="IVIA Lab" class="showcase-partner-logos__ivia" />
+        <img src="/static/assets/image/logo-ethz.svg" alt="ETH Zurich" class="showcase-partner-logos__eth" />
+      </div>
+    </div>
+    <div class="showcase-text">
+      <div class="section-eyebrow">AI4GOOD · IVIA Lab</div>
+      <h3>From classroom to climate impact</h3>
+      <p>AgroScan grew out of the elective course <strong>AI4GOOD: Human-Centered AI for Social Good — Peace, Health, Climate</strong> at ETH Zurich. Offered by the IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation), the course brings together computer science with peace and security, global health, and climate science.</p>
+      <p>Students move from seminar discussions to hands-on projects: they build AI prototypes on public data and reflect on ethical and societal implications along the way. AgroScan applies that approach to precision agriculture by providing open-source, satellite-based soil organic carbon maps that farmers and researchers can use without proprietary lock-in.</p>
+      <div class="showcase-btn-row">
+        <a class="btn-outline" href="https://ivia.ch/teaching/ai4good/" target="_blank" rel="noopener noreferrer">→ About the AI4GOOD course</a>
+        <a class="btn-outline" href="https://ivia.ch/#home" target="_blank" rel="noopener noreferrer">→ IVIA Lab</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Who We Built AgroScan For -->
   <section class="about-section" style="border-top:1px solid var(--border);">
-    <div class="section-eyebrow">User analysis</div>
+    <div class="section-eyebrow">Who We Built AgroScan For</div>
     <h2 class="section-title">Developed with the user in mind</h2>
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:720px;">
       AgroScan is developed to fit the needs of the user. Find out more about the three archetype users we had in mind when designing our website. All of them are based on our interviews with farmers in the South of Germany. 
     </p> 
     <div style="margin-top: 18px;">
-      <a class="btn-outline" href="/users_analysis">→ User analysis</a>
+      <a class="btn-outline" href="/users_analysis">→ Who We Built AgroScan For</a>
     </div>
   </section>
 
