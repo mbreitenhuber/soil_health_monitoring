@@ -908,6 +908,7 @@ function openDetailModal(item) {
   document.getElementById("edit-location").value   = item.location_name || "";
   document.getElementById("edit-crop").value       = item.crop          || "";
   document.getElementById("edit-notes").value      = item.notes         || "";
+  document.getElementById("Date-of-Analysis").value = item.date         || "";
 
   document.getElementById("detail-avg").textContent = formatOcGkg(item.avg_value);
   document.getElementById("detail-min").textContent = formatOcGkg(item.min_value);
