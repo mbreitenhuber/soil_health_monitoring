@@ -1,26 +1,34 @@
 {% extends "base.html" %}
 
-{% block title %}Home{% endblock %}
+{% block title %}{{ "Home" if lang == "en" else "Startseite" }}{% endblock %}
 
 {% block content %}
 <div class="page-content">
 
   <section class="hero">
-    <div class="hero-eyebrow">Precision agriculture · ML-based analysis</div>
+    <div class="hero-eyebrow">{{ "Precision agriculture · ML-based analysis" if lang == "en" else "Präzisionslandwirtschaft · ML-gestützte Analyse" }}</div>
     <h1 class="hero-title">
-      Your fields<br>
-      <span class="accent">Intelligently analyzed</span>
+      {% if lang == "en" %}
+        Your fields<br>
+        <span class="accent">Intelligently analyzed</span>
+      {% else %}
+        Deine Felder<br>
+        <span class="accent">Intelligent analysiert</span>
+      {% endif %}
     </h1>
     <p class="hero-sub">
-      AgroScan combines remote sensing with machine learning – select your agricultural field and receive a detailed map of its soil organic carbon content!
+      {% if lang == "en" %}
+        AgroScan combines remote sensing with machine learning – select your agricultural field and receive a detailed map of its soil organic carbon content!
+      {% else %}
+        AgroScan verbindet Fernerkundung mit maschinellem Lernen – wähle dein landwirtschaftliches Feld und erhalte eine detaillierte Karte des organischen Kohlenstoffs im Boden!
+      {% endif %}
     </p>
     <div class="hero-actions">
-      <a class="btn-primary" href="/analyse">→ Analyze now</a>
-      <a class="btn-outline"  href="/how_to">→ Learn how to use</a>
+      <a class="btn-primary" href="/analyse">→ {{ "Analyze now" if lang == "en" else "Jetzt analysieren" }}</a>
+      <a class="btn-outline"  href="/how_to">→ {{ "Learn how to use" if lang == "en" else "Anleitung lesen" }}</a>
     </div>
   </section>
 
-  <!-- Hauptbild -->
   <div style="padding:0 32px 72px; max-width:1100px; margin:0 auto;">
     {% if hero_image %}
       <img src="/static/assets/image/{{ hero_image }}{% if hero_image_version %}?v={{ hero_image_version }}{% endif %}" alt="AgroScan Screenshot"
@@ -28,78 +36,49 @@
     {% else %}
       <div class="img-placeholder" style="border-radius:12px;">
         <div class="icon">🗺️</div>
-        <div>Hauptbild einfügen — hero_image in main.py setzen</div>
-        <div style="font-size:0.68rem;opacity:0.6;">Empfohlen: 1400×600px</div>
+        <div>{{ "Insert hero image — set hero_image in main.py" if lang == "en" else "Hauptbild einfügen — hero_image in main.py setzen" }}</div>
+        <div style="font-size:0.68rem;opacity:0.6;">{{ "Recommended: 1400×600px" if lang == "en" else "Empfohlen: 1400×600px" }}</div>
       </div>
     {% endif %}
   </div>
 
-  <!-- Stats — Daten kommen aus HOME_STATS in main.py -->
-  <!--<div class="stats-bar">
-    {% for stat in stats %}
-      <div class="stat-item">
-        <div class="stat-num">{{ stat.value[lang] if stat.value is mapping and lang in stat.value else stat.value }}</div>
-        <div class="stat-label">{{ stat.label[lang] if stat.label is mapping and lang in stat.label else stat.label }}</div>
-      </div>
-    {% endfor %}
-  </div>-->
-
   <div class="stats-bar home-quote-bar">
     <figure class="home-quote-figure">
       <blockquote class="home-quote">
-        <p>Understanding our soil shouldn't be a privilege. Agroscan makes soil carbon monitoring open-source, satellite-powered, and free for all.</p>
+        <p>{% if lang == "en" %}Understanding our soil shouldn't be a privilege. Agroscan makes soil carbon monitoring open-source, satellite-powered, and free for all.{% else %}Unseren Boden zu verstehen sollte kein Privileg sein. AgroScan macht die Überwachung von Bodenkohlenstoff quelloffen, satellitengestützt und für alle kostenlos.{% endif %}</p>
       </blockquote>
       <figcaption class="home-quote-cite">AgroScan Team</figcaption>
     </figure>
   </div>
 
-  <!-- Features — Daten kommen aus HOME_FEATURES in main.py -->
-  <!--<section class="features">
-    <div class="section-eyebrow">What AgroScan delivers</div>
-    <h2 class="section-title">Simple. Precise. Scalable.</h2>
-    <div class="features-grid">
-      {% for f in features %}
-        <div class="feature-card">
-          <div class="feature-icon">{{ f.icon }}</div>
-          <div class="feature-name">{{ f.name[lang] if f.name is mapping and lang in f.name else f.name }}</div>
-          <div class="feature-desc">{{ f.desc[lang] if f.desc is mapping and lang in f.desc else f.desc }}</div>
-        </div>
-      {% endfor %}
-    </div>
-  </section>-->
-
-  <!-- Showcase 1 -->
   <section class="showcase">
     <div class="img-placeholder img-placeholder--media img-placeholder--cover" style="aspect-ratio:4/3;border-radius:10px;">
-      <img src="/static/assets/image/Farmer_on_field.png" alt="Farmer on field" />
+      <img src="/static/assets/image/Farmer_on_field.png" alt="{{ 'Farmer on field' if lang == 'en' else 'Landwirt auf dem Feld' }}" />
     </div>
     <div class="showcase-text">
-      <div class="section-eyebrow">How it works</div>
-      <h3>One click to become a carbon connoisseur</h3>
-      <p>Select the polygon drawing tool on the map, click around the edges of your field, and start the analysis.</p>
-      <p>The program splits the selected polygon into a 60x60 m grid and predicts the agricultural soil organic carbon content using a machine learning model.</p>
-      <a class="btn-primary" href="/analyse">→ Try out now</a>
+      <div class="section-eyebrow">{{ "How it works" if lang == "en" else "So funktioniert's" }}</div>
+      <h3>{{ "One click to become a carbon connoisseur" if lang == "en" else "Ein Klick zum Kohlenstoff-Kenner" }}</h3>
+      <p>{% if lang == "en" %}Select the polygon drawing tool on the map, click around the edges of your field, and start the analysis.{% else %}Wähle das Polygon-Werkzeug auf der Karte, klicke entlang der Feldgrenzen und starte die Analyse.{% endif %}</p>
+      <p>{% if lang == "en" %}The program splits the selected polygon into a 60x60 m grid and predicts the agricultural soil organic carbon content using a machine learning model.{% else %}Das Programm teilt das gewählte Polygon in ein 60×60-m-Raster auf und sagt den organischen Kohlenstoff im Ackerboden mit einem Machine-Learning-Modell voraus.{% endif %}</p>
+      <a class="btn-primary" href="/analyse">→ {{ "Try out now" if lang == "en" else "Jetzt ausprobieren" }}</a>
     </div>
   </section>
 
-  <!-- Showcase 2 -->
   <section class="showcase">
     <div class="showcase-text">
-      <div class="section-eyebrow">Machine Learning Model</div>
-      <h3>Satellite driven decision support – make it your own</h3>
-      <p>The machine learning model is trained on Sentinel-2 data as well as vegetation and soil indices. 
-        It utilized only free, publicly available data and is fully open-source making it easy to customize to your own use case. Curious? Read our report or checkout our GitHub repository. </p>
+      <div class="section-eyebrow">{{ "Machine Learning Model" if lang == "en" else "Machine-Learning-Modell" }}</div>
+      <h3>{{ "Satellite driven decision support – make it your own" if lang == "en" else "Satellitengestützte Entscheidungshilfe – mach es zu deinem" }}</h3>
+      <p>{% if lang == "en" %}The machine learning model is trained on Sentinel-2 data as well as vegetation and soil indices. It utilized only free, publicly available data and is fully open-source making it easy to customize to your own use case. Curious? Read our report or checkout our GitHub repository.{% else %}Das Machine-Learning-Modell wurde mit Sentinel-2-Daten sowie Vegetations- und Bodenindizes trainiert. Es nutzt ausschließlich freie, öffentlich verfügbare Daten und ist vollständig quelloffen – so lässt es sich leicht an den eigenen Anwendungsfall anpassen. Neugierig? Lies unseren Bericht oder schau in unser GitHub-Repository.{% endif %}</p>
       <div class="showcase-btn-row">
-        <a class="btn-outline" href="/report">→ Read our report</a>
-        <a class="btn-outline" href="https://github.com/mbreitenhuber/soil_health_monitoring" target="_blank" rel="noopener noreferrer">→ Checkout our GitHub repo</a>
+        <a class="btn-outline" href="/report">→ {{ "Read our report" if lang == "en" else "Bericht lesen" }}</a>
+        <a class="btn-outline" href="https://github.com/mbreitenhuber/soil_health_monitoring" target="_blank" rel="noopener noreferrer">→ {{ "Checkout our GitHub repo" if lang == "en" else "GitHub-Repo ansehen" }}</a>
       </div>
     </div>
     <div class="img-placeholder img-placeholder--media" style="aspect-ratio:4/3;border-radius:10px;">
-      <img src="/static/assets/image/flow_chart_ML.png" alt="Flow chart of the machine learning model" />
+      <img src="/static/assets/image/flow_chart_ML.png" alt="{{ 'Flow chart of the machine learning model' if lang == 'en' else 'Flussdiagramm des Machine-Learning-Modells' }}" />
     </div>
   </section>
 
-  <!-- Showcase 3 -->
   <section class="showcase">
     <div class="img-placeholder img-placeholder--media showcase-partner-logos" style="aspect-ratio:4/3;border-radius:10px;">
       <div class="showcase-partner-logos__stack">
@@ -109,54 +88,55 @@
     </div>
     <div class="showcase-text">
       <div class="section-eyebrow">AI4GOOD · IVIA Lab</div>
-      <h3>From classroom to climate impact</h3>
-      <p>AgroScan grew out of the elective course <strong>AI4GOOD: Human-Centered AI for Social Good — Peace, Health, Climate</strong> at ETH Zurich. Offered by the IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation), the course brings together computer science with peace and security, global health, and climate science.</p>
-      <p>Students move from seminar discussions to hands-on projects: they build AI prototypes on public data and reflect on ethical and societal implications along the way. AgroScan applies that approach to precision agriculture by providing open-source, satellite-based soil organic carbon maps that farmers and researchers can use without proprietary lock-in.</p>
+      <h3>{{ "From classroom to climate impact" if lang == "en" else "Vom Seminarraum zum Klimaeffekt" }}</h3>
+      <p>{% if lang == "en" %}AgroScan grew out of the elective course <strong>AI4GOOD: Human-Centered AI for Social Good — Peace, Health, Climate</strong> at ETH Zurich. Offered by the IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation), the course brings together computer science with peace and security, global health, and climate science.{% else %}AgroScan entstand im Wahlfach <strong>AI4GOOD: Human-Centered AI for Social Good — Peace, Health, Climate</strong> an der ETH Zürich. Das IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation) verbindet Informatik mit Frieden und Sicherheit, globaler Gesundheit und Klimawissenschaft.{% endif %}</p>
+      <p>{% if lang == "en" %}Students move from seminar discussions to hands-on projects: they build AI prototypes on public data and reflect on ethical and societal implications along the way. AgroScan applies that approach to precision agriculture by providing open-source, satellite-based soil organic carbon maps that farmers and researchers can use without proprietary lock-in.{% else %}Studierende gehen von Seminar-Diskussionen zu praktischen Projekten über: Sie bauen KI-Prototypen auf öffentlichen Daten und reflektieren ethische und gesellschaftliche Fragen. AgroScan wendet diesen Ansatz auf die Präzisionslandwirtschaft an – mit quelloffenen, satellitengestützten Karten des organischen Bodenkohlenstoffs für Landwirt:innen und Forschende ohne proprietäre Abhängigkeit.{% endif %}</p>
       <div class="showcase-btn-row">
-        <a class="btn-outline" href="https://ivia.ch/teaching/ai4good/" target="_blank" rel="noopener noreferrer">→ About the AI4GOOD course</a>
+        <a class="btn-outline" href="https://ivia.ch/teaching/ai4good/" target="_blank" rel="noopener noreferrer">→ {{ "About the AI4GOOD course" if lang == "en" else "Zum AI4GOOD-Kurs" }}</a>
         <a class="btn-outline" href="https://ivia.ch/#home" target="_blank" rel="noopener noreferrer">→ IVIA Lab</a>
       </div>
     </div>
   </section>
 
-  <!-- Who We Built AgroScan For -->
   <section class="about-section" style="border-top:1px solid var(--border);">
-    <div class="section-eyebrow">Who We Built AgroScan For</div>
-    <h2 class="section-title">Developed with the user in mind</h2>
+    <div class="section-eyebrow">{{ "Who We Built AgroScan For" if lang == "en" else "Für wen wir AgroScan entwickelt haben" }}</div>
+    <h2 class="section-title">{{ "Developed with the user in mind" if lang == "en" else "Mit dem Nutzer im Blick entwickelt" }}</h2>
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:720px;">
-      AgroScan is developed to fit the needs of the user. Find out more about the three archetype users we had in mind when designing our website. All of them are based on our interviews with farmers in the South of Germany. 
-    </p> 
+      {% if lang == "en" %}
+        AgroScan is developed to fit the needs of the user. Find out more about the three archetype users we had in mind when designing our website. All of them are based on our interviews with farmers in the South of Germany.
+      {% else %}
+        AgroScan ist auf die Bedürfnisse der Nutzer:innen ausgerichtet. Erfahre mehr über die drei Archetypen, die wir beim Design der Website im Blick hatten. Sie basieren auf unseren Interviews mit Landwirt:innen in Süddeutschland.
+      {% endif %}
+    </p>
     <div style="margin-top: 18px;">
-      <a class="btn-outline" href="/users_analysis">→ Who We Built AgroScan For</a>
+      <a class="btn-outline" href="/users_analysis">→ {{ "Who We Built AgroScan For" if lang == "en" else "Für wen wir AgroScan entwickelt haben" }}</a>
     </div>
   </section>
 
- <!-- Roadmap — Daten kommen aus ROADMAP in main.py -->
   <section class="about-section">
-    <div class="section-eyebrow">Development</div>
-      <h2 class="section-title">Roadmap</h2>
-      <div class="timeline">
-        {% for item in roadmap %}
+    <div class="section-eyebrow">{{ "Development" if lang == "en" else "Entwicklung" }}</div>
+    <h2 class="section-title">Roadmap</h2>
+    <div class="timeline">
+      {% for item in roadmap %}
         <div class="tl-item">
           <div class="tl-dot {% if not item.done %}tl-dot--future{% endif %}"></div>
-            <div>
-              <div class="tl-year {% if not item.done %}tl-year--future{% endif %}">
-                {{ item.version[lang] if item.version is mapping and lang in item.version else item.version }}
-              </div>
+          <div>
+            <div class="tl-year {% if not item.done %}tl-year--future{% endif %}">
+              {{ item.version[lang] if item.version is mapping and lang in item.version else item.version }}
+            </div>
             <div class="tl-content">
-            <h4>{{ item.title[lang] if item.title is mapping and lang in item.title else item.title }}</h4>
-            <p>{{ item.desc[lang] if item.desc is mapping and lang in item.desc else item.desc }}</p>
+              <h4>{{ item.title[lang] if item.title is mapping and lang in item.title else item.title }}</h4>
+              <p>{{ item.desc[lang] if item.desc is mapping and lang in item.desc else item.desc }}</p>
+            </div>
           </div>
         </div>
-      </div>
       {% endfor %}
     </div>
   </section>
 
-  <!-- Team — Daten kommen aus TEAM_MEMBERS in main.py -->
   <section class="about-section">
-    <div class="section-eyebrow">Team</div>
-    <h2 class="section-title">The faces behind the Project</h2>
+    <div class="section-eyebrow">{{ "Team" if lang == "en" else "Team" }}</div>
+    <h2 class="section-title">{{ "The faces behind the Project" if lang == "en" else "Die Gesichter hinter dem Projekt" }}</h2>
     <div class="team-grid">
       {% for member in team %}
         <div class="team-card">
@@ -167,24 +147,23 @@
                    style="width:100%;height:100%;object-fit:cover;" />
             {% else %}
               <div class="photo-icon">👤</div>
-              <div style="font-size:0.72rem;">Foto → static/assets/team/</div>
+              <div style="font-size:0.72rem;">{{ "Photo → static/assets/team/" if lang == "en" else "Foto → static/assets/team/" }}</div>
             {% endif %}
           </div>
           <div class="team-info">
             <div class="team-name">{{ member.name }}</div>
-            <div class="team-role">{{ member.role }}</div>
-            <div class="team-bio">{{ member.bio }}</div>
+            <div class="team-role">{{ member.role[lang] if member.role is mapping and lang in member.role else member.role }}</div>
+            <div class="team-bio">{{ member.bio[lang] if member.bio is mapping and lang in member.bio else member.bio }}</div>
           </div>
         </div>
       {% endfor %}
     </div>
   </section>
 
-  <!-- CTA -->
   <div class="home-cta">
-    <h2>Ready for smart field analysis?</h2>
-    <p>Go to the analysis page and draw your first polygon.</p>
-    <a class="btn-primary" href="/analyse">→ Start analysis</a>
+    <h2>{{ "Ready for smart field analysis?" if lang == "en" else "Bereit für smarte Feldanalyse?" }}</h2>
+    <p>{{ "Go to the analysis page and draw your first polygon." if lang == "en" else "Gehe zur Analyse-Seite und zeichne dein erstes Polygon." }}</p>
+    <a class="btn-primary" href="/analyse">→ {{ "Start analysis" if lang == "en" else "Analyse starten" }}</a>
   </div>
 
 </div>
