@@ -27,11 +27,6 @@
         {% endfor %}
       </div>
     </div>
-
-    {% for page in nav_pages if page.group == "middle" %}
-      <a class="nav-link {% if current_page == page.id %}active{% endif %}"
-         href="{{ page.href }}">{{ page.label }}</a>
-    {% endfor %}
   </div>
 
   <div class="nav-spacer"></div>
@@ -48,7 +43,7 @@
       </div>
     </div>
 
-    <a class="nav-link" href="/personal_dashboard">Personal Dashboard</a>
+    <a class="nav-link" href="/personal_dashboard">{{ "Personal Dashboard" if lang == "en" else "Mein Dashboard" }}</a>
   </div>
 </nav>
 

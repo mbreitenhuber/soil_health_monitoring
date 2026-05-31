@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Report — AgroScan{% endblock %}
+{% block title %}{{ "Report" if lang == "en" else "Bericht" }} — AgroScan{% endblock %}
 
 {% block body_class %}report-page{% endblock %}
 
@@ -13,217 +13,401 @@
 <div class="page-content">
 
   <div class="about-hero">
-    <div class="section-eyebrow">Scientific Background</div>
-    <h1>AgroScan <em>Report</em></h1>
+    <div class="section-eyebrow">{{ "Scientific Background" if lang == "en" else "Wissenschaftlicher Hintergrund" }}</div>
+    <h1>
+      {% if lang == "en" %}
+        AgroScan <em>Report</em>
+      {% else %}
+        AgroScan <em>Bericht</em>
+      {% endif %}
+    </h1>
   </div>
 
   <!-- Introduction -->
   <section class="about-section" id="sec-introduction">
-    <div class="section-eyebrow">Introduction</div>
+    <div class="section-eyebrow">{{ "Introduction" if lang == "en" else "Einleitung" }}</div>
 
     <p class="report-body">
-      Soils represent the largest terrestrial carbon pool globally and play a critical role as
-      carbon sinks through soil carbon sequestration, where atmospheric CO₂ is stored as
-      soil organic matter via photosynthesis (Paustian et.al, 2019)<a href="#ref1" class="ref-link">[1]</a>. Agricultural soils with high
-      soil organic carbon (SOC) content deliver significant environmental and agronomic co-
-      benefits: improved long-term productivity, increased biodiversity, and preservation of
-      ecosystem services (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>.
+      {% if lang == "en" %}
+        Soils represent the largest terrestrial carbon pool globally and play a critical role as
+        carbon sinks through soil carbon sequestration, where atmospheric CO₂ is stored as
+        soil organic matter via photosynthesis (Paustian et.al, 2019)<a href="#ref1" class="ref-link">[1]</a>. Agricultural soils with high
+        soil organic carbon (SOC) content deliver significant environmental and agronomic co-
+        benefits: improved long-term productivity, increased biodiversity, and preservation of
+        ecosystem services (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>.
+      {% else %}
+        Böden stellen weltweit den größten terrestrischen Kohlenstoffpool dar und wirken als
+        wichtige Kohlenstoffsenken durch Bodenkohlenstoffbindung, bei der atmosphärisches CO₂
+        über Photosynthese als organische Substanz im Boden gespeichert wird (Paustian et.al, 2019)<a href="#ref1" class="ref-link">[1]</a>.
+        Landwirtschaftliche Böden mit hohem Gehalt an organischem Bodenkohlenstoff (SOC) bringen
+        erhebliche ökologische und agronomische Nebeneffekte mit sich: verbesserte langfristige
+        Produktivität, gesteigerte Biodiversität und Erhalt von Ökosystemleistungen (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Consequently, monitoring and enhancing SOC stocks has become a priority within major policy frameworks, including
-      the EU Soil Strategy for 2030 that translates into the EU Soil Monitoring Law (Europ.
-      Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
+      {% if lang == "en" %}
+        Consequently, monitoring and enhancing SOC stocks has become a priority within major policy frameworks, including
+        the EU Soil Strategy for 2030 that translates into the EU Soil Monitoring Law (Europ.
+        Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
+      {% else %}
+        Daraus folgt, dass die Überwachung und Stärkung von SOC-Vorräten zu einer Priorität in
+        zentralen politischen Rahmenwerken geworden ist, einschließlich der EU-Bodenstrategie für
+        2030, die in das EU-Bodenüberwachungsgesetz mündet (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Despite this recognized importance, farmers face substantial barriers when integrating
-      SOC monitoring into their agricultural practices. Conventional soil sampling requires
-      repeated field and laboratory work across extended time periods, creating significant
-      cost, labor, and scalability constraints that limit routine application across large
-      agricultural areas (Ihasusta et.al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
+      {% if lang == "en" %}
+        Despite this recognized importance, farmers face substantial barriers when integrating
+        SOC monitoring into their agricultural practices. Conventional soil sampling requires
+        repeated field and laboratory work across extended time periods, creating significant
+        cost, labor, and scalability constraints that limit routine application across large
+        agricultural areas (Ihasusta et.al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
+      {% else %}
+        Trotz dieser anerkannten Bedeutung stehen Landwirt:innen erhebliche Hürden entgegen, wenn
+        sie SOC-Monitoring in ihre landwirtschaftliche Praxis integrieren wollen. Konventionelle
+        Bodenprobenahme erfordert wiederholte Feld- und Laborarbeit über längere Zeiträume und
+        führt zu hohen Kosten, Arbeitsaufwand und Skalierungsproblemen, die eine routinemäßige
+        Anwendung auf großen landwirtschaftlichen Flächen einschränken (Ihasusta et.al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Machine learning-based remote sensing models have emerged as a promising
-      approach to address these limitations. By leveraging satellite-derived data, these
-      models offer scalable and cost-efficient SOC estimation and allow a baseline to be
-      established using historic satellite imagery to assess the impact of sustainable soil
-      management (SSM) practices over time. However, many existing tools remain restricted
-      by paywalls, limited accessibility, or insufficient methodological transparency,
-      constraining their adoption in both research and practice.
+      {% if lang == "en" %}
+        Machine learning-based remote sensing models have emerged as a promising
+        approach to address these limitations. By leveraging satellite-derived data, these
+        models offer scalable and cost-efficient SOC estimation and allow a baseline to be
+        established using historic satellite imagery to assess the impact of sustainable soil
+        management (SSM) practices over time. However, many existing tools remain restricted
+        by paywalls, limited accessibility, or insufficient methodological transparency,
+        constraining their adoption in both research and practice.
+      {% else %}
+        Auf maschinellem Lernen basierende Fernerkundungsmodelle haben sich als vielversprechender
+        Ansatz zur Überwindung dieser Einschränkungen etabliert. Durch die Nutzung satellitengestützter
+        Daten ermöglichen diese Modelle skalierbare und kosteneffiziente SOC-Schätzungen und erlauben
+        die Etablierung einer Baseline anhand historischer Satellitenbilder, um die Wirkung
+        nachhaltiger Bodenbewirtschaftung (SSM) über die Zeit zu bewerten. Viele bestehende Tools
+        bleiben jedoch durch Paywalls, eingeschränkte Zugänglichkeit oder unzureichende methodische
+        Transparenz limitiert, was ihre Verbreitung in Forschung und Praxis einschränkt.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      AgroScan addresses these gaps by providing a free, open-source platform that enables
-      farmers to assess the SOC content of their fields, monitor the effectiveness of SSM
-      practices, and engage with evidence when advocating to policymakers. As an open-
-      source tool, it provides full transparency on the underlying methodology and allows
-      users to personalize or extend the platform for their own use cases.
+      {% if lang == "en" %}
+        AgroScan addresses these gaps by providing a free, open-source platform that enables
+        farmers to assess the SOC content of their fields, monitor the effectiveness of SSM
+        practices, and engage with evidence when advocating to policymakers. As an open-
+        source tool, it provides full transparency on the underlying methodology and allows
+        users to personalize or extend the platform for their own use cases.
+      {% else %}
+        AgroScan schließt diese Lücken mit einer kostenlosen Open-Source-Plattform, die Landwirt:innen
+        ermöglicht, den SOC-Gehalt ihrer Felder zu bewerten, die Wirksamkeit von SSM-Maßnahmen zu
+        überwachen und bei der Interessenvertretung gegenüber politischen Entscheidungsträger:innen
+        auf belastbare Evidenz zurückzugreifen. Als Open-Source-Tool bietet es volle Transparenz
+        über die zugrunde liegende Methodik und erlaubt Nutzer:innen, die Plattform für eigene
+        Anwendungsfälle anzupassen oder zu erweitern.
+      {% endif %}
     </p>
   </section>
 
   <!-- Literature Review -->
   <section class="about-section" id="sec-literature-review">
-    <div class="section-eyebrow">Literature Review</div>
+    <div class="section-eyebrow">{{ "Literature Review" if lang == "en" else "Literaturübersicht" }}</div>
 
     <p class="report-body">
-      The use of remote sensing combined with machine learning for SOC prediction in
-      agricultural soils has become more established in academic research. Nguyen et al.
-      (2022)<a href="#ref15" class="ref-link">[15]</a> demonstrated a multi-sensor data fusion model combining multispectral image
-      data from Sentinel-2 and synthetic aperture radar data from Sentinel-1, achieving high
-      prediction accuracy (R² = 0.870, RMSE = 1.818 t/ha). The study highlighted that
-      incorporating derived predictor features — including vegetation and soil indices
-      calculated from raw band values — significantly improved model performance.
+      {% if lang == "en" %}
+        The use of remote sensing combined with machine learning for SOC prediction in
+        agricultural soils has become more established in academic research. Nguyen et al.
+        (2022)<a href="#ref15" class="ref-link">[15]</a> demonstrated a multi-sensor data fusion model combining multispectral image
+        data from Sentinel-2 and synthetic aperture radar data from Sentinel-1, achieving high
+        prediction accuracy (R² = 0.870, RMSE = 1.818 t/ha). The study highlighted that
+        incorporating derived predictor features — including vegetation and soil indices
+        calculated from raw band values — significantly improved model performance.
+      {% else %}
+        Die Kombination aus Fernerkundung und maschinellem Lernen zur SOC-Vorhersage in
+        landwirtschaftlichen Böden ist in der akademischen Forschung zunehmend etabliert. Nguyen et al.
+        (2022)<a href="#ref15" class="ref-link">[15]</a> zeigten ein Multi-Sensor-Datenfusionsmodell, das multispektrale Bilddaten von
+        Sentinel-2 mit SAR-Daten von Sentinel-1 verbindet und hohe Vorhersagegenauigkeit erreicht
+        (R² = 0,870, RMSE = 1,818 t/ha). Die Studie betont, dass abgeleitete Prädiktorvariablen —
+        einschließlich Vegetations- und Bodenindizes aus Rohbandwerten — die Modellleistung
+        deutlich verbessern.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Complementing this, Guo et al. (2021)<a href="#ref5" class="ref-link">[5]</a> showed that Sentinel-2 optical data and crop-
-      growth indices are particularly effective predictors for agricultural soils, which typically
-      exhibit lower topological variability than other land use types. Similar results supporting
-      the use of remote sensing for carbon prediction were demonstrated by Yuzugullu et.al.
-      (2024)<a href="#ref21" class="ref-link">[21]</a>, Beisekenov et.al. (2025)<a href="#ref22" class="ref-link">[22]</a>, Zhang et.al. (2019)<a href="#ref23" class="ref-link">[23]</a>. Taken together, these studies
-      confirm that the technical foundation for remote sensing-based SOC prediction in
-      agricultural contexts is well established.
+      {% if lang == "en" %}
+        Complementing this, Guo et al. (2021)<a href="#ref5" class="ref-link">[5]</a> showed that Sentinel-2 optical data and crop-
+        growth indices are particularly effective predictors for agricultural soils, which typically
+        exhibit lower topological variability than other land use types. Similar results supporting
+        the use of remote sensing for carbon prediction were demonstrated by Yuzugullu et.al.
+        (2024)<a href="#ref21" class="ref-link">[21]</a>, Beisekenov et.al. (2025)<a href="#ref22" class="ref-link">[22]</a>, Zhang et.al. (2019)<a href="#ref23" class="ref-link">[23]</a>. Taken together, these studies
+        confirm that the technical foundation for remote sensing-based SOC prediction in
+        agricultural contexts is well established.
+      {% else %}
+        Ergänzend zeigten Guo et al. (2021)<a href="#ref5" class="ref-link">[5]</a>, dass optische Sentinel-2-Daten und Wachstumsindizes
+        besonders wirksame Prädiktoren für landwirtschaftliche Böden sind, die typischerweise eine
+        geringere topographische Variabilität als andere Landnutzungstypen aufweisen. Ähnliche
+        Ergebnisse zur Nutzung der Fernerkundung für Kohlenstoffvorhersagen lieferten Yuzugullu et.al.
+        (2024)<a href="#ref21" class="ref-link">[21]</a>, Beisekenov et.al. (2025)<a href="#ref22" class="ref-link">[22]</a> und Zhang et.al. (2019)<a href="#ref23" class="ref-link">[23]</a>. Zusammen bestätigen diese
+        Studien, dass die technische Grundlage für fernerkundungsbasierte SOC-Vorhersage in
+        landwirtschaftlichen Kontexten gut etabliert ist.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Despite this academic progress, the translation into accessible farmer-facing tools
-      remains limited. A review of existing commercial platforms shows a fragmented
-      landscape. Providers such as Agricolus (AGRICOLUS s.r.l., n.d.)<a href="#ref6" class="ref-link">[6]</a>, OneSoil (OneSoil AG,
-      n.d.)<a href="#ref8" class="ref-link">[8]</a>, and GeoPard Agriculture (FlyPard Analytics GmbH, n.d.)<a href="#ref7" class="ref-link">[7]</a> offer a range of remote
-      sensing-based services — including water stress monitoring and crop development
-      tracking — but none advertise dedicated SOC prediction capabilities on their website.
-      Farmonaut (Yuple Inc, n.d.)<a href="#ref9" class="ref-link">[9]</a> represents the most directly relevant commercial offering,
-      providing a carbon monitoring service. However, its platform discloses no information
-      on the underlying methodology, data sources, or model validation. This lack of
-      transparency showcases a broader pattern: where commercial tools exist, they tend to
-      operate as black boxes, are largely behind paywalls, and offer users no agency to
-      interact, adapt, or validate the tool for their specific regional or agronomic context.
+      {% if lang == "en" %}
+        Despite this academic progress, the translation into accessible farmer-facing tools
+        remains limited. A review of existing commercial platforms shows a fragmented
+        landscape. Providers such as Agricolus (AGRICOLUS s.r.l., n.d.)<a href="#ref6" class="ref-link">[6]</a>, OneSoil (OneSoil AG,
+        n.d.)<a href="#ref8" class="ref-link">[8]</a>, and GeoPard Agriculture (FlyPard Analytics GmbH, n.d.)<a href="#ref7" class="ref-link">[7]</a> offer a range of remote
+        sensing-based services — including water stress monitoring and crop development
+        tracking — but none advertise dedicated SOC prediction capabilities on their website.
+        Farmonaut (Yuple Inc, n.d.)<a href="#ref9" class="ref-link">[9]</a> represents the most directly relevant commercial offering,
+        providing a carbon monitoring service. However, its platform discloses no information
+        on the underlying methodology, data sources, or model validation. This lack of
+        transparency showcases a broader pattern: where commercial tools exist, they tend to
+        operate as black boxes, are largely behind paywalls, and offer users no agency to
+        interact, adapt, or validate the tool for their specific regional or agronomic context.
+      {% else %}
+        Trotz dieses akademischen Fortschritts bleibt die Umsetzung in zugängliche, landwirt:innenorientierte
+        Tools begrenzt. Eine Übersicht bestehender kommerzieller Plattformen zeigt ein fragmentiertes
+        Angebot. Anbieter wie Agricolus (AGRICOLUS s.r.l., n.d.)<a href="#ref6" class="ref-link">[6]</a>, OneSoil (OneSoil AG,
+        n.d.)<a href="#ref8" class="ref-link">[8]</a> und GeoPard Agriculture (FlyPard Analytics GmbH, n.d.)<a href="#ref7" class="ref-link">[7]</a> bieten verschiedene
+        fernerkundungsbasierte Dienste — darunter Wasserstress-Monitoring und Wachstumsverfolgung —
+        an, jedoch werben keine von ihnen auf ihrer Website explizit mit dedizierter SOC-Vorhersage.
+        Farmonaut (Yuple Inc, n.d.)<a href="#ref9" class="ref-link">[9]</a> ist das am ehesten vergleichbare kommerzielle Angebot und
+        stellt einen Carbon-Monitoring-Dienst bereit. Die Plattform gibt jedoch keine Informationen
+        zur zugrunde liegenden Methodik, zu Datenquellen oder zur Modellvalidierung preis. Diese
+        mangelnde Transparenz verdeutlicht ein breiteres Muster: Wo kommerzielle Tools existieren,
+        arbeiten sie häufig als Black Box, stehen weitgehend hinter Paywalls und geben Nutzer:innen
+        keine Möglichkeit, das Tool für ihren regionalen oder agronomischen Kontext zu prüfen,
+        anzupassen oder zu validieren.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      These gaps — limited availability, lack of methodological transparency and the absence
-      of user agency — motivated the central research question of the present study:
+      {% if lang == "en" %}
+        These gaps — limited availability, lack of methodological transparency and the absence
+        of user agency — motivated the central research question of the present study:
+      {% else %}
+        Diese Lücken — begrenzte Verfügbarkeit, fehlende methodische Transparenz und mangelnde
+        Nutzer:innenagency — motivierten die zentrale Forschungsfrage der vorliegenden Studie:
+      {% endif %}
     </p>
 
     <blockquote class="report-pullquote">
-      How can interactive machine learning be utilized to empower farmers to monitor and manage carbon stock in their agricultural soils?
+      {% if lang == "en" %}
+        How can interactive machine learning be utilized to empower farmers to monitor and manage carbon stock in their agricultural soils?
+      {% else %}
+        Wie kann interaktives maschinelles Lernen genutzt werden, um Landwirt:innen zu befähigen, den Kohlenstoffvorrat in ihren landwirtschaftlichen Böden zu überwachen und zu steuern?
+      {% endif %}
     </blockquote>
 
     <p class="report-body">
-      AgroScan addresses this question by providing an open-source, methodologically
-      transparent platform that enables farmers to query SOC predictions for their own fields
-      and track changes over time, placing the farmer as an active participant rather than a
-      passive end user.
+      {% if lang == "en" %}
+        AgroScan addresses this question by providing an open-source, methodologically
+        transparent platform that enables farmers to query SOC predictions for their own fields
+        and track changes over time, placing the farmer as an active participant rather than a
+        passive end user.
+      {% else %}
+        AgroScan beantwortet diese Frage mit einer Open-Source-Plattform, die methodisch transparent
+        ist und Landwirt:innen ermöglicht, SOC-Vorhersagen für ihre eigenen Felder abzufragen und
+        Veränderungen über die Zeit zu verfolgen — und sie dabei als aktive Akteur:innen statt als
+        passive Endnutzer:innen positioniert.
+      {% endif %}
     </p>
   </section>
 
   <!-- Data methodology -->
   <section class="about-section" id="sec-data-methodology">
-    <div class="section-eyebrow">Data methodology</div>
+    <div class="section-eyebrow">{{ "Data methodology" if lang == "en" else "Datenmethodik" }}</div>
 
     <p class="report-body">
-      <strong>1. Selection of case region</strong><br />
-      Germany was selected as the case region due to its significant agricultural sector,
-      strong policy relevance, and high soil data availability. Around half of Germany’s land
-      area is used for agriculture, making it one of the European Union’s largest agricultural
-      producers (Federal Ministry of Food and Agriculture [BMEL], 2023)<a href="#ref11" class="ref-link">[11]</a>. In addition,
-      Germany must comply with the European Union Soil Monitoring Law by 2028,
-      increasing the demand for scalable and cost-effective soil monitoring methods
-      (European Union, 2025)<a href="#ref12" class="ref-link">[12]</a>. AgroScan could support these future monitoring requirements
-      through large-scale SOC assessments. Germany also offers strong data availability:
-      The LUCAS 2019 soil dataset has 332 agricultural sampling locations in Germany, of
-      which 270 could be matched to Sentinel-2 data (Fernández-Ugalde et.al., 2022)<a href="#ref24" class="ref-link">[24]</a>; Fig. 1).
+      {% if lang == "en" %}
+        <strong>1. Selection of case region</strong><br />
+        Germany was selected as the case region due to its significant agricultural sector,
+        strong policy relevance, and high soil data availability. Around half of Germany’s land
+        area is used for agriculture, making it one of the European Union’s largest agricultural
+        producers (Federal Ministry of Food and Agriculture [BMEL], 2023)<a href="#ref11" class="ref-link">[11]</a>. In addition,
+        Germany must comply with the European Union Soil Monitoring Law by 2028,
+        increasing the demand for scalable and cost-effective soil monitoring methods
+        (European Union, 2025)<a href="#ref12" class="ref-link">[12]</a>. AgroScan could support these future monitoring requirements
+        through large-scale SOC assessments. Germany also offers strong data availability:
+        The LUCAS 2019 soil dataset has 332 agricultural sampling locations in Germany, of
+        which 270 could be matched to Sentinel-2 data (Fernández-Ugalde et.al., 2022)<a href="#ref24" class="ref-link">[24]</a>; Fig. 1).
+      {% else %}
+        <strong>1. Auswahl der Fallstudienregion</strong><br />
+        Deutschland wurde als Fallstudienregion gewählt wegen seines bedeutenden Agrarsektors,
+        seiner hohen politischen Relevanz und der guten Verfügbarkeit von Bodendaten. Etwa die
+        Hälfte der Landesfläche wird landwirtschaftlich genutzt, wodurch Deutschland zu den größten
+        Agrarproduzent:innen der Europäischen Union zählt (Federal Ministry of Food and Agriculture [BMEL], 2023)<a href="#ref11" class="ref-link">[11]</a>.
+        Zudem muss Deutschland bis 2028 das EU-Bodenüberwachungsgesetz umsetzen, was den Bedarf
+        an skalierbaren und kosteneffizienten Bodenüberwachungsmethoden erhöht (European Union, 2025)<a href="#ref12" class="ref-link">[12]</a>.
+        AgroScan könnte diese künftigen Monitoring-Anforderungen durch großflächige SOC-Bewertungen
+        unterstützen. Deutschland bietet außerdem eine gute Datenverfügbarkeit: Der LUCAS-2019-Bodendatensatz
+        umfasst 332 landwirtschaftliche Probenahmestellen in Deutschland, von denen 270 mit
+        Sentinel-2-Daten abgeglichen werden konnten (Fernández-Ugalde et.al., 2022)<a href="#ref24" class="ref-link">[24]</a>; Abb. 1).
+      {% endif %}
     </p>
 
     <figure class="report-figure" id="fig-1">
       <div class="report-figure-media">
-        <img src="/static/assets/image/LUCAS%20locations.png" alt="Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et.al., 2022)" />
+        <img src="/static/assets/image/LUCAS%20locations.png" alt="{% if lang == 'en' %}Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et.al., 2022){% else %}Karte der LUCAS-Bodenprobenahmestellen in Deutschland (Fernández-Ugalde et.al., 2022){% endif %}" />
       </div>
       <figcaption class="report-figure-caption">
-        Fig.1: Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et.al., 2022)<a href="#ref24" class="ref-link">[24]</a>
+        {% if lang == "en" %}
+          Fig.1: Mapping of LUCAS soil sampling locations in Germany (Fernández-Ugalde et.al., 2022)<a href="#ref24" class="ref-link">[24]</a>
+        {% else %}
+          Abb. 1: Karte der LUCAS-Bodenprobenahmestellen in Deutschland (Fernández-Ugalde et.al., 2022)<a href="#ref24" class="ref-link">[24]</a>
+        {% endif %}
       </figcaption>
     </figure>
 
     <p class="report-body">
-      <strong>2. Data sources</strong><br />
-      Two publicly available and freely accessible datasets were selected as the foundation
-      for the AgroScan model to support the project’s commitment to reproducibility and low
-      barriers to adoption.
+      {% if lang == "en" %}
+        <strong>2. Data sources</strong><br />
+        Two publicly available and freely accessible datasets were selected as the foundation
+        for the AgroScan model to support the project’s commitment to reproducibility and low
+        barriers to adoption.
+      {% else %}
+        <strong>2. Datenquellen</strong><br />
+        Als Grundlage für das AgroScan-Modell wurden zwei öffentlich verfügbare und frei zugängliche
+        Datensätze gewählt, um das Projektziel der Reproduzierbarkeit und niedriger Einstiegshürden
+        zu unterstützen.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>Input data:</strong> Sentinel-2 multispectral imagery was selected as the primary input data
-      source. It is operated by the European Space Agency as part of the Copernicus program
-      and provides near-global coverage with a site revisit frequency of five days. This
-      ensures a high availability of observations. It is freely accessible via the Copernicus API.
-      Its 13 spectral bands span the Visible, Near-Infrared (NIR), and Short-Wave Infrared
-      (SWIR) regions of the electromagnetic spectrum (Copernicus Sentinel, n.d.)<a href="#ref13" class="ref-link">[13]</a> Level-2A
-      products were used, which provide atmospherically corrected Bottom-of-Atmosphere
-      reflectance values. This improves the physical interpretability and comparability of the
-      data.
+      {% if lang == "en" %}
+        <strong>Input data:</strong> Sentinel-2 multispectral imagery was selected as the primary input data
+        source. It is operated by the European Space Agency as part of the Copernicus program
+        and provides near-global coverage with a site revisit frequency of five days. This
+        ensures a high availability of observations. It is freely accessible via the Copernicus API.
+        Its 13 spectral bands span the Visible, Near-Infrared (NIR), and Short-Wave Infrared
+        (SWIR) regions of the electromagnetic spectrum (Copernicus Sentinel, n.d.)<a href="#ref13" class="ref-link">[13]</a> Level-2A
+        products were used, which provide atmospherically corrected Bottom-of-Atmosphere
+        reflectance values. This improves the physical interpretability and comparability of the
+        data.
+      {% else %}
+        <strong>Eingabedaten:</strong> Als primäre Eingabedatenquelle wurde multispektrale Sentinel-2-Bildgebung
+        gewählt. Sie wird von der Europäischen Weltraumorganisation im Rahmen des Copernicus-Programms
+        betrieben und bietet nahezu globale Abdeckung mit einer Wiederholungsfrequenz von fünf Tagen.
+        Dadurch steht eine hohe Verfügbarkeit an Beobachtungen zur Verfügung. Der Zugriff erfolgt
+        kostenfrei über die Copernicus-API. Die 13 Spektralbänder decken den sichtbaren Bereich,
+        das Nahinfrarot (NIR) und das Kurzwellige Infrarot (SWIR) ab (Copernicus Sentinel, n.d.)<a href="#ref13" class="ref-link">[13]</a>.
+        Verwendet wurden Level-2A-Produkte mit atmosphärisch korrigierten Bottom-of-Atmosphere-Reflexionswerten.
+        Dies verbessert die physikalische Interpretierbarkeit und Vergleichbarkeit der Daten.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      From the full set of available bands, 10 were selected as model inputs: B2, B3, B4, B5,
-      B6, B7, B8, B8A, B11, and B12. These bands cover critical spectral regions and enable
-      inference of key biophysical properties relevant to SOC estimation, including vegetation
-      condition, soil moisture, and crop growth status (Ngyuen et al., 2022)<a href="#ref15" class="ref-link">[15]</a>.
+      {% if lang == "en" %}
+        From the full set of available bands, 10 were selected as model inputs: B2, B3, B4, B5,
+        B6, B7, B8, B8A, B11, and B12. These bands cover critical spectral regions and enable
+        inference of key biophysical properties relevant to SOC estimation, including vegetation
+        condition, soil moisture, and crop growth status (Ngyuen et al., 2022)<a href="#ref15" class="ref-link">[15]</a>.
+      {% else %}
+        Aus dem vollständigen Satz verfügbarer Bänder wurden zehn als Modelleingaben ausgewählt:
+        B2, B3, B4, B5, B6, B7, B8, B8A, B11 und B12. Diese Bänder decken zentrale Spektralbereiche
+        ab und ermöglichen die Ableitung wichtiger biophysikalischer Eigenschaften für die SOC-Schätzung,
+        einschließlich Vegetationszustand, Bodenfeuchte und Wachstumsstatus der Kultur (Ngyuen et al., 2022)<a href="#ref15" class="ref-link">[15]</a>.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>Target variable:</strong> The LUCAS Topsoil dataset was selected as the source of ground-truth
-      SOC measurements. It is coordinated by Eurostat and the European Commission’s
-      Joint Research Centre and provides georeferenced soil samples collected across EU
-      Member States from the topsoil layer (0–20 cm), which is most relevant for SOC
-      dynamics in agricultural systems (European Commission, JRC, 2021)<a href="#ref16" class="ref-link">[16]</a>. The dataset
-      includes land-use classification, enabling filtering to cropland samples only. This
-      ensures consistency between the target variable and the modelling domain. Its EU-
-      wide, harmonized design makes it well-suited as ground truth for remote sensing–
-      based SOC prediction. The upcoming LUCAS 2022 Topsoil release will enable future
-      model retraining with more recent observations.
+      {% if lang == "en" %}
+        <strong>Target variable:</strong> The LUCAS Topsoil dataset was selected as the source of ground-truth
+        SOC measurements. It is coordinated by Eurostat and the European Commission’s
+        Joint Research Centre and provides georeferenced soil samples collected across EU
+        Member States from the topsoil layer (0–20 cm), which is most relevant for SOC
+        dynamics in agricultural systems (European Commission, JRC, 2021)<a href="#ref16" class="ref-link">[16]</a>. The dataset
+        includes land-use classification, enabling filtering to cropland samples only. This
+        ensures consistency between the target variable and the modelling domain. Its EU-
+        wide, harmonized design makes it well-suited as ground truth for remote sensing–
+        based SOC prediction. The upcoming LUCAS 2022 Topsoil release will enable future
+        model retraining with more recent observations.
+      {% else %}
+        <strong>Zielvariable:</strong> Als Quelle für Referenzmessungen des organischen Bodenkohlenstoffs wurde
+        der LUCAS-Topsoil-Datensatz gewählt. Er wird von Eurostat und dem Joint Research Centre
+        der Europäischen Kommission koordiniert und enthält georeferenzierte Bodenproben aus der
+        Mutterbodenschicht (0–20 cm) in allen EU-Mitgliedstaaten — der für SOC-Dynamik in
+        landwirtschaftlichen Systemen relevantesten Schicht (European Commission, JRC, 2021)<a href="#ref16" class="ref-link">[16]</a>.
+        Der Datensatz umfasst eine Landnutzungsklassifikation, sodass auf Ackerproben gefiltert
+        werden kann. Damit bleibt die Zielvariable konsistent mit der Modellierungsdomäne. Sein
+        EU-weit harmonisiertes Design eignet sich gut als Ground Truth für fernerkundungsbasierte
+        SOC-Vorhersage. Die kommende LUCAS-2022-Topsoil-Veröffentlichung wird künftiges
+        Modell-Retraining mit aktuelleren Beobachtungen ermöglichen.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>3. Data collection and processing</strong><br />
-      The data collection and processing pipeline is based on a GitHub repository of the
-      Computer Vision for Intelligent Mobility System Laboratory of the Technische
-      Hochschule Ingolstadt (CVIMS, 2025)<a href="#ref17" class="ref-link">[17]</a>. We updated the pipeline to the current
-      Copernicus OData communication protocol, added a feature transformation, and
-      modified it to be compatible with our interactive use case. Building on the existing
-      CVIMS framework (2025)<a href="#ref17" class="ref-link">[17]</a>, the following outlines our team’s main contributions.
+      {% if lang == "en" %}
+        <strong>3. Data collection and processing</strong><br />
+        The data collection and processing pipeline is based on a GitHub repository of the
+        Computer Vision for Intelligent Mobility System Laboratory of the Technische
+        Hochschule Ingolstadt (CVIMS, 2025)<a href="#ref17" class="ref-link">[17]</a>. We updated the pipeline to the current
+        Copernicus OData communication protocol, added a feature transformation, and
+        modified it to be compatible with our interactive use case. Building on the existing
+        CVIMS framework (2025)<a href="#ref17" class="ref-link">[17]</a>, the following outlines our team’s main contributions.
+      {% else %}
+        <strong>3. Datenerhebung und -verarbeitung</strong><br />
+        Die Pipeline zur Datenerhebung und -verarbeitung basiert auf einem GitHub-Repository
+        des Computer Vision for Intelligent Mobility System Laboratory der Technischen Hochschule
+        Ingolstadt (CVIMS, 2025)<a href="#ref17" class="ref-link">[17]</a>. Wir haben die Pipeline auf das aktuelle Copernicus-OData-Kommunikationsprotokoll
+        aktualisiert, eine Feature-Transformation ergänzt und sie für unseren interaktiven
+        Anwendungsfall angepasst. Aufbauend auf dem bestehenden CVIMS-Framework (2025)<a href="#ref17" class="ref-link">[17]</a>
+        skizziert das Folgende die wichtigsten Beiträge unseres Teams.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>Feature transformation:</strong> Building on the selected raw band values, 13 additional
-      predictor features were derived: 7 vegetation indices, 4 soil indices, and 2 cyclical
-      temporal features encoding the month of observation. This feature engineering step
-      follows Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a>, who demonstrated that derived indices correlate more
-      strongly with agricultural SOC than raw spectral bands alone, with the Soil-Adjusted
-      Vegetation Index (SAVI) identified as the single most important predictor. The inclusion
-      of crop-growth indices is particularly appropriate for agricultural soils, which exhibit
-      comparatively low topological variability, making spectral signals related to vegetation
-      and soil surface conditions the dominant source of predictive information (Guo et al.,
-      2021)<a href="#ref5" class="ref-link">[5]</a>.
+      {% if lang == "en" %}
+        <strong>Feature transformation:</strong> Building on the selected raw band values, 13 additional
+        predictor features were derived: 7 vegetation indices, 4 soil indices, and 2 cyclical
+        temporal features encoding the month of observation. This feature engineering step
+        follows Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a>, who demonstrated that derived indices correlate more
+        strongly with agricultural SOC than raw spectral bands alone, with the Soil-Adjusted
+        Vegetation Index (SAVI) identified as the single most important predictor. The inclusion
+        of crop-growth indices is particularly appropriate for agricultural soils, which exhibit
+        comparatively low topological variability, making spectral signals related to vegetation
+        and soil surface conditions the dominant source of predictive information (Guo et al.,
+        2021)<a href="#ref5" class="ref-link">[5]</a>.
+      {% else %}
+        <strong>Feature-Transformation:</strong> Auf Basis der ausgewählten Rohbandwerte wurden 13 zusätzliche
+        Prädiktorvariablen abgeleitet: sieben Vegetationsindizes, vier Bodenindizes und zwei zyklische
+        zeitliche Merkmale zur Kodierung des Beobachtungsmonats. Dieser Feature-Engineering-Schritt
+        folgt Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a>, die zeigten, dass abgeleitete Indizes stärker mit landwirtschaftlichem
+        SOC korrelieren als Rohspektralbänder allein, wobei der Soil-Adjusted Vegetation Index (SAVI)
+        als wichtigster Prädiktor identifiziert wurde. Die Einbeziehung von Wachstumsindizes ist
+        besonders sinnvoll für landwirtschaftliche Böden mit vergleichsweise geringer topographischer
+        Variabilität, sodass spektrale Signale von Vegetation und Bodenoberfläche die dominante
+        Informationsquelle für Vorhersagen bilden (Guo et al., 2021)<a href="#ref5" class="ref-link">[5]</a>.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      The two temporal features encode the survey month as sine and cosine components
-      allowing the model to capture seasonal variation in surface reflectance while avoiding
-      artificial discontinuities between December and January.
+      {% if lang == "en" %}
+        The two temporal features encode the survey month as sine and cosine components
+        allowing the model to capture seasonal variation in surface reflectance while avoiding
+        artificial discontinuities between December and January.
+      {% else %}
+        Die beiden zeitlichen Merkmale kodieren den Probenahmemonat als Sinus- und Kosinuskomponenten.
+        So kann das Modell saisonale Schwankungen der Oberflächenreflexion erfassen, ohne künstliche
+        Diskontinuitäten zwischen Dezember und Januar einzuführen.
+      {% endif %}
     </p>
 
     <details class="report-infobox" id="infobox-predictor-features">
-      <summary class="report-infobox-summary">Overview of predictor features</summary>
+      <summary class="report-infobox-summary">{{ "Overview of predictor features" if lang == "en" else "Übersicht der Prädiktorvariablen" }}</summary>
       <div class="report-infobox-body">
         <div class="report-table-wrap">
           <table class="report-table">
             <thead>
               <tr>
-                <th>Predictor feature</th>
-                <th>Acronyms</th>
-                <th>Formulas</th>
+                <th>{{ "Predictor feature" if lang == "en" else "Prädiktorvariable" }}</th>
+                <th>{{ "Acronyms" if lang == "en" else "Akronym" }}</th>
+                <th>{{ "Formulas" if lang == "en" else "Formeln" }}</th>
               </tr>
             </thead>
             <tbody>
@@ -244,53 +428,95 @@
           </table>
         </div>
         <p class="report-note">
-          Note: Band wavelengths of S-2: B2 = Blue (492 nm), B3 = Green (560 nm), B4 = Red (665
-          nm), B5 = Red-edge 1 (RE1) (704 nm), B6 = Red-edge 2 (RE2) (740 nm), B7 = Red-edge 3
-          (RE3) (783 nm), B8 = Near-infrared (NIR) (833 nm), B8A = Narrow-NIR (865 nm), B11 =
-          SWIR1 (1614 nm), B12 = SWIR2 (2202 nm). (Adapted from Ngyuen et.al., 2022)<a href="#ref15" class="ref-link">[15]</a>
+          {% if lang == "en" %}
+            Note: Band wavelengths of S-2: B2 = Blue (492 nm), B3 = Green (560 nm), B4 = Red (665
+            nm), B5 = Red-edge 1 (RE1) (704 nm), B6 = Red-edge 2 (RE2) (740 nm), B7 = Red-edge 3
+            (RE3) (783 nm), B8 = Near-infrared (NIR) (833 nm), B8A = Narrow-NIR (865 nm), B11 =
+            SWIR1 (1614 nm), B12 = SWIR2 (2202 nm). (Adapted from Ngyuen et.al., 2022)<a href="#ref15" class="ref-link">[15]</a>
+          {% else %}
+            Hinweis: Bandwellenlängen von S-2: B2 = Blau (492 nm), B3 = Grün (560 nm), B4 = Rot (665
+            nm), B5 = Red-Edge 1 (RE1) (704 nm), B6 = Red-Edge 2 (RE2) (740 nm), B7 = Red-Edge 3
+            (RE3) (783 nm), B8 = Nahinfrarot (NIR) (833 nm), B8A = Schmal-NIR (865 nm), B11 =
+            SWIR1 (1614 nm), B12 = SWIR2 (2202 nm). (Adaptiert aus Ngyuen et.al., 2022)<a href="#ref15" class="ref-link">[15]</a>
+          {% endif %}
         </p>
       </div>
     </details>
 
     <p class="report-body">
-      <strong>Interactive use case:</strong> A fixed reference min-max normalization was implemented for
-      both Sentinel-2 band values and all derived indices. Unlike dataset-dependent
-      normalization, which scales values relative to the minimum and maximum of whichever
-      dataset is being processed, the fixed approach computes reference minimum and
-      maximum values once from a representative dataset — here, the full German training
-      set — and applies those constants consistently at every subsequent stage of the
-      pipeline.
+      {% if lang == "en" %}
+        <strong>Interactive use case:</strong> A fixed reference min-max normalization was implemented for
+        both Sentinel-2 band values and all derived indices. Unlike dataset-dependent
+        normalization, which scales values relative to the minimum and maximum of whichever
+        dataset is being processed, the fixed approach computes reference minimum and
+        maximum values once from a representative dataset — here, the full German training
+        set — and applies those constants consistently at every subsequent stage of the
+        pipeline.
+      {% else %}
+        <strong>Interaktiver Anwendungsfall:</strong> Für Sentinel-2-Bandwerte und alle abgeleiteten Indizes
+        wurde eine feste Referenz-Min-Max-Normalisierung implementiert. Im Gegensatz zur
+        datensatzabhängigen Normalisierung, die Werte relativ zu Minimum und Maximum des jeweils
+        verarbeiteten Datensatzes skaliert, berechnet der feste Ansatz Referenz-Minimum und -Maximum
+        einmalig aus einem repräsentativen Datensatz — hier dem vollständigen deutschen Trainingsset —
+        und wendet diese Konstanten in allen nachfolgenden Pipeline-Schritten konsistent an.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      This design decision was motivated to fit the interactive use case of AgroScan. At
-      inference time, a farmer submits the GPS coordinates of their field, triggering the
-      download of a small, location-specific Sentinel-2 datafile. A dataset-dependent
-      normalization applied to this single observation would produce meaningless scaled
-      values. The fixed reference approach ensures that the normalization applied to the
-      farmer’s input is identical to that used during training, preserving the statistical
-      relationship between features that the model learned. This makes the pipeline fully
-      reusable from training to individual farmer queries without modification. Values outside
-      the reference range are clipped to the unit interval to handle edge cases.
+      {% if lang == "en" %}
+        This design decision was motivated to fit the interactive use case of AgroScan. At
+        inference time, a farmer submits the GPS coordinates of their field, triggering the
+        download of a small, location-specific Sentinel-2 datafile. A dataset-dependent
+        normalization applied to this single observation would produce meaningless scaled
+        values. The fixed reference approach ensures that the normalization applied to the
+        farmer’s input is identical to that used during training, preserving the statistical
+        relationship between features that the model learned. This makes the pipeline fully
+        reusable from training to individual farmer queries without modification. Values outside
+        the reference range are clipped to the unit interval to handle edge cases.
+      {% else %}
+        Diese Designentscheidung orientiert sich am interaktiven Anwendungsfall von AgroScan. Zur
+        Inferenzzeit übergibt eine Landwirt:in die GPS-Koordinaten ihres Feldes, woraufhin eine
+        kleine, standortspezifische Sentinel-2-Datei heruntergeladen wird. Eine datensatzabhängige
+        Normalisierung dieser einzelnen Beobachtung würde bedeutungslose skalierte Werte erzeugen.
+        Der feste Referenzansatz stellt sicher, dass die Normalisierung der Eingabe identisch zu
+        der im Training ist und die statistischen Beziehungen zwischen Merkmalen erhalten bleiben,
+        die das Modell gelernt hat. Damit ist die Pipeline von Training bis zu einzelnen Abfragen
+        ohne Anpassung wiederverwendbar. Werte außerhalb des Referenzbereichs werden auf das
+        Einheitsintervall geclippt, um Randfälle abzufangen.
+      {% endif %}
     </p>
 
     <details class="report-infobox" id="infobox-normalization-logic">
-      <summary class="report-infobox-summary">Normalization logic</summary>
+      <summary class="report-infobox-summary">{{ "Normalization logic" if lang == "en" else "Normalisierungslogik" }}</summary>
       <div class="report-infobox-body">
         <p>
-          The fixed reference minimum and maximum values are computed once from a
-          representative dataset using the python scripts calculate_band_ranges.py and
-          calculate_index_ranges.py and saved to a respective .json file.
-          For the normalization each raw value <span class="report-math">\(x\)</span> is transformed to
+          {% if lang == "en" %}
+            The fixed reference minimum and maximum values are computed once from a
+            representative dataset using the python scripts calculate_band_ranges.py and
+            calculate_index_ranges.py and saved to a respective .json file.
+            For the normalization each raw value <span class="report-math">\(x\)</span> is transformed to
+          {% else %}
+            Die festen Referenz-Minimum- und -Maximumwerte werden einmalig aus einem repräsentativen
+            Datensatz mit den Python-Skripten calculate_band_ranges.py und calculate_index_ranges.py
+            berechnet und in jeweils einer .json-Datei gespeichert.
+            Für die Normalisierung wird jeder Rohwert <span class="report-math">\(x\)</span> transformiert zu
+          {% endif %}
         </p>
         <p class="report-math-block">
           \[x'=\frac{x-x_{\min}}{x_{\max}-x_{\min}}\]
         </p>
         <p>
-          and then clipped to the unit interval:
-          <span class="report-math">\(x' \leftarrow \min(1,\max(0,x'))\)</span>.
-          If <span class="report-math">\(x_{\max}=x_{\min}\)</span> the implementation returns 0 to avoid
-          division by zero and NaN/inf values are replaced with 0 afterwards.
+          {% if lang == "en" %}
+            and then clipped to the unit interval:
+            <span class="report-math">\(x' \leftarrow \min(1,\max(0,x'))\)</span>.
+            If <span class="report-math">\(x_{\max}=x_{\min}\)</span> the implementation returns 0 to avoid
+            division by zero and NaN/inf values are replaced with 0 afterwards.
+          {% else %}
+            und anschließend auf das Einheitsintervall geclippt:
+            <span class="report-math">\(x' \leftarrow \min(1,\max(0,x'))\)</span>.
+            Falls <span class="report-math">\(x_{\max}=x_{\min}\)</span>, gibt die Implementierung 0 zurück, um
+            Division durch null zu vermeiden; NaN/inf-Werte werden anschließend durch 0 ersetzt.
+          {% endif %}
         </p>
       </div>
     </details>
@@ -298,348 +524,633 @@
 
   <!-- ML model -->
   <section class="about-section" id="sec-ml-model">
-    <div class="section-eyebrow">ML model</div>
+    <div class="section-eyebrow">{{ "ML model" if lang == "en" else "ML-Modell" }}</div>
 
     <p class="report-body">
-      <strong>1. Selection of model</strong><br />
-      The model architecture and implementation used in this work are based on the
-      approach presented by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. The study evaluated three machine
-      learning approaches for predicting soil nutrient levels across Europe: XGBoost,
-      Random Forest, and Fully Connected Neural Networks (FCNNs). Model performance
-      was assessed using Root Mean Squared Error (RMSE) for several soil properties,
-      including phosphorus, nitrogen, potassium, and pH.
+      {% if lang == "en" %}
+        <strong>1. Selection of model</strong><br />
+        The model architecture and implementation used in this work are based on the
+        approach presented by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. The study evaluated three machine
+        learning approaches for predicting soil nutrient levels across Europe: XGBoost,
+        Random Forest, and Fully Connected Neural Networks (FCNNs). Model performance
+        was assessed using Root Mean Squared Error (RMSE) for several soil properties,
+        including phosphorus, nitrogen, potassium, and pH.
+      {% else %}
+        <strong>1. Modellauswahl</strong><br />
+        Architektur und Implementierung des in dieser Arbeit verwendeten Modells basieren auf dem
+        Ansatz von Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. Die Studie verglich drei maschinelle Lernverfahren
+        zur Vorhersage von Bodennährstoffgehalten in Europa: XGBoost, Random Forest und Fully
+        Connected Neural Networks (FCNNs). Die Modellleistung wurde anhand des Root Mean Squared
+        Error (RMSE) für mehrere Bodeneigenschaften bewertet, darunter Phosphor, Stickstoff,
+        Kalium und pH.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      The results showed that the FCNN architecture achieved the best overall performance.
-      While XGBoost and Random Forest produced similar results for pH estimation, FCNN
-      outperformed the other methods for nutrients with high variability.
+      {% if lang == "en" %}
+        The results showed that the FCNN architecture achieved the best overall performance.
+        While XGBoost and Random Forest produced similar results for pH estimation, FCNN
+        outperformed the other methods for nutrients with high variability.
+      {% else %}
+        Die Ergebnisse zeigten, dass die FCNN-Architektur die insgesamt beste Leistung erzielte.
+        Während XGBoost und Random Forest für die pH-Schätzung ähnliche Resultate lieferten,
+        übertraf FCNN die anderen Verfahren bei Nährstoffen mit hoher Variabilität.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Within the LUCAS dataset, organic carbon (OC) has a mean value of 18.18 g/kg and a
-      standard deviation of ±8.91 g/kg, indicating substantial variability across samples. This
-      behavior is comparable to the nutrient variables analyzed by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>,
-      where high variability strongly influenced model performance. Since FCNNs are well
-      suited for learning nonlinear relationships and modelling heterogeneous nutrient
-      distributions, they are considered the most appropriate architecture for this prediction
-      task.
+      {% if lang == "en" %}
+        Within the LUCAS dataset, organic carbon (OC) has a mean value of 18.18 g/kg and a
+        standard deviation of ±8.91 g/kg, indicating substantial variability across samples. This
+        behavior is comparable to the nutrient variables analyzed by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>,
+        where high variability strongly influenced model performance. Since FCNNs are well
+        suited for learning nonlinear relationships and modelling heterogeneous nutrient
+        distributions, they are considered the most appropriate architecture for this prediction
+        task.
+      {% else %}
+        Im LUCAS-Datensatz weist organischer Kohlenstoff (OC) einen Mittelwert von 18,18 g/kg
+        und eine Standardabweichung von ±8,91 g/kg auf, was auf erhebliche Variabilität zwischen
+        Proben hinweist. Dieses Verhalten ist vergleichbar mit den Nährstoffvariablen in Kammerlander
+        (2025)<a href="#ref14" class="ref-link">[14]</a>, bei denen hohe Variabilität die Modellleistung stark beeinflusste. Da FCNNs
+        gut geeignet sind, nichtlineare Zusammenhänge zu lernen und heterogene Nährstoffverteilungen
+        zu modellieren, gelten sie als die passendste Architektur für diese Vorhersageaufgabe.
+      {% endif %}
     </p>
 
     <figure class="report-figure" id="fig-oc-distribution">
       <div class="report-figure-media">
-        <img src="/static/assets/image/LUCAS_variability_DE_histogram.png" alt="Distribution of organic carbon (OC) values in the LUCAS dataset for Germany" />
+        <img src="/static/assets/image/LUCAS_variability_DE_histogram.png" alt="{% if lang == 'en' %}Distribution of organic carbon (OC) values in the LUCAS dataset for Germany{% else %}Verteilung der Werte für organischen Kohlenstoff (OC) im LUCAS-Datensatz für Deutschland{% endif %}" />
       </div>
       <figcaption class="report-figure-caption">
-        Distribution of organic carbon (OC) values in the LUCAS dataset. The histogram shows
-        the frequency distribution of OC concentrations in g/kg with the solid vertical line
-        indicating the mean OC value (18.18 g/kg) and the shaded region representing ±1
-        standard deviation (±8.91 g/kg).
+        {% if lang == "en" %}
+          Distribution of organic carbon (OC) values in the LUCAS dataset. The histogram shows
+          the frequency distribution of OC concentrations in g/kg with the solid vertical line
+          indicating the mean OC value (18.18 g/kg) and the shaded region representing ±1
+          standard deviation (±8.91 g/kg).
+        {% else %}
+          Verteilung der Werte für organischen Kohlenstoff (OC) im LUCAS-Datensatz. Das Histogramm
+          zeigt die Häufigkeitsverteilung der OC-Konzentrationen in g/kg; die durchgezogene vertikale
+          Linie markiert den Mittelwert (18,18 g/kg), der schattierte Bereich entspricht ±1
+          Standardabweichung (±8,91 g/kg).
+        {% endif %}
       </figcaption>
     </figure>
 
     <details class="report-infobox" id="infobox-fcnn">
-      <summary class="report-infobox-summary">What is a FCNN</summary>
+      <summary class="report-infobox-summary">{{ "What is a FCNN" if lang == "en" else "Was ist ein FCNN" }}</summary>
       <div class="report-infobox-body">
         <p>
-          FCNNs, also referred to as multilayer perceptron, are feedforward artificial neural
-          networks in which each neuron of one layer is connected to all neurons of the
-          subsequent layer. FCNNs are trained using the backpropagation algorithm introduced
-          by Rumelhart (1986)<a href="#ref19" class="ref-link">[19]</a>. Through multiple hidden layers and nonlinear activation
-          functions, FCNNs are capable of learning complex nonlinear relationships between
-          input features and target variables.
+          {% if lang == "en" %}
+            FCNNs, also referred to as multilayer perceptron, are feedforward artificial neural
+            networks in which each neuron of one layer is connected to all neurons of the
+            subsequent layer. FCNNs are trained using the backpropagation algorithm introduced
+            by Rumelhart (1986)<a href="#ref19" class="ref-link">[19]</a>. Through multiple hidden layers and nonlinear activation
+            functions, FCNNs are capable of learning complex nonlinear relationships between
+            input features and target variables.
+          {% else %}
+            FCNNs, auch als Multilayer-Perceptron bezeichnet, sind feedforward-künstliche neuronale
+            Netze, in denen jedes Neuron einer Schicht mit allen Neuronen der folgenden Schicht
+            verbunden ist. FCNNs werden mit dem Backpropagation-Algorithmus trainiert, den Rumelhart
+            (1986)<a href="#ref19" class="ref-link">[19]</a> einführte. Durch mehrere versteckte Schichten und nichtlineare Aktivierungsfunktionen
+            können FCNNs komplexe nichtlineare Zusammenhänge zwischen Eingabevariablen und Zielgrößen
+            lernen.
+          {% endif %}
         </p>
       </div>
 
       <figure class="report-figure" id="fig-2">
         <div class="report-figure-media">
-          <img src="/static/assets/image/FCNN%20Structure.png" alt="Structure of a fully connected dense neural network (Abueidda et.al., 2022)" />
+          <img src="/static/assets/image/FCNN%20Structure.png" alt="{% if lang == 'en' %}Structure of a fully connected dense neural network (Abueidda et.al., 2022){% else %}Aufbau eines vollständig verbundenen dichten neuronalen Netzes (Abueidda et.al., 2022){% endif %}" />
         </div>
-        <figcaption class="report-figure-caption">Fig.2: Structure of a fully connected dense neural network (Abueidda et.al., 2022)<a href="#ref20" class="ref-link">[20]</a></figcaption>
+        <figcaption class="report-figure-caption">
+          {% if lang == "en" %}
+            Fig.2: Structure of a fully connected dense neural network (Abueidda et.al., 2022)<a href="#ref20" class="ref-link">[20]</a>
+          {% else %}
+            Abb. 2: Aufbau eines vollständig verbundenen dichten neuronalen Netzes (Abueidda et.al., 2022)<a href="#ref20" class="ref-link">[20]</a>
+          {% endif %}
+        </figcaption>
       </figure>
     </details>
 
     <details class="report-infobox" id="infobox-ml-model">
-      <summary class="report-infobox-summary">The ML model behind AgroScan</summary>
+      <summary class="report-infobox-summary">{{ "The ML model behind AgroScan" if lang == "en" else "Das ML-Modell hinter AgroScan" }}</summary>
       <div class="report-infobox-body">
-        <p><strong>Model architecture</strong><br />
-          The network is constructed dynamically as a sequence of linear layers with ReLU
-          activation and dropout after each hidden layer, followed by a single linear output
-          neuron for predicting OC. Model training is performed with backpropagation in PyTorch
-          using mini-batches and RMSE as optimization objective. Weight decay of 0.01 is
-          applied for regularization.
+        <p><strong>{{ "Model architecture" if lang == "en" else "Modellarchitektur" }}</strong><br />
+          {% if lang == "en" %}
+            The network is constructed dynamically as a sequence of linear layers with ReLU
+            activation and dropout after each hidden layer, followed by a single linear output
+            neuron for predicting OC. Model training is performed with backpropagation in PyTorch
+            using mini-batches and RMSE as optimization objective. Weight decay of 0.01 is
+            applied for regularization.
+          {% else %}
+            Das Netz wird dynamisch als Sequenz linearer Schichten mit ReLU-Aktivierung und Dropout
+            nach jeder versteckten Schicht aufgebaut, gefolgt von einem linearen Ausgabeneuron zur
+            OC-Vorhersage. Das Training erfolgt per Backpropagation in PyTorch mit Mini-Batches und
+            RMSE als Optimierungsziel. Zur Regularisierung wird Weight Decay von 0,01 angewendet.
+          {% endif %}
         </p>
-        <p><strong>Hyperparameter tuning</strong><br />
-          Hyperparameter tuning is performed using Optuna. In each trial, the following
-          hyperparameters are sampled:
+        <p><strong>{{ "Hyperparameter tuning" if lang == "en" else "Hyperparameter-Tuning" }}</strong><br />
+          {% if lang == "en" %}
+            Hyperparameter tuning is performed using Optuna. In each trial, the following
+            hyperparameters are sampled:
+          {% else %}
+            Das Hyperparameter-Tuning erfolgt mit Optuna. In jedem Trial werden folgende
+            Hyperparameter gesampelt:
+          {% endif %}
         </p>
         <ul class="report-infobox-list">
-          <li>Number of hidden layers: 3 to 9 layers</li>
-          <li>Number of Neurons per Layer: 8 to 128 (step size 4)</li>
-          <li>Dropout Rate: continuous between 0.1 and 0.5</li>
-          <li>Learning Rate: 0.0001 to 0.01 (log scale)</li>
-          <li>Optimizer: SGD or Adam</li>
-          <li>Batch Size: 16, 32, or 64</li>
+          {% if lang == "en" %}
+            <li>Number of hidden layers: 3 to 9 layers</li>
+            <li>Number of Neurons per Layer: 8 to 128 (step size 4)</li>
+            <li>Dropout Rate: continuous between 0.1 and 0.5</li>
+            <li>Learning Rate: 0.0001 to 0.01 (log scale)</li>
+            <li>Optimizer: SGD or Adam</li>
+            <li>Batch Size: 16, 32, or 64</li>
+          {% else %}
+            <li>Anzahl versteckter Schichten: 3 bis 9</li>
+            <li>Neuronen pro Schicht: 8 bis 128 (Schrittweite 4)</li>
+            <li>Dropout-Rate: kontinuierlich zwischen 0,1 und 0,5</li>
+            <li>Lernrate: 0,0001 bis 0,01 (logarithmische Skala)</li>
+            <li>Optimierer: SGD oder Adam</li>
+            <li>Batch-Größe: 16, 32 oder 64</li>
+          {% endif %}
         </ul>
-        <p><strong>Model training</strong><br />
-          For every trial, a new FCNN architecture is built from the sampled layer widths and
-          dropout rates, trained for 20 epochs, and evaluated on the held-out test set. The
-          currently best model (lowest test RMSE so far) is saved to disk as a checkpoint file
-          (.pth), together with architecture metadata (input size, hidden sizes, dropout rates,
-          output size, and loss type).
-          For FCNN training, the dataset is split once into train and test subsets using an 80/20
-          ratio. Thus, FCNN validation is a single random holdout split.
+        <p><strong>{{ "Model training" if lang == "en" else "Modelltraining" }}</strong><br />
+          {% if lang == "en" %}
+            For every trial, a new FCNN architecture is built from the sampled layer widths and
+            dropout rates, trained for 20 epochs, and evaluated on the held-out test set. The
+            currently best model (lowest test RMSE so far) is saved to disk as a checkpoint file
+            (.pth), together with architecture metadata (input size, hidden sizes, dropout rates,
+            output size, and loss type).
+            For FCNN training, the dataset is split once into train and test subsets using an 80/20
+            ratio. Thus, FCNN validation is a single random holdout split.
+          {% else %}
+            In jedem Trial wird eine neue FCNN-Architektur aus den gesampelten Schichtbreiten und
+            Dropout-Raten aufgebaut, 20 Epochen trainiert und auf dem Hold-out-Testset evaluiert.
+            Das bislang beste Modell (niedrigster Test-RMSE) wird als Checkpoint-Datei (.pth) gespeichert,
+            zusammen mit Architektur-Metadaten (Eingabegröße, versteckte Größen, Dropout-Raten,
+            Ausgabegröße und Loss-Typ).
+            Für das FCNN-Training wird der Datensatz einmalig im Verhältnis 80/20 in Trainings- und
+            Testsubset aufgeteilt. Die FCNN-Validierung erfolgt somit als einzelner zufälliger Hold-out-Split.
+          {% endif %}
         </p>
-        <p><strong>Model employment</strong><br />
-          The prediction is implemented in run_pipeline_from_gps.py. The same feature-
-          processing logic used during training is reused to prepare the dataset. Sentinel-2
-          imagery for each location is downloaded, after which the pixel values around the
-          sampled point are extracted, the spectral bands are normalized, and the derived
-          features are computed. The transformed dataset is then passed to the neural network,
-          which outputs the predicted carbon content value, stored as OC in the repository.
+        <p><strong>{{ "Model employment" if lang == "en" else "Modelleinsatz" }}</strong><br />
+          {% if lang == "en" %}
+            The prediction is implemented in run_pipeline_from_gps.py. The same feature-
+            processing logic used during training is reused to prepare the dataset. Sentinel-2
+            imagery for each location is downloaded, after which the pixel values around the
+            sampled point are extracted, the spectral bands are normalized, and the derived
+            features are computed. The transformed dataset is then passed to the neural network,
+            which outputs the predicted carbon content value, stored as OC in the repository.
+          {% else %}
+            Die Vorhersage ist in run_pipeline_from_gps.py implementiert. Dieselbe Feature-Verarbeitungslogik
+            wie im Training wird zur Datensatzvorbereitung wiederverwendet. Sentinel-2-Bilder für jeden
+            Standort werden heruntergeladen, anschließend werden Pixelwerte um den Probenpunkt extrahiert,
+            die Spektralbänder normalisiert und abgeleitete Merkmale berechnet. Der transformierte Datensatz
+            wird an das neuronale Netz übergeben, das den vorhergesagten Kohlenstoffgehalt ausgibt und
+            als OC im Repository speichert.
+          {% endif %}
         </p>
       </div>
     </details>
 
     <p class="report-body">
-      Using the described model architecture, a RMSE of 6.536 OC g/kg was obtained. This is
-      relatively high, primarily due to the limited dataset size due to computational
-      constraints within the scope of this project. The primary focus of the project was the
-      integration of the machine learning model into a deployable pipeline and interactive
-      web-based platform to make the information accessible to farmers.
+      {% if lang == "en" %}
+        Using the described model architecture, a RMSE of 6.536 OC g/kg was obtained. This is
+        relatively high, primarily due to the limited dataset size due to computational
+        constraints within the scope of this project. The primary focus of the project was the
+        integration of the machine learning model into a deployable pipeline and interactive
+        web-based platform to make the information accessible to farmers.
+      {% else %}
+        Mit der beschriebenen Modellarchitektur wurde ein RMSE von 6,536 OC g/kg erzielt. Dieser
+        Wert ist relativ hoch, vor allem wegen der begrenzten Datensatzgröße infolge rechnerischer
+        Einschränkungen im Projektumfang. Der Schwerpunkt lag auf der Integration des maschinellen
+        Lernmodells in eine deploybare Pipeline und eine interaktive webbasierte Plattform, um die
+        Informationen für Landwirt:innen zugänglich zu machen.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>2. Model interaction</strong><br />
-      The data collection, processing and model prediction pipeline was compiled into a
-      wrapper script (run_pipeline_from_gps.py) and placed into the website backend. It uses
-      the same workflow as during model training (see info box, flow chart). The wrapper
-      enables the user to interact with the model: They select their field, from there the field
-      coordinates are extracted in a grid system and used as input for the model wrapper. As
-      output, it provides a visualization for the user of the prediction in the form of a map, and
-      detailed information in the personal dashboard making the information on the SOC
-      easy-to-access to the farmer.
+      {% if lang == "en" %}
+        <strong>2. Model interaction</strong><br />
+        The data collection, processing and model prediction pipeline was compiled into a
+        wrapper script (run_pipeline_from_gps.py) and placed into the website backend. It uses
+        the same workflow as during model training (see info box, flow chart). The wrapper
+        enables the user to interact with the model: They select their field, from there the field
+        coordinates are extracted in a grid system and used as input for the model wrapper. As
+        output, it provides a visualization for the user of the prediction in the form of a map, and
+        detailed information in the personal dashboard making the information on the SOC
+        easy-to-access to the farmer.
+      {% else %}
+        <strong>2. Modellinteraktion</strong><br />
+        Die Pipeline für Datenerhebung, -verarbeitung und Modellvorhersage wurde in ein Wrapper-Skript
+        (run_pipeline_from_gps.py) zusammengefasst und ins Website-Backend integriert. Sie nutzt denselben
+        Workflow wie beim Modelltraining (siehe Infobox, Flussdiagramm). Der Wrapper ermöglicht die
+        Interaktion mit dem Modell: Nutzer:innen wählen ihr Feld aus, die Feld-Koordinaten werden in
+        einem Rastersystem extrahiert und als Eingabe für den Modell-Wrapper verwendet. Als Ausgabe
+        liefert das System eine Kartenvisualisierung der Vorhersage sowie detaillierte Informationen
+        im persönlichen Dashboard und macht SOC-Daten für Landwirt:innen leicht zugänglich.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      To speed up processing, the system reuses previously downloaded Sentinel scenes
-      and cropped outputs whenever possible. Raw Sentinel scenes are cached as raw data,
-      while cropped per-point outputs are stored together with metadata. The backend
-      generates a fixed 60×60 m grid over the selected field polygon and uses the grid centers
-      as analysis points. To maximize cache reuse, the grid is dynamically aligned to existing
-      cached points by selecting the anchor position with the highest overlap. If a cached
-      point is found within a 10 m radius, the existing cropped image is reused instead of
-      generating a new one. As a result, only when no data is available, missing scenes are
-      downloaded and cropped significantly reducing processing time.
+      {% if lang == "en" %}
+        To speed up processing, the system reuses previously downloaded Sentinel scenes
+        and cropped outputs whenever possible. Raw Sentinel scenes are cached as raw data,
+        while cropped per-point outputs are stored together with metadata. The backend
+        generates a fixed 60×60 m grid over the selected field polygon and uses the grid centers
+        as analysis points. To maximize cache reuse, the grid is dynamically aligned to existing
+        cached points by selecting the anchor position with the highest overlap. If a cached
+        point is found within a 10 m radius, the existing cropped image is reused instead of
+        generating a new one. As a result, only when no data is available, missing scenes are
+        downloaded and cropped significantly reducing processing time.
+      {% else %}
+        Zur Beschleunigung der Verarbeitung werden bereits heruntergeladene Sentinel-Szenen und
+        zugeschnittene Ausgaben nach Möglichkeit wiederverwendet. Rohe Sentinel-Szenen werden als
+        Rohdaten gecacht, zugeschnittene Punkt-Ausgaben gemeinsam mit Metadaten gespeichert. Das
+        Backend erzeugt ein festes 60×60-m-Raster über das ausgewählte Feldpolygon und nutzt die
+        Rasterzentren als Analysepunkte. Zur Maximierung der Cache-Nutzung wird das Raster dynamisch
+        an vorhandene gecachte Punkte ausgerichtet, indem die Ankerposition mit der größten Überlappung
+        gewählt wird. Liegt ein gecachter Punkt innerhalb eines 10-m-Radius, wird das vorhandene
+        zugeschnittene Bild wiederverwendet statt ein neues zu erzeugen. Fehlende Szenen werden nur
+        bei Bedarf heruntergeladen und zugeschnitten, was die Verarbeitungszeit deutlich reduziert.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      This same mechanism can be extended to a background sync process that proactively
-      downloads and updates cached scenes for a farm/region when new Sentinel
-      acquisitions arrive, enabling near-instant analysis for farmers without waiting for on-
-      demand downloads.
+      {% if lang == "en" %}
+        This same mechanism can be extended to a background sync process that proactively
+        downloads and updates cached scenes for a farm/region when new Sentinel
+        acquisitions arrive, enabling near-instant analysis for farmers without waiting for on-
+        demand downloads.
+      {% else %}
+        Derselbe Mechanismus lässt sich auf einen Hintergrund-Sync-Prozess erweitern, der bei neuen
+        Sentinel-Aufnahmen proaktiv gecachte Szenen für einen Betrieb oder eine Region aktualisiert
+        und nahezu sofortige Analysen ohne Wartezeit auf On-demand-Downloads ermöglicht.
+      {% endif %}
     </p>
 
     <figure class="report-figure" id="fig-3">
       <div class="report-figure-media">
-        <img src="/static/assets/image/User%20Model%20Interaction%20Flow.png" alt="Flow diagram of user-model interaction on AgroScan Website" />
+        <img src="/static/assets/image/User%20Model%20Interaction%20Flow.png" alt="{% if lang == 'en' %}Flow diagram of user-model interaction on AgroScan Website{% else %}Flussdiagramm der Nutzer-Modell-Interaktion auf der AgroScan-Website{% endif %}" />
       </div>
-      <figcaption class="report-figure-caption">Fig. 3: Flow diagram of user-model interaction on AgroScan Website</figcaption>
+      <figcaption class="report-figure-caption">
+        {% if lang == "en" %}
+          Fig. 3: Flow diagram of user-model interaction on AgroScan Website
+        {% else %}
+          Abb. 3: Flussdiagramm der Nutzer-Modell-Interaktion auf der AgroScan-Website
+        {% endif %}
+      </figcaption>
     </figure>
   </section>
 
   <!-- Website -->
   <section class="about-section" id="sec-website">
-    <div class="section-eyebrow">Website</div>
+    <div class="section-eyebrow">{{ "Website" if lang == "en" else "Website" }}</div>
 
     <p class="report-body">
-      <strong>1. Design Objectives and User-Centered Rationale</strong><br />
-      The AgroScan website was designed with the following primary stakeholder in mind: a
-      farmer without programming background but familiar with software-based farm
-      management tools, and an active interest in carbon farming and sustainable soil
-      management (SSM). User requirements were informed by direct conversations with
-      farmers (see <a href="/users_analysis" class="report-internal-link">user profiles</a>) in Landkreis Eichstätt, Bavaria,
-      Germany, and translated into three core design objectives: high usability, learnability,
-      and efficiency of the interface; a field data management system enabling long-term
-      SOC monitoring to assess the impact of SSM practices over time; and meaningful
-      technical agency over the underlying model. These objectives are addressed through
-      three corresponding design solutions: a simple step-by-step analysis workflow, a grid-
-      style personal dashboard, and full methodological transparency through open-source
-      code, public data sources, and accessible documentation.
+      {% if lang == "en" %}
+        <strong>1. Design Objectives and User-Centered Rationale</strong><br />
+        The AgroScan website was designed with the following primary stakeholder in mind: a
+        farmer without programming background but familiar with software-based farm
+        management tools, and an active interest in carbon farming and sustainable soil
+        management (SSM). User requirements were informed by direct conversations with
+        farmers (see <a href="/users_analysis" class="report-internal-link">user profiles</a>) in Landkreis Eichstätt, Bavaria,
+        Germany, and translated into three core design objectives: high usability, learnability,
+        and efficiency of the interface; a field data management system enabling long-term
+        SOC monitoring to assess the impact of SSM practices over time; and meaningful
+        technical agency over the underlying model. These objectives are addressed through
+        three corresponding design solutions: a simple step-by-step analysis workflow, a grid-
+        style personal dashboard, and full methodological transparency through open-source
+        code, public data sources, and accessible documentation.
+      {% else %}
+        <strong>1. Designziele und nutzerzentrierte Begründung</strong><br />
+        Die AgroScan-Website richtet sich primär an Landwirt:innen ohne Programmierhintergrund,
+        die jedoch mit softwarebasierten Betriebsmanagement-Tools vertraut sind und sich aktiv
+        für Carbon Farming und nachhaltige Bodenbewirtschaftung (SSM) interessieren. Nutzeranforderungen
+        wurden durch direkte Gespräche mit Landwirt:innen (siehe <a href="/users_analysis" class="report-internal-link">Nutzerprofile</a>) im
+        Landkreis Eichstätt, Bayern, Deutschland abgeleitet und in drei zentrale Designziele überführt:
+        hohe Usability, Erlernbarkeit und Effizienz der Oberfläche; ein Felddaten-Managementsystem
+        für langfristiges SOC-Monitoring zur Bewertung von SSM-Maßnahmen über die Zeit; sowie
+        bedeutsame technische Handlungsfähigkeit in Bezug auf das zugrunde liegende Modell. Diese
+        Ziele werden durch drei passende Lösungen adressiert: ein einfacher schrittweiser Analyse-Workflow,
+        ein rasterbasiertes persönliches Dashboard und volle methodische Transparenz durch Open-Source-Code,
+        öffentliche Datenquellen und zugängliche Dokumentation.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>2. Interaction Workflow</strong><br />
-      <strong>Analysis Core User Flow</strong><br />
-      The core user flow follows a step-by-step navigation model illustrated in Figure 4.
-      Several interaction design principles were applied to maximize usability and reduce
-      cognitive load. Pattern affordance is established by consistently coloring every action
-      button that advances the workflow (diamond shape) in AgroScan's signature green
-      helping users to orient themselves. Established icons and interface conventions, e.g., a
-      magnifier for location search and layer icons for map layer selection, build on familiarity
-      with widely used services such as Google Maps. This facilitates familiarization with the
-      website. Additionally, several features for error prevention were implemented: a pop-up
-      summarizing main limitations in application of the model, and if a user tries to start the
-      analysis without a field selected another pop-up message guides them to the field
-      selection. To reduce memory requirements and support first-time users, instructions
-      guide the user in each step in the analysis page, with the current step highlighted in light
-      green.
+      {% if lang == "en" %}
+        <strong>2. Interaction Workflow</strong><br />
+        <strong>Analysis Core User Flow</strong><br />
+        The core user flow follows a step-by-step navigation model illustrated in Figure 4.
+        Several interaction design principles were applied to maximize usability and reduce
+        cognitive load. Pattern affordance is established by consistently coloring every action
+        button that advances the workflow (diamond shape) in AgroScan's signature green
+        helping users to orient themselves. Established icons and interface conventions, e.g., a
+        magnifier for location search and layer icons for map layer selection, build on familiarity
+        with widely used services such as Google Maps. This facilitates familiarization with the
+        website. Additionally, several features for error prevention were implemented: a pop-up
+        summarizing main limitations in application of the model, and if a user tries to start the
+        analysis without a field selected another pop-up message guides them to the field
+        selection. To reduce memory requirements and support first-time users, instructions
+        guide the user in each step in the analysis page, with the current step highlighted in light
+        green.
+      {% else %}
+        <strong>2. Interaktions-Workflow</strong><br />
+        <strong>Kern-User-Flow der Analyse</strong><br />
+        Der zentrale User-Flow folgt einem schrittweisen Navigationsmodell, dargestellt in Abbildung 4.
+        Mehrere Interaktionsdesign-Prinzipien maximieren Usability und reduzieren kognitive Belastung.
+        Pattern Affordance wird durch einheitliche grüne Farbgebung aller Workflow-fortschreitenden
+        Aktionsschaltflächen (Rautenform) in AgroScans Signaturgrün etabliert und unterstützt die
+        Orientierung. Etablierte Icons und Konventionen — z. B. Lupe für Standortsuche und Layer-Icons
+        für Kartenebenen — bauen auf Vertrautheit mit Diensten wie Google Maps auf und erleichtern
+        die Einarbeitung. Zudem wurden Fehlerpräventionsfunktionen implementiert: ein Pop-up mit den
+        wichtigsten Anwendungsgrenzen des Modells und ein weiteres Pop-up, wenn ohne Feldauswahl
+        eine Analyse gestartet wird. Zur Entlastung des Arbeitsgedächtnisses und Unterstützung von
+        Erstnutzer:innen führen Anleitungen auf der Analyse-Seite durch jeden Schritt; der aktuelle
+        Schritt ist hellgrün hervorgehoben.
+      {% endif %}
     </p>
 
     <figure class="report-figure" id="fig-4">
       <div class="report-figure-media">
-        <img src="/static/assets/image/Core%20Analysis%20Flow.png" alt="Core user flow to conduct analysis of field on AgroScan website" />
+        <img src="/static/assets/image/Core%20Analysis%20Flow.png" alt="{% if lang == 'en' %}Core user flow to conduct analysis of field on AgroScan website{% else %}Kern-User-Flow zur Feldanalyse auf der AgroScan-Website{% endif %}" />
       </div>
-      <figcaption class="report-figure-caption">Fig. 4: Core user flow to conduct analysis of field on AgroScan website. It assumes that at each decision point the decision to advance the analysis workflow is made.</figcaption>
+      <figcaption class="report-figure-caption">
+        {% if lang == "en" %}
+          Fig. 4: Core user flow to conduct analysis of field on AgroScan website. It assumes that at each decision point the decision to advance the analysis workflow is made.
+        {% else %}
+          Abb. 4: Kern-User-Flow zur Feldanalyse auf der AgroScan-Website. Es wird angenommen, dass an jedem Entscheidungspunkt der Fortschritt im Analyse-Workflow gewählt wird.
+        {% endif %}
+      </figcaption>
     </figure>
 
     <p class="report-body">
-      <strong>Personal Dashboard</strong><br />
-      The personal dashboard uses a grid layout to enable the farmer to quickly scan field-
-      level information. Information is organized across two hierarchical levels. The first level
-      provides an overview of all registered fields, with each tile representing a single field.
-      Tile layout follows a left-to-right reading logic: field metadata is presented first,
-      followed by a line chart visualizing the temporal development of SOC content and a
-      written-out latest SOC value, and finally a green color-coded “Click to explore” button
-      to access field details. Looking ahead, information of future features (e.g., chatbot
-      recommendations for SSM practices) can be implemented here. Grouping of metadata
-      using emojis supports quick visual parsing. The second level, accessed via the detail
-      view, provides a higher resolution of field analysis information including minimum and
-      maximum SOC values per analysis, alongside a dedicated button to initiate a new
-      analysis for the same field. All these features directly support the farmer’s use case of
-      repeated monitoring over time to evaluate SSM practices in an easy and intuitive
-      manner.
+      {% if lang == "en" %}
+        <strong>Personal Dashboard</strong><br />
+        The personal dashboard uses a grid layout to enable the farmer to quickly scan field-
+        level information. Information is organized across two hierarchical levels. The first level
+        provides an overview of all registered fields, with each tile representing a single field.
+        Tile layout follows a left-to-right reading logic: field metadata is presented first,
+        followed by a line chart visualizing the temporal development of SOC content and a
+        written-out latest SOC value, and finally a green color-coded “Click to explore” button
+        to access field details. Looking ahead, information of future features (e.g., chatbot
+        recommendations for SSM practices) can be implemented here. Grouping of metadata
+        using emojis supports quick visual parsing. The second level, accessed via the detail
+        view, provides a higher resolution of field analysis information including minimum and
+        maximum SOC values per analysis, alongside a dedicated button to initiate a new
+        analysis for the same field. All these features directly support the farmer’s use case of
+        repeated monitoring over time to evaluate SSM practices in an easy and intuitive
+        manner.
+      {% else %}
+        <strong>Persönliches Dashboard</strong><br />
+        Das persönliche Dashboard nutzt ein Rasterlayout, damit Landwirt:innen Feldinformationen
+        schnell erfassen können. Informationen sind auf zwei Hierarchieebenen organisiert. Die erste
+        Ebene bietet eine Übersicht aller registrierten Felder; jede Kachel steht für ein Feld. Das
+        Kachel-Layout folgt einer Links-nach-Rechts-Logik: zuerst Feld-Metadaten, dann ein Liniendiagramm
+        zur zeitlichen SOC-Entwicklung mit ausgeschriebenem aktuellem SOC-Wert, schließlich ein grün
+        codierter „Click to explore“-Button für Felddetails. Künftige Features (z. B. Chatbot-Empfehlungen
+        für SSM-Maßnahmen) können hier ergänzt werden. Metadaten-Gruppierung mit Emojis unterstützt
+        schnelles visuelles Erfassen. Die zweite Ebene im Detail-View liefert feinere Analyseinformationen
+        inklusive Min-/Max-SOC-Werten pro Analyse sowie einen Button für eine neue Analyse desselben
+        Felds. Diese Funktionen unterstützen wiederholtes Monitoring zur Bewertung von SSM-Maßnahmen
+        auf einfache und intuitive Weise.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      <strong>3. ML Explainability and Information Design</strong><br />
-      The SOC prediction results are communicated through a map displaying the spatial
-      variability of SOC content across the selected field. A color gradient from green for high
-      SOC content and red for low SOC content provides an immediate intuitive visual
-      encoding of field conditions. A legend explains the color-coded thresholds, which are
-      based on the SOC value distribution in the LUCAS soil dataset<a href="#ref16" class="ref-link">[16]</a>. This makes the
-      classification transparent and verifiable using an established reference. The dashboard
-      further supports comparison across fields using absolute SOC values and line charts,
-      enabling farmers to contextualize individual field results within their larger field
-      portfolio.
+      {% if lang == "en" %}
+        <strong>3. ML Explainability and Information Design</strong><br />
+        The SOC prediction results are communicated through a map displaying the spatial
+        variability of SOC content across the selected field. A color gradient from green for high
+        SOC content and red for low SOC content provides an immediate intuitive visual
+        encoding of field conditions. A legend explains the color-coded thresholds, which are
+        based on the SOC value distribution in the LUCAS soil dataset<a href="#ref16" class="ref-link">[16]</a>. This makes the
+        classification transparent and verifiable using an established reference. The dashboard
+        further supports comparison across fields using absolute SOC values and line charts,
+        enabling farmers to contextualize individual field results within their larger field
+        portfolio.
+      {% else %}
+        <strong>3. ML-Erklärbarkeit und Informationsdesign</strong><br />
+        SOC-Vorhersageergebnisse werden über eine Karte kommuniziert, die die räumliche Variabilität
+        des SOC-Gehalts im ausgewählten Feld zeigt. Ein Farbverlauf von Grün (hoher SOC) zu Rot
+        (niedriger SOC) liefert eine unmittelbar intuitive visuelle Kodierung der Feldzustände. Eine
+        Legende erklärt die farbcodierten Schwellenwerte auf Basis der SOC-Verteilung im LUCAS-Bodendatensatz<a href="#ref16" class="ref-link">[16]</a>.
+        Damit ist die Klassifikation transparent und anhand einer etablierten Referenz überprüfbar.
+        Das Dashboard unterstützt zudem Feldvergleiche über absolute SOC-Werte und Liniendiagramme
+        und ermöglicht Einordnung einzelner Ergebnisse im Gesamtportfolio.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Technical agency is supported through several mechanisms. An export function allows
-      prediction results to be downloaded in .csv format, enabling integration with other farm
-      management platforms. A dedicated how-to-use page explains the ML model in plain
-      language for non-technical users, complemented by a more detailed technical
-      summary for users interested in methodological details. The public GitHub repository
-      provides an additional channel for agency: farmers without a coding background can
-      raise issues or feature requests directly, while technically proficient users can inspect,
-      replicate, or extend the model. Together, these features distinguish AgroScan from the
-      opaque, paywalled commercial tools identified in the literature review, and applies the
-      principle that interactive ML should expand rather than constrain user agency.
+      {% if lang == "en" %}
+        Technical agency is supported through several mechanisms. An export function allows
+        prediction results to be downloaded in .csv format, enabling integration with other farm
+        management platforms. A dedicated how-to-use page explains the ML model in plain
+        language for non-technical users, complemented by a more detailed technical
+        summary for users interested in methodological details. The public GitHub repository
+        provides an additional channel for agency: farmers without a coding background can
+        raise issues or feature requests directly, while technically proficient users can inspect,
+        replicate, or extend the model. Together, these features distinguish AgroScan from the
+        opaque, paywalled commercial tools identified in the literature review, and applies the
+        principle that interactive ML should expand rather than constrain user agency.
+      {% else %}
+        Technische Handlungsfähigkeit wird durch mehrere Mechanismen unterstützt. Eine Exportfunktion
+        erlaubt den Download von Vorhersageergebnissen im .csv-Format zur Integration in andere
+        Betriebsmanagement-Plattformen. Eine dedizierte How-to-Seite erklärt das ML-Modell in
+        verständlicher Sprache für nicht-technische Nutzer:innen, ergänzt durch eine detailliertere
+        technische Zusammenfassung. Das öffentliche GitHub-Repository bietet einen weiteren Kanal:
+        Landwirt:innen ohne Coding-Hintergrund können Issues oder Feature-Requests einreichen,
+        technisch versierte Nutzer:innen Modell prüfen, replizieren oder erweitern. Zusammen heben
+        diese Merkmale AgroScan von undurchsichtigen, kostenpflichtigen kommerziellen Tools ab und
+        setzen das Prinzip um, dass interaktives ML Nutzer:innenagency erweitern statt einschränken soll.
+      {% endif %}
     </p>
   </section>
 
   <!-- Ethical Considerations -->
   <section class="about-section" id="sec-ethics">
-    <div class="section-eyebrow">Ethical Considerations</div>
+    <div class="section-eyebrow">{{ "Ethical Considerations" if lang == "en" else "Ethische Überlegungen" }}</div>
 
     <p class="report-body">
-      Remote sensing is widely used for environmental monitoring, agriculture, and climate
-      research, but it also raises ethical concerns that are often overlooked (Benett et al.,
-      2024)<a href="#ref10" class="ref-link">[10]</a>. In AgroScan, two main concerns were identified.
+      {% if lang == "en" %}
+        Remote sensing is widely used for environmental monitoring, agriculture, and climate
+        research, but it also raises ethical concerns that are often overlooked (Benett et al.,
+        2024)<a href="#ref10" class="ref-link">[10]</a>. In AgroScan, two main concerns were identified.
+      {% else %}
+        Fernerkundung wird breit für Umweltmonitoring, Landwirtschaft und Klimaforschung genutzt,
+        wirft jedoch ethische Fragen auf, die oft übersehen werden (Benett et al., 2024)<a href="#ref10" class="ref-link">[10]</a>.
+        Bei AgroScan wurden zwei zentrale Bedenken identifiziert.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      First, remote sensing creates a physical distance between data collection and affected
-      communities. This may impose normative assumptions about soil organic carbon
-      (SOC) management without fully considering local knowledge, consent, and farming
-      practices. While AgroScan can empower farmers to use sustainable soil management,
-      it could also lead to unintended impact like institutions using it to impose and monitor
-      regulations unsuited for the local context.
+      {% if lang == "en" %}
+        First, remote sensing creates a physical distance between data collection and affected
+        communities. This may impose normative assumptions about soil organic carbon
+        (SOC) management without fully considering local knowledge, consent, and farming
+        practices. While AgroScan can empower farmers to use sustainable soil management,
+        it could also lead to unintended impact like institutions using it to impose and monitor
+        regulations unsuited for the local context.
+      {% else %}
+        Erstens schafft Fernerkundung räumliche Distanz zwischen Datenerhebung und betroffenen
+        Gemeinschaften. Dadurch können normative Annahmen zur SOC-Bewirtschaftung entstehen,
+        ohne lokales Wissen, Einwilligung und landwirtschaftliche Praxis vollständig zu berücksichtigen.
+        AgroScan kann Landwirt:innen bei nachhaltiger Bodenbewirtschaftung stärken, birgt aber auch
+        unbeabsichtigte Effekte, etwa wenn Institutionen es nutzen, um unpassende Vorgaben zu
+        erzwingen und zu überwachen.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      To address this, AgroScan will be released as an open-source project on GitHub with a
-      detailed README and only publicly available, free datasets to reduce technical and
-      financial barriers. The farmer can understand, reproduce and adapt the methodology
-      and use it to advocate for regulations in front of policymakers. Future releases aim to
-      include a community forums and input of local knowledge (e.g., soil type, uploaded
-      pictures) into model to support farmer participation and platform improvement and
-      offer a low-tech method to impact the development of the AgroScan.
+      {% if lang == "en" %}
+        To address this, AgroScan will be released as an open-source project on GitHub with a
+        detailed README and only publicly available, free datasets to reduce technical and
+        financial barriers. The farmer can understand, reproduce and adapt the methodology
+        and use it to advocate for regulations in front of policymakers. Future releases aim to
+        include a community forums and input of local knowledge (e.g., soil type, uploaded
+        pictures) into model to support farmer participation and platform improvement and
+        offer a low-tech method to impact the development of the AgroScan.
+      {% else %}
+        Als Gegenmaßnahme wird AgroScan als Open-Source-Projekt auf GitHub mit ausführlichem
+        README und ausschließlich öffentlich verfügbaren, kostenfreien Datensätzen veröffentlicht,
+        um technische und finanzielle Hürden zu senken. Landwirt:innen können die Methodik verstehen,
+        reproduzieren und anpassen und sie bei der Interessenvertretung gegenüber politischen
+        Entscheidungsträger:innen nutzen. Künftige Versionen sollen Community-Foren und lokales
+        Wissen (z. B. Bodentyp, hochgeladene Bilder) ins Modell einbeziehen, um Beteiligung und
+        Plattformverbesserung zu fördern und niederschwellige Einflussnahme auf die Weiterentwicklung
+        von AgroScan zu ermöglichen.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Second, AgroScan has limited transferability beyond its European focus, shaped by
-      available datasets and the team’s familiarity with German agricultural conditions.
-      Applying the tool to a different regional and social context may create unpredicted
-      ethical risks e.g., related to indigenous sovereignty, authoritarian misuse of agricultural
-      information, or mismatches with local farming needs.
+      {% if lang == "en" %}
+        Second, AgroScan has limited transferability beyond its European focus, shaped by
+        available datasets and the team’s familiarity with German agricultural conditions.
+        Applying the tool to a different regional and social context may create unpredicted
+        ethical risks e.g., related to indigenous sovereignty, authoritarian misuse of agricultural
+        information, or mismatches with local farming needs.
+      {% else %}
+        Zweitens ist die Übertragbarkeit von AgroScan über den europäischen Fokus hinaus begrenzt,
+        geprägt durch verfügbare Datensätze und die Vertrautheit des Teams mit deutschen
+        landwirtschaftlichen Bedingungen. Einsatz in anderen regionalen und sozialen Kontexten kann
+        unvorhergesehene ethische Risiken erzeugen, z. B. im Hinblick auf indigene Souveränität,
+        autoritären Missbrauch landwirtschaftlicher Informationen oder Fehlpassungen zu lokalen
+        Anbaubedürfnissen.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Therefore, transferring AgroScan to other regions requires a strong understanding of
-      local social and agricultural contexts, ideally through participatory engagement with
-      local communities. In many lower-income regions, limited soil sampling data also
-      creates technical barriers, making participatory soil sampling campaigns important for
-      developing socially responsible remote sensing tools.
+      {% if lang == "en" %}
+        Therefore, transferring AgroScan to other regions requires a strong understanding of
+        local social and agricultural contexts, ideally through participatory engagement with
+        local communities. In many lower-income regions, limited soil sampling data also
+        creates technical barriers, making participatory soil sampling campaigns important for
+        developing socially responsible remote sensing tools.
+      {% else %}
+        Eine Übertragung auf andere Regionen erfordert daher tiefes Verständnis lokaler sozialer und
+        agronomischer Kontexte, idealerweise durch partizipative Einbindung lokaler Gemeinschaften.
+        In vielen einkommensschwächeren Regionen erschweren begrenzte Bodenproben-Daten zudem
+        technische Hürden, weshalb partizipative Bodenprobenkampagnen wichtig sind, um sozial
+        verantwortungsvolle Fernerkundungstools zu entwickeln.
+      {% endif %}
     </p>
   </section>
 
   <!-- Evaluation -->
   <section class="about-section" id="sec-evaluation">
-    <div class="section-eyebrow">Evaluation</div>
+    <div class="section-eyebrow">{{ "Evaluation" if lang == "en" else "Evaluation" }}</div>
 
     <p class="report-body">
-      AgroScan investigated the question: how can interactive machine learning be utilized to
-      empower farmers to monitor and manage carbon stock in their agricultural soils? The
-      project successfully addresses this through three channels. First, a simple step-by-
-      step analysis workflow with an efficient repeated-sampling feature directly fulfills the
-      user requirement of quick, routine SOC assessment. Second, a grid-style personal
-      dashboard tailored to carbon farming confers technical agency to the farmer, enabling
-      long-term comparison of SOC trends across fields to evaluate the impact of SSM
-      practices. Third, an open-source architecture with publicly documented methodology
-      closes the transparency and accessibility gaps identified in the literature review. This
-      differentiates AgroScan from existing commercial tools. Taken together, these
-      contributions constitute a working proof of concept for a farmer-facing, interactive SOC
-      monitoring platform.
+      {% if lang == "en" %}
+        AgroScan investigated the question: how can interactive machine learning be utilized to
+        empower farmers to monitor and manage carbon stock in their agricultural soils? The
+        project successfully addresses this through three channels. First, a simple step-by-
+        step analysis workflow with an efficient repeated-sampling feature directly fulfills the
+        user requirement of quick, routine SOC assessment. Second, a grid-style personal
+        dashboard tailored to carbon farming confers technical agency to the farmer, enabling
+        long-term comparison of SOC trends across fields to evaluate the impact of SSM
+        practices. Third, an open-source architecture with publicly documented methodology
+        closes the transparency and accessibility gaps identified in the literature review. This
+        differentiates AgroScan from existing commercial tools. Taken together, these
+        contributions constitute a working proof of concept for a farmer-facing, interactive SOC
+        monitoring platform.
+      {% else %}
+        AgroScan untersuchte die Frage: Wie kann interaktives maschinelles Lernen genutzt werden,
+        um Landwirt:innen zu befähigen, den Kohlenstoffvorrat in ihren landwirtschaftlichen Böden
+        zu überwachen und zu steuern? Das Projekt adressiert dies über drei Wege. Erstens erfüllt ein
+        einfacher schrittweiser Analyse-Workflow mit effizienter Wiederholungsprobenahme die
+        Nutzeranforderung schneller, routinemäßiger SOC-Bewertung. Zweitens verleiht ein rasterbasiertes
+        persönliches Dashboard für Carbon Farming technische Handlungsfähigkeit und ermöglicht
+        langfristige SOC-Trendvergleiche zur Bewertung von SSM-Maßnahmen. Drittens schließt eine
+        Open-Source-Architektur mit öffentlich dokumentierter Methodik die Transparenz- und
+        Zugänglichkeitslücken aus der Literaturübersicht. Zusammen bilden diese Beiträge einen
+        funktionierenden Proof of Concept für eine landwirt:innenorientierte, interaktive SOC-Monitoring-Plattform.
+      {% endif %}
     </p>
 
     <p class="report-body">
-      Given the limited project timeframe, several limitations remain. On the model side, the
-      small training dataset (n=270, LUCAS 2015) constrains predictive accuracy. This can be
-      improved by incorporating data from neighboring EU countries and retraining on the
-      upcoming LUCAS 2022 release expected in Q3 2026. The current feature set further
-      omits predictors with established value, most notably Sentinel-1 SAR-derived features,
-      which Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a> demonstrated correlate more strongly with agricultural SOC
-      than optical data alone, as well as crop yield, weather, and elevation data. Integrating
-      farmer-provided local inputs such as soil type and bulk density could additionally
-      bridge the physical separation inherent to remote sensing and improve model
-      accuracy. Spatially, the current 60×60m pixel resolution limits within-field variability
-      insights for smaller parcels. This could be reduced to 10×10m by leveraging the full
-      Sentinel-2 resolution and applying interpolation for bands with higher resolution. On
-      the visualization side, the current SOC threshold classification is derived from the
-      aggregate LUCAS distribution and does not account for local soil conditions, land use,
-      or climate. Incorporating location and farmer-provided soil type data would enable
-      more regionally specific and agronomically meaningful threshold definitions. A detailed
-      overview of planned platform developments addressing these limitations is provided on
-      the <a href="/future_work" class="report-internal-link">AgroScan Future Features page</a>.
+      {% if lang == "en" %}
+        Given the limited project timeframe, several limitations remain. On the model side, the
+        small training dataset (n=270, LUCAS 2015) constrains predictive accuracy. This can be
+        improved by incorporating data from neighboring EU countries and retraining on the
+        upcoming LUCAS 2022 release expected in Q3 2026. The current feature set further
+        omits predictors with established value, most notably Sentinel-1 SAR-derived features,
+        which Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a> demonstrated correlate more strongly with agricultural SOC
+        than optical data alone, as well as crop yield, weather, and elevation data. Integrating
+        farmer-provided local inputs such as soil type and bulk density could additionally
+        bridge the physical separation inherent to remote sensing and improve model
+        accuracy. Spatially, the current 60×60m pixel resolution limits within-field variability
+        insights for smaller parcels. This could be reduced to 10×10m by leveraging the full
+        Sentinel-2 resolution and applying interpolation for bands with higher resolution. On
+        the visualization side, the current SOC threshold classification is derived from the
+        aggregate LUCAS distribution and does not account for local soil conditions, land use,
+        or climate. Incorporating location and farmer-provided soil type data would enable
+        more regionally specific and agronomically meaningful threshold definitions. A detailed
+        overview of planned platform developments addressing these limitations is provided on
+        the <a href="/future_work" class="report-internal-link">AgroScan Future Features page</a>.
+      {% else %}
+        Aufgrund des begrenzten Projektzeitraums bleiben mehrere Einschränkungen. Modellseitig
+        begrenzt der kleine Trainingssatz (n=270, LUCAS 2015) die Vorhersagegenauigkeit. Verbesserungen
+        sind durch Daten benachbarter EU-Länder und Retraining mit der erwarteten LUCAS-2022-Veröffentlichung
+        in Q3 2026 möglich. Der aktuelle Feature-Satz lässt etablierte Prädiktoren aus, insbesondere
+        Sentinel-1-SAR-Merkmale, die laut Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a> stärker mit landwirtschaftlichem SOC
+        korrelieren als optische Daten allein, sowie Ertrags-, Wetter- und Höhendaten. Lokale Eingaben
+        von Landwirt:innen wie Bodentyp und Rohdichte könnten die physische Distanz der Fernerkundung
+        überbrücken und die Genauigkeit erhöhen. Räumlich begrenzt die 60×60-m-Auflösung Einblicke
+        in kleinere Parzellen; 10×10 m wären mit voller Sentinel-2-Auflösung und Interpolation höher
+        aufgelöster Bänder erreichbar. Visualisierungsseitig stammt die SOC-Schwellenklassifikation
+        aus der aggregierten LUCAS-Verteilung und berücksichtigt lokale Boden-, Nutzungs- und Klimabedingungen
+        nicht. Standort- und Bodentypdaten würden regional spezifischere Schwellen ermöglichen. Eine
+        detaillierte Übersicht geplanter Weiterentwicklungen findet sich auf der
+        <a href="/future_work" class="report-internal-link">AgroScan-Seite zu zukünftigen Features</a>.
+      {% endif %}
     </p>
   </section>
 
   <!-- AI Statement -->
   <section class="about-section" id="sec-ai-statement">
-    <div class="section-eyebrow">AI Statement</div>
+    <div class="section-eyebrow">{{ "AI Statement" if lang == "en" else "KI-Erklärung" }}</div>
 
     <p class="report-body">
-      Throughout the report, the project team used ChatGPT to help with the formulation of
-      the report. The authors remain completely responsible for the entire report content. All
-      content generated by ChatGPT underwent careful review, validation, and, where
-      necessary, revision to ensure it met academic standards.
+      {% if lang == "en" %}
+        Throughout the report, the project team used ChatGPT to help with the formulation of
+        the report. The authors remain completely responsible for the entire report content. All
+        content generated by ChatGPT underwent careful review, validation, and, where
+        necessary, revision to ensure it met academic standards.
+      {% else %}
+        Im Verlauf der Berichtserstellung nutzte das Projektteam ChatGPT zur Formulierungshilfe.
+        Die Autor:innen tragen die volle Verantwortung für den gesamten Berichtsinhalt. Alle von
+        ChatGPT erzeugten Inhalte wurden sorgfältig geprüft, validiert und bei Bedarf überarbeitet,
+        um akademischen Standards zu entsprechen.
+      {% endif %}
     </p>
   </section>
 
   <!-- References -->
   <section class="about-section" id="sec-references">
-    <div class="section-eyebrow">References</div>
+    <div class="section-eyebrow">{{ "References" if lang == "en" else "Literaturverzeichnis" }}</div>
 
     <ol class="report-references">
       <li id="ref1">

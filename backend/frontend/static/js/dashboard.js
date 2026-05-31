@@ -83,6 +83,15 @@ function readDashboardConfig() {
 
 const dashboardConfig  = readDashboardConfig();
 const ocClassification = dashboardConfig.ocClassification || null;
+const ui = dashboardConfig.ui || {};
+
+function uiText(key, vars = {}) {
+  let s = ui[key] || key;
+  Object.entries(vars).forEach(([k, v]) => {
+    s = s.replace(`{${k}}`, v);
+  });
+  return s;
+}
 
 /* ── Zone colour (LUCAS tiers, mirrors map.js) ──── */
 const OC_TIER_COLORS = FieldGradientOverlay.TIER_COLORS;
@@ -230,7 +239,7 @@ function buildFieldIndexMap(groups) {
   return map;
 }
 
-function fieldKey(a) { return (a.field_name || "Unnamed Field").trim(); }
+function fieldKey(a) { return (a.field_name || uiText("unnamed_field")).trim(); }
 
 function updateDashboardKPIs(analyses = allAnalyses) {
 
@@ -349,7 +358,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const isOpen = panel.style.display === "block";
 
     panel.style.display = isOpen ? "none" : "block";
-    toggleBtn.textContent = isOpen ? "Filters ▾" : "Filters ▴";
+    toggleBtn.textContent = isOpen ? uiText("filters_open") : uiText("filters");
   });
 
   const container = document.getElementById("dashboard-container");
@@ -400,13 +409,13 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
   if (!allAnalyses.length) {
     container.innerHTML =
-      "<p style='color:#888;padding:16px 0'>No saved analyses yet.</p>";
+      `<p style='color:#888;padding:16px 0'>${uiText("no_analyses")}</p>`;
     return;
   }
   if (!analyses || analyses.length === 0) {
     container.innerHTML = filtered
-      ? "<p style='color:#888;padding:16px 0'>No fields match your filters.</p>"
-      : "<p style='color:#888;padding:16px 0'>No saved analyses yet.</p>";
+      ? `<p style='color:#888;padding:16px 0'>${uiText("no_match")}</p>`
+      : `<p style='color:#888;padding:16px 0'>${uiText("no_analyses")}</p>`;
     return;
   }
 
@@ -471,7 +480,7 @@ function renderDashboard(analyses, { filtered = false } = {}) {
             ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
           </div>
           <div class="fgc-count">
-            ${items.length === 1 ? "1 analysis" : `${items.length} analyses`}
+            ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
           </div>
         </div>
 
@@ -485,10 +494,10 @@ function renderDashboard(analyses, { filtered = false } = {}) {
         <!-- COL 3: Latest value + actions -->
         <div class="fgc-actions">
           <div class="fgc-latest">
-            <span class="fgc-latest-label">Latest Avg OC</span>
+            <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
             <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
-            ${trendBadge(trendAllTime, "All-time")}
-            ${trendBadge(trendPrev,   "vs. prev.")}
+            ${trendBadge(trendAllTime, uiText("all_time"))}
+            ${trendBadge(trendPrev, uiText("vs_prev"))}
           </div>
           <div class="fgc-buttons">
             <label class="compare-label"
@@ -496,10 +505,10 @@ function renderDashboard(analyses, { filtered = false } = {}) {
                           display:flex; gap:7px; align-items:center; user-select:none;">
               <input type="checkbox" class="compare-checkbox"
                      data-field="${safeField}" ${checked}>
-              Select for comparison
+              ${uiText("select_compare")}
             </label>
             <button class="fgc-explore-btn" data-field="${safeField}">
-              Click to explore ›
+              ${uiText("click_explore")}
             </button>
           </div>
         </div>
@@ -575,7 +584,7 @@ function drawSparklines() {
       ctx.fillStyle = TICK_COLOR;
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      ctx.fillText("OC over time", pad.left + iW / 2, 3);
+      ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
 
       // ── Y gridlines + labels ───────────────────────────────
       ctx.font = FONT_SM;
@@ -847,11 +856,11 @@ function renderFieldLineChart(items) {
   };
 
   const { labels, datasets } = padChart(rawLabels, [
-    { ...sharedOpts, label: "Maximum", data: maxData,
+    { ...sharedOpts, label: uiText("chart_maximum"), data: maxData,
       borderColor: COLORS.max, pointBackgroundColor: COLORS.max },
-    { ...sharedOpts, label: "Average", data: avgData,
+    { ...sharedOpts, label: uiText("chart_average"), data: avgData,
       borderColor: COLORS.avg, pointBackgroundColor: COLORS.avg },
-    { ...sharedOpts, label: "Minimum", data: minData,
+    { ...sharedOpts, label: uiText("chart_minimum"), data: minData,
       borderColor: COLORS.min, pointBackgroundColor: COLORS.min },
   ]);
 
@@ -898,9 +907,9 @@ function renderFieldAnalysesList(items) {
         </div>
       </div>
       <div class="field-analysis-row-actions">
-        <button class="btn-secondary field-detail-btn"   data-id="${a.id}">Details</button>
-        <button class="btn-secondary field-download-btn btn-tooltip" data-tooltip="Download CSV" data-id="${a.id}">⬇</button>
-        <button class="btn-danger    field-delete-btn"   data-id="${a.id}">Delete</button>
+        <button class="btn-secondary field-detail-btn"   data-id="${a.id}">${uiText("details")}</button>
+        <button class="btn-secondary field-download-btn btn-tooltip" data-tooltip="${uiText("download_csv")}" data-id="${a.id}">⬇</button>
+        <button class="btn-danger    field-delete-btn"   data-id="${a.id}">${uiText("delete")}</button>
       </div>
     </div>
   `).join("");
@@ -927,7 +936,7 @@ function renderFieldAnalysesList(items) {
 }
 
 async function deleteAnalysisFromField(id) {
-  if (!confirm("Delete this analysis?")) return;
+  if (!confirm(uiText("delete_confirm"))) return;
   try {
     const res = await fetch(`${API_URL}/api/analyses/${id}`, { method: "DELETE" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -949,7 +958,7 @@ async function deleteAnalysisFromField(id) {
       renderFieldAnalysesList(remaining);
     }
   } catch (err) {
-    alert("Delete failed: " + err.message);
+    alert(uiText("delete_failed", { msg: err.message }));
   }
 }
 
@@ -1028,20 +1037,23 @@ function updateFilterSummary(filtered, name, crop, from, to) {
   const toggleBtn = document.getElementById("toggle-filters");
   if (toggleBtn) {
     toggleBtn.textContent = active
-      ? "Filters (active) ▴"
-      : "Filters ▾";
+      ? uiText("filters_active")
+      : uiText("filters");
   }
 
   const filteredFields = Object.keys(groupByField(filtered)).length;
   const totalFields    = Object.keys(groupByField(allAnalyses)).length;
   const parts = [];
-  if (name) parts.push(`name contains "<b>${escapeHtml(name)}</b>"`);
-  if (crop) parts.push(`crop = "<b>${escapeHtml(crop)}</b>"`);
-  if (from) parts.push(`from <b>${escapeHtml(from)}</b>`);
-  if (to)   parts.push(`to <b>${escapeHtml(to)}</b>`);
+  if (name) parts.push(uiText("filter_name", { val: escapeHtml(name) }));
+  if (crop) parts.push(uiText("filter_crop", { val: escapeHtml(crop) }));
+  if (from) parts.push(uiText("filter_from", { val: escapeHtml(from) }));
+  if (to)   parts.push(uiText("filter_to", { val: escapeHtml(to) }));
 
-  el.innerHTML     =
-    `Showing <b>${filteredFields}</b> of <b>${totalFields}</b> fields — ${parts.join(", ")}`;
+  el.innerHTML = uiText("filter_summary", {
+    shown: filteredFields,
+    total: totalFields,
+    parts: parts.join(", "),
+  });
   el.style.display = "block";
 }
 
@@ -1059,7 +1071,7 @@ function downloadAnalysis(id) {
 
 function showCompareChart() {
   if (selectedForCompare.size < 2) {
-    alert("Please select at least 2 fields for comparison.");
+    alert(uiText("compare_min_fields"));
     return;
   }
 
@@ -1072,7 +1084,7 @@ function showCompareChart() {
   const title    = document.createElement("p");
   title.style.cssText =
     "font-weight:700;font-size:0.95rem;margin:0 0 16px;color:#333;";
-  title.textContent = "Field Comparison — Average OC (g/kg) over Time";
+  title.textContent = uiText("compare_title");
   wrapper.appendChild(title);
 
   const canvas = document.createElement("canvas");
@@ -1229,7 +1241,7 @@ async function saveDetails() {
       openFieldModal(currentFieldName);
     }
   } catch (err) {
-    alert("Save failed: " + err.message);
+    alert(uiText("save_failed", { msg: err.message }));
   }
 }
 

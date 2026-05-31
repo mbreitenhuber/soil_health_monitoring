@@ -54,6 +54,35 @@
   "save_success_go_dash": ("Go to Personal Dashboard" if lang == "en" else "Zum Personal Dashboard"),
   "model_info_title": ("Important note" if lang == "en" else "Wichtiger Hinweis"),
   "model_info_close": ("Close" if lang == "en" else "Schließen"),
+  "model_info_1": ("The model works best in Germany" if lang == "en" else "Das Modell funktioniert am besten in Deutschland"),
+  "model_info_2": ("Only select agricultural fields" if lang == "en" else "Nur landwirtschaftliche Felder auswählen"),
+  "model_info_3": ("Do not use large fields" if lang == "en" else "Keine grossen Felder verwenden"),
+  "model_info_4": ("Do not leave this page while the model is running" if lang == "en" else "Diese Seite nicht verlassen, während das Modell läuft"),
+  "analysis_date": ("Analysis date" if lang == "en" else "Analysedatum"),
+  "save_to_dashboard": ("Save to Personal Dashboard" if lang == "en" else "Im Personal Dashboard speichern"),
+  "save_popup_title": ("Save Analysis" if lang == "en" else "Analyse speichern"),
+  "field_name": ("Field Name" if lang == "en" else "Feldname"),
+  "field_name_ph": ("North Wheat Field" if lang == "en" else "Nordweizenfeld"),
+  "location": ("Location" if lang == "en" else "Standort"),
+  "location_ph": ("Zurich North" if lang == "en" else "Zürich Nord"),
+  "crop": ("Crop" if lang == "en" else "Kultur"),
+  "select_crop": ("Select crop" if lang == "en" else "Kultur wählen"),
+  "crop_wheat": ("Wheat" if lang == "en" else "Weizen"),
+  "crop_corn": ("Corn" if lang == "en" else "Mais"),
+  "crop_barley": ("Barley" if lang == "en" else "Gerste"),
+  "crop_potato": ("Potato" if lang == "en" else "Kartoffel"),
+  "crop_soybean": ("Soybean" if lang == "en" else "Soja"),
+  "crop_rice": ("Rice" if lang == "en" else "Reis"),
+  "crop_custom": ("Other / Custom" if lang == "en" else "Andere / Eigene"),
+  "custom_crop_ph": ("Enter custom crop..." if lang == "en" else "Eigene Kultur eingeben…"),
+  "notes": ("Notes" if lang == "en" else "Notizen"),
+  "notes_ph": ("Optional notes..." if lang == "en" else "Optionale Notizen…"),
+  "save_analysis_btn": ("Save Analysis" if lang == "en" else "Analyse speichern"),
+  "leaflet_no_edit": ("No layers to edit" if lang == "en" else "Keine Layer zum Bearbeiten"),
+  "leaflet_no_delete": ("No layers to delete" if lang == "en" else "Keine Layer zum Löschen"),
+  "leaflet_edit_tip": ("Drag handles or markers to edit features" if lang == "en" else "Griffe oder Marker ziehen, um Elemente zu bearbeiten"),
+  "leaflet_edit_sub": ("Click cancel to undo changes" if lang == "en" else "Abbrechen klicken, um Änderungen rückgängig zu machen"),
+  "leaflet_remove_tip": ("Click on a feature to remove" if lang == "en" else "Auf ein Element klicken, um es zu entfernen"),
 } %}
 <div class="app-layout">
 
@@ -94,7 +123,7 @@
 
       <!-- DATE SELECTOR -->
       <div class="analysis-date-box">
-        <label for="analysis-date">Analyse Datum</label>
+        <label for="analysis-date">{{ t.analysis_date }}</label>
         <input type="date" id="analysis-date">
       </div>
 
@@ -116,7 +145,7 @@
     <div>
       <div class="section-label">{{ t.result }}</div>
       <div class="result-box" id="result-box">
-        <button class="btn-save" id="btn-save-dashboard" style="display:none;margin: 0 0 10px 0;">Save to Personal Dashboard</button>
+        <button class="btn-save" id="btn-save-dashboard" style="display:none;margin: 0 0 10px 0;">{{ t.save_to_dashboard }}</button>
         <div class="result-row"><span>{{ t.zones_analyzed }}</span><span class="val" id="res-zones">–</span></div>
         <div class="result-row"><span>{{ t.avg_soil_quality }}</span> <span class="val" id="res-avg">–</span></div>
         <div class="result-row"><span>{{ t.highest_zone }}</span>    <span class="val" id="res-max">–</span></div>
@@ -159,52 +188,52 @@
   <div class="save-popup-card">
 
     <div class="save-popup-header">
-      <h3>Save Analysis</h3>
-      <button type="button" class="btn-close-x" id="close-save-popup" aria-label="Close">✕</button>
+      <h3>{{ t.save_popup_title }}</h3>
+      <button type="button" class="btn-close-x" id="close-save-popup" aria-label="{{ t.class_info_close }}">✕</button>
     </div>
 
     <div class="save-popup-content">
 
       <!-- FIELD NAME -->
       <div class="save-field">
-        <label>Field Name</label>
+        <label>{{ t.field_name }}</label>
 
         <input
           type="text"
           id="dashboard-field-name"
-          placeholder="North Wheat Field"
+          placeholder="{{ t.field_name_ph }}"
         >
       </div>
 
       <!-- LOCATION -->
       <div class="save-field">
-        <label>Location</label>
+        <label>{{ t.location }}</label>
 
         <input
           type="text"
           id="dashboard-location-name"
-          placeholder="Zurich North"
+          placeholder="{{ t.location_ph }}"
         >
       </div>
 
       <!-- CROP -->
       <div class="save-field">
 
-        <label>Crop</label>
+        <label>{{ t.crop }}</label>
 
         <select id="dashboard-crop">
 
-          <option value="">Select crop</option>
+          <option value="">{{ t.select_crop }}</option>
 
-          <option>Wheat</option>
-          <option>Corn</option>
-          <option>Barley</option>
-          <option>Potato</option>
-          <option>Soybean</option>
-          <option>Rice</option>
+          <option>{{ t.crop_wheat }}</option>
+          <option>{{ t.crop_corn }}</option>
+          <option>{{ t.crop_barley }}</option>
+          <option>{{ t.crop_potato }}</option>
+          <option>{{ t.crop_soybean }}</option>
+          <option>{{ t.crop_rice }}</option>
 
           <option value="custom">
-            Other / Custom
+            {{ t.crop_custom }}
           </option>
 
         </select>
@@ -212,7 +241,7 @@
         <input
           type="text"
           id="dashboard-custom-crop"
-          placeholder="Enter custom crop..."
+          placeholder="{{ t.custom_crop_ph }}"
           style="display:none;"
         >
 
@@ -221,12 +250,12 @@
       <!-- NOTES -->
       <div class="save-field">
 
-        <label>Notes</label>
+        <label>{{ t.notes }}</label>
 
         <textarea
           id="dashboard-notes"
           rows="4"
-          placeholder="Optional notes..."
+          placeholder="{{ t.notes_ph }}"
         ></textarea>
 
       </div>
@@ -236,7 +265,7 @@
         class="btn-dashboard-save"
         id="confirm-dashboard-save"
       >
-        Save Analysis
+        {{ t.save_analysis_btn }}
       </button>
 
     </div>
@@ -254,10 +283,10 @@
     </div>
     <div class="save-popup-content">
       <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:10px;line-height:1.6;">
-        <li>The model works best in germany</li>
-        <li>Only select agricultural fields</li>
-        <li>Do not use large fields</li>
-        <li>Do not leave this page while to model is running</li>
+        <li>{{ t.model_info_1 }}</li>
+        <li>{{ t.model_info_2 }}</li>
+        <li>{{ t.model_info_3 }}</li>
+        <li>{{ t.model_info_4 }}</li>
       </ul>
       <div class="save-popup-actions">
         <button type="button" class="btn-close-modal" id="model-info-ok">
@@ -332,6 +361,7 @@
     
     // Übersetzungen zusammenführen (Jinja + Fallback)
     const translations = { ...defaultTranslations, ...leafletTranslations };
+    const mapUi = {{ map_ui | tojson }};
     
     // Leaflet Draw Texte setzen
     L.drawLocal.draw.toolbar.buttons.polygon = translations.draw_polygon;
@@ -346,19 +376,20 @@
     L.drawLocal.draw.toolbar.undo.title = translations.undo;
     L.drawLocal.draw.toolbar.undo.text = translations.undo;
     L.drawLocal.edit.toolbar.buttons.edit = translations.edit_layers;
-    L.drawLocal.edit.toolbar.buttons.editDisabled = "No layers to edit";
+    L.drawLocal.edit.toolbar.buttons.editDisabled = mapUi.no_layers_edit;
     L.drawLocal.edit.toolbar.buttons.remove = translations.delete_layers;
-    L.drawLocal.edit.toolbar.buttons.removeDisabled = "No layers to delete";
+    L.drawLocal.edit.toolbar.buttons.removeDisabled = mapUi.no_layers_delete;
     L.drawLocal.edit.toolbar.actions.save.title = translations.save;
     L.drawLocal.edit.toolbar.actions.save.text = translations.save;
     L.drawLocal.edit.toolbar.actions.cancel.title = translations.cancel;
     L.drawLocal.edit.toolbar.actions.cancel.text = translations.cancel;
     L.drawLocal.edit.toolbar.actions.clearAll.title = translations.clear_all;
     L.drawLocal.edit.toolbar.actions.clearAll.text = translations.clear_all;
-    L.drawLocal.edit.handlers.edit.tooltip.text = "Drag handles or markers to edit features";
-    L.drawLocal.edit.handlers.edit.tooltip.subtext = "Click cancel to undo changes";
-    L.drawLocal.edit.handlers.remove.tooltip.text = "Click on a feature to remove";
+    L.drawLocal.edit.handlers.edit.tooltip.text = mapUi.edit_tooltip;
+    L.drawLocal.edit.handlers.edit.tooltip.subtext = mapUi.edit_subtext;
+    L.drawLocal.edit.handlers.remove.tooltip.text = mapUi.remove_tooltip;
     
+    window.MAP_UI = mapUi;
     const API_URL = "{{ api_url }}" || window.location.origin;
     const ocDataEl = document.getElementById("oc-classification-data");
     window.OC_CLASSIFICATION = ocDataEl

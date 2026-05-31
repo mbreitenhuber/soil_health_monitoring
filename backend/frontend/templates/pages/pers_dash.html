@@ -1,10 +1,56 @@
 {% extends "base.html" %}
 
-{% block title %}Personal Dashboard{% endblock %}
+{% set t = {
+  "eyebrow": ("Dashboard" if lang == "en" else "Dashboard"),
+  "title": ("Personal Dashboard" if lang == "en" else "Mein Dashboard"),
+  "total_fields": ("Total Fields" if lang == "en" else "Felder gesamt"),
+  "total_analyses": ("Total Analyses" if lang == "en" else "Analysen gesamt"),
+  "average_field": ("Average Field" if lang == "en" else "Durchschnittliches Feld"),
+  "best_field": ("Best Field" if lang == "en" else "Bestes Feld"),
+  "worst_field": ("Worst Field" if lang == "en" else "Schlechtestes Feld"),
+  "sort": ("Sort ▾" if lang == "en" else "Sortieren ▾"),
+  "sort_latest": ("Latest OC" if lang == "en" else "Aktueller OC"),
+  "sort_best": ("Best OC" if lang == "en" else "Bester OC"),
+  "sort_worst": ("Worst OC" if lang == "en" else "Schlechtester OC"),
+  "sort_trend": ("Most Improved" if lang == "en" else "Grösste Verbesserung"),
+  "filters": ("Filters ▾" if lang == "en" else "Filter ▾"),
+  "field_name": ("Field Name" if lang == "en" else "Feldname"),
+  "search_field": ("Search field name…" if lang == "en" else "Feldname suchen…"),
+  "crop": ("Crop" if lang == "en" else "Kultur"),
+  "all_crops": ("All crops" if lang == "en" else "Alle Kulturen"),
+  "from": ("From" if lang == "en" else "Von"),
+  "to": ("To" if lang == "en" else "Bis"),
+  "reset": ("✕ Reset" if lang == "en" else "✕ Zurücksetzen"),
+  "download_all": ("⬇ Download All" if lang == "en" else "⬇ Alle herunterladen"),
+  "compare": ("⚖ Compare Fields" if lang == "en" else "⚖ Felder vergleichen"),
+  "end_compare": ("✕ End Comparison" if lang == "en" else "✕ Vergleich beenden"),
+  "analyses": ("Analyses" if lang == "en" else "Analysen"),
+  "field_area": ("Field Area" if lang == "en" else "Feldfläche"),
+  "data_points": ("Data Points" if lang == "en" else "Datenpunkte"),
+  "latest_avg": ("Latest Avg" if lang == "en" else "Aktueller Ø"),
+  "oc_over_time": ("OC Development over Time" if lang == "en" else "OC-Entwicklung im Zeitverlauf"),
+  "all_analyses": ("All Analyses" if lang == "en" else "Alle Analysen"),
+  "close": ("Close" if lang == "en" else "Schliessen"),
+  "new_analysis": ("+ New Analysis" if lang == "en" else "+ Neue Analyse"),
+  "analysis_details": ("Analysis Details" if lang == "en" else "Analyse-Details"),
+  "location": ("Location" if lang == "en" else "Standort"),
+  "location_ph": ("e.g. Bavaria, Germany" if lang == "en" else "z. B. Bayern, Deutschland"),
+  "field_name_ph": ("e.g. North Field" if lang == "en" else "z. B. Nordfeld"),
+  "crop_ph": ("e.g. Wheat" if lang == "en" else "z. B. Weizen"),
+  "date": ("Date" if lang == "en" else "Datum"),
+  "notes": ("Notes" if lang == "en" else "Notizen"),
+  "notes_ph": ("Any additional notes…" if lang == "en" else "Zusätzliche Notizen…"),
+  "minimum": ("Minimum" if lang == "en" else "Minimum"),
+  "average": ("Average" if lang == "en" else "Durchschnitt"),
+  "maximum": ("Maximum" if lang == "en" else "Maximum"),
+  "field_map": ("Field Map — Soil Quality Zones" if lang == "en" else "Feldkarte — Bodenqualitätszonen"),
+  "save_changes": ("Save Changes" if lang == "en" else "Änderungen speichern"),
+} %}
+
+{% block title %}{{ "Personal Dashboard" if lang == "en" else "Mein Dashboard" }}{% endblock %}
 
 {% block head_styles %}
 <link rel="stylesheet" href="/static/css/dashboard.css?v={{ static_css_version }}" />
-<!-- Leaflet CSS — needed for the mini satellite map in the detail modal -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
@@ -13,8 +59,8 @@
 <div class="page-content">
 
   <div class="about-hero">
-    <div class="section-eyebrow">Dashboard</div>
-    <h1>Personal Dashboard</h1>
+    <div class="section-eyebrow">{{ t.eyebrow }}</div>
+    <h1>{{ t.title }}</h1>
   </div>
 
   <section class="about-section">
@@ -23,27 +69,27 @@
     <div class="dashboard-kpis">
 
       <div class="kpi-card">
-        <span class="kpi-label">Total Fields</span>
+        <span class="kpi-label">{{ t.total_fields }}</span>
         <strong class="kpi-value" id="kpi-total-fields">0</strong>
       </div>
 
       <div class="kpi-card">
-        <span class="kpi-label">Total Analyses</span>
+        <span class="kpi-label">{{ t.total_analyses }}</span>
         <strong class="kpi-value" id="kpi-total-analyses">0</strong>
       </div>
 
       <div class="kpi-card">
-        <span class="kpi-label">Average Field</span>
+        <span class="kpi-label">{{ t.average_field }}</span>
         <strong class="kpi-value" id="kpi-average-oc">–</strong>
       </div>
 
       <div class="kpi-card">
-        <span class="kpi-label">Best Field</span>
+        <span class="kpi-label">{{ t.best_field }}</span>
         <strong class="kpi-value" id="kpi-best-field">–</strong>
       </div>
 
       <div class="kpi-card">
-        <span class="kpi-label">Worst Field</span>
+        <span class="kpi-label">{{ t.worst_field }}</span>
         <strong class="kpi-value" id="kpi-worst-field">–</strong>
       </div>
 
@@ -57,17 +103,17 @@
         <!-- SORT (looks like filter box now) -->
         <div class="sort-wrapper">
           <button id="sort-toggle" class="btn-filter-toggle">
-            Sort ▾
+            {{ t.sort }}
           </button>
 
           <div id="sort-panel" class="sort-panel" style="display:none;">
 
             <!-- wichtig: hidden select für bestehende JS-Logik -->
             <select id="sort-fields" style="display:none;">
-              <option value="latest">Latest OC</option>
-              <option value="best">Best OC</option>
-              <option value="worst">Worst OC</option>
-              <option value="trend">Most Improved</option>
+              <option value="latest">{{ t.sort_latest }}</option>
+              <option value="best">{{ t.sort_best }}</option>
+              <option value="worst">{{ t.sort_worst }}</option>
+              <option value="trend">{{ t.sort_trend }}</option>
             </select>
 
             <!-- UI Buttons -->
@@ -75,28 +121,28 @@
               document.getElementById('sort-fields').value='latest';
               document.getElementById('sort-fields').dispatchEvent(new Event('change'));
             ">
-              Latest OC
+              {{ t.sort_latest }}
             </div>
 
             <div class="sort-option" onclick="
               document.getElementById('sort-fields').value='best';
               document.getElementById('sort-fields').dispatchEvent(new Event('change'));
             ">
-              Best OC
+              {{ t.sort_best }}
             </div>
 
             <div class="sort-option" onclick="
               document.getElementById('sort-fields').value='worst';
               document.getElementById('sort-fields').dispatchEvent(new Event('change'));
             ">
-              Worst OC
+              {{ t.sort_worst }}
             </div>
 
             <div class="sort-option" onclick="
               document.getElementById('sort-fields').value='trend';
               document.getElementById('sort-fields').dispatchEvent(new Event('change'));
             ">
-              Most Improved
+              {{ t.sort_trend }}
             </div>
 
           </div>
@@ -105,7 +151,7 @@
         <!-- FILTER BAR -->
 
         <button id="toggle-filters" class="btn-secondary">
-          Filters ▾
+          {{ t.filters }}
         </button>
 
         <div id="filter-panel" style="display:none; margin-top:10px;">
@@ -113,30 +159,30 @@
           <div class="dashboard-filters">
 
             <div class="filter-group">
-              <label class="filter-label">Field Name</label>
+              <label class="filter-label">{{ t.field_name }}</label>
               <input id="filter-name" type="text" class="filter-input"
-                    placeholder="Search field name…">
+                    placeholder="{{ t.search_field }}">
             </div>
 
             <div class="filter-group">
-              <label class="filter-label">Crop</label>
+              <label class="filter-label">{{ t.crop }}</label>
               <select id="filter-crop" class="filter-select">
-                <option value="">All crops</option>
+                <option value="">{{ t.all_crops }}</option>
               </select>
             </div>
 
             <div class="filter-group">
-              <label class="filter-label">From</label>
+              <label class="filter-label">{{ t.from }}</label>
               <input id="filter-date-from" type="date" class="filter-input">
             </div>
 
             <div class="filter-group">
-              <label class="filter-label">To</label>
+              <label class="filter-label">{{ t.to }}</label>
               <input id="filter-date-to" type="date" class="filter-input">
             </div>
 
             <div class="filter-group filter-group--btn">
-              <button id="filter-reset" class="btn-reset">✕ Reset</button>
+              <button id="filter-reset" class="btn-reset">{{ t.reset }}</button>
             </div>
 
           </div>
@@ -148,11 +194,11 @@
       <!-- RIGHT SIDE -->
       <div class="controls-right">
 
-        <button class="btn-control" id="download-csv-btn">⬇ Download All</button>
-        <button class="btn-control" id="compare-btn">⚖ Compare Fields</button>
+        <button class="btn-control" id="download-csv-btn">{{ t.download_all }}</button>
+        <button class="btn-control" id="compare-btn">{{ t.compare }}</button>
 
         <button class="btn-end-compare" id="end-compare-btn" style="display:none;">
-          ✕ End Comparison
+          {{ t.end_compare }}
         </button>
 
       </div>
@@ -184,36 +230,36 @@
     <!-- 4 stat cards -->
     <div class="detail-stats-grid field-stats-grid">
       <div class="detail-stat-card">
-        <span>Analyses</span>
+        <span>{{ t.analyses }}</span>
         <strong id="field-stat-count">–</strong>
       </div>
       <div class="detail-stat-card stat-min">
-        <span>Field Area</span>
+        <span>{{ t.field_area }}</span>
         <strong id="field-stat-min">–</strong>
       </div>
       <div class="detail-stat-card stat-max">
-        <span>Data Points</span>
+        <span>{{ t.data_points }}</span>
         <strong id="field-stat-max">–</strong>
       </div>
       <div class="detail-stat-card stat-avg">
-        <span>Latest Avg</span>
+        <span>{{ t.latest_avg }}</span>
         <strong id="field-stat-latest">–</strong>
       </div>
     </div>
 
     <!-- Line chart — OC development over time -->
-    <div class="field-section-label">OC Development over Time</div>
+    <div class="field-section-label">{{ t.oc_over_time }}</div>
     <div class="detail-chart-wrapper">
       <canvas id="field-line-chart"></canvas>
     </div>
 
     <!-- Per-analysis list -->
-    <div class="field-section-label">All Analyses</div>
+    <div class="field-section-label">{{ t.all_analyses }}</div>
     <div id="field-analyses-list" class="field-analyses-list"></div>
 
     <div class="detail-actions">
-      <button class="btn-close-modal" onclick="closeFieldModal()">Close</button>
-      <button class="btn-new-analysis" id="field-new-analysis-btn">+ New Analysis</button>
+      <button class="btn-close-modal" onclick="closeFieldModal()">{{ t.close }}</button>
+      <button class="btn-new-analysis" id="field-new-analysis-btn">{{ t.new_analysis }}</button>
     </div>
 
   </div>
@@ -227,62 +273,62 @@
   <div class="detail-card">
 
     <div class="detail-header">
-      <h2>Analysis Details</h2>
+      <h2>{{ t.analysis_details }}</h2>
       <button class="btn-close-x" onclick="closeDetailModal()">✕</button>
     </div>
 
     <!-- Editable fields -->
     <div class="detail-grid">
       <div class="detail-field">
-        <label>Field Name</label>
-        <input id="edit-field-name" placeholder="e.g. North Field">
+        <label>{{ t.field_name }}</label>
+        <input id="edit-field-name" placeholder="{{ t.field_name_ph }}">
       </div>
       <div class="detail-field">
-        <label>Location</label>
-        <input id="edit-location" placeholder="e.g. Bavaria, Germany">
+        <label>{{ t.location }}</label>
+        <input id="edit-location" placeholder="{{ t.location_ph }}">
       </div>
       <div class="detail-field">
-        <label>Crop</label>
-        <input id="edit-crop" placeholder="e.g. Wheat">
+        <label>{{ t.crop }}</label>
+        <input id="edit-crop" placeholder="{{ t.crop_ph }}">
       </div>
       <div class="detail-field">
-        <label>Date</label>
+        <label>{{ t.date }}</label>
         <input id="Date-of-Analysis" readonly tabindex="-1"
               style="cursor:default; opacity:0.6; pointer-events:none;">
       </div>
       <div class="detail-field detail-full">
-        <label>Notes</label>
-        <textarea id="edit-notes" placeholder="Any additional notes…"></textarea>
+        <label>{{ t.notes }}</label>
+        <textarea id="edit-notes" placeholder="{{ t.notes_ph }}"></textarea>
       </div>
     </div>
 
     <!-- Stat cards -->
     <div class="detail-stats-grid">
       <div class="detail-stat-card stat-min">
-        <span>Minimum</span>
+        <span>{{ t.minimum }}</span>
         <strong id="detail-min">–</strong>
       </div>
       <div class="detail-stat-card stat-avg">
-        <span>Average</span>
+        <span>{{ t.average }}</span>
         <strong id="detail-avg">–</strong>
       </div>
       <div class="detail-stat-card stat-max">
-        <span>Maximum</span>
+        <span>{{ t.maximum }}</span>
         <strong id="detail-max">–</strong>
       </div>
     </div>
 
     <!-- ── Mini satellite map ── -->
     <div class="detail-map-section">
-      <div class="field-section-label">Field Map — Soil Quality Zones</div>
+      <div class="field-section-label">{{ t.field_map }}</div>
       <div class="detail-map-wrapper">
         <div id="detail-map"></div>
       </div>
     </div>
 
     <div class="detail-actions">
-      <button class="btn-close-modal" onclick="closeDetailModal()">Close</button>
-      <button class="btn-save" id="save-details">Save Changes</button>
+      <button class="btn-close-modal" onclick="closeDetailModal()">{{ t.close }}</button>
+      <button class="btn-save" id="save-details">{{ t.save_changes }}</button>
     </div>
 
   </div>
@@ -293,7 +339,7 @@
 
 {% block scripts %}
 <script type="application/json" id="dashboard-config">
-  {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang, "ocClassification": oc_classification} | tojson }}
+  {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang, "ocClassification": oc_classification, "ui": dashboard_ui} | tojson }}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- Leaflet JS — for the mini satellite map -->
@@ -335,15 +381,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!clickedInsidePanel && !clickedToggle) {
       panel.style.display = "none";
-      toggle.textContent = "Filters ▾";
+      toggle.textContent = "{{ 'Filters ▾' if lang == 'en' else 'Filter ▾' }}";
     }
   });
 
-  // optional: ESC to close (UX upgrade)
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       panel.style.display = "none";
-      toggle.textContent = "Filters ▾";
+      toggle.textContent = "{{ 'Filters ▾' if lang == 'en' else 'Filter ▾' }}";
     }
   });
 });

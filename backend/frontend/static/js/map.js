@@ -1,5 +1,20 @@
 /* map.js — Leaflet Karte + Analyse */
 
+const MAP_UI = window.MAP_UI || {
+  ready: "Ready ✓",
+  no_polygon: "No Polygon",
+  search_placeholder: "Search location or coordinates...",
+  search_error: "Location not found",
+  layer_satellite: "Satellite",
+  layer_analysis: "Analysis",
+  layer_labels: "Labels",
+  layer_drawings: "Drawings",
+  layer_results: "Results",
+  backend_unreachable: "Backend unreachable:\n{msg}",
+  custom_crop_required: "Please enter a custom crop name",
+  save_failed: "Could not save analysis",
+};
+
 const map = L.map("map", {
   zoomAnimation: true,
   fadeAnimation: true,
@@ -123,8 +138,8 @@ labels.addTo(map);
 L.Control.geocoder({
   collapsed: false,
   defaultMarkGeocode: false,
-  placeholder: "Search location or coordinates...",
-  errorMessage: "Location not found",
+  placeholder: MAP_UI.search_placeholder,
+  errorMessage: MAP_UI.search_error,
   suggestMinLength: 3,
   geocoder: L.Control.Geocoder.nominatim()
 })
@@ -162,14 +177,14 @@ searchMarker = L.circleMarker(center, {
 // =====================
 
 const baseLayers = {
-  "Satellite": satellite,
-  "Analysis": minimal
+  [MAP_UI.layer_satellite]: satellite,
+  [MAP_UI.layer_analysis]: minimal
 };
 
 const overlays = {
-  "Labels": labels,
-  "Drawings": drawnItems,
-  "Results": resultLayer
+  [MAP_UI.layer_labels]: labels,
+  [MAP_UI.layer_drawings]: drawnItems,
+  [MAP_UI.layer_results]: resultLayer
 };
 
 L.control.layers(baseLayers, overlays).addTo(map);
@@ -330,7 +345,7 @@ function showAnalysisHint() {
 function updateStats(latlngs) {
   document.getElementById("stat-points").textContent = latlngs.length;
   document.getElementById("stat-area").textContent = calcArea(latlngs).toFixed(2) + " ha";
-  document.getElementById("stat-status").textContent = "Bereit ✓";
+  document.getElementById("stat-status").textContent = MAP_UI.ready;
   hideAnalysisHint();
   setStep(2);
 }
@@ -372,7 +387,7 @@ map.on(L.Draw.Event.DELETED, () => {
     document.getElementById(id).textContent = "–"
   );
 
-  document.getElementById("stat-status").textContent = "Kein Polygon";
+  document.getElementById("stat-status").textContent = MAP_UI.no_polygon;
   hideAnalysisHint();
 
   resultLayer.clearLayers();
@@ -473,7 +488,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
 
   } catch (err) {
     document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
-    alert("Backend nicht erreichbar:\n" + err.message);
+    alert(MAP_UI.backend_unreachable.replace("{msg}", err.message));
   } finally {
     document.getElementById("loader").classList.remove("visible");
     document.getElementById("btn-analyse").disabled = false;
@@ -497,7 +512,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
     document.getElementById(id).textContent = "–"
   );
 
-  document.getElementById("stat-status").textContent = "Kein Polygon";
+  document.getElementById("stat-status").textContent = MAP_UI.no_polygon;
   hideAnalysisHint();
   document.getElementById("result-box").classList.remove("visible");
   document.getElementById("btn-save-dashboard").style.display = "none";
@@ -614,7 +629,7 @@ if (confirmDashboardSaveBtn) {
       selectedCrop = dashboardCustomCrop.value.trim();
 
       if (!selectedCrop) {
-        alert("Please enter a custom crop name");
+        alert(MAP_UI.custom_crop_required);
         return;
       }
     }
@@ -656,7 +671,7 @@ if (confirmDashboardSaveBtn) {
 
       console.error(err);
 
-      alert("Could not save analysis");
+      alert(MAP_UI.save_failed);
     }
 
   });
@@ -718,7 +733,7 @@ function renderClassInfoPopup(classification) {
     noteEl.textContent = [c.dataset_note, c.colormap_note].filter(Boolean).join(" ");
   }
   if (datasetEl) {
-    datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
+    datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? (MAP_UI.point || "point") : (MAP_UI.points || "points")} · ${c.parameter}, ${c.depth_cm} cm`;
   }
   if (linkEl && c.reference_url) {
     linkEl.href = c.reference_url;
