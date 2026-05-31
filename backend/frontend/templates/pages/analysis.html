@@ -36,11 +36,11 @@
   "avg_soil_quality": ("Average Soil Quality" if lang == "en" else "Durchschnittliche Bodenqualität"),
   "highest_zone": ("Highest Zone" if lang == "en" else "Beste Zone"),
   "lowest_zone": ("Lowest Zone" if lang == "en" else "Schlechteste Zone"),
-  "legend_title": ("Legend – Soil Quality" if lang == "en" else "Legende – Bodenqualität"),
-  "high": ("High (top 30 %)" if lang == "en" else "Hoch (oberes 30 %)"),
-  "medium": ("Medium (40 %)" if lang == "en" else "Mittel (mittleres 40 %)"),
-  "low": ("Low (bottom 30 %)" if lang == "en" else "Niedrig (unteres 30 %)"),
-  "legend_lucas": ("vs. LUCAS Germany reference" if lang == "en" else "vs. LUCAS-Referenz Deutschland"),
+  "legend_title": ("Legend – SOC (plasma)" if lang == "en" else "Legende – SOC (Plasma)"),
+  "legend_lucas": ("LUCAS DE reference · g/kg OC · details via (i)" if lang == "en" else "LUCAS-Referenz DE · g/kg OC · Details über (i)"),
+  "legend_unit": ("g/kg" if lang == "en" else "g/kg"),
+  "howto_cta_text": ("Would you like full instructions on how to use this analysis tool and interpret the results?" if lang == "en" else "Möchtest du eine vollständige Anleitung zur Nutzung dieses Analyse-Tools und zur Interpretation der Ergebnisse?"),
+  "howto_cta_btn": ('Check out the full guide at "How to Use"' if lang == "en" else 'Zur vollständigen Anleitung unter „Anleitung“'),
   "class_info_btn": ("Classification details" if lang == "en" else "Einteilung & Schwellen"),
   "class_info_title": ("OC classification thresholds" if lang == "en" else "Schwellen der OC-Einteilung"),
   "class_info_close": ("Close" if lang == "en" else "Schließen"),
@@ -59,7 +59,7 @@
 
   <aside class="sidebar">
 
-    <div>
+    <div id="instructions-panel">
       <div class="section-label">{{ t.instructions }}</div>
       <div class="steps" id="steps-container">
         <div class="step active" id="step-1">
@@ -74,6 +74,10 @@
           <div class="step-num">3</div>
           <div class="step-text">{{ t.step3 }}</div>
         </div>
+      </div>
+      <div class="analysis-howto-cta" id="analysis-howto-cta">
+        <p class="analysis-howto-cta-text">{{ t.howto_cta_text }}</p>
+        <a class="btn-howto-link" href="/how_to">→ {{ t.howto_cta_btn }}</a>
       </div>
     </div>
 
@@ -126,18 +130,19 @@
         <button type="button" class="btn-class-info" id="btn-class-info" title="{{ t.class_info_btn }}" aria-label="{{ t.class_info_btn }}">i</button>
       </div>
       <p class="legend-sub">{{ t.legend_lucas }}</p>
-      <div class="legend">
-        <div class="legend-item">
-          <div class="legend-swatch" style="background:#22c55e;"></div>
-          <span>{{ t.high }}</span>
+      <div class="legend-plasma" aria-label="{{ t.legend_title }}">
+        <div class="legend-plasma-strip">
+          {% for color in oc_classification.discrete_colors %}
+          <span
+            class="legend-plasma-seg"
+            style="background:{{ color }};"
+            title="{{ oc_classification.discrete_bin_labels[loop.index0] }}"
+          ></span>
+          {% endfor %}
         </div>
-        <div class="legend-item">
-          <div class="legend-swatch" style="background:#f59e0b;"></div>
-          <span>{{ t.medium }}</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-swatch" style="background:#ef4444;"></div>
-          <span>{{ t.low }}</span>
+        <div class="legend-plasma-scale">
+          <span class="legend-plasma-scale-low">{{ "%.1f"|format(oc_classification.percentile_boundaries_gkg[0]) }} {{ t.legend_unit }}</span>
+          <span class="legend-plasma-scale-high">{{ "%.1f"|format(oc_classification.percentile_boundaries_gkg[-1]) }}+ {{ t.legend_unit }}</span>
         </div>
       </div>
     </div>

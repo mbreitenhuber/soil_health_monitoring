@@ -293,9 +293,9 @@ TEAM_MEMBERS = [
     {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": "Maggie.jpg",
      "bio": "Interactive ML model development, Website-ML model communication, Website UX design support, User case research, Literature review"},
     {"name": "Jerome Reiter", "role": "Bachelor Student in Computational Science and Engineering",  "photo": "Jerome.jpg",
-     "bio": "Backend and frontend development, Map design and personal dashboard."},
+     "bio": "Backend and frontend development, Map design and personal dashboard, Project pitch, Literature review"},
      {"name": "Claudio Bussinger", "role": "Bachelor Student in Computational Science and Engineering",  "photo": "Claudio.jpg",
-     "bio": "Backend and frontend development, Map design and website design."},
+     "bio": "Backend and frontend development, Map design and website design, Project pitch, Literature review"},
 ]
 
 
@@ -509,6 +509,16 @@ class OCClassificationMeta(BaseModel):
     dataset_note: str
     tier_descriptions: dict[str, str]
     colors: dict[str, str]
+    colormap: str
+    colormap_mode: str
+    percentile_boundaries_gkg: list[float]
+    discrete_percentiles: list[int]
+    discrete_colors: list[str]
+    discrete_bin_labels: list[str]
+    discrete_bin_labels_short: list[str]
+    colormap_note: str
+    howto_map_intro: str
+    howto_tier_groups: list[dict]
 
 class PredictionResponse(BaseModel):
     zones: List[ZoneResult]

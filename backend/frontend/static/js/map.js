@@ -298,9 +298,10 @@ function ocTier(value, classification) {
 }
 
 function valueToColor(value, classification) {
-  const c = classification || ocClassification;
-  const tier = ocTier(value, c);
-  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+  return FieldGradientOverlay.valueToColorPlasmaDiscrete(
+    value,
+    classification || ocClassification
+  );
 }
 
 function formatOcValue(value) {
@@ -399,7 +400,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
   resultLayer.clearLayers();
   setStep(3);
 
-  document.getElementById("steps-container").classList.add("hidden");
+  document.getElementById("instructions-panel")?.classList.add("is-collapsed");
 
   try {
     const res = await fetch(`${API_URL}/api/predict`, {
@@ -471,6 +472,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     document.getElementById("btn-save-dashboard").style.display = "block";
 
   } catch (err) {
+    document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
     alert("Backend nicht erreichbar:\n" + err.message);
   } finally {
     document.getElementById("loader").classList.remove("visible");
@@ -507,7 +509,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   switchToFieldMode();
   setStep(1);
 
-  document.getElementById("steps-container").classList.remove("hidden");
+  document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
   document.getElementById("btn-save-dashboard").style.display = "none";
 
   const dateInput = document.getElementById("analysis-date");
@@ -712,22 +714,33 @@ function renderClassInfoPopup(classification) {
   const datasetEl = document.getElementById("class-info-dataset");
   const linkEl = document.getElementById("class-info-link");
 
-  if (noteEl) noteEl.textContent = c.dataset_note || "";
+  if (noteEl) {
+    noteEl.textContent = [c.dataset_note, c.colormap_note].filter(Boolean).join(" ");
+  }
   if (datasetEl) {
     datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
   }
   if (linkEl && c.reference_url) {
     linkEl.href = c.reference_url;
   }
-  if (tiersEl && c.tier_descriptions) {
-    const order = ["low", "medium", "high"];
-    tiersEl.innerHTML = order
-      .map(tier => {
-        const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
-        const text = c.tier_descriptions[tier] || "";
-        return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
-      })
-      .join("");
+  if (tiersEl) {
+    if (c.discrete_bin_labels && c.discrete_colors) {
+      tiersEl.innerHTML = c.discrete_bin_labels
+        .map((text, i) => {
+          const swatch = c.discrete_colors[i] || "#888";
+          return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+        })
+        .join("");
+    } else if (c.tier_descriptions) {
+      const order = ["low", "medium", "high"];
+      tiersEl.innerHTML = order
+        .map(tier => {
+          const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
+          const text = c.tier_descriptions[tier] || "";
+          return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+        })
+        .join("");
+    }
   }
 }
 

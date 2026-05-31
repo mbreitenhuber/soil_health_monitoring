@@ -13,7 +13,7 @@
   <div class="about-hero">
     <div class="section-eyebrow">User Guide</div>
     <h1>How to use <em>AgroScan</em></h1>
-    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil organic carbon level on the map.</p>
+    <p>A step-by-step guide to analyzing and saving your agricultural fields. This includes everything from drawing your first polygon to reading the soil's organic carbon level on a map and managing your fields.</p>
   </div>
 
   <!-- Quick Steps Overview -->
@@ -40,7 +40,7 @@
         <div class="howto-step-num">03</div>
         <div class="howto-step-icon">🗺️</div>
         <h3>Read your zone map</h3>
-        <p>Your field is divided into color-coded zones. Green means high soil organic carbon levels, yellow is medium, and red indicates areas that may need attention.</p>
+        <p>Your field is divided into color-coded grid cells using a plasma scale tied to LUCAS (Germany) reference percentiles, darker purples are lower SOC, brighter yellows are higher.</p>
       </div>
 
     </div>
@@ -114,7 +114,6 @@
       </div>
       <div class="howto-detail-body">
         <p>After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.</p>
-        <p style="margin-top:12px;">To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
       </div>
     </div>
 
@@ -126,6 +125,7 @@
       </div>
       <div class="howto-detail-body">
         <p>You can save your results by clicking the <strong>Save</strong> button in the sidebar. This stores your analysis (including the polygon and summary statistics) so you can view and compare it later in your Personal Dashboard.</p>
+        <p style="margin-top:12px;">To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
       </div>
     </div>
   </section>
@@ -192,35 +192,27 @@
     <div class="section-eyebrow">Interpreting results</div>
     <h2 class="section-title">How to read the SOC map</h2>
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
-      The model divides your fields into a regular grid of cells. For each cell the soil organic carbon (SOC) is predicted in g/kg in the topsoil and visualized with a color-code. The color-code was designed based on the SOC value distribution in the LUCAS topsoil dataset in Germany. The following guide explains what each color range means in practice and how you can act on the results.
+    <p class="howto-map-intro">
+      {{ oc_classification.howto_map_intro | safe }}
+      <a href="{{ oc_classification.reference_url }}" target="_blank" rel="noopener noreferrer">LUCAS topsoil data (ESDAC)</a>.
     </p>
 
     <div class="howto-legend-block">
 
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:#22c55e;"></div>
+      {% for group in oc_classification.howto_tier_groups %}
+      <div class="howto-legend-row{% if loop.last %} howto-legend-row--last{% endif %}">
+        <div class="howto-legend-swatches" aria-hidden="true">
+          {% for color in group.colors %}
+          <span class="howto-legend-swatch-seg" style="background:{{ color }};"></span>
+          {% endfor %}
+        </div>
         <div>
-          <div class="howto-legend-label">High SOC content — top 30 % of LUCAS (DE), SOC ≥ {{ oc_classification.threshold_high_gkg }} g/kg</div>
-            <p>These zones show strong indicators of high soil organic carbon content. They are in the top 30th percentile of the SOC distribution agricultural fields in Germany. Fields or sub-areas in this range are performing well. Your sustainable soil management practices are likely to be working. Feel free to share your experience in the upcoming community forum for farmers in your area!</p>
+          <div class="howto-legend-label">{{ group.title | safe }}</div>
+          <p class="howto-legend-map-steps">{{ group.map_steps }}</p>
+          <p>{{ group.body }}</p>
         </div>
       </div>
-
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:#f59e0b;"></div>
-        <div>
-          <div class="howto-legend-label">Medium SOC content — middle 40 %, {{ oc_classification.threshold_low_gkg }} – {{ oc_classification.threshold_high_gkg }} g/kg</div>
-          <p>These zones are within an acceptable range, but some show some variability. Try implementing sustainable soil management practices (SSM) like reduced tillage, crop diversification and cover cropping. Monitoring these areas over successive analyses can help identify whether SOC content is increasing or decreasing. We are in the process of implementing a community forum where you can find out what farmers in your area are doing to increase their SOC level and share your progress.</p>
-        </div>
-      </div>
-
-      <div class="howto-legend-row" style="border-bottom:none;">
-        <div class="howto-legend-swatch" style="background:#ef4444;"></div>
-        <div>
-          <div class="howto-legend-label">Low SOC content — bottom 30 % of LUCAS (DE), SOC &lt; {{ oc_classification.threshold_low_gkg }} g/kg</div>
-          <p>These zones flag areas that may require attention. They are in the bottom 30th percentile of the SOC distribution of agricultural fields in Germany. Try implementing sustainable soil management practices and continuous monitoring to assess their impact. In the upcoming community forum, you can learn about SSM practices that farmers in your area are employing.</p>
-        </div>
-      </div>
+      {% endfor %}
 
     </div>
 

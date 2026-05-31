@@ -44,7 +44,7 @@
 }
 
 .report-internal-link {
-  color: var(--accent2);
+  color: var(--accent);
   text-decoration: none;
   transition: opacity 0.15s;
 }

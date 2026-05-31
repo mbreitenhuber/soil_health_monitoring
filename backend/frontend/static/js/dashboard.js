@@ -96,9 +96,7 @@ function ocTier(value) {
 }
 
 function valueToColor(value) {
-  const c = ocClassification;
-  const tier = ocTier(value);
-  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+  return FieldGradientOverlay.valueToColorPlasmaDiscrete(value, ocClassification);
 }
 
 let allAnalyses        = dashboardConfig.analyses || [];
