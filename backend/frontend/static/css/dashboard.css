@@ -3,9 +3,9 @@
 ========================= */
 
 .dashboard-container {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   padding: 8px 0 32px;
 }
 
@@ -39,26 +39,156 @@
 }
 
 /* =========================
-   FIELD GROUP CARD
+   FIELD GROUP CARD — 3-column layout
 ========================= */
 
 .field-group-card {
   cursor: pointer;
   position: relative;
+
+  /* Override base card flex: use grid for 3 columns */
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 0.85fr;
+  gap: 0;
+  padding: 0;
+  align-items: stretch;
+  min-height: 160px;
 }
 
 .field-group-card:hover {
   transform: translateY(-2px);
-  border-color: var(--accent);
-  box-shadow: 0 10px 30px rgba(95,167,100,0.10);
+  border-color: var(--border2);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
 
-.field-group-header {
+/* ── Col 1: Info ── */
+.fgc-info {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 16px 16px 20px;
 }
+
+.fgc-meta-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.fgc-count {
+  margin-top: auto;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  opacity: 0.7;
+  padding-top: 6px;
+}
+
+/* ── Col 2: Chart ── */
+.fgc-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: stretch;
+  padding: 8px 10px 8px 4px;
+  position: relative;
+  min-width: 0;
+}
+
+.fgc-sparkline {
+  width: 100%;
+  flex: 1;
+  min-height: 130px;
+  display: block;
+}
+
+/* ── Col 3: Actions ── */
+.fgc-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px 20px 16px 16px;
+}
+
+.fgc-latest {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fgc-latest-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-dim);
+}
+
+.fgc-latest-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.fgc-trend-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+}
+
+.fgc-trend-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.fgc-explore-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  background: var(--accent);
+  color: var(--bg, #fff);
+  border: 2px solid transparent;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+
+  font-family: 'Syne', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+
+  cursor: pointer;
+  transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.fgc-explore-btn:hover {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px var(--accent);
+  transform: translateY(-1px);
+}
+
+/* trend inside actions col */
+.fgc-actions .field-trend {
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+/* =========================
+   TREND BADGES
+========================= */
 
 .field-trend {
   display: inline-block;
@@ -70,40 +200,17 @@
 .trend-down { color: #ef4444; }
 .trend-flat { color: #9ca3af; }
 
-.field-group-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 4px;
-  padding-top: 10px;
-  border-top: 1px solid var(--border);
-}
-
-.field-analyses-hint {
-  font-size: 0.78rem;
-  color: var(--text-dim);
-}
-
-.field-chevron {
-  font-size: 1.2rem;
-  color: var(--accent);
-  font-weight: 700;
-  transition: transform 0.15s;
-}
-.field-group-card:hover .field-chevron {
-  transform: translateX(3px);
-}
-
 /* =========================
    HEADER TEXT
 ========================= */
 
 .analysis-title {
   font-family: 'Syne', sans-serif;
-  font-size: 1.05rem;
+  font-size: 1.0rem;
   font-weight: 700;
   color: var(--text);
   margin-bottom: 2px;
+  line-height: 1.3;
 }
 
 .analysis-meta {
@@ -144,7 +251,7 @@
   padding: 0.5rem 0.85rem;
   border-radius: 9px;
   border: 1px solid var(--border);
-  background: #ffffff;   /* <- NEU: weiß */
+  background: #ffffff;
   color: var(--text);
   cursor: pointer;
   font-size: 0.85rem;
@@ -153,7 +260,7 @@
 }
 
 .btn-secondary:hover {
-  background: #f9f9f9;   /* leichter Hover */
+  background: #f9f9f9;
   border-color: var(--accent);
   transform: translateY(-1px);
 }
@@ -411,7 +518,6 @@
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--border);
-  /* reserve height so Leaflet can render correctly */
   height: 320px;
   position: relative;
 }
@@ -635,6 +741,22 @@
    RESPONSIVE
 ========================= */
 
+@media (max-width: 700px) {
+  .field-group-card {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+  }
+  .fgc-chart {
+    padding: 12px 16px 10px;
+  }
+  .fgc-sparkline {
+    min-height: 90px;
+  }
+  .fgc-actions {
+    padding: 14px 16px;
+  }
+}
+
 @media (max-width: 600px) {
   .detail-grid           { grid-template-columns: 1fr; }
   .detail-stats-grid     { grid-template-columns: 1fr 1fr; }
@@ -810,7 +932,6 @@
 
   padding: 16px 18px;
   height: 110px;
-  
 
   display: flex;
   flex-direction: column;
@@ -823,10 +944,6 @@
   font-size: 1.25rem;
   color: var(--text-dim);
   font-weight: 500;
-}
-
-.field-group-card {
-  position: relative;
 }
 
 .field-id-badge {
@@ -856,23 +973,6 @@
   transform: translateY(-3px);
   border-color: var(--accent);
   box-shadow: 0 10px 30px rgba(95,167,100,0.15);
-}
-
-.sort-group {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-
-  max-width: 220px;
-  margin-bottom: 14px;
-}
-
-.sort-label {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-dim);
 }
 
 /* =========================
@@ -913,18 +1013,12 @@
   box-sizing: border-box;
 }
 
-/* SORT box = identical to filters */
-.sort-box {
-  margin: 0; /* override old spacing */
-  max-width: 260px;
-}
-
-/* FILTER TOGGLE should look like filter input/select */
+/* FILTER TOGGLE */
 .btn-filter-toggle {
-  padding: 0.5rem 0.85rem;   /* gleich wie btn-secondary */
+  padding: 0.5rem 0.85rem;
   border-radius: 9px;
   border: 1px solid var(--border);
-  background: #ffffff;       /* gleich wie Filter */
+  background: #ffffff;
   color: var(--text);
   font-size: 0.85rem;
   font-weight: 500;
@@ -944,31 +1038,71 @@
 }
 
 .btn-control {
-  padding: 9px 12px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-  background: var(--surface2);
-  color: var(--text);
-  font-size: 0.875rem;
+  background: white;
+  color: #1f2937;
+  border: 1px solid rgba(0,0,0,0.08);
+  padding: 10px 14px;
+  border-radius: 10px;
   font-weight: 500;
   cursor: pointer;
-  transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+  transition: all 0.2s ease;
 }
 
 .btn-control:hover {
+  background: #f3f4f6;
   border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* =========================
+   TOOLTIP (data-tooltip)
+========================= */
+
+.btn-tooltip {
+  position: relative;
+}
+
+.btn-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1f2937;
+  color: #f9fafb;
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+  padding: 4px 9px;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+.btn-tooltip::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #1f2937;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 10;
+}
+
+.btn-tooltip:hover::after,
+.btn-tooltip:hover::before {
+  opacity: 1;
 }
 
 .btn-control:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 3px rgba(95,167,100,0.10);
-}
-
-.dashboard-controls .btn-primary {
-  height: 38px;
-  padding: 0 12px;
-  display: inline-flex;
-  align-items: center;
 }
 
 .controls-left {
@@ -1020,28 +1154,4 @@
 
 .sort-option:hover {
   background: var(--surface);
-}
-
-.btn-control {
-  background: white;
-  color: #1f2937;
-  border: 1px solid rgba(0,0,0,0.08);
-  padding: 10px 14px;
-  border-radius: 10px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-/* Hover Effekt */
-.btn-control:hover {
-  background: #f3f4f6;
-  border-color: var(--accent);
-  transform: translateY(-1px);
-}
-
-/* optional: active state */
-.btn-control:active {
-  transform: translateY(0px);
-  box-shadow: none;
 }

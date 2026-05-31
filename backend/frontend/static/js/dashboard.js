@@ -96,7 +96,9 @@ function ocTier(value) {
 }
 
 function valueToColor(value) {
-  return FieldGradientOverlay.valueToColorPlasmaDiscrete(value, ocClassification);
+  const c = ocClassification;
+  const tier = ocTier(value);
+  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
 }
 
 let allAnalyses        = dashboardConfig.analyses || [];
@@ -250,7 +252,7 @@ function updateDashboardKPIs(analyses = allAnalyses) {
 
   sortedEntries.forEach(([fieldName, items]) => {
 
-    const latest = items[items.length - 1]; // garantiert neueste (weil vorher sortiert)
+    const latest = items[items.length - 1];
     const val = parseOc(latest?.avg_value);
 
     if (val === null) return;
@@ -288,19 +290,16 @@ function updateDashboardKPIs(analyses = allAnalyses) {
   renderKpiField("kpi-best-field", bestField, bestValue, fieldIndexMap, "best");
   renderKpiField("kpi-worst-field", worstField, worstValue, fieldIndexMap, "worst");
 
-    // reset old states (important for filter updates)
   document.querySelectorAll(".kpi-card").forEach(c => {
     c.classList.remove("kpi-card--best", "kpi-card--worst");
   });
 
-  // best card
   const bestEl = document.getElementById("kpi-best-field");
   if (bestEl) {
     const card = bestEl.closest(".kpi-card");
     if (card) card.classList.add("kpi-card--best");
   }
 
-  // worst card
   const worstEl = document.getElementById("kpi-worst-field");
   if (worstEl) {
     const card = worstEl.closest(".kpi-card");
@@ -392,6 +391,7 @@ function updateEndCompareBtn() {
 
 /* ══════════════════════════════════════════════════
    RENDER — one card per unique field name
+   NEW LAYOUT: 3-column sketch design
 ══════════════════════════════════════════════════ */
 
 function renderDashboard(analyses, { filtered = false } = {}) {
@@ -412,76 +412,319 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
   const groups = groupByField(analyses);
   fieldIndexMap = buildFieldIndexMap(groups);
-  
-  const sortMode = document.getElementById("sort-fields")?.value || "latest";
 
+  const sortMode = document.getElementById("sort-fields")?.value || "latest";
   const sortedGroups = sortGroups(groups, sortMode);
 
   container.innerHTML = sortedGroups.map(({ name, items }) => {
-  const latest    = items[items.length - 1];
-  const first     = items[0];
+    const latest   = items[items.length - 1];
+    const first    = items[0];
+    const prev     = items.length >= 2 ? items[items.length - 2] : null;
 
-  const dateRange = items.length > 1
-    ? `${escapeHtml(first.date)} – ${escapeHtml(latest.date)}`
-    : escapeHtml(latest.date || "–");
+    const firstVal  = parseOc(first.avg_value);
+    const latestVal = parseOc(latest.avg_value);
+    const prevVal   = prev ? parseOc(prev.avg_value) : null;
 
-  const firstVal  = parseOc(first.avg_value);
-  const latestVal = parseOc(latest.avg_value);
+    // All-time change (first → latest)
+    const trendAllTime = (firstVal != null && latestVal != null && firstVal !== 0)
+      ? ((latestVal - firstVal) / firstVal) * 100
+      : null;
 
-  const trend = (firstVal != null && latestVal != null && firstVal !== 0)
-    ? ((latestVal - firstVal) / firstVal) * 100
-    : null;
+    // Previous-analysis change (prev → latest)
+    const trendPrev = (prevVal != null && latestVal != null && prevVal !== 0)
+      ? ((latestVal - prevVal) / prevVal) * 100
+      : null;
 
-  const trendHTML = trend !== null
-    ? `<span class="field-trend ${
-        trend >  TREND_FLAT_PCT ? "trend-up"   :
-        trend < -TREND_FLAT_PCT ? "trend-down" : "trend-flat"
-      }">
-      ${
-        trend >  TREND_FLAT_PCT ? "↑" :
-        trend < -TREND_FLAT_PCT ? "↓" : "→"
-      } ${Math.abs(trend).toFixed(1)}%
-    </span>`
-    : "";
+    function trendBadge(pct, label) {
+      if (pct === null) return "";
+      const cls = pct >  0.2 ? "trend-up" : pct < -0.2 ? "trend-down" : "trend-flat";
+      const arrow = pct > 0.2 ? "↑" : pct < -0.2 ? "↓" : "→";
+      return `<span class="fgc-trend-row">
+        <span class="fgc-trend-label">${label}</span>
+        <span class="field-trend ${cls}">${arrow} ${Math.abs(pct).toFixed(1)}%</span>
+      </span>`;
+    }
 
-  const checked   = selectedForCompare.has(name) ? "checked" : "";
-  const safeField = encodeURIComponent(name);
+    const checked   = selectedForCompare.has(name) ? "checked" : "";
+    const safeField = encodeURIComponent(name);
 
-  return `
-    <div class="analysis-card field-group-card" data-field="${safeField}">
-      <div class="field-group-header">
-        <div class="analysis-title">
-          ${fieldIndexMap[name] ?? "–"}. ${escapeHtml(name)}
+    const dateRange = items.length > 1
+      ? `${escapeHtml(first.date)} – ${escapeHtml(latest.date)}`
+      : escapeHtml(latest.date || "–");
+
+    // Sparkline data
+    const sparkItems = items.filter(i => parseOc(i.avg_value) != null);
+    const sparkData  = sparkItems.map(i => parseOc(i.avg_value));
+    const sparkDates = sparkItems.map(i => i.date || "");
+
+    return `
+      <div class="analysis-card field-group-card" data-field="${safeField}">
+
+        <!-- COL 1: Field info -->
+        <div class="fgc-info">
+          <div class="analysis-title">
+            ${fieldIndexMap[name] ?? "–"}. ${escapeHtml(name)}
+          </div>
+          <div class="fgc-meta-list">
+            <span>📅 ${dateRange}</span>
+            ${latest.crop          ? `<span>🌾 ${escapeHtml(latest.crop)}</span>`          : ""}
+            ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
+          </div>
+          <div class="fgc-count">
+            ${items.length === 1 ? "1 analysis" : `${items.length} analyses`}
+          </div>
+        </div>
+
+        <!-- COL 2: Sparkline chart (avg only, coloured segments) -->
+        <div class="fgc-chart">
+          <canvas class="fgc-sparkline"
+                  data-values="${sparkData.join(",")}"
+                  data-labels="${sparkDates.join("|")}"></canvas>
+        </div>
+
+        <!-- COL 3: Latest value + actions -->
+        <div class="fgc-actions">
+          <div class="fgc-latest">
+            <span class="fgc-latest-label">Latest Avg OC</span>
+            <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
+            ${trendBadge(trendAllTime, "All-time")}
+            ${trendBadge(trendPrev,   "vs. prev.")}
+          </div>
+          <button class="fgc-explore-btn" data-field="${safeField}">
+            Click to explore ›
+          </button>
+          <label class="compare-label"
+                 style="cursor:pointer; font-size:0.78rem; color:var(--text-dim);
+                        display:flex; gap:7px; align-items:center; user-select:none;">
+            <input type="checkbox" class="compare-checkbox"
+                   data-field="${safeField}" ${checked}>
+            Select for comparison
+          </label>
         </div>
 
       </div>
+    `;
+  }).join("");
 
-      <div class="analysis-meta">
-        📅 ${dateRange}<br>
-        ${latest.crop ? `🌾 ${escapeHtml(latest.crop)}<br>` : ""}
-        ${latest.location_name ? `📍 ${escapeHtml(latest.location_name)}<br>` : ""}
-        📊 Latest Avg: <b>${formatOcGkg(latest.avg_value)}</b>
-        ${trendHTML}
-      </div>
+  // Draw sparklines after DOM update
+  requestAnimationFrame(() => drawSparklines());
+}
 
-      <label class="compare-label"
-             style="display:flex;gap:8px;align-items:center;cursor:pointer;
-                    font-size:0.8rem;color:var(--text-dim);">
-        <input type="checkbox" class="compare-checkbox"
-               data-field="${safeField}" ${checked}>
-        Select for comparison
-      </label>
+/* ── Draw mini sparkline on each .fgc-sparkline canvas ──
+   • Y-axis labels fully visible (wider left pad)
+   • Chart title drawn inside canvas top-left
+   • Line segments coloured: green=rise, red=fall, black=flat (±0.2 abs)
+   • Hover tooltip showing exact value + date                           */
+function drawSparklines() {
+  document.querySelectorAll(".fgc-sparkline").forEach(canvas => {
+    if (canvas._sparklineInit) return; // already set up
+    canvas._sparklineInit = true;
 
-      <div class="field-group-footer">
-        <span class="field-analyses-hint">
-          ${items.length === 1 ? "1 analysis" : `${items.length} analyses`}
-          &nbsp;— click to explore
-        </span>
-        <span class="field-chevron">›</span>
-      </div>
-    </div>
-  `;
-}).join("");
+    const raw    = canvas.dataset.values || "";
+    const labels = (canvas.dataset.labels || "").split("|").map(s => s.trim());
+    const values = raw.split(",").map(v => parseFloat(v)).filter(v => Number.isFinite(v));
+    if (!values.length) return;
+
+    function redraw(hoverIdx) {
+      const W = canvas.offsetWidth  || 220;
+      const H = canvas.offsetHeight || 120;
+      if (W === 0 || H === 0) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
+        canvas.width  = W * dpr;
+        canvas.height = H * dpr;
+      }
+      const ctx = canvas.getContext("2d");
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, W, H);
+
+      // ── Layout ────────────────────────────────────────────
+      const TICK_COLOR = "#9ca3af";
+      const GRID_COLOR = "rgba(255,255,255,0.08)";
+      const FONT_SM    = "9.5px system-ui,sans-serif";
+      const FONT_TITLE = "bold 9px system-ui,sans-serif";
+      const Y_LABEL_W  = 52;   // enough for "XX.XX g/kg"
+      const X_LABEL_H  = 15;
+      const TITLE_H    = 14;   // space reserved at top for title
+
+      const pad = { top: TITLE_H + 4, right: 8, bottom: X_LABEL_H, left: Y_LABEL_W };
+      const iW  = W - pad.left - pad.right;
+      const iH  = H - pad.top  - pad.bottom;
+
+      // ── Y range (30 % padding) ─────────────────────────────
+      const dMin  = Math.min(...values);
+      const dMax  = Math.max(...values);
+      const range = Math.max(dMax - dMin, 0.5);
+      const rPad  = Math.max(range * 0.30, 0.5);
+      const yMin  = Math.max(0, dMin - rPad);
+      const yMax  = dMax + rPad;
+      const yRange = yMax - yMin;
+
+      const toX = i => {
+        const X_PAD = 12; // inner margin on each side so line doesn't touch edge
+        if (values.length === 1) return pad.left + iW / 2;
+        return pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2);
+      };
+      const toY = v => pad.top + iH - ((v - yMin) / yRange) * iH;
+
+      // ── Chart title (centred over plot area) ──────────────
+      ctx.font      = FONT_TITLE;
+      ctx.fillStyle = TICK_COLOR;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText("OC over time", pad.left + iW / 2, 3);
+
+      // ── Y gridlines + labels ───────────────────────────────
+      ctx.font = FONT_SM;
+      const yTicks = [yMin + yRange * 0.2, yMin + yRange * 0.8];
+      yTicks.forEach(tv => {
+        const y = toY(tv);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(pad.left + iW, y);
+        ctx.strokeStyle = GRID_COLOR;
+        ctx.lineWidth   = 1;
+        ctx.stroke();
+
+        ctx.textAlign    = "right";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle    = TICK_COLOR;
+        ctx.fillText(tv.toFixed(2) + " g/kg", pad.left - 3, y);
+      });
+
+      // ── X baseline ────────────────────────────────────────
+      ctx.beginPath();
+      ctx.moveTo(pad.left, pad.top + iH);
+      ctx.lineTo(pad.left + iW, pad.top + iH);
+      ctx.strokeStyle = "rgba(156,163,175,0.25)";
+      ctx.lineWidth   = 1;
+      ctx.stroke();
+
+      // ── X date labels (first + last) ──────────────────────
+      if (labels.length >= values.length && values.length >= 1) {
+        ctx.font         = FONT_SM;
+        ctx.textBaseline = "top";
+        ctx.fillStyle    = TICK_COLOR;
+        const fmt = s => s ? s.slice(5) : ""; // "MM-DD"
+        ctx.textAlign = "left";
+        ctx.fillText(fmt(labels[0]), pad.left, pad.top + iH + 3);
+        if (values.length > 1) {
+          ctx.textAlign = "right";
+          ctx.fillText(fmt(labels[values.length - 1]), pad.left + iW, pad.top + iH + 3);
+        }
+      }
+
+      // ── Gradient fill (neutral green) ─────────────────────
+      const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + iH);
+      grad.addColorStop(0, "rgba(95,167,100,0.18)");
+      grad.addColorStop(1, "rgba(95,167,100,0.00)");
+      ctx.beginPath();
+      values.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+      ctx.lineTo(toX(values.length - 1), pad.top + iH);
+      ctx.lineTo(toX(0), pad.top + iH);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // ── Coloured line segments ─────────────────────────────
+      // Threshold: 0.2 absolute change → flat (black)
+      const FLAT_ABS = 0.2;
+      for (let i = 0; i < values.length - 1; i++) {
+        const diff  = values[i + 1] - values[i];
+        const color = diff >  FLAT_ABS ? "#22c55e"
+                    : diff < -FLAT_ABS ? "#ef4444"
+                    : "#6b7280";
+
+        ctx.beginPath();
+        ctx.moveTo(toX(i),     toY(values[i]));
+        ctx.lineTo(toX(i + 1), toY(values[i + 1]));
+        ctx.strokeStyle = color;
+        ctx.lineWidth   = 2.5;
+        ctx.lineJoin    = "round";
+        ctx.lineCap     = "round";
+        ctx.stroke();
+      }
+
+      // ── Dots ──────────────────────────────────────────────
+      values.forEach((v, i) => {
+        const isHover = (i === hoverIdx);
+        ctx.beginPath();
+        ctx.arc(toX(i), toY(v), isHover ? 5 : 3, 0, Math.PI * 2);
+        ctx.fillStyle   = isHover ? "#ffffff" : "#5fa764";
+        ctx.fill();
+        ctx.strokeStyle = isHover ? "#5fa764" : "#ffffff";
+        ctx.lineWidth   = isHover ? 2 : 1.5;
+        ctx.stroke();
+      });
+
+      // ── Hover tooltip ──────────────────────────────────────
+      if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < values.length) {
+        const tx   = toX(hoverIdx);
+        const ty   = toY(values[hoverIdx]);
+        const text = `${values[hoverIdx].toFixed(2)} g/kg`;
+        const dateText = labels[hoverIdx] || "";
+        const fullText = dateText ? `${dateText}: ${text}` : text;
+
+        ctx.font = "bold 10px system-ui,sans-serif";
+        const tw = ctx.measureText(fullText).width;
+        const bPad = 5;
+        const bW = tw + bPad * 2;
+        const bH = 18;
+        let bx = tx - bW / 2;
+        let by = ty - bH - 8;
+        // keep inside canvas
+        bx = Math.max(pad.left, Math.min(bx, W - pad.right - bW));
+        by = Math.max(2, by);
+
+        ctx.fillStyle = "rgba(31,41,55,0.92)";
+        ctx.beginPath();
+        ctx.roundRect(bx, by, bW, bH, 4);
+        ctx.fill();
+
+        ctx.fillStyle    = "#f9fafb";
+        ctx.textAlign    = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(fullText, bx + bW / 2, by + bH / 2);
+      }
+    }
+
+    // Initial draw
+    redraw(null);
+
+    // ── Hover interaction ──────────────────────────────────────
+    function getHoverIndex(e) {
+      const rect   = canvas.getBoundingClientRect();
+      const mx     = e.clientX - rect.left;
+      const W      = canvas.offsetWidth  || 220;
+      const Y_LABEL_W = 52;
+      const X_LABEL_H = 15;
+      const TITLE_H   = 14;
+      const X_PAD     = 12;
+      const pad = { left: Y_LABEL_W, right: 8, top: TITLE_H + 4, bottom: X_LABEL_H };
+      const iW  = W - pad.left - pad.right;
+
+      let closest = null, minDist = Infinity;
+      values.forEach((_, i) => {
+        const x = values.length > 1
+          ? pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2)
+          : pad.left + iW / 2;
+        const d = Math.abs(mx - x);
+        if (d < minDist) { minDist = d; closest = i; }
+      });
+      return minDist < 24 ? closest : null;
+    }
+
+    canvas.addEventListener("mousemove", e => {
+      const idx = getHoverIndex(e);
+      canvas.style.cursor = idx != null ? "crosshair" : "default";
+      redraw(idx);
+    });
+    canvas.addEventListener("mouseleave", () => {
+      canvas.style.cursor = "default";
+      redraw(null);
+    });
+  });
 }
 
 /* ══════════════════════════════════════════════════
@@ -489,11 +732,14 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 ══════════════════════════════════════════════════ */
 
 function onCardClick(e) {
-  if (e.target.closest(".compare-label") ||
-      e.target.closest(".compare-checkbox")) return;
-  const card = e.target.closest(".field-group-card");
-  if (!card) return;
-  openFieldModal(decodeURIComponent(card.dataset.field));
+  // Only the "Click to explore" button opens the field modal
+  const exploreBtn = e.target.closest(".fgc-explore-btn");
+  if (exploreBtn) {
+    e.stopPropagation();
+    openFieldModal(decodeURIComponent(exploreBtn.dataset.field));
+    return;
+  }
+  // Checkbox / label — handled by onCardChange, no modal
 }
 
 function onCardChange(e) {
@@ -512,11 +758,8 @@ function onCardChange(e) {
 function updateFieldModalStats(items) {
   const latest = items[items.length - 1];
 
-  // Fläche berechnen
-  // Beispiel: latest.area_ha oder latest.area_m2
   const fieldArea = `${latest.field_area_ha.toFixed(2)} ha`;
 
-  // Anzahl analysierter Zonen / Punkte
   const datapoints =
     Array.isArray(latest.zones)
       ? latest.zones.length
@@ -557,8 +800,6 @@ function openFieldModal(fieldName) {
   renderFieldLineChart(items);
   renderFieldAnalysesList(items);
 
-  // "+ New Analysis" — hands the EXACT polygon of the latest analysis
-  // to map.js via sessionStorage, so the field is already drawn on the map
   document.getElementById("field-new-analysis-btn").onclick = () => {
     const prefill = {
       polygon:       latest.polygon       || [],
@@ -568,7 +809,6 @@ function openFieldModal(fieldName) {
     };
     sessionStorage.setItem("dashboard_prefill", JSON.stringify(prefill));
 
-    // Also store simple params for the save-popup fields
     const p = new URLSearchParams();
     p.set("field", fieldName);
     if (latest.location_name) p.set("location", latest.location_name);
@@ -604,7 +844,6 @@ function renderFieldLineChart(items) {
     fill:             false,
   };
 
-  // pad labels + data for x-axis breathing room
   const { labels, datasets } = padChart(rawLabels, [
     { ...sharedOpts, label: "Maximum", data: maxData,
       borderColor: COLORS.max, pointBackgroundColor: COLORS.max },
@@ -658,7 +897,7 @@ function renderFieldAnalysesList(items) {
       </div>
       <div class="field-analysis-row-actions">
         <button class="btn-secondary field-detail-btn"   data-id="${a.id}">Details</button>
-        <button class="btn-secondary field-download-btn" data-id="${a.id}">⬇</button>
+        <button class="btn-secondary field-download-btn btn-tooltip" data-tooltip="Download CSV" data-id="${a.id}">⬇</button>
         <button class="btn-danger    field-delete-btn"   data-id="${a.id}">Delete</button>
       </div>
     </div>
@@ -916,7 +1155,6 @@ function openDetailModal(item) {
 
   if (typeof L === "undefined") return;
 
-  /* Leaflet in modals: tear down first, then init after layout has real size. */
   destroyDetailMap();
   requestAnimationFrame(() => {
     requestAnimationFrame(() => renderDetailMap(item));
@@ -1076,7 +1314,7 @@ function sortGroups(groups, mode) {
     return { name, items, metrics };
   }).filter(x => x.metrics);
 
-    switch (mode) {
+  switch (mode) {
     case "latest":
       enriched.sort((a, b) => b.metrics.latest - a.metrics.latest);
       break;
