@@ -53,7 +53,7 @@ function padChart(labels, datasets) {
   const pDatasets = datasets.map(ds => ({
     ...ds,
     data: [null, ...ds.data, null],
-    spanGaps: false,
+    spanGaps: true,
   }));
   return { labels: pLabels, datasets: pDatasets };
 }
