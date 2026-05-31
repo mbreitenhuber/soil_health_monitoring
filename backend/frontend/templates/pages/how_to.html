@@ -23,7 +23,7 @@
       {% if lang == "en" %}
         A step-by-step guide to analyzing and saving your agricultural fields. This includes everything from drawing your first polygon to reading the soil's organic carbon level on a map and managing your fields.
       {% else %}
-        Eine Schritt-für-Schritt-Anleitung zur Analyse und Speicherung deiner landwirtschaftlichen Felder — vom ersten Polygon bis zur Ablesung des organischen Kohlenstoffs auf der Karte und zur Verwaltung deiner Felder.
+        Eine Schritt-für-Schritt-Anleitung zur Analyse und Speicherung deiner landwirtschaftlichen Felder, vom ersten Polygon bis zur Ablesung des organischen Kohlenstoffs auf der Karte und zur Verwaltung deiner Felder.
       {% endif %}
     </p>
   </div>
@@ -31,7 +31,7 @@
   <!-- Quick Steps Overview -->
   <section class="about-section" style="padding-top:0;">
     <div class="section-eyebrow">{{ "Overview" if lang == "en" else "Überblick" }}</div>
-    <h2 class="section-title">{{ "Three steps to your zone map" if lang == "en" else "Drei Schritte zur Zonenkarte" }}</h2>
+    <h2 class="section-title">{{ "Three steps to your SOC map" if lang == "en" else "Drei Schritte zu deiner SOC Karte" }}</h2>
     <div class="howto-steps-grid">
 
       <div class="howto-step-card">
@@ -68,7 +68,7 @@
           {% if lang == "en" %}
             Your field is divided into color-coded grid cells using a plasma scale tied to LUCAS (Germany) reference percentiles, darker purples are lower SOC, brighter yellows are higher.
           {% else %}
-            Dein Feld wird in farbcodierte Rasterzellen unterteilt — eine Plasma-Skala an LUCAS-Referenz-Perzentilen (Deutschland): dunklere Violetttöne bedeuten niedrigeren SOC, hellere Gelbtöne höheren.
+            Dein Feld wird in farbcodierte Rasterzellen unterteilt mit einer Plasma-Skala an LUCAS-Referenz-Perzentilen (Deutschland): dunklere Violetttöne bedeuten niedrigeren SOC, hellere Gelbtöne höheren.
           {% endif %}
         </p>
       </div>
@@ -101,7 +101,7 @@
             Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
             To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
           {% else %}
-            Zoome mit dem Mausrad oder den <kbd>+</kbd> / <kbd>–</kbd>-Buttons auf der Karte in deine Region, bevor du zeichnest — so setzt du die Polygonpunkte genauer.
+            Zoome mit dem Mausrad oder den <kbd>+</kbd> / <kbd>–</kbd>-Buttons auf der Karte in deine Region, bevor du zeichnest. So setzt du die Polygonpunkte genauer.
             Du kannst auch nach dem nächsten Ort suchen oder die Koordinaten deines Feldes in die Suchleiste oben rechts eingeben, um direkt dorthin zu springen.
           {% endif %}
         </div>
@@ -133,7 +133,7 @@
           <li>Klicke einmal auf die Karte, um die erste Ecke deines Feldes zu setzen.</li>
           <li>Klicke entlang der Feldgrenze weiter, um weitere Punkte hinzuzufügen.</li>
           <li>Falsche Ecke gesetzt? Klicke in der Werkzeugleiste auf <strong>Rückgängig</strong>, um den zuletzt gesetzten Punkt zu entfernen.</li>
-          <li>Schließe das Polygon, indem du erneut auf den ersten Punkt klickst, oder wähle <strong>Beenden</strong> in der Werkzeugleiste.</li>
+          <li>Schliesse das Polygon, indem du erneut auf den ersten Punkt klickst, oder wähle <strong>Beenden</strong> in der Werkzeugleiste.</li>
           <li>Zum Nachbearbeiten wähle <strong>Layer bearbeiten</strong> (Stift-Symbol), ziehe die Eckpunkte an die gewünschte Position und klicke auf <strong>Speichern</strong>.</li>
           {% endif %}
         </ol>
@@ -149,7 +149,7 @@
           {% if lang == "en" %}
             You do not need to be pixel-perfect. A rough outline is enough for a meaningful zone map. You can use <strong>Undo last point</strong> while drawing and <strong>Edit layers</strong> / <strong>Save changes</strong> for small corrections without redrawing the whole field.
           {% else %}
-            Pixelgenauigkeit ist nicht nötig — eine grobe Umrandung reicht für eine aussagekräftige Zonenkarte. Nutze <strong>Rückgängig</strong> beim Zeichnen sowie <strong>Layer bearbeiten</strong> / <strong>Speichern</strong> für kleine Korrekturen, ohne das ganze Feld neu zu zeichnen.
+            Pixelgenauigkeit ist nicht nötig. Eine grobe Umrandung reicht für eine aussagekräftige Zonenkarte. Nutze <strong>Rückgängig</strong> beim Zeichnen sowie <strong>Layer bearbeiten</strong> / <strong>Speichern</strong> für kleine Korrekturen, ohne das ganze Feld neu zu zeichnen.
           {% endif %}
         </div>
       </div>
@@ -166,7 +166,7 @@
           {% if lang == "en" %}
             Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.
           {% else %}
-            Sobald ein Polygon gezeichnet ist, wählst du das Datum für die Analyse. Der Button <strong>Analyse starten</strong> in der Seitenleiste wird aktiv. Klicke darauf — während das Modell läuft, erscheint ein Ladeindikator.
+            Sobald ein Polygon gezeichnet ist, wählst du das Datum für die Analyse. Der Button <strong>Analyse starten</strong> in der Seitenleiste wird aktiv. Klicke darauf. Während das Modell läuft, erscheint ein Ladeindikator.
           {% endif %}
         </p>
         <div class="howto-tip">
@@ -175,7 +175,7 @@
             The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis.
             <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
           {% else %}
-            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern — je grösser das Feld, desto länger. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
+            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern. Je grösser das Feld, desto länger dauert es. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
             <p> Bleibt der Button inaktiv, prüfe, ob dein Polygon auf der Karte vollständig geschlossen ist. </p>
           {% endif %}
         </div>
@@ -210,7 +210,7 @@
           {% if lang == "en" %}
             You can save your results by clicking the <strong>Save</strong> button in the sidebar. Further down is a complete step-by-step guide on how to use the personal dashboard.
           {% else %}
-            Du kannst deine Ergebnisse über den Button <strong>Speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zum Personal Dashboard.
+            Du kannst deine Ergebnisse über den Button <strong>Speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zu Mein Dashboard.
           {% endif %}
         </p>
         <p style="margin-top:12px;">
@@ -233,7 +233,7 @@
       {% if lang == "en" %}
         Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each saved run keeps your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values. Analyses with the <strong>same field name</strong> are grouped together so you can track development over time. The walkthrough below follows a typical path through the dashboard, from saving on the Analysis page to comparing fields and exporting data.
       {% else %}
-        Sobald eine Analyse auf der Karte fertig ist, kannst du sie im <strong>Personal Dashboard</strong> speichern. Jeder gespeicherte Lauf enthält dein Feld-Polygon, das Analysedatum, jede 60-m-Zone mit vorhergesagtem SOC (g/kg) sowie Min-, Durchschnitts- und Max-Werte. Analysen mit <strong>demselben Feldnamen</strong> werden gruppiert, damit du die Entwicklung über die Zeit verfolgen kannst. Die Anleitung unten führt dich vom Speichern auf der Analyse-Seite bis zum Feldvergleich und Export.
+        Sobald eine Analyse auf der Karte fertig ist, kannst du sie im <strong>Mein Dashboard</strong> speichern. Jeder gespeicherte Lauf enthält dein Feld-Polygon, das Analysedatum, jede 60-m-Zone mit vorhergesagtem SOC (g/kg) sowie Min-, Durchschnitts- und Max-Werte. Analysen mit <strong>demselben Feldnamen</strong> werden gruppiert, damit du die Entwicklung über die Zeit verfolgen kannst. Die Anleitung unten führt dich vom Speichern auf der Analyse-Seite bis zum Feldvergleich und Export.
       {% endif %}
     </p>
 
@@ -246,9 +246,9 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            When your zone map is ready, click <strong>Save to Personal Dashboard</strong> in the Analysis sidebar. A form opens where you enter:
+            When your SOC map is ready, click <strong>Save to Personal Dashboard</strong> in the Analysis sidebar. A form opens where you enter:
           {% else %}
-            Wenn deine Zonenkarte fertig ist, klicke in der Analyse-Seitenleiste auf <strong>Im Personal Dashboard speichern</strong>. Ein Formular öffnet sich — dort gibst du ein:
+            Wenn deine SOC Karte fertig ist, klicke in der Analyse-Seitenleiste auf <strong>In Mein Dashboard speichern</strong>. Ein Formular öffnet sich. Dort gibst du ein:
           {% endif %}
         </p>
         <ol class="howto-list">
@@ -257,14 +257,14 @@
           <li><strong>Location</strong>, <strong>crop</strong>, and <strong>notes</strong> (optional) — these appear on your field cards and help with filtering.</li>
           {% else %}
           <li><strong>Feldname</strong> (Pflicht) — nutze für jedes reale Feld einen einheitlichen Namen, damit spätere Läufe gruppiert werden.</li>
-          <li><strong>Standort</strong>, <strong>Kultur</strong> und <strong>Notizen</strong> (optional) — sie erscheinen auf den Feldkarten und helfen beim Filtern.</li>
+          <li><strong>Standort</strong>, <strong>Pflanzenart</strong> und <strong>Notizen</strong> (optional) — sie erscheinen auf den Feldkarten und helfen beim Filtern.</li>
           {% endif %}
         </ol>
         <p style="margin-top:16px;">
           {% if lang == "en" %}
             Click <strong>Save Analysis</strong> to store the run. A confirmation appears with a link to the Personal Dashboard. You do not need to re-run the model to view the results again later.
           {% else %}
-            Klicke auf <strong>Analyse speichern</strong>, um den Lauf zu sichern. Eine Bestätigung mit Link zum Personal Dashboard erscheint. Du musst das Modell nicht erneut ausführen, um die Ergebnisse später wieder anzusehen.
+            Klicke auf <strong>Analyse speichern</strong>, um den Lauf zu sichern. Eine Bestätigung mit Link zu Mein Dashboard erscheint. Du musst das Modell nicht erneut ausführen, um die Ergebnisse später wieder anzusehen.
           {% endif %}
         </p>
       </div>
@@ -281,7 +281,7 @@
           {% if lang == "en" %}
             Go to <strong>Personal Dashboard</strong> via the top navigation or the link in the save confirmation. At the top you will see five summary cards:
           {% else %}
-            Wechsle über die obere Navigation oder den Link in der Speicherbestätigung zum <strong>Personal Dashboard</strong>. Oben siehst du fünf Übersichtskarten:
+            Wechsle über die obere Navigation oder den Link in der Speicherbestätigung zu <strong>Mein Dashboard</strong>. Oben siehst du fünf Übersichtskarten:
           {% endif %}
         </p>
         <ol class="howto-list">
@@ -319,12 +319,12 @@
           <li>Use <strong>Sort ▾</strong> to reorder fields by latest OC, best OC, worst OC, or most improved over time.</li>
           <li>Open <strong>Filters ▾</strong> to narrow the list by field name, crop, or date range. Click <strong>✕ Reset</strong> inside the filter panel to clear all filters.</li>
           <li>Each field row shows its number, name, date span, crop and location (if set), how many analyses are stored, a small <strong>OC over time</strong> sparkline, and the <strong>Latest Avg OC</strong> with trend indicators (<strong>All-time</strong> and <strong>vs. prev.</strong>).</li>
-          <li>Click <strong>Click to explore ›</strong> on a row to open that field's full history — the rest of the row is for sorting and comparison, not for opening the field.</li>
+          <li>Click <strong>Click to explore ›</strong> on a row to open that field's full history. The rest of the row is for sorting and comparison, not for opening the field.</li>
           {% else %}
           <li>Nutze <strong>Sortieren ▾</strong>, um Felder nach aktuellem OC, bestem OC, schlechtestem OC oder grösster Verbesserung zu ordnen.</li>
-          <li>Öffne <strong>Filter ▾</strong>, um nach Feldname, Kultur oder Datumsbereich einzugrenzen. Klicke im Filterpanel auf <strong>✕ Zurücksetzen</strong>, um alle Filter zu löschen.</li>
-          <li>Jede Zeile zeigt Nummer, Name, Datumsbereich, Kultur und Standort (falls gesetzt), Anzahl gespeicherter Analysen, eine kleine <strong>OC im Zeitverlauf</strong>-Sparkline sowie <strong>Aktueller Ø OC</strong> mit Trend (<strong>Gesamt</strong> und <strong>vs. vorh.</strong>).</li>
-          <li>Klicke in einer Zeile auf <strong>Zum Erkunden klicken ›</strong>, um die vollständige Feldhistorie zu öffnen — der Rest der Zeile dient Sortierung und Vergleich, nicht dem Öffnen des Feldes.</li>
+          <li>Öffne <strong>Filter ▾</strong>, um nach Feldname, Pflanzenart oder Datumsbereich einzugrenzen. Klicke im Filterpanel auf <strong>✕ Zurücksetzen</strong>, um alle Filter zu löschen.</li>
+          <li>Jede Zeile zeigt Nummer, Name, Datumsbereich, Pflanzenart und Standort (falls gesetzt), Anzahl gespeicherter Analysen, eine kleine <strong>OC im Zeitverlauf</strong>-Sparkline sowie <strong>Aktueller Ø OC</strong> mit Trend (<strong>Gesamt</strong> und <strong>vs. vorh.</strong>).</li>
+          <li>Klicke in einer Zeile auf <strong>Zum Erkunden klicken ›</strong>, um die vollständige Feldhistorie zu öffnen. Der Rest der Zeile dient Sortierung und Vergleich, nicht dem Öffnen des Feldes.</li>
           {% endif %}
         </ol>
       </div>
@@ -351,7 +351,7 @@
           <li>A line chart of <strong>OC Development over Time</strong> with minimum, average, and maximum values for each analysis date.</li>
           <li>An <strong>All Analyses</strong> list — newest first — with min, avg, and max badges per run, plus action buttons for each entry.</li>
           {% else %}
-          <li>Oben Feldname, Standort und Kultur.</li>
+          <li>Oben Feldname, Standort und Pflanzenart.</li>
           <li>Vier Kennzahlen: Anzahl Analysen, Feldfläche (ha), Raster-Datenpunkte und aktueller Durchschnitts-SOC.</li>
           <li>Ein Liniendiagramm <strong>OC-Entwicklung im Zeitverlauf</strong> mit Min-, Mittel- und Max-Werten je Analysedatum.</li>
           <li>Liste <strong>Alle Analysen</strong> — neueste zuerst — mit Min-/Ø-/Max-Badges pro Lauf und Aktionen je Eintrag.</li>
@@ -388,9 +388,9 @@
           <li>Inspect the <strong>Field Map — Soil Quality Zones</strong>: a satellite mini-map with the saved polygon and colour-coded 60 m zones, the same view you had on the Analysis page.</li>
           <li>Click <strong>Save Changes</strong> to update metadata, or <strong>Close</strong> to dismiss without saving.</li>
           {% else %}
-          <li><strong>Feldname</strong>, <strong>Standort</strong>, <strong>Kultur</strong> und <strong>Notizen</strong> bearbeiten. Ein Umbenennen verschiebt den Lauf in eine andere Dashboard-Gruppe.</li>
+          <li><strong>Feldname</strong>, <strong>Standort</strong>, <strong>Pflanzenart</strong> und <strong>Notizen</strong> bearbeiten. Ein Umbenennen verschiebt den Lauf in eine andere Dashboard-Gruppe.</li>
           <li>Analysedatum (nur lesen) sowie Min-, Durchschnitts- und Max-SOC des Laufs prüfen.</li>
-          <li><strong>Feldkarte — Bodenqualitätszonen</strong> ansehen: Satelliten-Minikarte mit gespeichertem Polygon und farbcodierten 60-m-Zonen — dieselbe Ansicht wie auf der Analyse-Seite.</li>
+          <li><strong>Feldkarte — Bodenqualitätszonen</strong> ansehen: Satelliten-Minikarte mit gespeichertem Polygon und farbcodierten 60-m-Zonen, dieselbe Ansicht wie auf der Analyse-Seite.</li>
           <li><strong>Änderungen speichern</strong> für Metadaten oder <strong>Schliessen</strong> ohne Speichern.</li>
           {% endif %}
         </ol>
@@ -431,7 +431,7 @@
         {% if lang == "en" %}
           Use a consistent field name for each physical parcel and save after every new analysis date. That way your sparklines, timeline charts, and field comparison reflect real changes on the ground, for example after irrigation, reduced tillage, or cover crops.
         {% else %}
-          Nutze für jede physische Parzelle einen einheitlichen Feldnamen und speichere nach jedem neuen Analysedatum. So zeigen Sparklines, Zeitverlaufsdiagramme und Feldvergleich echte Veränderungen vor Ort — z. B. nach Bewässerung, reduzierter Bodenbearbeitung oder Zwischenfrüchten.
+          Nutze für jede physische Parzelle einen einheitlichen Feldnamen und speichere nach jedem neuen Analysedatum. So zeigen Sparklines, Zeitverlaufsdiagramme und Feldvergleich echte Veränderungen vor Ort, z. B. nach Bewässerung, reduzierter Bodenbearbeitung oder Zwischenfrüchten.
         {% endif %}
       </p>
       <a class="btn-primary" href="/personal_dashboard">{{ "→ Go to Personal Dashboard" if lang == "en" else "→ Zum Personal Dashboard" }}</a>
@@ -470,9 +470,9 @@
     <div class="howto-tip" style="margin-top:40px;">
       <span class="howto-tip-label">📌 {{ "Important" if lang == "en" else "Wichtig" }}</span>
       {% if lang == "en" %}
-        The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
+        The SOC map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
       {% else %}
-        Die Zonenkarte ist ein Entscheidungshilfe-Werkzeug und kein Ersatz für Bodenproben vor Ort. Kombiniere AgroScan-Ergebnisse immer mit deinem Feldknow-how und bei Bedarf mit zertifizierten Labor-Bodenanalysen.
+        Die SOC Karte ist ein Entscheidungshilfe-Werkzeug und kein Ersatz für Bodenproben vor Ort. Kombiniere AgroScan-Ergebnisse immer mit deinem Feldknow-how und bei Bedarf mit zertifizierten Labor-Bodenanalysen.
       {% endif %}
     </div>
 
@@ -490,10 +490,10 @@
         It studies those examples, finds the patterns in the provided data, and uses them to make predictions on new data it has never seen before.
         The more examples it learns from, the better its predictions become. And this exactly what we did with AgroScan!
       {% else %}
-        Machine Learning bedeutet, einem Computer Muster zu erkennen, ohne jede Regel von Hand zu programmieren.
+        Machine Learning bedeutet, einem Computer beizubringen, Muster zu erkennen, ohne jede Regel von Hand zu programmieren.
         Statt genau vorzugeben, wonach gesucht wird, zeigt man viele Beispiele mit bekannten Antworten.
         Das System lernt daraus Muster und nutzt sie für Vorhersagen bei neuen, unbekannten Daten.
-        Je mehr Beispiele, desto besser die Vorhersagen — genau so haben wir AgroScan aufgebaut!
+        Je mehr Beispiele, desto besser die Vorhersagen. Und Genau so haben wir AgroScan aufgebaut!
       {% endif %}
     </p>
 
@@ -504,7 +504,7 @@
         {% if lang == "en" %}
           Every five days, the European Sentinel-2 satellite passes over your field and records how it reflects sunlight not just in colors you can see, but in invisible wavelengths that reveal information about vegetation health, moisture levels, and soil composition. AgroScan analyses these spectral "fingerprints" to estimate how much organic carbon is stored in your topsoil.
         {% else %}
-          Alle fünf Tage überfliegt der europäische Sentinel-2-Satellit dein Feld und misst die Lichtreflexion — nicht nur in sichtbaren Farben, sondern auch in unsichtbaren Wellenlängen mit Informationen zu Vegetation, Feuchte und Bodenzusammensetzung. AgroScan wertet diese spektralen „Fingerabdrücke“ aus, um den organischen Kohlenstoff in deinem Oberboden zu schätzen.
+          Alle fünf Tage überfliegt der europäische Sentinel-2-Satellit dein Feld und misst die Lichtreflexion, nicht nur in sichtbaren Farben, sondern auch in unsichtbaren Wellenlängen mit Informationen zu Vegetation, Feuchte und Bodenzusammensetzung. AgroScan wertet diese spektralen „Fingerabdrücke“ aus, um den organischen Kohlenstoff in deinem Oberboden zu schätzen.
         {% endif %}
       </p>
 
@@ -513,14 +513,14 @@
         {% if lang == "en" %}
           Before making any prediction, our system was trained on soil measurements collected across Germany as part of the EU-wide LUCAS soil survey, so samples that were physically taken from the ground and analyzed in a laboratory. By finding patterns between those confirmed measurements and the satellite images taken at the same locations, the model learned to recognized what high and low carbon soils look like from space.
         {% else %}
-          Vor jeder Vorhersage wurde unser System mit Bodenmessungen aus ganz Deutschland trainiert — im Rahmen der EU-weiten LUCAS-Bodenerhebung, also Proben vom Feld, analysiert im Labor. Aus Mustern zwischen diesen Messungen und Satellitenbildern am selben Ort lernte das Modell, wie kohlenstoffreiche und -arme Böden aus dem All aussehen.
+          Vor jeder Vorhersage wurde unser System mit Bodenmessungen aus ganz Deutschland trainiert, im Rahmen der EU-weiten LUCAS-Bodenerhebung, also Proben vom Feld, analysiert im Labor. Aus Mustern zwischen diesen Messungen und Satellitenbildern am selben Ort lernte das Modell, wie kohlenstoffreiche und -arme Böden aus dem All aussehen.
         {% endif %}
       </p>
       <p>
         {% if lang == "en" %}
           Think of it like this: if you showed a system thousands of photos of cats and dogs with labels, it would learn to recognize the animal from visual cues alone. AgroScan does the same except it learned from soil, satellites, and the wavelengths of reflected light.
         {% else %}
-          Stell es dir so vor: Zeigst du einem System tausende beschriftete Katzen- und Hundefotos, erkennt es das Tier allein an visuellen Merkmalen. AgroScan macht dasselbe — nur mit Boden, Satelliten und reflektiertem Licht.
+          Stell es dir so vor: Zeigst du einem System tausende beschriftete Katzen- und Hundefotos, erkennt es das Tier allein an visuellen Merkmalen. AgroScan macht dasselbe, nur mit Boden, Satelliten und reflektiertem Licht.
         {% endif %}
       </p>
 
@@ -529,14 +529,14 @@
         {% if lang == "en" %}
           Using the patterns learned during training, AgroScan predicts the SOC value in your selected field. The value is only an estimate and not a lab measurement. It is good at prediction for fields similar to the training data from Germany. The model's predictions become less accurate the more the test field differs from the training fields.
         {% else %}
-          Mit den Trainingsmustern sagt AgroScan den SOC-Wert für dein ausgewähltes Feld voraus. Es handelt sich um eine Schätzung, keine Labor-Messung. Die Vorhersage ist am zuverlässigsten für Felder, die den Trainingsdaten aus Deutschland ähneln — je stärker dein Feld abweicht, desto ungenauer werden die Werte.
+          Mit den Trainingsmustern sagt AgroScan den SOC-Wert für dein ausgewähltes Feld voraus. Es handelt sich um eine Schätzung, keine Labor-Messung. Die Vorhersage ist am zuverlässigsten für Felder, die den Trainingsdaten aus Deutschland ähneln. Je stärker dein Feld abweicht, desto ungenauer werden die Werte.
         {% endif %}
       </p>
       <p>
         {% if lang == "en" %}
           The model gives you an indication of your soil's carbon status and, more importantly, how that status changes over time. A single prediction tells you where you stand today. A series of predictions across seasons tells you whether your soil management practices are working.
         {% else %}
-          Das Modell zeigt dir den Kohlenstoffstatus deines Bodens — und vor allem, wie er sich über die Zeit verändert. Eine einzelne Vorhersage sagt, wo du heute stehst; eine Serie über mehrere Saisons zeigt, ob deine Bodenbewirtschaftung wirkt.
+          Das Modell zeigt dir den Kohlenstoffstatus deines Bodens und vor allem, wie er sich über die Zeit verändert. Eine einzelne Vorhersage sagt, wo du heute stehst; eine Serie über mehrere Saisons zeigt, ob deine Bodenbewirtschaftung wirkt.
         {% endif %}
       </p>
 
@@ -571,7 +571,7 @@
               {% if lang == "en" %}
                 Currently, one polygon can be active on the map at a time. You can still analyze and save multiple fields by saving the result, clicking Reset, and drawing the next field polygon. Your saved analyses are listed in the Personal Dashboard.
               {% else %}
-                Aktuell kann nur ein Polygon gleichzeitig auf der Karte aktiv sein. Du kannst trotzdem mehrere Felder analysieren und speichern: Ergebnis speichern, Zurücksetzen klicken, nächstes Polygon zeichnen. Gespeicherte Analysen findest du im Personal Dashboard.
+                Aktuell kann nur ein Polygon gleichzeitig auf der Karte aktiv sein. Du kannst trotzdem mehrere Felder analysieren und speichern: Ergebnis speichern, Zurücksetzen klicken, nächstes Polygon zeichnen. Gespeicherte Analysen findest du in Mein Dashboard.
               {% endif %}
             </p>
           </div>
@@ -601,7 +601,7 @@
               {% if lang == "en" %}
                 If you analyze the same polygon with the same date, results can be very similar because the same inputs are used. Try selecting a different date, or compare multiple saved runs in the Personal Dashboard to spot changes over time.
               {% else %}
-                Analysierst du dasselbe Polygon mit demselben Datum, sind die Ergebnisse oft sehr ähnlich, weil dieselben Eingaben genutzt werden. Wähle ein anderes Datum oder vergleiche mehrere gespeicherte Läufe im Personal Dashboard, um Veränderungen über die Zeit zu erkennen.
+                Analysierst du dasselbe Polygon mit demselben Datum, sind die Ergebnisse oft sehr ähnlich, weil dieselben Eingaben genutzt werden. Wähle ein anderes Datum oder vergleiche mehrere gespeicherte Läufe in Mein Dashboard, um Veränderungen über die Zeit zu erkennen.
               {% endif %}
             </p>
           </div>
@@ -616,7 +616,7 @@
               {% if lang == "en" %}
                 Saved analyses are stored in the app's database and can be managed from the Personal Dashboard. Use the Delete button on an entry to remove it from your history.
               {% else %}
-                Gespeicherte Analysen liegen in der App-Datenbank und lassen sich im Personal Dashboard verwalten. Mit <strong>Löschen</strong> bei einem Eintrag entfernst du ihn aus deiner Historie.
+                Gespeicherte Analysen liegen in der App-Datenbank und lassen sich in Mein Dashboard verwalten. Mit <strong>Löschen</strong> bei einem Eintrag entfernst du ihn aus deiner Historie.
               {% endif %}
             </p>
           </div>
@@ -631,7 +631,7 @@
               {% if lang == "en" %}
                 Yes, all stored data can be downloaded as CSV-Files. Go to the personal dashboard and use the Download all button or download fields independently.
               {% else %}
-                Ja — alle gespeicherten Daten kannst du als CSV herunterladen. Im Personal Dashboard nutzt du <strong>Alle herunterladen</strong> oder lädst einzelne Felder bzw. Analysen separat herunter.
+                Ja, alle gespeicherten Daten kannst du als CSV herunterladen. In Mein Dashboard nutzt du <strong>Alle herunterladen</strong> oder lädst einzelne Felder bzw. Analysen separat herunter.
               {% endif %}
             </p>
           </div>

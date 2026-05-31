@@ -300,7 +300,7 @@ def _howto_tier_groups(
         f"berechnet: Das 30. Perzentil ({threshold_low:.1f} g/kg) ist z. B. der Wert, unter dem "
         f"30 % der LUCAS (DE)-Messungen liegen. Auf der Karte wird SOC mit der <strong>Plasma</strong>-Farbskala "
         f"in {len(boundaries)} diskreten Stufen an Referenzperzentilen ({pct_steps}) dargestellt. "
-        f"Die drei Bänder unten fassen diese Farbtöne nach <strong>empfohlenen Maßnahmen</strong> zusammen "
+        f"Die drei Bänder unten fassen diese Farbtöne nach <strong>empfohlenen Massnahmen</strong> zusammen "
         f"(unteres 30 %, mittleres 40 %, oberes 30 % der LUCAS-Verteilung) — feinere Farbstufen "
         f"ändern nicht, was wir empfehlen."
     )

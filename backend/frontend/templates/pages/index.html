@@ -18,9 +18,9 @@
     </h1>
     <p class="hero-sub">
       {% if lang == "en" %}
-        AgroScan combines remote sensing with machine learning – select your agricultural field and receive a detailed map of its soil organic carbon content!
+        AgroScan combines remote sensing with machine learning. Select your agricultural field and receive a detailed map of its soil organic carbon content!
       {% else %}
-        AgroScan verbindet Fernerkundung mit maschinellem Lernen – wähle dein landwirtschaftliches Feld und erhalte eine detaillierte Karte des organischen Kohlenstoffs im Boden!
+        AgroScan verbindet Fernerkundung mit maschinellem Lernen. Wähle dein landwirtschaftliches Feld und erhalte eine detaillierte Karte des organischen Kohlenstoffs im Boden!
       {% endif %}
     </p>
     <div class="hero-actions">
@@ -45,7 +45,7 @@
   <div class="stats-bar home-quote-bar">
     <figure class="home-quote-figure">
       <blockquote class="home-quote">
-        <p>{% if lang == "en" %}Understanding our soil shouldn't be a privilege. Agroscan makes soil carbon monitoring open-source, satellite-powered, and free for all.{% else %}Unseren Boden zu verstehen sollte kein Privileg sein. AgroScan macht die Überwachung von Bodenkohlenstoff quelloffen, satellitengestützt und für alle kostenlos.{% endif %}</p>
+        <p>{% if lang == "en" %}Understanding our soil shouldn't be a privilege. Agroscan makes soil carbon monitoring open-source, satellite-powered, and free for all.{% else %}Unseren Boden zu verstehen sollte kein Privileg sein. Mit AgroScan wird die Überwachung von Bodenkohlenstoff open-source, satellitengestützt und für alle kostenlos.{% endif %}</p>
       </blockquote>
       <figcaption class="home-quote-cite">AgroScan Team</figcaption>
     </figure>
@@ -67,8 +67,8 @@
   <section class="showcase">
     <div class="showcase-text">
       <div class="section-eyebrow">{{ "Machine Learning Model" if lang == "en" else "Machine-Learning-Modell" }}</div>
-      <h3>{{ "Satellite driven decision support – make it your own" if lang == "en" else "Satellitengestützte Entscheidungshilfe – mach es zu deinem" }}</h3>
-      <p>{% if lang == "en" %}The machine learning model is trained on Sentinel-2 data as well as vegetation and soil indices. It utilized only free, publicly available data and is fully open-source making it easy to customize to your own use case. Curious? Read our report or checkout our GitHub repository.{% else %}Das Machine-Learning-Modell wurde mit Sentinel-2-Daten sowie Vegetations- und Bodenindizes trainiert. Es nutzt ausschließlich freie, öffentlich verfügbare Daten und ist vollständig quelloffen – so lässt es sich leicht an den eigenen Anwendungsfall anpassen. Neugierig? Lies unseren Bericht oder schau in unser GitHub-Repository.{% endif %}</p>
+      <h3>{{ "Satellite driven decision support" if lang == "en" else "Satellitengestützte Entscheidungshilfe" }}</h3>
+      <p>{% if lang == "en" %}The machine learning model is trained on Sentinel-2 data as well as vegetation and soil indices. It utilized only free, publicly available data and is fully open-source making it easy to customize to your own use case. Curious? Read our report or checkout our GitHub repository.{% else %}Das Machine-Learning-Modell wurde mit Sentinel-2-Daten sowie Vegetations- und Bodenindizes trainiert. Es nutzt ausschliesslich freie, öffentlich verfügbare Daten und ist vollständig open-source, sodass es sich leicht an den eigenen Anwendungsfall anpassen lässt. Neugierig? Lies unseren Bericht oder schau in unser GitHub-Repository.{% endif %}</p>
       <div class="showcase-btn-row">
         <a class="btn-outline" href="/report">→ {{ "Read our report" if lang == "en" else "Bericht lesen" }}</a>
         <a class="btn-outline" href="https://github.com/mbreitenhuber/soil_health_monitoring" target="_blank" rel="noopener noreferrer">→ {{ "Checkout our GitHub repo" if lang == "en" else "GitHub-Repo ansehen" }}</a>
@@ -90,7 +90,7 @@
       <div class="section-eyebrow">AI4GOOD · IVIA Lab</div>
       <h3>{{ "From classroom to climate impact" if lang == "en" else "Vom Seminarraum zum Klimaeffekt" }}</h3>
       <p>{% if lang == "en" %}AgroScan grew out of the elective course <strong>AI4GOOD: Human-Centered AI for Social Good — Peace, Health, Climate</strong> at ETH Zurich. Offered by the IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation), the course brings together computer science with peace and security, global health, and climate science.{% else %}AgroScan entstand im Wahlfach <strong>AI4GOOD: Human-Centered AI for Social Good — Peace, Health, Climate</strong> an der ETH Zürich. Das IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation) verbindet Informatik mit Frieden und Sicherheit, globaler Gesundheit und Klimawissenschaft.{% endif %}</p>
-      <p>{% if lang == "en" %}Students move from seminar discussions to hands-on projects: they build AI prototypes on public data and reflect on ethical and societal implications along the way. AgroScan applies that approach to precision agriculture by providing open-source, satellite-based soil organic carbon maps that farmers and researchers can use without proprietary lock-in.{% else %}Studierende gehen von Seminar-Diskussionen zu praktischen Projekten über: Sie bauen KI-Prototypen auf öffentlichen Daten und reflektieren ethische und gesellschaftliche Fragen. AgroScan wendet diesen Ansatz auf die Präzisionslandwirtschaft an – mit quelloffenen, satellitengestützten Karten des organischen Bodenkohlenstoffs für Landwirt:innen und Forschende ohne proprietäre Abhängigkeit.{% endif %}</p>
+      <p>{% if lang == "en" %}Students move from seminar discussions to hands-on projects: they build AI prototypes on public data and reflect on ethical and societal implications along the way. AgroScan applies that approach to precision agriculture by providing open-source, satellite-based soil organic carbon maps that farmers and researchers can use without proprietary lock-in.{% else %}Studierende gehen von Seminar-Diskussionen zu praktischen Projekten über: Sie bauen KI-Prototypen auf öffentlichen Daten und reflektieren ethische und gesellschaftliche Fragen. AgroScan wendet diesen Ansatz auf die Präzisionslandwirtschaft an und stellt Landwirt:innen und Forschende mit satellitengestützten, open-source Karten des organischen Bodenkohlenstoffs zur Verfügung ohne proprietäre Abhängigkeit.{% endif %}</p>
       <div class="showcase-btn-row">
         <a class="btn-outline" href="https://ivia.ch/teaching/ai4good/" target="_blank" rel="noopener noreferrer">→ {{ "About the AI4GOOD course" if lang == "en" else "Zum AI4GOOD-Kurs" }}</a>
         <a class="btn-outline" href="https://ivia.ch/#home" target="_blank" rel="noopener noreferrer">→ IVIA Lab</a>
