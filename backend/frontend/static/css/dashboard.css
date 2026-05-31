@@ -66,7 +66,7 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
-  padding: 18px 16px 16px 20px;
+  padding: 22px 16px 16px 20px;
 }
 
 .fgc-meta-list {
@@ -108,15 +108,22 @@
 .fgc-actions {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   gap: 10px;
-  padding: 16px 20px 16px 16px;
+  padding: 22px 20px 16px 16px;
 }
 
 .fgc-latest {
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.fgc-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: auto;
 }
 
 .fgc-latest-label {

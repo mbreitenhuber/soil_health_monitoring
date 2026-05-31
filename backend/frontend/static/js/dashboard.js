@@ -490,16 +490,18 @@ function renderDashboard(analyses, { filtered = false } = {}) {
             ${trendBadge(trendAllTime, "All-time")}
             ${trendBadge(trendPrev,   "vs. prev.")}
           </div>
-          <button class="fgc-explore-btn" data-field="${safeField}">
-            Click to explore ›
-          </button>
-          <label class="compare-label"
-                 style="cursor:pointer; font-size:0.78rem; color:var(--text-dim);
-                        display:flex; gap:7px; align-items:center; user-select:none;">
-            <input type="checkbox" class="compare-checkbox"
-                   data-field="${safeField}" ${checked}>
-            Select for comparison
-          </label>
+          <div class="fgc-buttons">
+            <label class="compare-label"
+                   style="cursor:pointer; font-size:0.78rem; color:var(--text-dim);
+                          display:flex; gap:7px; align-items:center; user-select:none;">
+              <input type="checkbox" class="compare-checkbox"
+                     data-field="${safeField}" ${checked}>
+              Select for comparison
+            </label>
+            <button class="fgc-explore-btn" data-field="${safeField}">
+              Click to explore ›
+            </button>
+          </div>
         </div>
 
       </div>
