@@ -124,7 +124,7 @@
         <h3>Save your results</h3>
       </div>
       <div class="howto-detail-body">
-        <p>You can save your results by clicking the <strong>Save</strong> button in the sidebar. This stores your analysis (including the polygon and summary statistics) so you can view and compare it later in your Personal Dashboard.</p>
+        <p>You can save your results by clicking the <strong>Save</strong> button in the sidebar. Furhter down is a complete step-by-step guide on how to use the personal dashboard.</p>
         <p style="margin-top:12px;">To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
       </div>
     </div>
@@ -132,57 +132,117 @@
 
   <!-- Saving & managing fields -->
   <section class="about-section">
-    <div class="section-eyebrow">Data management</div>
+    <div class="section-eyebrow">Personal Dashboard</div>
     <h2 class="section-title">Saving fields & managing your analyses</h2>
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:12px;">
-      Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each entry is one complete run: your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values.
-    </p>
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:32px;">
-      If you analyse the same parcel again later, save the new run under the <strong>same field name</strong>. AgroScan will group those runs together so you can track development over time, filter your history, and compare fields side by side.
+      Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each saved run keeps your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values. Analyses with the <strong>same field name</strong> are grouped together so you can track development over time. The walkthrough below follows a typical path through the dashboard, from saving on the Analysis page to comparing fields and exporting data.
     </p>
 
-    <div class="howto-steps-grid howto-dash-grid" style="margin-top:0;">
-      <div class="howto-step-card">
-        <div class="howto-step-icon">💾</div>
-        <h3>Save from Analysis</h3>
-        <p>When your zone map is ready, the sidebar shows <strong>Save to Personal Dashboard</strong>. A short form opens where you enter a field name (required for grouping), plus optional location, crop, and notes. Confirm to store the run — you do not need to repeat the analysis to view it again later.</p>
+    <!-- Step 1 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 1</div>
+        <h3>Save your analysis from the map</h3>
       </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">🗃️</div>
-        <h3>What gets stored</h3>
-        <p>Besides your labels, AgroScan keeps the polygon geometry, analysis date, all zone polygons with SOC values and colour tiers, and the field-level min, average, and max in g/kg. That is enough to rebuild charts in the dashboard and export rows to CSV without re-running the model.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">📂</div>
-        <h3>Dashboard overview</h3>
-        <p>The <strong>Saved Analyses</strong> list is organised by field name: one card per field, with a badge for how many runs you have. Each card shows the date span, crop and location if you added them, the latest average SOC, and a small trend indicator when several dates exist. Use the filter bar to narrow by name, crop, or from/to date, and <strong>Reset</strong> to show everything again.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">📈</div>
-        <h3>Field history &amp; charts</h3>
-        <p>Click any field card to open its history. You will see how many analyses are stored, all-time minimum and maximum SOC, the latest average, and a line chart of min, average, and max across dates for that field only. Below the chart, every single run is listed with its date and summary values.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">✏️</div>
-        <h3>One analysis at a time</h3>
-        <p>From the field history, open <strong>Details</strong> on a run to adjust field name, location, crop, or notes, then <strong>Save Changes</strong>. A bar chart shows that run’s min, average, and max. Use <strong>⬇</strong> to download that analysis as CSV, or <strong>Delete</strong> to remove it. <strong>+ New Analysis</strong> takes you back to the map where you can analyse the same field again.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">⚖️</div>
-        <h3>Compare &amp; export all</h3>
-        <p>At the top of the dashboard, <strong>Download All</strong> exports every saved run in one CSV file. To compare different fields, tick <strong>Select for comparison</strong> on at least two field cards and press <strong>Compare Fields</strong> — a chart plots average SOC over time, one line per field. This works best when each field name refers to one real parcel.</p>
+      <div class="howto-detail-body">
+        <p>When your zone map is ready, click <strong>Save to Personal Dashboard</strong> in the Analysis sidebar. A form opens where you enter:</p>
+        <ol class="howto-list">
+          <li><strong>Field name</strong> (required) — use a consistent name for each real parcel so later runs are grouped together.</li>
+          <li><strong>Location</strong>, <strong>crop</strong>, and <strong>notes</strong> (optional) — these appear on your field cards and help with filtering.</li>
+        </ol>
+        <p style="margin-top:16px;">Click <strong>Save Analysis</strong> to store the run. A confirmation appears with a link to the Personal Dashboard. You do not need to re-run the model to view the results again later.</p>
       </div>
     </div>
 
-    <div class="howto-tip" style="margin-top:28px;">
+    <!-- Step 2 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 2</div>
+        <h3>Open the dashboard and read the summary</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>Go to <strong>Personal Dashboard</strong> via the top navigation or the link in the save confirmation. At the top you will see five summary cards:</p>
+        <ol class="howto-list">
+          <li><strong>Total Fields</strong> — how many distinct field names you have saved.</li>
+          <li><strong>Total Analyses</strong> — the total number of individual analysis runs.</li>
+          <li><strong>Average Field</strong> — the mean of each field's latest average SOC.</li>
+          <li><strong>Best Field</strong> and <strong>Worst Field</strong> — the fields with the highest and lowest latest average SOC. Click either card to jump straight to that field's history.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 3</div>
+        <h3>Sort, filter, and scan your field list</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>Below the summary, the control bar lets you organise the list before you open any field:</p>
+        <ol class="howto-list">
+          <li>Use <strong>Sort ▾</strong> to reorder fields by latest OC, best OC, worst OC, or most improved over time.</li>
+          <li>Open <strong>Filters ▾</strong> to narrow the list by field name, crop, or date range. Click <strong>✕ Reset</strong> inside the filter panel to clear all filters.</li>
+          <li>Each field row shows its number, name, date span, crop and location (if set), how many analyses are stored, a small <strong>OC over time</strong> sparkline, and the <strong>Latest Avg OC</strong> with trend indicators (<strong>All-time</strong> and <strong>vs. prev.</strong>).</li>
+          <li>Click <strong>Click to explore ›</strong> on a row to open that field's full history — the rest of the row is for sorting and comparison, not for opening the field.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 4</div>
+        <h3>Explore a field's history</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>The field panel opens when you click <strong>Click to explore ›</strong> or a best/worst field chip in the summary. It shows:</p>
+        <ol class="howto-list">
+          <li>Field name, location, and crop at the top.</li>
+          <li>Four stats: number of analyses, field area (ha), number of grid data points, and latest average SOC.</li>
+          <li>A line chart of <strong>OC Development over Time</strong> with minimum, average, and maximum values for each analysis date.</li>
+          <li>An <strong>All Analyses</strong> list — newest first — with min, avg, and max badges per run, plus action buttons for each entry.</li>
+        </ol>
+        <p style="margin-top:16px;">From this list you can open <strong>Details</strong> for one run, download it with <strong>⬇</strong>, or remove it with <strong>Delete</strong>. Use <strong>+ New Analysis</strong> at the bottom to analyse the same parcel again on a new date (the polygon and metadata are prefilled on the Analysis page).</p>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 5</div>
+        <h3>View or edit a single analysis</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>Click <strong>Details</strong> on any run in the field history to open the analysis panel. Here you can:</p>
+        <ol class="howto-list">
+          <li>Edit <strong>field name</strong>, <strong>location</strong>, <strong>crop</strong>, and <strong>notes</strong>. Renaming a field moves the run to a different group in the dashboard.</li>
+          <li>Review the analysis date (read-only) and the run's minimum, average, and maximum SOC.</li>
+          <li>Inspect the <strong>Field Map — Soil Quality Zones</strong>: a satellite mini-map with the saved polygon and colour-coded 60 m zones, the same view you had on the Analysis page.</li>
+          <li>Click <strong>Save Changes</strong> to update metadata, or <strong>Close</strong> to dismiss without saving.</li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">Step 6</div>
+        <h3>Compare fields and export data</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>Back on the main dashboard view, you can work across several fields at once:</p>
+        <ol class="howto-list">
+          <li>Tick <strong>Select for comparison</strong> on at least two field rows, then click <strong>⚖ Compare Fields</strong>. A chart appears above the list plotting each field's average SOC over time as a separate line.</li>
+          <li>Click <strong>✕ End Comparison</strong> to hide the chart and clear your selection.</li>
+          <li>Click <strong>⬇ Download All</strong> to export every saved analysis in one CSV file, or use the <strong>⬇</strong> button on an individual run inside a field's history for a single-analysis export.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="howto-tip" style="margin-top:25px;">
       <span class="howto-tip-label">📌 Tip</span>
-      <p>Use a consistent field name for each physical parcel and save after every new analysis date. That way your timeline and comparison charts reflect real changes on the ground — for example after irrigation, reduced tillage, or cover crops.</p>
+      <p>Use a consistent field name for each physical parcel and save after every new analysis date. That way your sparklines, timeline charts, and field comparison reflect real changes on the ground, for example after irrigation, reduced tillage, or cover crops.</p>
       <a class="btn-primary" href="/personal_dashboard">→ Go to Personal Dashboard</a>
     </div>
   </section>
