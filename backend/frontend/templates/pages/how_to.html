@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}How to Use{% endblock %}
+{% block title %}{{ "How to Use" if lang == "en" else "Anleitung" }}{% endblock %}
 
 {% block head_styles %}
   <link rel="stylesheet" href="/static/css/how_to.css?v={{ static_css_version }}" />
@@ -11,36 +11,66 @@
 
   <!-- Hero -->
   <div class="about-hero">
-    <div class="section-eyebrow">User Guide</div>
-    <h1>How to use <em>AgroScan</em></h1>
-    <p>A step-by-step guide to analyzing your agricultural fields — from drawing your first polygon to reading the soil organic carbon level on the map.</p>
+    <div class="section-eyebrow">{{ "User Guide" if lang == "en" else "Benutzerhandbuch" }}</div>
+    <h1>
+      {% if lang == "en" %}
+        How to use <em>AgroScan</em>
+      {% else %}
+        So nutzt du <em>AgroScan</em>
+      {% endif %}
+    </h1>
+    <p>
+      {% if lang == "en" %}
+        A step-by-step guide to analyzing and saving your agricultural fields. This includes everything from drawing your first polygon to reading the soil's organic carbon level on a map and managing your fields.
+      {% else %}
+        Eine Schritt-für-Schritt-Anleitung zur Analyse und Speicherung deiner landwirtschaftlichen Felder, vom ersten Polygon bis zur Ablesung des organischen Kohlenstoffs auf der Karte und zur Verwaltung deiner Felder.
+      {% endif %}
+    </p>
   </div>
 
   <!-- Quick Steps Overview -->
   <section class="about-section" style="padding-top:0;">
-    <div class="section-eyebrow">Overview</div>
-    <h2 class="section-title">Three steps to your zone map</h2>
+    <div class="section-eyebrow">{{ "Overview" if lang == "en" else "Überblick" }}</div>
+    <h2 class="section-title">{{ "Three steps to your SOC map" if lang == "en" else "Drei Schritte zu deiner SOC Karte" }}</h2>
     <div class="howto-steps-grid">
 
       <div class="howto-step-card">
         <div class="howto-step-num">01</div>
         <div class="howto-step-icon">✏️</div>
-        <h3>Draw your field</h3>
-        <p>Use the polygon tool on the map to outline the boundaries of your agricultural field. Click to set each corner until you close the shape.</p>
+        <h3>{{ "Draw your field" if lang == "en" else "Feld zeichnen" }}</h3>
+        <p>
+          {% if lang == "en" %}
+            Use the polygon tool on the map to outline the boundaries of your agricultural field. Click to set each corner until you close the shape.
+          {% else %}
+            Nutze das Polygon-Werkzeug auf der Karte, um die Grenzen deines landwirtschaftlichen Feldes zu umzeichnen. Klicke für jede Ecke, bis die Form geschlossen ist.
+          {% endif %}
+        </p>
       </div>
 
       <div class="howto-step-card">
         <div class="howto-step-num">02</div>
         <div class="howto-step-icon">⟶</div>
-        <h3>Start the analysis</h3>
-        <p>Once your polygon is drawn, choose a date and click <strong>Start analysis</strong> in the sidebar. The ML model will process your field.</p>
+        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+        <p>
+          {% if lang == "en" %}
+            Once your polygon is drawn, choose a date and click <strong>Start analysis</strong> in the sidebar. The ML model will process your field.
+          {% else %}
+            Sobald dein Polygon gezeichnet ist, wähle ein Datum und klicke in der Seitenleiste auf <strong>Analyse starten</strong>. Das ML-Modell verarbeitet dein Feld.
+          {% endif %}
+        </p>
       </div>
 
       <div class="howto-step-card">
         <div class="howto-step-num">03</div>
         <div class="howto-step-icon">🗺️</div>
-        <h3>Read your zone map</h3>
-        <p>Your field is divided into color-coded zones. Green means high soil organic carbon levels, yellow is medium, and red indicates areas that may need attention.</p>
+        <h3>{{ "Read your zone map" if lang == "en" else "Zonenkarte lesen" }}</h3>
+        <p>
+          {% if lang == "en" %}
+            Your field is divided into color-coded grid cells using a plasma scale tied to LUCAS (Germany) reference percentiles, darker purples are lower SOC, brighter yellows are higher.
+          {% else %}
+            Dein Feld wird in farbcodierte Rasterzellen unterteilt mit einer Plasma-Skala an LUCAS-Referenz-Perzentilen (Deutschland): dunklere Violetttöne bedeuten niedrigeren SOC, hellere Gelbtöne höheren.
+          {% endif %}
+        </p>
       </div>
 
     </div>
@@ -48,21 +78,32 @@
 
   <!-- Detailed Walkthrough -->
   <section class="about-section">
-    <div class="section-eyebrow">Step-by-Step</div>
-    <h2 class="section-title">Detailed walkthrough</h2>
+    <div class="section-eyebrow">{{ "Step-by-Step" if lang == "en" else "Schritt für Schritt" }}</div>
+    <h2 class="section-title">{{ "Detailed walkthrough" if lang == "en" else "Ausführliche Anleitung" }}</h2>
 
     <!-- Step 1 -->
     <div class="howto-detail">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">Step 1</div>
-        <h3>Navigate to the Analysis page</h3>
+        <div class="howto-detail-num">{{ "Step 1" if lang == "en" else "Schritt 1" }}</div>
+        <h3>{{ "Navigate to the Analysis page" if lang == "en" else "Zur Analyse-Seite wechseln" }}</h3>
       </div>
       <div class="howto-detail-body">
-        <p>Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.</p>
+        <p>
+          {% if lang == "en" %}
+            Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.
+          {% else %}
+            Klicke in der oberen Navigation auf <strong>Analyse</strong> oder nutze auf der Startseite den Button <em>Jetzt analysieren</em>. Du siehst eine Vollbildkarte mit Fokus auf Deutschland.
+          {% endif %}
+        </p>
         <div class="howto-tip">
-          <span class="howto-tip-label">💡 Tip</span>
-          Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points. 
-          To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
+          <span class="howto-tip-label">💡 {{ "Tip" if lang == "en" else "Tipp" }}</span>
+          {% if lang == "en" %}
+            Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
+            To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
+          {% else %}
+            Zoome mit dem Mausrad oder den <kbd>+</kbd> / <kbd>–</kbd>-Buttons auf der Karte in deine Region, bevor du zeichnest. So setzt du die Polygonpunkte genauer.
+            Du kannst auch nach dem nächsten Ort suchen oder die Koordinaten deines Feldes in die Suchleiste oben rechts eingeben, um direkt dorthin zu springen.
+          {% endif %}
         </div>
       </div>
     </div>
@@ -70,22 +111,46 @@
     <!-- Step 2 -->
     <div class="howto-detail">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">Step 2</div>
-        <h3>Draw your field polygon</h3>
+        <div class="howto-detail-num">{{ "Step 2" if lang == "en" else "Schritt 2" }}</div>
+        <h3>{{ "Draw your field polygon" if lang == "en" else "Feld-Polygon zeichnen" }}</h3>
       </div>
       <div class="howto-detail-body">
-        <p>In the top-left corner of the map you will find the drawing toolbar. Select the <strong>Polygon</strong> tool (the pentagon icon, second from the top). Then:</p>
+        <p>
+          {% if lang == "en" %}
+            In the top-left corner of the map you will find the drawing toolbar. Select the <strong>Polygon</strong> tool (the pentagon icon, second from the top). Then:
+          {% else %}
+            Oben links auf der Karte findest du die Zeichenwerkzeuge. Wähle das <strong>Polygon</strong>-Werkzeug (Pentagon-Symbol, zweites von oben). Dann:
+          {% endif %}
+        </p>
         <ol class="howto-list">
+          {% if lang == "en" %}
           <li>Click once on the map to place the first corner of your field.</li>
           <li>Continue clicking along the field boundary to add more points.</li>
           <li>Placed a corner in the wrong spot? Click <strong>Undo last point</strong> in the toolbar to remove the most recent point and try again.</li>
           <li>Close the polygon by clicking on the first point again, or press <strong>Finish</strong> in the toolbar.</li>
           <li>To adjust the shape afterwards, select <strong>Edit layers</strong> (pencil icon), drag the corner handles to move them, then click <strong>Save changes</strong> to apply the new outline.</li>
+          {% else %}
+          <li>Klicke einmal auf die Karte, um die erste Ecke deines Feldes zu setzen.</li>
+          <li>Klicke entlang der Feldgrenze weiter, um weitere Punkte hinzuzufügen.</li>
+          <li>Falsche Ecke gesetzt? Klicke in der Werkzeugleiste auf <strong>Rückgängig</strong>, um den zuletzt gesetzten Punkt zu entfernen.</li>
+          <li>Schliesse das Polygon, indem du erneut auf den ersten Punkt klickst, oder wähle <strong>Beenden</strong> in der Werkzeugleiste.</li>
+          <li>Zum Nachbearbeiten wähle <strong>Layer bearbeiten</strong> (Stift-Symbol), ziehe die Eckpunkte an die gewünschte Position und klicke auf <strong>Speichern</strong>.</li>
+          {% endif %}
         </ol>
-        <p style="margin-top:16px;">The sidebar updates automatically with the number of vertices and the approximate area. If you need to start over, use <strong>Reset</strong> in the sidebar after an analysis, or draw a new polygon once the field is cleared.</p>
+        <p style="margin-top:16px;">
+          {% if lang == "en" %}
+            The sidebar updates automatically with the number of vertices and the approximate area. If you need to start over, use <strong>Reset</strong> in the sidebar after an analysis, or draw a new polygon once the field is cleared.
+          {% else %}
+            Die Seitenleiste zeigt automatisch die Anzahl der Eckpunkte und die ungefähre Fläche. Zum Neustart nutze nach einer Analyse <strong>Zurücksetzen</strong> in der Seitenleiste oder zeichne ein neues Polygon, sobald das Feld geleert ist.
+          {% endif %}
+        </p>
         <div class="howto-tip">
-          <span class="howto-tip-label">💡 Tip</span>
-          You do not need to be pixel-perfect. A rough outline is enough for a meaningful zone map. You can use <strong>Undo last point</strong> while drawing and <strong>Edit layers</strong> / <strong>Save changes</strong> for small corrections without redrawing the whole field.
+          <span class="howto-tip-label">💡 {{ "Tip" if lang == "en" else "Tipp" }}</span>
+          {% if lang == "en" %}
+            You do not need to be pixel-perfect. A rough outline is enough for a meaningful zone map. You can use <strong>Undo last point</strong> while drawing and <strong>Edit layers</strong> / <strong>Save changes</strong> for small corrections without redrawing the whole field.
+          {% else %}
+            Pixelgenauigkeit ist nicht nötig. Eine grobe Umrandung reicht für eine aussagekräftige Zonenkarte. Nutze <strong>Rückgängig</strong> beim Zeichnen sowie <strong>Layer bearbeiten</strong> / <strong>Speichern</strong> für kleine Korrekturen, ohne das ganze Feld neu zu zeichnen.
+          {% endif %}
         </div>
       </div>
     </div>
@@ -93,15 +158,26 @@
     <!-- Step 3 -->
     <div class="howto-detail">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">Step 3</div>
-        <h3>Start the analysis</h3>
+        <div class="howto-detail-num">{{ "Step 3" if lang == "en" else "Schritt 3" }}</div>
+        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
       </div>
       <div class="howto-detail-body">
-        <p>Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.</p>
+        <p>
+          {% if lang == "en" %}
+            Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.
+          {% else %}
+            Sobald ein Polygon gezeichnet ist, wählst du das Datum für die Analyse. Der Button <strong>Analyse starten</strong> in der Seitenleiste wird aktiv. Klicke darauf. Während das Modell läuft, erscheint ein Ladeindikator.
+          {% endif %}
+        </p>
         <div class="howto-tip">
-          <span class="howto-tip-label">⚠️ Note</span>
-          The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis. 
-          <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
+          <span class="howto-tip-label">⚠️ {{ "Note" if lang == "en" else "Hinweis" }}</span>
+          {% if lang == "en" %}
+            The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis.
+            <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
+          {% else %}
+            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern. Je grösser das Feld, desto länger dauert es. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
+            <p> Bleibt der Button inaktiv, prüfe, ob dein Polygon auf der Karte vollständig geschlossen ist. </p>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -109,168 +185,373 @@
     <!-- Step 4 -->
     <div class="howto-detail">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">Step 4</div>
-        <h3>Read your results</h3>
+        <div class="howto-detail-num">{{ "Step 4" if lang == "en" else "Schritt 4" }}</div>
+        <h3>{{ "Read your results" if lang == "en" else "Ergebnisse lesen" }}</h3>
       </div>
       <div class="howto-detail-body">
-        <p>After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.</p>
-        <p style="margin-top:12px;">To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.</p>
+        <p>
+          {% if lang == "en" %}
+            After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.
+          {% else %}
+            Nach Abschluss der Analyse wird dein Feld nach dem vorhergesagten organischen Kohlenstoff im Boden farbcodiert. In der Seitenleiste siehst du eine Zusammenfassung mit der Anzahl analysierter Zonen, dem durchschnittlichen SOC sowie den höchsten und niedrigsten SOC-Werten.
+          {% endif %}
+        </p>
       </div>
     </div>
 
     <!-- Step 5 -->
     <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">Step 5</div>
-        <h3>Save your results</h3>
+        <div class="howto-detail-num">{{ "Step 5" if lang == "en" else "Schritt 5" }}</div>
+        <h3>{{ "Save your results" if lang == "en" else "Ergebnisse speichern" }}</h3>
       </div>
       <div class="howto-detail-body">
-        <p>You can save your results by clicking the <strong>Save</strong> button in the sidebar. This stores your analysis (including the polygon and summary statistics) so you can view and compare it later in your Personal Dashboard.</p>
+        <p>
+          {% if lang == "en" %}
+            You can save your results by clicking the <strong>Save</strong> button in the sidebar. Further down is a complete step-by-step guide on how to use the personal dashboard.
+          {% else %}
+            Du kannst deine Ergebnisse über den Button <strong>Speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zu Mein Dashboard.
+          {% endif %}
+        </p>
+        <p style="margin-top:12px;">
+          {% if lang == "en" %}
+            To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.
+          {% else %}
+            Für einen Neustart klicke auf <strong>Zurücksetzen</strong>, um alle Layer zu löschen und ein neues Polygon zu zeichnen.
+          {% endif %}
+        </p>
       </div>
     </div>
   </section>
 
   <!-- Saving & managing fields -->
   <section class="about-section">
-    <div class="section-eyebrow">Data management</div>
-    <h2 class="section-title">Saving fields & managing your analyses</h2>
+    <div class="section-eyebrow">{{ "Personal Dashboard" if lang == "en" else "Mein Dashboard" }}</div>
+    <h2 class="section-title">{{ "Saving fields & managing your analyses" if lang == "en" else "Felder speichern & Analysen verwalten" }}</h2>
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:12px;">
-      Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each entry is one complete run: your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values.
-    </p>
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:32px;">
-      If you analyse the same parcel again later, save the new run under the <strong>same field name</strong>. AgroScan will group those runs together so you can track development over time, filter your history, and compare fields side by side.
+      {% if lang == "en" %}
+        Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each saved run keeps your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values. Analyses with the <strong>same field name</strong> are grouped together so you can track development over time. The walkthrough below follows a typical path through the dashboard, from saving on the Analysis page to comparing fields and exporting data.
+      {% else %}
+        Sobald eine Analyse auf der Karte fertig ist, kannst du sie im <strong>Mein Dashboard</strong> speichern. Jeder gespeicherte Lauf enthält dein Feld-Polygon, das Analysedatum, jede 60-m-Zone mit vorhergesagtem SOC (g/kg) sowie Min-, Durchschnitts- und Max-Werte. Analysen mit <strong>demselben Feldnamen</strong> werden gruppiert, damit du die Entwicklung über die Zeit verfolgen kannst. Die Anleitung unten führt dich vom Speichern auf der Analyse-Seite bis zum Feldvergleich und Export.
+      {% endif %}
     </p>
 
-    <div class="howto-steps-grid howto-dash-grid" style="margin-top:0;">
-      <div class="howto-step-card">
-        <div class="howto-step-icon">💾</div>
-        <h3>Save from Analysis</h3>
-        <p>When your zone map is ready, the sidebar shows <strong>Save to Personal Dashboard</strong>. A short form opens where you enter a field name (required for grouping), plus optional location, crop, and notes. Confirm to store the run — you do not need to repeat the analysis to view it again later.</p>
+    <!-- Step 1 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 1" if lang == "en" else "Schritt 1" }}</div>
+        <h3>{{ "Save your analysis from the map" if lang == "en" else "Analyse von der Karte speichern" }}</h3>
       </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">🗃️</div>
-        <h3>What gets stored</h3>
-        <p>Besides your labels, AgroScan keeps the polygon geometry, analysis date, all zone polygons with SOC values and colour tiers, and the field-level min, average, and max in g/kg. That is enough to rebuild charts in the dashboard and export rows to CSV without re-running the model.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">📂</div>
-        <h3>Dashboard overview</h3>
-        <p>The <strong>Saved Analyses</strong> list is organised by field name: one card per field, with a badge for how many runs you have. Each card shows the date span, crop and location if you added them, the latest average SOC, and a small trend indicator when several dates exist. Use the filter bar to narrow by name, crop, or from/to date, and <strong>Reset</strong> to show everything again.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">📈</div>
-        <h3>Field history &amp; charts</h3>
-        <p>Click any field card to open its history. You will see how many analyses are stored, all-time minimum and maximum SOC, the latest average, and a line chart of min, average, and max across dates for that field only. Below the chart, every single run is listed with its date and summary values.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">✏️</div>
-        <h3>One analysis at a time</h3>
-        <p>From the field history, open <strong>Details</strong> on a run to adjust field name, location, crop, or notes, then <strong>Save Changes</strong>. A bar chart shows that run’s min, average, and max. Use <strong>⬇</strong> to download that analysis as CSV, or <strong>Delete</strong> to remove it. <strong>+ New Analysis</strong> takes you back to the map where you can analyse the same field again.</p>
-      </div>
-
-      <div class="howto-step-card">
-        <div class="howto-step-icon">⚖️</div>
-        <h3>Compare &amp; export all</h3>
-        <p>At the top of the dashboard, <strong>Download All</strong> exports every saved run in one CSV file. To compare different fields, tick <strong>Select for comparison</strong> on at least two field cards and press <strong>Compare Fields</strong> — a chart plots average SOC over time, one line per field. This works best when each field name refers to one real parcel.</p>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            When your SOC map is ready, click <strong>Save to Personal Dashboard</strong> in the Analysis sidebar. A form opens where you enter:
+          {% else %}
+            Wenn deine SOC Karte fertig ist, klicke in der Analyse-Seitenleiste auf <strong>In Mein Dashboard speichern</strong>. Ein Formular öffnet sich. Dort gibst du ein:
+          {% endif %}
+        </p>
+        <ol class="howto-list">
+          {% if lang == "en" %}
+          <li><strong>Field name</strong> (required) — use a consistent name for each real parcel so later runs are grouped together.</li>
+          <li><strong>Location</strong>, <strong>crop</strong>, and <strong>notes</strong> (optional) — these appear on your field cards and help with filtering.</li>
+          {% else %}
+          <li><strong>Feldname</strong> (Pflicht) — nutze für jedes reale Feld einen einheitlichen Namen, damit spätere Läufe gruppiert werden.</li>
+          <li><strong>Standort</strong>, <strong>Pflanzenart</strong> und <strong>Notizen</strong> (optional) — sie erscheinen auf den Feldkarten und helfen beim Filtern.</li>
+          {% endif %}
+        </ol>
+        <p style="margin-top:16px;">
+          {% if lang == "en" %}
+            Click <strong>Save Analysis</strong> to store the run. A confirmation appears with a link to the Personal Dashboard. You do not need to re-run the model to view the results again later.
+          {% else %}
+            Klicke auf <strong>Analyse speichern</strong>, um den Lauf zu sichern. Eine Bestätigung mit Link zu Mein Dashboard erscheint. Du musst das Modell nicht erneut ausführen, um die Ergebnisse später wieder anzusehen.
+          {% endif %}
+        </p>
       </div>
     </div>
 
-    <div class="howto-tip" style="margin-top:28px;">
-      <span class="howto-tip-label">📌 Tip</span>
-      <p>Use a consistent field name for each physical parcel and save after every new analysis date. That way your timeline and comparison charts reflect real changes on the ground — for example after irrigation, reduced tillage, or cover crops.</p>
-      <a class="btn-primary" href="/personal_dashboard">→ Go to Personal Dashboard</a>
+    <!-- Step 2 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 2" if lang == "en" else "Schritt 2" }}</div>
+        <h3>{{ "Open the dashboard and read the summary" if lang == "en" else "Dashboard öffnen & Übersicht lesen" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            Go to <strong>Personal Dashboard</strong> via the top navigation or the link in the save confirmation. At the top you will see five summary cards:
+          {% else %}
+            Wechsle über die obere Navigation oder den Link in der Speicherbestätigung zu <strong>Mein Dashboard</strong>. Oben siehst du fünf Übersichtskarten:
+          {% endif %}
+        </p>
+        <ol class="howto-list">
+          {% if lang == "en" %}
+          <li><strong>Total Fields</strong> — how many distinct field names you have saved.</li>
+          <li><strong>Total Analyses</strong> — the total number of individual analysis runs.</li>
+          <li><strong>Average Field</strong> — the mean of each field's latest average SOC.</li>
+          <li><strong>Best Field</strong> and <strong>Worst Field</strong> — the fields with the highest and lowest latest average SOC. Click either card to jump straight to that field's history.</li>
+          {% else %}
+          <li><strong>Felder gesamt</strong> — wie viele verschiedene Feldnamen du gespeichert hast.</li>
+          <li><strong>Analysen gesamt</strong> — die Gesamtzahl einzelner Analyse-Läufe.</li>
+          <li><strong>Durchschnittliches Feld</strong> — der Mittelwert des jeweils aktuellen durchschnittlichen SOC pro Feld.</li>
+          <li><strong>Bestes Feld</strong> und <strong>Schlechtestes Feld</strong> — Felder mit dem höchsten bzw. niedrigsten aktuellen Durchschnitts-SOC. Klicke auf eine Karte, um direkt zur Feldhistorie zu springen.</li>
+          {% endif %}
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 3" if lang == "en" else "Schritt 3" }}</div>
+        <h3>{{ "Sort, filter, and scan your field list" if lang == "en" else "Feldliste sortieren, filtern & durchsuchen" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            Below the summary, the control bar lets you organise the list before you open any field:
+          {% else %}
+            Unter der Übersicht organisierst du die Liste über die Steuerleiste, bevor du ein Feld öffnest:
+          {% endif %}
+        </p>
+        <ol class="howto-list">
+          {% if lang == "en" %}
+          <li>Use <strong>Sort ▾</strong> to reorder fields by latest OC, best OC, worst OC, or most improved over time.</li>
+          <li>Open <strong>Filters ▾</strong> to narrow the list by field name, crop, or date range. Click <strong>✕ Reset</strong> inside the filter panel to clear all filters.</li>
+          <li>Each field row shows its number, name, date span, crop and location (if set), how many analyses are stored, a small <strong>OC over time</strong> sparkline, and the <strong>Latest Avg OC</strong> with trend indicators (<strong>All-time</strong> and <strong>vs. prev.</strong>).</li>
+          <li>Click <strong>Click to explore ›</strong> on a row to open that field's full history. The rest of the row is for sorting and comparison, not for opening the field.</li>
+          {% else %}
+          <li>Nutze <strong>Sortieren ▾</strong>, um Felder nach aktuellem OC, bestem OC, schlechtestem OC oder grösster Verbesserung zu ordnen.</li>
+          <li>Öffne <strong>Filter ▾</strong>, um nach Feldname, Pflanzenart oder Datumsbereich einzugrenzen. Klicke im Filterpanel auf <strong>✕ Zurücksetzen</strong>, um alle Filter zu löschen.</li>
+          <li>Jede Zeile zeigt Nummer, Name, Datumsbereich, Pflanzenart und Standort (falls gesetzt), Anzahl gespeicherter Analysen, eine kleine <strong>OC im Zeitverlauf</strong>-Sparkline sowie <strong>Aktueller Ø OC</strong> mit Trend (<strong>Gesamt</strong> und <strong>vs. vorh.</strong>).</li>
+          <li>Klicke in einer Zeile auf <strong>Zum Erkunden klicken ›</strong>, um die vollständige Feldhistorie zu öffnen. Der Rest der Zeile dient Sortierung und Vergleich, nicht dem Öffnen des Feldes.</li>
+          {% endif %}
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 4" if lang == "en" else "Schritt 4" }}</div>
+        <h3>{{ "Explore a field's history" if lang == "en" else "Feldhistorie erkunden" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            The field panel opens when you click <strong>Click to explore ›</strong> or a best/worst field chip in the summary. It shows:
+          {% else %}
+            Das Feldpanel öffnet sich über <strong>Zum Erkunden klicken ›</strong> oder einen Bestes-/Schlechtestes-Feld-Chip in der Übersicht. Es zeigt:
+          {% endif %}
+        </p>
+        <ol class="howto-list">
+          {% if lang == "en" %}
+          <li>Field name, location, and crop at the top.</li>
+          <li>Four stats: number of analyses, field area (ha), number of grid data points, and latest average SOC.</li>
+          <li>A line chart of <strong>OC Development over Time</strong> with minimum, average, and maximum values for each analysis date.</li>
+          <li>An <strong>All Analyses</strong> list — newest first — with min, avg, and max badges per run, plus action buttons for each entry.</li>
+          {% else %}
+          <li>Oben Feldname, Standort und Pflanzenart.</li>
+          <li>Vier Kennzahlen: Anzahl Analysen, Feldfläche (ha), Raster-Datenpunkte und aktueller Durchschnitts-SOC.</li>
+          <li>Ein Liniendiagramm <strong>OC-Entwicklung im Zeitverlauf</strong> mit Min-, Mittel- und Max-Werten je Analysedatum.</li>
+          <li>Liste <strong>Alle Analysen</strong> — neueste zuerst — mit Min-/Ø-/Max-Badges pro Lauf und Aktionen je Eintrag.</li>
+          {% endif %}
+        </ol>
+        <p style="margin-top:16px;">
+          {% if lang == "en" %}
+            From this list you can open <strong>Details</strong> for one run, download it with <strong>⬇</strong>, or remove it with <strong>Delete</strong>. Use <strong>+ New Analysis</strong> at the bottom to analyse the same parcel again on a new date (the polygon and metadata are prefilled on the Analysis page).
+          {% else %}
+            Aus der Liste öffnest du <strong>Details</strong> zu einem Lauf, lädst ihn mit <strong>⬇</strong> herunter oder entfernst ihn mit <strong>Löschen</strong>. Mit <strong>+ Neue Analyse</strong> unten analysierst du dieselbe Parzelle zu einem neuen Datum (Polygon und Metadaten sind auf der Analyse-Seite vorausgefüllt).
+          {% endif %}
+        </p>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 5" if lang == "en" else "Schritt 5" }}</div>
+        <h3>{{ "View or edit a single analysis" if lang == "en" else "Einzelne Analyse ansehen oder bearbeiten" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            Click <strong>Details</strong> on any run in the field history to open the analysis panel. Here you can:
+          {% else %}
+            Klicke in der Feldhistorie bei einem Lauf auf <strong>Details</strong>, um das Analyse-Panel zu öffnen. Dort kannst du:
+          {% endif %}
+        </p>
+        <ol class="howto-list">
+          {% if lang == "en" %}
+          <li>Edit <strong>field name</strong>, <strong>location</strong>, <strong>crop</strong>, and <strong>notes</strong>. Renaming a field moves the run to a different group in the dashboard.</li>
+          <li>Review the analysis date (read-only) and the run's minimum, average, and maximum SOC.</li>
+          <li>Inspect the <strong>Field Map — Soil Quality Zones</strong>: a satellite mini-map with the saved polygon and colour-coded 60 m zones, the same view you had on the Analysis page.</li>
+          <li>Click <strong>Save Changes</strong> to update metadata, or <strong>Close</strong> to dismiss without saving.</li>
+          {% else %}
+          <li><strong>Feldname</strong>, <strong>Standort</strong>, <strong>Pflanzenart</strong> und <strong>Notizen</strong> bearbeiten. Ein Umbenennen verschiebt den Lauf in eine andere Dashboard-Gruppe.</li>
+          <li>Analysedatum (nur lesen) sowie Min-, Durchschnitts- und Max-SOC des Laufs prüfen.</li>
+          <li><strong>Feldkarte — Bodenqualitätszonen</strong> ansehen: Satelliten-Minikarte mit gespeichertem Polygon und farbcodierten 60-m-Zonen, dieselbe Ansicht wie auf der Analyse-Seite.</li>
+          <li><strong>Änderungen speichern</strong> für Metadaten oder <strong>Schliessen</strong> ohne Speichern.</li>
+          {% endif %}
+        </ol>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 6" if lang == "en" else "Schritt 6" }}</div>
+        <h3>{{ "Compare fields and export data" if lang == "en" else "Felder vergleichen & Daten exportieren" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            Back on the main dashboard view, you can work across several fields at once:
+          {% else %}
+            In der Hauptansicht des Dashboards kannst du mit mehreren Feldern gleichzeitig arbeiten:
+          {% endif %}
+        </p>
+        <ol class="howto-list">
+          {% if lang == "en" %}
+          <li>Tick <strong>Select for comparison</strong> on at least two field rows, then click <strong>⚖ Compare Fields</strong>. A chart appears above the list plotting each field's average SOC over time as a separate line.</li>
+          <li>Click <strong>✕ End Comparison</strong> to hide the chart and clear your selection.</li>
+          <li>Click <strong>⬇ Download All</strong> to export every saved analysis in one CSV file, or use the <strong>⬇</strong> button on an individual run inside a field's history for a single-analysis export.</li>
+          {% else %}
+          <li>Aktiviere <strong>Zum Vergleich auswählen</strong> bei mindestens zwei Feldzeilen, dann <strong>⚖ Felder vergleichen</strong>. Über der Liste erscheint ein Diagramm mit der durchschnittlichen SOC-Entwicklung je Feld als eigene Linie.</li>
+          <li><strong>✕ Vergleich beenden</strong> blendet das Diagramm aus und löscht die Auswahl.</li>
+          <li><strong>⬇ Alle herunterladen</strong> exportiert alle gespeicherten Analysen in einer CSV-Datei; mit <strong>⬇</strong> bei einem einzelnen Lauf in der Feldhistorie exportierst du nur diesen Lauf.</li>
+          {% endif %}
+        </ol>
+      </div>
+    </div>
+
+    <div class="howto-tip" style="margin-top:25px;">
+      <span class="howto-tip-label">📌 {{ "Tip" if lang == "en" else "Tipp" }}</span>
+      <p>
+        {% if lang == "en" %}
+          Use a consistent field name for each physical parcel and save after every new analysis date. That way your sparklines, timeline charts, and field comparison reflect real changes on the ground, for example after irrigation, reduced tillage, or cover crops.
+        {% else %}
+          Nutze für jede physische Parzelle einen einheitlichen Feldnamen und speichere nach jedem neuen Analysedatum. So zeigen Sparklines, Zeitverlaufsdiagramme und Feldvergleich echte Veränderungen vor Ort, z. B. nach Bewässerung, reduzierter Bodenbearbeitung oder Zwischenfrüchten.
+        {% endif %}
+      </p>
+      <a class="btn-primary" href="/personal_dashboard">{{ "→ Go to Personal Dashboard" if lang == "en" else "→ Zum Personal Dashboard" }}</a>
     </div>
   </section>
 
   <!-- Reading the Results -->
   <section class="about-section">
-    <div class="section-eyebrow">Interpreting results</div>
-    <h2 class="section-title">How to read the SOC map</h2>
+    <div class="section-eyebrow">{{ "Interpreting results" if lang == "en" else "Ergebnisse interpretieren" }}</div>
+    <h2 class="section-title">{{ "How to read the SOC map" if lang == "en" else "SOC-Karte lesen" }}</h2>
 
-    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:700px;margin-bottom:40px;">
-      The model divides your fields into a regular grid of cells. For each cell the soil organic carbon (SOC) is predicted in g/kg in the topsoil and visualized with a color-code. The color-code was designed based on the SOC value distribution in the LUCAS topsoil dataset in Germany. The following guide explains what each color range means in practice and how you can act on the results.
+    <p class="howto-map-intro">
+      {{ oc_classification.howto_map_intro | safe }}
+      <a href="{{ oc_classification.reference_url }}" target="_blank" rel="noopener noreferrer">{{ "LUCAS topsoil data (ESDAC)" if lang == "en" else "LUCAS-Bodendaten (ESDAC)" }}</a>.
     </p>
 
     <div class="howto-legend-block">
 
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:#22c55e;"></div>
+      {% for group in oc_classification.howto_tier_groups %}
+      <div class="howto-legend-row{% if loop.last %} howto-legend-row--last{% endif %}">
+        <div class="howto-legend-swatches" aria-hidden="true">
+          {% for color in group.colors %}
+          <span class="howto-legend-swatch-seg" style="background:{{ color }};"></span>
+          {% endfor %}
+        </div>
         <div>
-          <div class="howto-legend-label">High SOC content — top 30 % of LUCAS (DE), SOC ≥ {{ oc_classification.threshold_high_gkg }} g/kg</div>
-            <p>These zones show strong indicators of high soil organic carbon content. They are in the top 30th percentile of the SOC distribution agricultural fields in Germany. Fields or sub-areas in this range are performing well. Your sustainable soil management practices are likely to be working. Feel free to share your experience in the upcoming community forum for farmers in your area!</p>
+          <div class="howto-legend-label">{{ group.title | safe }}</div>
+          <p class="howto-legend-map-steps">{{ group.map_steps }}</p>
+          <p>{{ group.body }}</p>
         </div>
       </div>
-
-      <div class="howto-legend-row">
-        <div class="howto-legend-swatch" style="background:#f59e0b;"></div>
-        <div>
-          <div class="howto-legend-label">Medium SOC content — middle 40 %, {{ oc_classification.threshold_low_gkg }} – {{ oc_classification.threshold_high_gkg }} g/kg</div>
-          <p>These zones are within an acceptable range, but some show some variability. Try implementing sustainable soil management practices (SSM) like reduced tillage, crop diversification and cover cropping. Monitoring these areas over successive analyses can help identify whether SOC content is increasing or decreasing. We are in the process of implementing a community forum where you can find out what farmers in your area are doing to increase their SOC level and share your progress.</p>
-        </div>
-      </div>
-
-      <div class="howto-legend-row" style="border-bottom:none;">
-        <div class="howto-legend-swatch" style="background:#ef4444;"></div>
-        <div>
-          <div class="howto-legend-label">Low SOC content — bottom 30 % of LUCAS (DE), SOC &lt; {{ oc_classification.threshold_low_gkg }} g/kg</div>
-          <p>These zones flag areas that may require attention. They are in the bottom 30th percentile of the SOC distribution of agricultural fields in Germany. Try implementing sustainable soil management practices and continuous monitoring to assess their impact. In the upcoming community forum, you can learn about SSM practices that farmers in your area are employing.</p>
-        </div>
-      </div>
+      {% endfor %}
 
     </div>
 
     <div class="howto-tip" style="margin-top:40px;">
-      <span class="howto-tip-label">📌 Important</span>
-      The zone map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
+      <span class="howto-tip-label">📌 {{ "Important" if lang == "en" else "Wichtig" }}</span>
+      {% if lang == "en" %}
+        The SOC map is a decision-support tool, not a substitute for on-the-ground soil testing. Always combine the AgroScan results with your own field knowledge and, where necessary, certified laboratory soil analyses.
+      {% else %}
+        Die SOC Karte ist ein Entscheidungshilfe-Werkzeug und kein Ersatz für Bodenproben vor Ort. Kombiniere AgroScan-Ergebnisse immer mit deinem Feldknow-how und bei Bedarf mit zertifizierten Labor-Bodenanalysen.
+      {% endif %}
     </div>
 
   </section>
 
   <!-- About the ML Model -->
   <section class="about-section">
-    <div class="section-eyebrow">Under the hood</div>
-    <h2 class="section-title">About the ML model & data</h2>
+    <div class="section-eyebrow">{{ "Under the hood" if lang == "en" else "Im Hintergrund" }}</div>
+    <h2 class="section-title">{{ "About the ML model & data" if lang == "en" else "ML-Modell & Daten" }}</h2>
 
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:820px;margin-bottom:18px;">
-      Machine learning is a way of teaching a computer to recognize patterns without programming every rule by hand.
-      Instead of telling the computer exactly what to look for, you show it a lot of real examples with known answers.
-      It studies those examples, finds the patterns in the provided data, and uses them to make predictions on new data it has never seen before.
-      The more examples it learns from, the better its predictions become. And this exactly what we did with AgroScan!
+      {% if lang == "en" %}
+        Machine learning is a way of teaching a computer to recognize patterns without programming every rule by hand.
+        Instead of telling the computer exactly what to look for, you show it a lot of real examples with known answers.
+        It studies those examples, finds the patterns in the provided data, and uses them to make predictions on new data it has never seen before.
+        The more examples it learns from, the better its predictions become. And this exactly what we did with AgroScan!
+      {% else %}
+        Machine Learning bedeutet, einem Computer beizubringen, Muster zu erkennen, ohne jede Regel von Hand zu programmieren.
+        Statt genau vorzugeben, wonach gesucht wird, zeigt man viele Beispiele mit bekannten Antworten.
+        Das System lernt daraus Muster und nutzt sie für Vorhersagen bei neuen, unbekannten Daten.
+        Je mehr Beispiele, desto besser die Vorhersagen. Und Genau so haben wir AgroScan aufgebaut!
+      {% endif %}
     </p>
 
-    <div class="howto-model-grid">
+    <div class="howto-model-body">
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">🛰️</div>
-        <h4>1. Satellites provide the data for our prediction</h4>
-        <p>Every five days, the European Sentinel-2 satellite passes over your field and records how it reflects sunlight not just in colors you can see, but in invisible wavelengths that reveal information about vegetation health, moisture levels, and soil composition. AgroScan analyses these spectral "fingerprints" to estimate how much organic carbon is stored in your topsoil.</p>
-      </div>
+      <h4 class="howto-model-heading">{{ "1. Satellites provide the data for our prediction" if lang == "en" else "1. Satelliten liefern die Daten für unsere Vorhersage" }}</h4>
+      <p>
+        {% if lang == "en" %}
+          Every five days, the European Sentinel-2 satellite passes over your field and records how it reflects sunlight not just in colors you can see, but in invisible wavelengths that reveal information about vegetation health, moisture levels, and soil composition. AgroScan analyses these spectral "fingerprints" to estimate how much organic carbon is stored in your topsoil.
+        {% else %}
+          Alle fünf Tage überfliegt der europäische Sentinel-2-Satellit dein Feld und misst die Lichtreflexion, nicht nur in sichtbaren Farben, sondern auch in unsichtbaren Wellenlängen mit Informationen zu Vegetation, Feuchte und Bodenzusammensetzung. AgroScan wertet diese spektralen „Fingerabdrücke“ aus, um den organischen Kohlenstoff in deinem Oberboden zu schätzen.
+        {% endif %}
+      </p>
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">🧪</div>
-        <h4>2. We train our model using real ground soil samples</h4>
-        <p>Before making any prediction, our system was trained on soil measurements collected across Germany as part of the EU-wide LUCAS soil survey, so samples that were physically taken from the ground and analyzed in a laboratory. By finding patterns between those confirmed measurements and the satellite images taken at the same locations, the model learned to recognized what high and low carbon soils look like from space.</p>
-        <p style="margin-top:12px;">Think of it like this: if you showed a system thousands of photos of cats and dogs with labels, it would learn to recognize the animal from visual cues alone. AgroScan does the same except it learned from soil, satellites, and the wavelengths of reflected light.</p>
-      </div>
+      <h4 class="howto-model-heading">{{ "2. We train our model using real ground soil samples" if lang == "en" else "2. Wir trainieren das Modell mit echten Bodenproben" }}</h4>
+      <p>
+        {% if lang == "en" %}
+          Before making any prediction, our system was trained on soil measurements collected across Germany as part of the EU-wide LUCAS soil survey, so samples that were physically taken from the ground and analyzed in a laboratory. By finding patterns between those confirmed measurements and the satellite images taken at the same locations, the model learned to recognized what high and low carbon soils look like from space.
+        {% else %}
+          Vor jeder Vorhersage wurde unser System mit Bodenmessungen aus ganz Deutschland trainiert, im Rahmen der EU-weiten LUCAS-Bodenerhebung, also Proben vom Feld, analysiert im Labor. Aus Mustern zwischen diesen Messungen und Satellitenbildern am selben Ort lernte das Modell, wie kohlenstoffreiche und -arme Böden aus dem All aussehen.
+        {% endif %}
+      </p>
+      <p>
+        {% if lang == "en" %}
+          Think of it like this: if you showed a system thousands of photos of cats and dogs with labels, it would learn to recognize the animal from visual cues alone. AgroScan does the same except it learned from soil, satellites, and the wavelengths of reflected light.
+        {% else %}
+          Stell es dir so vor: Zeigst du einem System tausende beschriftete Katzen- und Hundefotos, erkennt es das Tier allein an visuellen Merkmalen. AgroScan macht dasselbe, nur mit Boden, Satelliten und reflektiertem Licht.
+        {% endif %}
+      </p>
 
-      <div class="howto-model-card">
-        <div class="howto-model-icon">🧠</div>
-        <h4>3. AgroScan estimates the SOC values for your field</h4>
-        <p>Using the patterns learned during training, AgroScan predicts the SOC value in your selected field. The value is only an estimate and not a lab measurement. It is good at prediction for fields similar to the training data from Germany. The model’s predictions become less accurate the more the test field differs from the training fields.</p>
-        <p style="margin-top:12px;">The model gives you an indication of your soil's carbon status and, more importantly, how that status changes over time. A single prediction tells you where you stand today. A series of predictions across seasons tells you whether your soil management practices are working.</p>
-      </div>
+      <h4 class="howto-model-heading">{{ "3. AgroScan estimates the SOC values for your field" if lang == "en" else "3. AgroScan schätzt die SOC-Werte für dein Feld" }}</h4>
+      <p>
+        {% if lang == "en" %}
+          Using the patterns learned during training, AgroScan predicts the SOC value in your selected field. The value is only an estimate and not a lab measurement. It is good at prediction for fields similar to the training data from Germany. The model's predictions become less accurate the more the test field differs from the training fields.
+        {% else %}
+          Mit den Trainingsmustern sagt AgroScan den SOC-Wert für dein ausgewähltes Feld voraus. Es handelt sich um eine Schätzung, keine Labor-Messung. Die Vorhersage ist am zuverlässigsten für Felder, die den Trainingsdaten aus Deutschland ähneln. Je stärker dein Feld abweicht, desto ungenauer werden die Werte.
+        {% endif %}
+      </p>
+      <p>
+        {% if lang == "en" %}
+          The model gives you an indication of your soil's carbon status and, more importantly, how that status changes over time. A single prediction tells you where you stand today. A series of predictions across seasons tells you whether your soil management practices are working.
+        {% else %}
+          Das Modell zeigt dir den Kohlenstoffstatus deines Bodens und vor allem, wie er sich über die Zeit verändert. Eine einzelne Vorhersage sagt, wo du heute stehst; eine Serie über mehrere Saisons zeigt, ob deine Bodenbewirtschaftung wirkt.
+        {% endif %}
+      </p>
 
     </div>
 
     <div class="howto-tip" style="margin-top:40px;">
-      <span class="howto-tip-label">💡 Tip</span>
-      <p>If you would like to find out more about how the ML model works in detail, you can visit the report page for more information.</p>
-      <a class="btn-outline" href="/report">→ Report</a>
+      <span class="howto-tip-label">💡 {{ "Tip" if lang == "en" else "Tipp" }}</span>
+      <p>
+        {% if lang == "en" %}
+          If you would like to find out more about how the ML model works in detail, you can visit the report page for more information.
+        {% else %}
+          Mehr Details zum ML-Modell findest du auf der Report-Seite.
+        {% endif %}
+      </p>
+      <a class="btn-outline" style="margin-top:18px;" href="/report">{{ "→ Report" if lang == "en" else "→ Report" }}</a>
     </div>
 
   </section>
@@ -278,51 +559,81 @@
   <!-- FAQ -->
   <section class="about-section">
     <div class="section-eyebrow">FAQ</div>
-    <h2 class="section-title">Common questions</h2>
+    <h2 class="section-title">{{ "Common questions" if lang == "en" else "Häufige Fragen" }}</h2>
 
     <div class="howto-faq">
 
       <div class="howto-faq-item">
         <details class="howto-faq-details">
-          <summary class="howto-faq-q">Can I analyze multiple fields in one session?</summary>
+          <summary class="howto-faq-q">{{ "Can I analyze multiple fields in one session?" if lang == "en" else "Kann ich mehrere Felder in einer Sitzung analysieren?" }}</summary>
           <div class="howto-faq-a">
-            <p>Currently, one polygon can be active on the map at a time. You can still analyze and save multiple fields by saving the result, clicking Reset, and drawing the next field polygon. Your saved analyses are listed in the Personal Dashboard.</p>
+            <p>
+              {% if lang == "en" %}
+                Currently, one polygon can be active on the map at a time. You can still analyze and save multiple fields by saving the result, clicking Reset, and drawing the next field polygon. Your saved analyses are listed in the Personal Dashboard.
+              {% else %}
+                Aktuell kann nur ein Polygon gleichzeitig auf der Karte aktiv sein. Du kannst trotzdem mehrere Felder analysieren und speichern: Ergebnis speichern, Zurücksetzen klicken, nächstes Polygon zeichnen. Gespeicherte Analysen findest du in Mein Dashboard.
+              {% endif %}
+            </p>
           </div>
         </details>
       </div>
 
       <div class="howto-faq-item">
         <details class="howto-faq-details">
-          <summary class="howto-faq-q">How large can my polygon be?</summary>
+          <summary class="howto-faq-q">{{ "How large can my polygon be?" if lang == "en" else "Wie gross darf mein Polygon sein?" }}</summary>
           <div class="howto-faq-a">
-            <p>Although there is no hard size limit, larger areas result in a greater number of grid cells and a longer analysis time. To achieve the best results, we recommend analysing individual fields or management zones separately.</p>
+            <p>
+              {% if lang == "en" %}
+                Although there is no hard size limit, larger areas result in a greater number of grid cells and a longer analysis time. To achieve the best results, we recommend analysing individual fields or management zones separately.
+              {% else %}
+                Es gibt keine feste Grössenobergrenze, aber grössere Flächen bedeuten mehr Rasterzellen und längere Laufzeit. Für die besten Ergebnisse empfehlen wir, einzelne Felder oder Bewirtschaftungszonen getrennt zu analysieren.
+              {% endif %}
+            </p>
           </div>
         </details>
       </div>
 
       <div class="howto-faq-item">
         <details class="howto-faq-details">
-          <summary class="howto-faq-q">Why do my results look very similar across runs?</summary>
+          <summary class="howto-faq-q">{{ "Why do my results look very similar across runs?" if lang == "en" else "Warum sehen meine Ergebnisse bei verschiedenen Läufen sehr ähnlich aus?" }}</summary>
           <div class="howto-faq-a">
-            <p>If you analyze the same polygon with the same date, results can be very similar because the same inputs are used. Try selecting a different date, or compare multiple saved runs in the Personal Dashboard to spot changes over time.</p>
+            <p>
+              {% if lang == "en" %}
+                If you analyze the same polygon with the same date, results can be very similar because the same inputs are used. Try selecting a different date, or compare multiple saved runs in the Personal Dashboard to spot changes over time.
+              {% else %}
+                Analysierst du dasselbe Polygon mit demselben Datum, sind die Ergebnisse oft sehr ähnlich, weil dieselben Eingaben genutzt werden. Wähle ein anderes Datum oder vergleiche mehrere gespeicherte Läufe in Mein Dashboard, um Veränderungen über die Zeit zu erkennen.
+              {% endif %}
+            </p>
           </div>
         </details>
       </div>
 
       <div class="howto-faq-item">
         <details class="howto-faq-details">
-          <summary class="howto-faq-q">Where are saved analyses stored and how do I delete them?</summary>
+          <summary class="howto-faq-q">{{ "Where are saved analyses stored and how do I delete them?" if lang == "en" else "Wo werden gespeicherte Analysen abgelegt und wie lösche ich sie?" }}</summary>
           <div class="howto-faq-a">
-            <p>Saved analyses are stored in the app’s database and can be managed from the Personal Dashboard. Use the Delete button on an entry to remove it from your history.</p>
+            <p>
+              {% if lang == "en" %}
+                Saved analyses are stored in the app's database and can be managed from the Personal Dashboard. Use the Delete button on an entry to remove it from your history.
+              {% else %}
+                Gespeicherte Analysen liegen in der App-Datenbank und lassen sich in Mein Dashboard verwalten. Mit <strong>Löschen</strong> bei einem Eintrag entfernst du ihn aus deiner Historie.
+              {% endif %}
+            </p>
           </div>
         </details>
       </div>
 
       <div class="howto-faq-item howto-faq-item--last">
         <details class="howto-faq-details">
-          <summary class="howto-faq-q">Can I export the results?</summary>
+          <summary class="howto-faq-q">{{ "Can I export the results?" if lang == "en" else "Kann ich die Ergebnisse exportieren?" }}</summary>
           <div class="howto-faq-a">
-            <p>Yes, all stored data can be downloaded as CSV-Files. Go to the personal dashboard and use the Download all button or download fields independently.</p>
+            <p>
+              {% if lang == "en" %}
+                Yes, all stored data can be downloaded as CSV-Files. Go to the personal dashboard and use the Download all button or download fields independently.
+              {% else %}
+                Ja, alle gespeicherten Daten kannst du als CSV herunterladen. In Mein Dashboard nutzt du <strong>Alle herunterladen</strong> oder lädst einzelne Felder bzw. Analysen separat herunter.
+              {% endif %}
+            </p>
           </div>
         </details>
       </div>
@@ -332,9 +643,15 @@
 
   <!-- CTA -->
   <div class="home-cta">
-    <h2>Ready to analyze your field?</h2>
-    <p>Head to the Analysis page and draw your first polygon and find out your carbon content.</p>
-    <a class="btn-primary" href="/analyse">→ Go to Analysis</a>
+    <h2>{{ "Ready to analyze your field?" if lang == "en" else "Bereit, dein Feld zu analysieren?" }}</h2>
+    <p>
+      {% if lang == "en" %}
+        Head to the Analysis page and draw your first polygon and find out your carbon content.
+      {% else %}
+        Geh zur Analyse-Seite, zeichne dein erstes Polygon und finde heraus, wie viel Kohlenstoff in deinem Boden steckt.
+      {% endif %}
+    </p>
+    <a class="btn-primary" href="/analyse">{{ "→ Go to Analysis" if lang == "en" else "→ Zur Analyse" }}</a>
   </div>
 
 </div>
@@ -343,4 +660,3 @@
 {% block scripts %}
   <script src="/static/js/how_to.js?v={{ static_css_version }}"></script>
 {% endblock %}
-

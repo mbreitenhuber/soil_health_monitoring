@@ -19,6 +19,7 @@ import subprocess
 import sys
 import tempfile
 
+from shapely.geometry import Polygon
 
 from fastapi import FastAPI, Request, Cookie, HTTPException
 import sqlite3
@@ -106,6 +107,31 @@ def _api_base_url() -> str:
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
 STATIC_CSS_VERSION = "6"
 
+import math
+
+def _calculate_area_ha(polygon: List["Coordinate"]) -> float:
+    if len(polygon) < 3:
+        return 0.0
+
+    R = 6371000  # Erdradius in Metern
+    coords = [(p.lat, p.lng) for p in polygon]
+    area = 0.0
+    n = len(coords)
+
+    for i in range(n):
+        j = (i + 1) % n
+        lat_i, lng_i = coords[i]
+        lat_j, lng_j = coords[j]
+
+        xi = math.radians(lng_i) * R * math.cos(math.radians(lat_i))
+        yi = math.radians(lat_i) * R
+        xj = math.radians(lng_j) * R * math.cos(math.radians(lat_j))
+        yj = math.radians(lat_j) * R
+
+        area += xi * yj - xj * yi
+
+    return round(abs(area / 2) / 10000, 3)
+
 # ── App ────────────────────────────────────────────────
 app = FastAPI(title="AgroScan")
 
@@ -133,6 +159,8 @@ def init_db():
         max_value REAL,
 
         zones TEXT,
+              
+        field_area_ha REAL,
 
         created_at TEXT
     )
@@ -155,6 +183,9 @@ def init_db():
 
     if "created_at" not in existing_columns:
         c.execute("ALTER TABLE analyses ADD COLUMN created_at TEXT")
+
+    if "field_area_ha" not in existing_columns:
+        c.execute("ALTER TABLE analyses ADD COLUMN field_area_ha REAL")
 
     conn.commit()
     conn.close()
@@ -184,6 +215,7 @@ def _analysis_from_row(row: sqlite3.Row) -> dict:
         "min_value": row["min_value"] or 0,
         "max_value": row["max_value"] or 0,
         "zones": _json_list(row["zones"]),
+        "field_area_ha": row["field_area_ha"] or 0,
         "created_at": row["created_at"],
     }
 
@@ -210,7 +242,7 @@ NAV_PAGES = [
     {"id": "home",               "label": {"en": "Home",               "de": "Home"},                "href": "/",                   "group": "main"},
     {"id": "analysis",           "label": {"en": "Analysis",           "de": "Analyse"},             "href": "/analyse",            "group": "main"},
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
-    {"id": "unser_analysis",     "label": {"en": "Users Analysis",     "de": "Nutzeralysis"},        "href": "/users_analysis",     "group": "more"},
+    {"id": "unser_analysis",     "label": {"en": "Who We Built AgroScan For",     "de": "Für wen wir AgroScan entwickelt haben"},        "href": "/users_analysis",     "group": "more"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
     {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "main"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
@@ -245,7 +277,7 @@ ROADMAP = [
      "desc": {"en": "Web-App development with FastAPI and Jinja2. Focused on analysis and saving the results.", "de": "Web-App-Entwicklung mit FastAPI und Jinja2. Fokussiert auf Analyse und Speichern der Ergebnisse."}},
     {"version": "v0.3", "title": {"en": "Integration of the ML-Model into the Web-App", "de": "Integration des ML-Modells in die Web-App"},   "done": True,
      "desc": {"en": "Connect the Web-App to the ML-Model and make it usable.", "de": "Verbinde die Web-App mit dem ML-Modell und macht es nutzbar."}},
-    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalizing the Web-App"},   "done": True,
+    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalisierung der Web-App"},   "done": True,
      "desc": {"en": "Finalizing the Web-App. Focused on the user experience and the design.", "de": "Die Web-App wird finalisiert. Fokussiert auf die Nutzungserfahrung und das Design."}},
     {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": True,
      "desc": {"en": "Final deployment and documentation of the project.", "de": "Finales Deployment und die Dokumentation des Projekts."}},
@@ -256,14 +288,22 @@ ROADMAP = [
 # Neue Teammitglieder: Eintrag hier ergänzen.
 # photo: Dateiname in static/assets/team/ — oder None für Platzhalter
 TEAM_MEMBERS = [
-    {"name": "Clara Buller",   "role": "Master Student in Energy Science and Technology",   "photo": "Clara.jpg",
-     "bio": "Interactive ML model development, Website UX design support, Website content development, Project report, Literature review"},
-    {"name": "Margarete Breitenhuber", "role": "Master Student in Mechanical Engineering",  "photo": "Maggie.jpg",
-     "bio": "Interactive ML model development, Website-ML model communication, Website UX design support, User case research, Literature review"},
-    {"name": "Jerome Reiter", "role": "Bachelor Student in Computational Science and Engineering",  "photo": "Jerome.jpg",
-     "bio": "Backend and frontend development, Map design and personal dashboard."},
-     {"name": "Claudio Bussinger", "role": "Bachelor Student in Computational Science and Engineering",  "photo": "Claudio.jpg",
-     "bio": "Backend and frontend development, Map design and website design."},
+    {"name": "Clara Buller",   "photo": "Clara.jpg",
+     "role": {"en": "Master Student in Energy Science and Technology", "de": "Masterstudentin Energy Science and Technology"},
+     "bio": {"en": "Interactive ML model development, Website UX design support, Website content development, Project report, Literature review",
+             "de": "Interaktive ML-Modellentwicklung, UX-Design der Website, Website-Inhalte, Projektbericht, Literaturrecherche"}},
+    {"name": "Margarete Breitenhuber", "photo": "Maggie.jpg",
+     "role": {"en": "Master Student in Mechanical Engineering", "de": "Masterstudentin Maschinenbau"},
+     "bio": {"en": "Interactive ML model development, Website-ML model communication, Website UX design support, User case research, Literature review",
+             "de": "Interaktive ML-Modellentwicklung, Website-ML-Kommunikation, UX-Design der Website, Nutzerforschung, Literaturrecherche"}},
+    {"name": "Jerome Reiter", "photo": "Jerome.jpg",
+     "role": {"en": "Bachelor Student in Computational Science and Engineering", "de": "Bachelorstudent Computational Science and Engineering"},
+     "bio": {"en": "Backend and frontend development, Map design and personal dashboard, Project pitch, Literature review",
+             "de": "Backend- und Frontend-Entwicklung, Kartendesign und Personal Dashboard, Projektpitch, Literaturrecherche"}},
+    {"name": "Claudio Bussinger", "photo": "Claudio.jpg",
+     "role": {"en": "Bachelor Student in Computational Science and Engineering", "de": "Bachelorstudent Computational Science and Engineering"},
+     "bio": {"en": "Backend and frontend development, Map design and website design, Project pitch, Literature review",
+             "de": "Backend- und Frontend-Entwicklung, Kartendesign und Website-Design, Projektpitch, Literaturrecherche"}},
 ]
 
 
@@ -288,6 +328,8 @@ def ctx(request: Request, page_id: str, lang: str = "en", **extra) -> dict:
         "static_css_version": STATIC_CSS_VERSION,
         # analysis.html erwartet `leaflet_translations` (wird im JS geparst)
         "leaflet_translations": LEAFLET_DRAW_TRANSLATIONS.get(lang, {}),
+        "dashboard_ui": DASHBOARD_UI.get(lang, DASHBOARD_UI["en"]),
+        "map_ui": MAP_UI.get(lang, MAP_UI["en"]),
         **extra,
     }
 
@@ -324,6 +366,126 @@ LEAFLET_DRAW_TRANSLATIONS = {
         "save": "Speichern",
         "clear_all": "Alle entfernen"
     }
+}
+
+DASHBOARD_UI = {
+    "en": {
+        "unnamed_field": "Unnamed Field",
+        "no_analyses": "No saved analyses yet.",
+        "no_match": "No fields match your filters.",
+        "one_analysis": "1 analysis",
+        "n_analyses": "{n} analyses",
+        "all_time": "All-time",
+        "vs_prev": "vs. prev.",
+        "latest_avg_oc": "Latest Avg OC",
+        "select_compare": "Select for comparison",
+        "click_explore": "Click to explore ›",
+        "oc_over_time": "OC over time",
+        "details": "Details",
+        "delete": "Delete",
+        "download_csv": "Download CSV",
+        "delete_confirm": "Delete this analysis?",
+        "delete_failed": "Delete failed: {msg}",
+        "save_failed": "Save failed: {msg}",
+        "compare_min_fields": "Please select at least 2 fields for comparison.",
+        "compare_title": "Field Comparison — Average OC (g/kg) over Time",
+        "filters": "Filters ▾",
+        "filters_open": "Filters ▴",
+        "filters_active": "Filters (active) ▴",
+        "filter_summary": "Showing <b>{shown}</b> of <b>{total}</b> fields — {parts}",
+        "filter_name": 'name contains "<b>{val}</b>"',
+        "filter_crop": 'crop = "<b>{val}</b>"',
+        "filter_from": "from <b>{val}</b>",
+        "filter_to": "to <b>{val}</b>",
+        "all_crops": "All crops",
+        "chart_maximum": "Maximum",
+        "chart_average": "Average",
+        "chart_minimum": "Minimum",
+        "point": "point",
+        "points": "points",
+    },
+    "de": {
+        "unnamed_field": "Unbenanntes Feld",
+        "no_analyses": "Noch keine Analysen gespeichert.",
+        "no_match": "Keine Felder entsprechen deinen Filtern.",
+        "one_analysis": "1 Analyse",
+        "n_analyses": "{n} Analysen",
+        "all_time": "Gesamt",
+        "vs_prev": "vs. vorh.",
+        "latest_avg_oc": "Aktueller Ø OC",
+        "select_compare": "Zum Vergleich auswählen",
+        "click_explore": "Zum Erkunden klicken ›",
+        "oc_over_time": "OC im Zeitverlauf",
+        "details": "Details",
+        "delete": "Löschen",
+        "download_csv": "CSV herunterladen",
+        "delete_confirm": "Diese Analyse löschen?",
+        "delete_failed": "Löschen fehlgeschlagen: {msg}",
+        "save_failed": "Speichern fehlgeschlagen: {msg}",
+        "compare_min_fields": "Bitte mindestens 2 Felder zum Vergleich auswählen.",
+        "compare_title": "Feldvergleich — Durchschnittlicher OC (g/kg) im Zeitverlauf",
+        "filters": "Filter ▾",
+        "filters_open": "Filter ▴",
+        "filters_active": "Filter (aktiv) ▴",
+        "filter_summary": "<b>{shown}</b> von <b>{total}</b> Feldern — {parts}",
+        "filter_name": 'Name enthält „<b>{val}</b>"',
+        "filter_crop": 'Kultur = „<b>{val}</b>"',
+        "filter_from": "ab <b>{val}</b>",
+        "filter_to": "bis <b>{val}</b>",
+        "all_crops": "Alle Kulturen",
+        "chart_maximum": "Maximum",
+        "chart_average": "Durchschnitt",
+        "chart_minimum": "Minimum",
+        "point": "Messpunkt",
+        "points": "Messpunkte",
+    },
+}
+
+MAP_UI = {
+    "en": {
+        "ready": "Ready ✓",
+        "no_polygon": "No Polygon",
+        "search_placeholder": "Search location or coordinates...",
+        "search_error": "Location not found",
+        "layer_satellite": "Satellite",
+        "layer_analysis": "Analysis",
+        "layer_labels": "Labels",
+        "layer_drawings": "Drawings",
+        "layer_results": "Results",
+        "backend_unreachable": "Backend unreachable:\n{msg}",
+        "custom_crop_required": "Please enter a custom crop name",
+        "save_failed": "Could not save analysis",
+        "no_layers_edit": "No layers to edit",
+        "no_layers_delete": "No layers to delete",
+        "edit_tooltip": "Drag handles or markers to edit features",
+        "edit_subtext": "Click cancel to undo changes",
+        "remove_tooltip": "Click on a feature to remove",
+        "analysis_date": "Analysis date",
+        "point": "point",
+        "points": "points",
+    },
+    "de": {
+        "ready": "Bereit ✓",
+        "no_polygon": "Kein Polygon",
+        "search_placeholder": "Ort oder Koordinaten suchen…",
+        "search_error": "Ort nicht gefunden",
+        "layer_satellite": "Satellit",
+        "layer_analysis": "Analyse",
+        "layer_labels": "Beschriftungen",
+        "layer_drawings": "Zeichnungen",
+        "layer_results": "Ergebnisse",
+        "backend_unreachable": "Backend nicht erreichbar:\n{msg}",
+        "custom_crop_required": "Bitte einen eigenen Kulturtyp eingeben",
+        "save_failed": "Analyse konnte nicht gespeichert werden",
+        "no_layers_edit": "Keine Layer zum Bearbeiten",
+        "no_layers_delete": "Keine Layer zum Löschen",
+        "edit_tooltip": "Griffe oder Marker ziehen, um Elemente zu bearbeiten",
+        "edit_subtext": "Abbrechen klicken, um Änderungen rückgängig zu machen",
+        "remove_tooltip": "Auf ein Element klicken, um es zu entfernen",
+        "analysis_date": "Analysedatum",
+        "point": "Messpunkt",
+        "points": "Messpunkte",
+    },
 }
 
 def get_nav_context(current_page: str, lang: str = "en"):
@@ -386,9 +548,6 @@ async def analysis(request: Request, lang: str = Cookie(default="en")):
 async def future_work(request: Request, lang: str = Cookie(default="en")):
     return templates.TemplateResponse("pages/future_work.html", ctx(
         request, "future_work", lang,
-        roadmap=ROADMAP,
-        team=TEAM_MEMBERS,
-        gallery_images=None,     # z.B. [{"file": "field.jpg", "alt": "Feld"}]
     ))
 
 @app.get("/how_to", response_class=HTMLResponse)
@@ -477,6 +636,16 @@ class OCClassificationMeta(BaseModel):
     dataset_note: str
     tier_descriptions: dict[str, str]
     colors: dict[str, str]
+    colormap: str
+    colormap_mode: str
+    percentile_boundaries_gkg: list[float]
+    discrete_percentiles: list[int]
+    discrete_colors: list[str]
+    discrete_bin_labels: list[str]
+    discrete_bin_labels_short: list[str]
+    colormap_note: str
+    howto_map_intro: str
+    howto_tier_groups: list[dict]
 
 class PredictionResponse(BaseModel):
     zones: List[ZoneResult]
@@ -1044,9 +1213,10 @@ def save_analysis(req: SaveRequest):
             min_value,
             max_value,
             zones,
+            field_area_ha,
             created_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     """, (
         req.date,
         req.crop,
@@ -1061,6 +1231,8 @@ def save_analysis(req: SaveRequest):
         req.max_value,
 
         json.dumps(req.zones),
+
+        _calculate_area_ha(req.polygon),
 
         datetime.now().isoformat()
     ))
@@ -1117,6 +1289,7 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
         "Max (g/kg OC)",
         "Polygon Points",
         "Zones Count",
+        "Field Area (ha)",
         "Created At"
     ])
 
@@ -1141,7 +1314,8 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             round(a.get("max_value", 0), 1),
             poly_len,
             zone_len,
-            a.get("created_at")
+            round(a.get("field_area_ha", 0), 3),
+            a.get("created_at"),
         ])
 
     output.seek(0)

@@ -1,5 +1,5 @@
 /**
- * Clipped smooth gradient fill inside a field polygon (visual only).
+ * Field SOC visualization: discrete plasma bins (default) or smooth IDW fill.
  * Measurement values stay on the 60 m grid cells from the API.
  */
 (function (global) {
@@ -10,6 +10,20 @@
     medium: "#f59e0b",
     high: "#22c55e",
   };
+
+  /** Matplotlib plasma, 10 evenly spaced samples (low → high). */
+  const PLASMA_DISCRETE = [
+    "#0d0887",
+    "#46039f",
+    "#7201a8",
+    "#9c179e",
+    "#bd3786",
+    "#d8576b",
+    "#ed7953",
+    "#fb9f3a",
+    "#fdca26",
+    "#f0f921",
+  ];
 
   function normalizePolygon(ring) {
     if (!ring || !ring.length) return [];
@@ -115,6 +129,28 @@
       g: a.g + (b.g - a.g) * u,
       b: a.b + (b.b - a.b) * u,
     };
+  }
+
+  function discreteBinIndex(value, boundaries) {
+    if (!boundaries || !boundaries.length) return 0;
+    for (let i = 0; i < boundaries.length; i++) {
+      if (value <= boundaries[i]) return i;
+    }
+    return boundaries.length - 1;
+  }
+
+  function valueToColorPlasmaDiscrete(value, classification) {
+    const c = classification;
+    const boundaries =
+      c && c.percentile_boundaries_gkg && c.percentile_boundaries_gkg.length
+        ? c.percentile_boundaries_gkg
+        : null;
+    const colors =
+      c && c.discrete_colors && c.discrete_colors.length
+        ? c.discrete_colors
+        : PLASMA_DISCRETE;
+    const idx = discreteBinIndex(Number(value), boundaries);
+    return colors[Math.min(idx, colors.length - 1)];
   }
 
   function valueToColorContinuous(value, classification) {
@@ -228,6 +264,56 @@
     return { offscreen: off, destX: ox, destY: oy, destW: boxW, destH: boxH };
   }
 
+  /** Slight outward expansion in px to hide anti-aliasing gaps between grid cells. */
+  function expandRingPx(pts, padPx) {
+    if (!pts.length || padPx <= 0) return pts;
+    let cx = 0;
+    let cy = 0;
+    for (const p of pts) {
+      cx += p.x;
+      cy += p.y;
+    }
+    cx /= pts.length;
+    cy /= pts.length;
+    return pts.map((p) => {
+      const dx = p.x - cx;
+      const dy = p.y - cy;
+      const len = Math.hypot(dx, dy) || 1;
+      return { x: p.x + (dx / len) * padPx, y: p.y + (dy / len) * padPx };
+    });
+  }
+
+  function drawDiscreteCells(ctx, map, polygon, zones, colorForValue, ringPx, opacity) {
+    ctx.save();
+    ctx.beginPath();
+    ringPx.forEach((pt, i) => {
+      if (i === 0) ctx.moveTo(pt.x, pt.y);
+      else ctx.lineTo(pt.x, pt.y);
+    });
+    ctx.closePath();
+    ctx.clip();
+    ctx.globalAlpha = opacity;
+
+    const gapPad = 2;
+
+    for (const zone of zones || []) {
+      const poly = zone.sub_polygon || [];
+      if (poly.length < 3) continue;
+      const ring = normalizePolygon(poly);
+      let pts = ring.map((p) => map.latLngToContainerPoint([p.lat, p.lng]));
+      pts = expandRingPx(pts, gapPad);
+      ctx.beginPath();
+      pts.forEach((pt, i) => {
+        if (i === 0) ctx.moveTo(pt.x, pt.y);
+        else ctx.lineTo(pt.x, pt.y);
+      });
+      ctx.closePath();
+      ctx.fillStyle = colorForValue(Number(zone.value));
+      ctx.fill("evenodd");
+    }
+    ctx.restore();
+  }
+
   const FieldGradientLayer = L.Layer.extend({
     initialize(polygonLatLng, zones, options) {
       this._polygon = normalizePolygon(polygonLatLng);
@@ -235,6 +321,7 @@
       this._options = L.Util.extend(
         {
           opacity: 0.88,
+          discrete: true,
           idwPower: 2.5,
           idwSmoothM: 18,
           idwMaxNeighbors: 10,
@@ -269,7 +356,7 @@
       if (typeof fn === "function") {
         return fn(value, this._options.classification);
       }
-      return valueToColorContinuous(value, this._options.classification);
+      return valueToColorPlasmaDiscrete(value, this._options.classification);
     },
 
     _redraw() {
@@ -294,6 +381,22 @@
       const ringPx = this._polygon.map((p) =>
         map.latLngToContainerPoint([p.lat, p.lng])
       );
+
+      if (this._options.discrete !== false) {
+        const prevSmoothing = ctx.imageSmoothingEnabled;
+        ctx.imageSmoothingEnabled = false;
+        drawDiscreteCells(
+          ctx,
+          map,
+          this._polygon,
+          this._zones,
+          (v) => this._colorForValue(v),
+          ringPx,
+          this._options.opacity
+        );
+        ctx.imageSmoothingEnabled = prevSmoothing;
+        return;
+      }
 
       const coloredSamples = buildColoredSamples(this._zones, (v) =>
         this._colorForValue(v)
@@ -488,6 +591,9 @@
     FieldGradientLayer,
     addFieldVisualization,
     valueToColorContinuous,
+    valueToColorPlasmaDiscrete,
+    discreteBinIndex,
+    PLASMA_DISCRETE,
     zoneSample,
     normalizePolygon,
     TIER_COLORS,

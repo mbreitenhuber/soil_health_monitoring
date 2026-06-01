@@ -1,5 +1,20 @@
 /* map.js — Leaflet Karte + Analyse */
 
+const MAP_UI = window.MAP_UI || {
+  ready: "Ready ✓",
+  no_polygon: "No Polygon",
+  search_placeholder: "Search location or coordinates...",
+  search_error: "Location not found",
+  layer_satellite: "Satellite",
+  layer_analysis: "Analysis",
+  layer_labels: "Labels",
+  layer_drawings: "Drawings",
+  layer_results: "Results",
+  backend_unreachable: "Backend unreachable:\n{msg}",
+  custom_crop_required: "Please enter a custom crop name",
+  save_failed: "Could not save analysis",
+};
+
 const map = L.map("map", {
   zoomAnimation: true,
   fadeAnimation: true,
@@ -123,8 +138,8 @@ labels.addTo(map);
 L.Control.geocoder({
   collapsed: false,
   defaultMarkGeocode: false,
-  placeholder: "Search location or coordinates...",
-  errorMessage: "Location not found",
+  placeholder: MAP_UI.search_placeholder,
+  errorMessage: MAP_UI.search_error,
   suggestMinLength: 3,
   geocoder: L.Control.Geocoder.nominatim()
 })
@@ -162,14 +177,14 @@ searchMarker = L.circleMarker(center, {
 // =====================
 
 const baseLayers = {
-  "Satellite": satellite,
-  "Analysis": minimal
+  [MAP_UI.layer_satellite]: satellite,
+  [MAP_UI.layer_analysis]: minimal
 };
 
 const overlays = {
-  "Labels": labels,
-  "Drawings": drawnItems,
-  "Results": resultLayer
+  [MAP_UI.layer_labels]: labels,
+  [MAP_UI.layer_drawings]: drawnItems,
+  [MAP_UI.layer_results]: resultLayer
 };
 
 L.control.layers(baseLayers, overlays).addTo(map);
@@ -298,9 +313,10 @@ function ocTier(value, classification) {
 }
 
 function valueToColor(value, classification) {
-  const c = classification || ocClassification;
-  const tier = ocTier(value, c);
-  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+  return FieldGradientOverlay.valueToColorPlasmaDiscrete(
+    value,
+    classification || ocClassification
+  );
 }
 
 function formatOcValue(value) {
@@ -329,7 +345,7 @@ function showAnalysisHint() {
 function updateStats(latlngs) {
   document.getElementById("stat-points").textContent = latlngs.length;
   document.getElementById("stat-area").textContent = calcArea(latlngs).toFixed(2) + " ha";
-  document.getElementById("stat-status").textContent = "Bereit ✓";
+  document.getElementById("stat-status").textContent = MAP_UI.ready;
   hideAnalysisHint();
   setStep(2);
 }
@@ -371,7 +387,7 @@ map.on(L.Draw.Event.DELETED, () => {
     document.getElementById(id).textContent = "–"
   );
 
-  document.getElementById("stat-status").textContent = "Kein Polygon";
+  document.getElementById("stat-status").textContent = MAP_UI.no_polygon;
   hideAnalysisHint();
 
   resultLayer.clearLayers();
@@ -399,7 +415,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
   resultLayer.clearLayers();
   setStep(3);
 
-  document.getElementById("steps-container").classList.add("hidden");
+  document.getElementById("instructions-panel")?.classList.add("is-collapsed");
 
   try {
     const res = await fetch(`${API_URL}/api/predict`, {
@@ -471,7 +487,8 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     document.getElementById("btn-save-dashboard").style.display = "block";
 
   } catch (err) {
-    alert("Backend nicht erreichbar:\n" + err.message);
+    document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
+    alert(MAP_UI.backend_unreachable.replace("{msg}", err.message));
   } finally {
     document.getElementById("loader").classList.remove("visible");
     document.getElementById("btn-analyse").disabled = false;
@@ -495,7 +512,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
     document.getElementById(id).textContent = "–"
   );
 
-  document.getElementById("stat-status").textContent = "Kein Polygon";
+  document.getElementById("stat-status").textContent = MAP_UI.no_polygon;
   hideAnalysisHint();
   document.getElementById("result-box").classList.remove("visible");
   document.getElementById("btn-save-dashboard").style.display = "none";
@@ -507,7 +524,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   switchToFieldMode();
   setStep(1);
 
-  document.getElementById("steps-container").classList.remove("hidden");
+  document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
   document.getElementById("btn-save-dashboard").style.display = "none";
 
   const dateInput = document.getElementById("analysis-date");
@@ -612,7 +629,7 @@ if (confirmDashboardSaveBtn) {
       selectedCrop = dashboardCustomCrop.value.trim();
 
       if (!selectedCrop) {
-        alert("Please enter a custom crop name");
+        alert(MAP_UI.custom_crop_required);
         return;
       }
     }
@@ -654,7 +671,7 @@ if (confirmDashboardSaveBtn) {
 
       console.error(err);
 
-      alert("Could not save analysis");
+      alert(MAP_UI.save_failed);
     }
 
   });
@@ -712,22 +729,33 @@ function renderClassInfoPopup(classification) {
   const datasetEl = document.getElementById("class-info-dataset");
   const linkEl = document.getElementById("class-info-link");
 
-  if (noteEl) noteEl.textContent = c.dataset_note || "";
+  if (noteEl) {
+    noteEl.textContent = [c.dataset_note, c.colormap_note].filter(Boolean).join(" ");
+  }
   if (datasetEl) {
-    datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
+    datasetEl.textContent = `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? (MAP_UI.point || "point") : (MAP_UI.points || "points")} · ${c.parameter}, ${c.depth_cm} cm`;
   }
   if (linkEl && c.reference_url) {
     linkEl.href = c.reference_url;
   }
-  if (tiersEl && c.tier_descriptions) {
-    const order = ["low", "medium", "high"];
-    tiersEl.innerHTML = order
-      .map(tier => {
-        const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
-        const text = c.tier_descriptions[tier] || "";
-        return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
-      })
-      .join("");
+  if (tiersEl) {
+    if (c.discrete_bin_labels && c.discrete_colors) {
+      tiersEl.innerHTML = c.discrete_bin_labels
+        .map((text, i) => {
+          const swatch = c.discrete_colors[i] || "#888";
+          return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+        })
+        .join("");
+    } else if (c.tier_descriptions) {
+      const order = ["low", "medium", "high"];
+      tiersEl.innerHTML = order
+        .map(tier => {
+          const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
+          const text = c.tier_descriptions[tier] || "";
+          return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+        })
+        .join("");
+    }
   }
 }
 

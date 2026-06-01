@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}User Experiences{% endblock %}
+{% block title %}{{ "Who We Build AgroScan For" if lang == "en" else "Für wen wir AgroScan entwickelt haben" }}{% endblock %}
 
 {% block head_styles %}
   <link rel="stylesheet" href="/static/css/users_experience.css?v={{ static_css_version }}" />
@@ -10,37 +10,45 @@
 <div class="page-content">
 
   <div class="about-hero">
-    <div class="section-eyebrow">User analysis</div>
+    <div class="section-eyebrow">{{ "Who We Built AgroScan For" if lang == "en" else "Für wen wir AgroScan entwickelt haben" }}</div>
     <h1>
-      Developed with the user in <em>mind</em>
+      {% if lang == "en" %}
+        Developed with the user in <em>mind</em>
+      {% else %}
+        Mit dem Nutzer im <em>Fokus</em> entwickelt
+      {% endif %}
     </h1>
     <p>
-      We designed AgroScan around real users and their experience. These three archetypes shaped how we structured the website and prioritized features.
+      {% if lang == "en" %}
+        We designed AgroScan around real users and their experience. These three archetypes shaped how we structured the website and prioritized features.
+      {% else %}
+        Wir haben AgroScan konsequent an echten Nutzer:innen und ihren Bedürfnissen ausgerichtet. Diese drei Archetypen haben die Struktur der Website und die Priorisierung der Funktionen massgeblich geprägt.
+      {% endif %}
     </p>
   </div>
 
   <section class="about-section">
-    <div class="section-eyebrow">Archetype users</div>
-    <h2 class="section-title">Three different perspectives on one product</h2>
+    <div class="section-eyebrow">{{ "Archetype users" if lang == "en" else "Archetypische Nutzer:innen" }}</div>
+    <h2 class="section-title">{{ "Three Perspectives on One Product" if lang == "en" else "Drei Perspektiven auf ein Produkt" }}</h2>
 
     <div class="testimonials-grid">
       <article class="testimonial-card persona-card">
         <div class="persona-photo">
-          <img src="/static/assets/image/Johannes.png" alt="Portrait of Johannes" />
+          <img src="/static/assets/image/Johannes.png" alt="{{ 'Portrait of Johannes' if lang == 'en' else 'Porträt von Johannes' }}" />
         </div>
         <div class="persona-body">
           <div class="persona-name">Johannes</div>
           <div class="persona-content">
             <div class="persona-box persona-box--facts">
               <ul class="persona-list">
-                <li><strong>Age:</strong> 27</li>
-                <li><strong>Occupation:</strong> Public sector employee</li>
-                <li><strong>Connection to farming:</strong> Studied agricultural science, inherited parents’ farm, part-time farming</li>
+                <li><strong>{{ "Age:" if lang == "en" else "Alter:" }}</strong> 27</li>
+                <li><strong>{{ "Occupation:" if lang == "en" else "Beruf:" }}</strong> {{ "Public sector employee" if lang == "en" else "Angestellter im öffentlichen Dienst" }}</li>
+                <li><strong>{{ "Connection to farming:" if lang == "en" else "Bezug zur Landwirtschaft:" }}</strong> {{ "Studied agricultural science, inherited parents' farm, part-time farming" if lang == "en" else "Studium der Agrarwissenschaften, Übernahme des elterlichen Hofs, Landwirtschaft im Nebenerwerb" }}</li>
               </ul>
             </div>
             <div class="persona-box persona-box--use">
-              <div class="persona-q">How could our tool be useful?</div>
-              <p class="persona-a">A cost-effective and time-saving way to plan and estimate fertilizer use.</p>
+              <div class="persona-q">{{ "How could our tool be useful?" if lang == "en" else "Wie kann unser Tool helfen?" }}</div>
+              <p class="persona-a">{{ "A cost-effective and time-saving way to plan and estimate fertilizer use." if lang == "en" else "Eine kostengünstige und zeitsparende Möglichkeit zur Planung und Abschätzung des Düngemitteleinsatzes." }}</p>
             </div>
           </div>
         </div>
@@ -48,21 +56,21 @@
 
       <article class="testimonial-card persona-card">
         <div class="persona-photo">
-          <img src="/static/assets/image/Anton.png" alt="Portrait of Anton" />
+          <img src="/static/assets/image/Anton.png" alt="{{ 'Portrait of Anton' if lang == 'en' else 'Porträt von Anton' }}" />
         </div>
         <div class="persona-body">
           <div class="persona-name">Anton</div>
           <div class="persona-content">
             <div class="persona-box persona-box--facts">
               <ul class="persona-list">
-                <li><strong>Age:</strong> 48</li>
-                <li><strong>Occupation:</strong> Organic farmer</li>
-                <li><strong>Connection to farming:</strong> Runs his own farm, trained as a farmer</li>
+                <li><strong>{{ "Age:" if lang == "en" else "Alter:" }}</strong> 48</li>
+                <li><strong>{{ "Occupation:" if lang == "en" else "Beruf:" }}</strong> {{ "Organic farmer" if lang == "en" else "Biolandwirt" }}</li>
+                <li><strong>{{ "Connection to farming:" if lang == "en" else "Bezug zur Landwirtschaft:" }}</strong> {{ "Runs his own farm, trained as a farmer" if lang == "en" else "Führt einen eigenen Betrieb, gelernter Landwirt" }}</li>
               </ul>
             </div>
             <div class="persona-box persona-box--use">
-              <div class="persona-q">How could our tool be useful?</div>
-              <p class="persona-a">Supports soil organic matter (humus) building and helps argue for more flexible fertilization regulations.</p>
+              <div class="persona-q">{{ "How could our tool be useful?" if lang == "en" else "Wie kann unser Tool helfen?" }}</div>
+              <p class="persona-a">{{ "Supports soil organic matter (humus) building and helps argue for more flexible fertilization regulations." if lang == "en" else "Unterstützt den Humusaufbau und hilft dabei, flexiblere Düngevorschriften zu begründen." }}</p>
             </div>
           </div>
         </div>
@@ -70,21 +78,27 @@
 
       <article class="testimonial-card persona-card">
         <div class="persona-photo">
-          <img src="/static/assets/image/Laura.png" alt="Portrait of Dr. Laura" />
+          <img src="/static/assets/image/Laura.png" alt="{{ 'Portrait of Dr. Laura' if lang == 'en' else 'Porträt von Dr. Laura' }}" />
         </div>
         <div class="persona-body">
           <div class="persona-name">Dr. Laura</div>
           <div class="persona-content">
             <div class="persona-box persona-box--facts">
               <ul class="persona-list">
-                <li><strong>Age:</strong> 42</li>
-                <li><strong>Occupation:</strong> Climate policy maker</li>
-                <li><strong>Connection to farming:</strong> Works at the Federal Environment Office (agriculture &amp; climate protection), evaluates measures for CO₂ storage in soils</li>
+                <li><strong>{{ "Age:" if lang == "en" else "Alter:" }}</strong> 42</li>
+                <li><strong>{{ "Occupation:" if lang == "en" else "Beruf:" }}</strong> {{ "Climate policy maker" if lang == "en" else "Klimapolitikerin" }}</li>
+                <li><strong>{{ "Connection to farming:" if lang == "en" else "Bezug zur Landwirtschaft:" }}</strong> {{ "Works at the Federal Environment Office (agriculture & climate protection), evaluates measures for CO₂ storage in soils" if lang == "en" else "Arbeitet beim Bundesamt für Umwelt (Landwirtschaft & Klimaschutz) und bewertet Massnahmen zur CO₂-Speicherung in Böden" }}</li>
               </ul>
             </div>
             <div class="persona-box persona-box--use">
-              <div class="persona-q">How could our tool be useful?</div>
-              <p class="persona-a">A data-driven basis for designing and evaluating soil carbon storage programs. Helps target programs (e.g., voluntary carbon credits) and improve policy design by incentivizing actual soil organic matter build-up.</p>
+              <div class="persona-q">{{ "How could our tool be useful?" if lang == "en" else "Wie kann unser Tool helfen?" }}</div>
+              <p class="persona-a">
+                {% if lang == "en" %}
+                  A data-driven basis for designing and evaluating soil carbon storage programs. Helps target programs (e.g., voluntary carbon credits) and improve policy design by incentivizing actual soil organic matter build-up.
+                {% else %}
+                  Eine datenbasierte Grundlage für die Entwicklung und Bewertung von Programmen zur Kohlenstoffspeicherung im Boden. Hilft dabei, Programme (z. B. freiwillige Carbon Credits) gezielt auszurichten und die Politikgestaltung zu verbessern, indem tatsächlicher Humusaufbau stärker gefördert wird.
+                {% endif %}
+              </p>
             </div>
           </div>
         </div>
@@ -93,9 +107,9 @@
   </section>
 
   <div class="home-cta" style="border-top:1px solid var(--border);">
-    <h2>Curious to try it?</h2>
-    <p>Start an analysis and view the zone map of the SOC levels of your field.</p>
-    <a class="btn-primary" style="margin-top: 4px;" href="/analyse">→ Go to analysis</a>
+    <h2>{{ "Curious to try it?" if lang == "en" else "Neugierig geworden?" }}</h2>
+    <p>{{ "Start an analysis and view the zone map of the SOC levels of your field." if lang == "en" else "Starte eine Analyse und sieh dir die Zonenkarte der SOC-Werte deines Feldes an." }}</p>
+    <a class="btn-primary" style="margin-top: 4px;" href="/analyse">→ {{ "Go to analysis" if lang == "en" else "Zur Analyse" }}</a>
   </div>
 
 </div>
