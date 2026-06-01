@@ -13,6 +13,14 @@
   padding-top: 28px;
 }
 
+.report-page .section-eyebrow {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.14em;
+  margin-bottom: 16px;
+}
+
 /* ── Body text ─────────────────────────────────── */
 
 .report-body {

@@ -50,11 +50,11 @@
       {% if lang == "en" %}
         Consequently, monitoring and enhancing SOC stocks has become a priority within major policy frameworks, including
         the EU Soil Strategy for 2030 that translates into the EU Soil Monitoring Law (Europ.
-        Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
+        Commission, 2019<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
       {% else %}
         Infolgedessen rücken die Überwachung und der Ausbau von SOC-Vorräten zu einer Priorität
         innerhalb zentraler politischer Rahmenwerke — darunter die EU-Bodenstrategie für 2030,
-        die in das EU-Bodenüberwachungsgesetz mündet (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
+        die in das EU-Bodenüberwachungsgesetz mündet (Europ. Commission, 2019<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
       {% endif %}
     </p>
 
@@ -522,12 +522,12 @@
         </p>
         <p>
           {% if lang == "en" %}
-            and then clipped to the unit interval:
+            and then, if needed, clipped to the unit interval:
             <span class="report-math">\(x' \leftarrow \min(1,\max(0,x'))\)</span>.
             If <span class="report-math">\(x_{\max}=x_{\min}\)</span> the implementation returns 0 to avoid
             division by zero and NaN/inf values are replaced with 0 afterwards.
           {% else %}
-            und anschliessend auf das Einheitsintervall geclippt:
+            und anschliessend, falls nötig, auf das Einheitsintervall geclippt:
             <span class="report-math">\(x' \leftarrow \min(1,\max(0,x'))\)</span>.
             Falls <span class="report-math">\(x_{\max}=x_{\min}\)</span>, gibt die Implementierung 0 zurück, um
             eine Division durch null zu vermeiden; NaN-/Inf-Werte werden anschliessend durch 0 ersetzt.
@@ -545,7 +545,7 @@
       {% if lang == "en" %}
         <strong>1. Selection of model</strong><br />
         The model architecture and implementation used in this work are based on the
-        approach presented by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. The study evaluated three machine
+        approach presented by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. Kammerlander evaluated three machine
         learning approaches for predicting soil nutrient levels across Europe: XGBoost,
         Random Forest, and Fully Connected Neural Networks (FCNNs). Model performance
         was assessed using Root Mean Squared Error (RMSE) for several soil properties,
@@ -553,7 +553,7 @@
       {% else %}
         <strong>1. Modellauswahl</strong><br />
         Architektur und Implementierung des in dieser Arbeit verwendeten Modells orientieren sich
-        am Ansatz von Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. Die Studie evaluierte drei Verfahren
+        am Ansatz von Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>. Kammerlander evaluierte drei Verfahren
         des maschinellen Lernens zur Vorhersage von Bodennährstoffgehalten in Europa: XGBoost,
         Random Forest und Fully Connected Neural Networks (FCNNs). Die Modellleistung wurde anhand
         des Root Mean Squared Error (RMSE) für mehrere Bodeneigenschaften bewertet, darunter
@@ -575,7 +575,7 @@
 
     <p class="report-body">
       {% if lang == "en" %}
-        Within the LUCAS dataset, organic carbon (OC) has a mean value of 18.18 g/kg and a
+        Within the LUCAS dataset filtered for German croplands, organic carbon (OC) has a mean value of 18.18 g/kg and a
         standard deviation of ±8.91 g/kg, indicating substantial variability across samples. This
         behavior is comparable to the nutrient variables analyzed by Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>,
         where high variability strongly influenced model performance. Since FCNNs are well
@@ -583,7 +583,7 @@
         distributions, they are considered the most appropriate architecture for this prediction
         task.
       {% else %}
-        Im LUCAS-Datensatz weist organischer Kohlenstoff (OC) einen Mittelwert von 18,18 g/kg
+        Im LUCAS-Datensatz für deutsche Ackerlandflächen weist organischer Kohlenstoff (OC) einen Mittelwert von 18,18 g/kg
         und eine Standardabweichung von ±8,91 g/kg auf, was auf eine erhebliche Variabilität
         zwischen den Proben hinweist. Dieses Muster ist vergleichbar mit den Nährstoffvariablen
         in Kammerlander (2025)<a href="#ref14" class="ref-link">[14]</a>, bei denen hohe Variabilität die Modellleistung
@@ -754,22 +754,22 @@
         <strong>2. Model interaction</strong><br />
         The data collection, processing and model prediction pipeline was compiled into a
         wrapper script (run_pipeline_from_gps.py) and placed into the website backend. It uses
-        the same workflow as during model training (see info box, flow chart). The wrapper
+        the same workflow as during model training (see Fig. 3). The wrapper
         enables the user to interact with the model: They select their field, from there the field
         coordinates are extracted in a grid system and used as input for the model wrapper. As
-        output, it provides a visualization for the user of the prediction in the form of a map, and
-        detailed information in the personal dashboard making the information on the SOC
-        easy-to-access to the farmer.
+        output, it provides a visualization for the user of the prediction in the form of a map, 
+        and detailed information in the personal dashboard making the SOC information 
+        easy-to-access for the farmer.
       {% else %}
         <strong>2. Modellinteraktion</strong><br />
         Die Pipeline für Datenerhebung, -verarbeitung und Modellvorhersage wurde in ein Wrapper-Skript
         (run_pipeline_from_gps.py) zusammengefasst und in das Website-Backend integriert. Sie folgt
-        demselben Workflow wie beim Modelltraining (siehe Infobox, Flussdiagramm). Der Wrapper
+        demselben Workflow wie beim Modelltraining (siehe Fig. 3). Der Wrapper
         ermöglicht die Interaktion mit dem Modell: Nutzerinnen und Nutzer wählen ihr Feld aus,
         woraufhin die Feld-Koordinaten in einem Rastersystem extrahiert und als Eingabe für den
         Modell-Wrapper verwendet werden. Als Ausgabe liefert das System eine Kartenvisualisierung
-        der Vorhersage sowie detaillierte Informationen im persönlichen Dashboard und macht
-        SOC-Daten für Landwirtinnen und Landwirte leicht zugänglich.
+        der Vorhersage sowie detaillierte Informationen im persönlichen Dashboard, wodurch die 
+        SOC-Daten für den Landwirt leicht zugänglich sind.
       {% endif %}
     </p>
 
@@ -842,8 +842,8 @@
         and efficiency of the interface; a field data management system enabling long-term
         SOC monitoring to assess the impact of SSM practices over time; and meaningful
         technical agency over the underlying model. These objectives are addressed through
-        three corresponding design solutions: a simple step-by-step analysis workflow, a grid-
-        style personal dashboard, and full methodological transparency through open-source
+        three corresponding design solutions: a simple step-by-step analysis workflow, an analytical personal dashboard, 
+        and full methodological transparency through open-source
         code, public data sources, and accessible documentation.
       {% else %}
         <strong>1. Designziele und nutzerzentrierte Begründung</strong><br />
@@ -857,7 +857,7 @@
         für langfristiges SOC-Monitoring zur Bewertung der Wirkung von SSM-Massnahmen über die Zeit;
         sowie bedeutsame technische Handlungsfähigkeit in Bezug auf das zugrunde liegende Modell.
         Diese Ziele werden durch drei entsprechende Designlösungen adressiert: ein einfacher
-        schrittweiser Analyse-Workflow, ein rasterbasiertes persönliches Dashboard sowie volle
+        schrittweiser Analyse-Workflow, ein analytisches persönliches Dashboard sowie volle
         methodische Transparenz durch Open-Source-Code, öffentliche Datenquellen und zugängliche
         Dokumentation.
       {% endif %}
@@ -917,35 +917,32 @@
     <p class="report-body">
       {% if lang == "en" %}
         <strong>Personal Dashboard</strong><br />
-        The personal dashboard uses a grid layout to enable the farmer to quickly scan field-
-        level information. Information is organized across two hierarchical levels. The first level
-        provides an overview of all registered fields, with each tile representing a single field.
-        Tile layout follows a left-to-right reading logic: field metadata is presented first,
-        followed by a line chart visualizing the temporal development of SOC content and a
-        written-out latest SOC value, and finally a green color-coded “Click to explore” button
-        to access field details. Looking ahead, information of future features (e.g., chatbot
-        recommendations for SSM practices) can be implemented here. Grouping of metadata
-        using emojis supports quick visual parsing. The second level, accessed via the detail
-        view, provides a higher resolution of field analysis information including minimum and
-        maximum SOC values per analysis, alongside a dedicated button to initiate a new
-        analysis for the same field. All these features directly support the farmer’s use case of
-        repeated monitoring over time to evaluate SSM practices in an easy and intuitive
-        manner.
+        The personal analytical dashboard uses a card-based, hierarchical information architecture 
+        to enable the farmer to scan field-level information at a glance. At the top of the page a 
+        KPI strip provides a high-level aggregation of field information (total fields, analyses, etc.). 
+        Below, each field is presented as a content card in a card-based layout pattern allowing for 
+        easy scalable information content. Each content card includes embedded field metadata, 
+        and a micro-visualization of OC content over time and inline numeric annotations to reduce 
+        cognitive load. Several UX interaction patterns were integrated. The farmer has the option 
+        refine the visible selection via the sort, filter and comparison function. Additional field-level 
+        analyses details can be accessed via the “Click to explore” button, alongside a dedicated button 
+        to initiate a new analysis for the same field to support long-term SOC monitoring. 
+        Looking ahead, information of future features can be implemented here. 
       {% else %}
         <strong>Persönliches Dashboard</strong><br />
-        Das persönliche Dashboard nutzt ein Rasterlayout, damit Landwirtinnen und Landwirte
-        Feldinformationen schnell erfassen können. Die Informationen sind auf zwei Hierarchieebenen
-        organisiert. Die erste Ebene bietet eine Übersicht aller registrierten Felder; jede Kachel
-        steht für ein Feld. Das Kachel-Layout folgt einer Links-nach-Rechts-Logik: zuerst
-        Feld-Metadaten, dann ein Liniendiagramm zur zeitlichen SOC-Entwicklung mit ausgeschriebenem
-        aktuellem SOC-Wert, schliesslich ein grün codierter „Click to explore“-Button für Felddetails.
-        Perspektivisch können hier Informationen zu künftigen Features (z. B. Chatbot-Empfehlungen
-        für SSM-Massnahmen) ergänzt werden. Die Gruppierung von Metadaten mithilfe von Emojis
-        unterstützt schnelles visuelles Erfassen. Die zweite Ebene, zugänglich über die Detailansicht,
-        bietet eine höhere Auflösung der Feldanalyseinformationen, einschliesslich Minimum- und
-        Maximum-SOC-Werten pro Analyse, sowie einen dedizierten Button zur Initiierung einer neuen
-        Analyse für dasselbe Feld. Diese Funktionen unterstützen den Anwendungsfall wiederholten
-        Monitorings über die Zeit zur Bewertung von SSM-Massnahmen auf einfache und intuitive Weise.
+        Das persönliche Analyse-Dashboard nutzt eine kartenbasierte, hierarchische Informationsarchitektur, 
+        damit der Landwirt die Informationen auf Feldebene auf einen Blick erfassen kann. Am oberen Rand 
+        der Seite bietet ein KPI-Balken eine allgemeine Zusammenfassung der Feldinformationen 
+        (Gesamtzahl der Felder, Analysen usw.). Darunter wird jedes Feld als Inhaltskarte in einem 
+        kartenbasierten Layout dargestellt, was eine einfache Skalierung der Informationsinhalte ermöglicht. 
+        Jede Inhaltskarte enthält eingebettete Feldmetadaten sowie eine Mikrovisualisierung der OC-Inhalte 
+        im Zeitverlauf und integrierte numerische Anmerkungen, um die kognitive Belastung zu reduzieren. 
+        Es wurden mehrere UX-Interaktionsmuster integriert. Der Landwirt hat die Möglichkeit, die sichtbare 
+        Auswahl über die Sortier-, Filter- und Vergleichsfunktionen zu verfeinern. Zusätzliche Details zu 
+        den Analysen auf Feldebene können über die Schaltfläche „Zum Erkunden anklicken“ abgerufen werden, 
+        ebenso wie eine spezielle Schaltfläche zum Starten einer neuen Analyse für dasselbe Feld, um die 
+        langfristige SOC-Überwachung zu unterstützen. Zukünftig können hier Informationen zu 
+        neuen Funktionen implementiert werden. 
       {% endif %}
     </p>
 
@@ -953,10 +950,11 @@
       {% if lang == "en" %}
         <strong>3. ML Explainability and Information Design</strong><br />
         The SOC prediction results are communicated through a map displaying the spatial
-        variability of SOC content across the selected field. A color gradient from green for high
-        SOC content and red for low SOC content provides an immediate intuitive visual
-        encoding of field conditions. A legend explains the color-coded thresholds, which are
-        based on the SOC value distribution in the LUCAS soil dataset<a href="#ref16" class="ref-link">[16]</a>. This makes the
+        variability of SOC content across the selected field. A color gradient from purple 
+        for low SOC content to yellow for high SOC content that is also visible for color-blind 
+        users. It provides an immediate intuitive visual encoding of field conditions. A legend 
+        on the analysis page explains the color codes, which are based on the SOC value distribution 
+        in the LUCAS soil dataset. <a href="#ref16" class="ref-link">[16]</a>. This makes the
         classification transparent and verifiable using an established reference. The dashboard
         further supports comparison across fields using absolute SOC values and line charts,
         enabling farmers to contextualize individual field results within their larger field
@@ -964,14 +962,15 @@
       {% else %}
         <strong>3. ML-Erklärbarkeit und Informationsdesign</strong><br />
         Die SOC-Vorhersageergebnisse werden über eine Karte kommuniziert, die die räumliche
-        Variabilität des SOC-Gehalts im ausgewählten Feld abbildet. Ein Farbverlauf von Grün
-        (hoher SOC) zu Rot (niedriger SOC) liefert eine unmittelbar intuitive visuelle Kodierung
-        der Feldzustände. Eine Legende erläutert die farbcodierten Schwellenwerte, die auf der
-        SOC-Verteilung im LUCAS-Bodendatensatz basieren<a href="#ref16" class="ref-link">[16]</a>. Damit ist die Klassifikation
-        transparent und anhand einer etablierten Referenz überprüfbar. Das Dashboard unterstützt
-        zudem Feldvergleiche anhand absoluter SOC-Werte und Liniendiagramme und ermöglicht es
-        Landwirtinnen und Landwirten, einzelne Feldergebnisse im Kontext ihres gesamten
-        Feldportfolios einzuordnen.
+        Variabilität des SOC-Gehalts im ausgewählten Feld abbildet. Ein Farbverlauf von Violett 
+        für einen niedrigen SOC-Gehalt bis Gelb für einen hohen SOC-Gehalt, der auch für 
+        farbenblinde Nutzer erkennbar ist. Er bietet eine unmittelbare, intuitive visuelle 
+        Darstellung der Bodenbedingungen. Eine Legende auf der Analyseseite erläutert die Farbcodes, 
+        die auf der Verteilung der SOC-Werte im LUCAS-Bodendatensatz basieren. <a href="#ref16" class="ref-link">[16]</a>. 
+        Damit ist die Klassifikation transparent und anhand einer etablierten Referenz überprüfbar. 
+        Das Dashboard unterstützt zudem Feldvergleiche anhand absoluter SOC-Werte und 
+        Liniendiagramme und ermöglicht es Landwirtinnen und Landwirten, einzelne Feldergebnisse 
+        im Kontext ihres gesamten Feldportfolios einzuordnen.
       {% endif %}
     </p>
 
@@ -1104,7 +1103,7 @@
         empower farmers to monitor and manage carbon stock in their agricultural soils? The
         project successfully addresses this through three channels. First, a simple step-by-
         step analysis workflow with an efficient repeated-sampling feature directly fulfills the
-        user requirement of quick, routine SOC assessment. Second, a grid-style personal
+        user requirement of quick, routine SOC assessment. Second, a card-based, hierarchical personal
         dashboard tailored to carbon farming confers technical agency to the farmer, enabling
         long-term comparison of SOC trends across fields to evaluate the impact of SSM
         practices. Third, an open-source architecture with publicly documented methodology
@@ -1118,7 +1117,7 @@
         Böden zu überwachen und zu steuern? Das Projekt adressiert diese Frage über drei Wege.
         Erstens erfüllt ein einfacher schrittweiser Analyse-Workflow mit effizienter Funktion für
         wiederholte Analysen die Nutzeranforderung einer schnellen, routinemässigen SOC-Bewertung.
-        Zweitens verleiht ein rasterbasiertes persönliches Dashboard, zugeschnitten auf Carbon Farming,
+        Zweitens verleiht ein kartenbasiertes, hierarchisches persönliches Dashboard, zugeschnitten auf Carbon Farming,
         Landwirtinnen und Landwirten technische Handlungsfähigkeit und ermöglicht langfristige
         SOC-Trendvergleiche zur Bewertung der Wirkung von SSM-Massnahmen. Drittens schliesst eine
         Open-Source-Architektur mit öffentlich dokumentierter Methodik die Transparenz- und

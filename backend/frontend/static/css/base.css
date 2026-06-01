@@ -24,6 +24,7 @@
   --danger:   #C94F4F;   /* weniger „washed out“ */
 
   --nav-h:    64px;
+  --popup-gap: 24px;
 }
 
 html, body { min-height: 100%; font-family: 'DM Mono', monospace; background: var(--bg); color: var(--text); }

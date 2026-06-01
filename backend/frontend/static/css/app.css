@@ -251,9 +251,14 @@
   background: rgba(0,0,0,0.45);
   backdrop-filter: blur(6px);
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  padding:
+    calc(var(--nav-h) + var(--popup-gap))
+    20px
+    var(--popup-gap);
+  box-sizing: border-box;
+  overflow: hidden;
 
   opacity: 0;
   pointer-events: none;
@@ -270,7 +275,11 @@
 
 .save-popup-card {
   width: 420px;
-  max-width: calc(100vw - 40px);
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 
   background: var(--surface);
   border: 1px solid var(--border);
@@ -295,6 +304,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-shrink: 0;
 
   padding: 18px 20px;
 
@@ -387,6 +397,11 @@
   display: flex;
   flex-direction: column;
   gap: 18px;
+
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .save-field {
