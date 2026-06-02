@@ -19,7 +19,7 @@ const map = L.map("map", {
   zoomAnimation: true,
   fadeAnimation: true,
   markerZoomAnimation: true
-}).setView([51.1657, 10.4515], 7);
+}).setView([48.81430, 11.27558], 15);
 
 // Prefill data set by Personal Dashboard when re-analysing an existing field
 let _prefill = null;
