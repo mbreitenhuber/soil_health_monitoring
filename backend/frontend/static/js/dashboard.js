@@ -104,10 +104,11 @@ function ocTier(value) {
   return "high";
 }
 
-function valueToColor(value) {
-  const c = ocClassification;
-  const tier = ocTier(value);
-  return (c && c.colors && c.colors[tier]) || OC_TIER_COLORS[tier] || OC_TIER_COLORS.medium;
+function valueToColor(value, classification) {
+  return FieldGradientOverlay.valueToColorPlasmaDiscrete(
+    value,
+    classification || ocClassification
+  );
 }
 
 let allAnalyses        = dashboardConfig.analyses || [];
@@ -849,7 +850,7 @@ function renderFieldLineChart(items) {
   const allY      = [...maxData, ...avgData, ...minData];
 
   const sharedOpts = {
-    tension: 0.35,
+    tension: 0,
     pointRadius:      items.length === 1 ? 7 : 5,
     pointHoverRadius: 8,
     borderWidth:      2.5,
@@ -1109,7 +1110,7 @@ function showCompareChart() {
       data:                 rawDates.map(d => byDate[d] ? roundOc(byDate[d].avg_value) : null),
       borderColor:          color,
       pointBackgroundColor: color,
-      tension:              0.35,
+      tension:              0,
       pointRadius:          5,
       pointHoverRadius:     7,
       borderWidth:          2.5,
@@ -1171,9 +1172,11 @@ function openDetailModal(item) {
   if (typeof L === "undefined") return;
 
   destroyDetailMap();
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => renderDetailMap(item));
-  });
+    document.getElementById("detail-modal").style.display = "flex";
+
+    setTimeout(() => {
+      renderDetailMap(item);
+    }, 50);
 }
 
 function destroyDetailMap() {
@@ -1283,19 +1286,15 @@ function renderDetailMap(item) {
 
   const bounds = [];
 
-  const viz = FieldGradientOverlay.addFieldVisualization({
-    map: detailMap,
-    polygon,
-    zones,
-    classification: ocClassification,
-    valueToColor,
-    formatTooltip: (zone) =>
-      `<b>${zone.label || "–"}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`,
-    gradientOptions: {
-      renderMaxPx: 280,
-      idwMaxNeighbors: 8,
-    },
-  });
+const viz = FieldGradientOverlay.addFieldVisualization({
+  map: detailMap,
+  polygon,
+  zones,
+  classification: ocClassification,
+  valueToColor: valueToColor,   // 👈 WICHTIG
+  formatTooltip: (zone) =>
+    `<b>${zone.label || "–"}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`,
+});
 
   if (viz.borderLayer) bounds.push(viz.borderLayer.getBounds());
   else if (polygon.length >= 3) {
