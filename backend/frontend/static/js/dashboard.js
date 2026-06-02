@@ -496,9 +496,9 @@ function renderDashboard(analyses, { filtered = false } = {}) {
           <div class="fgc-latest">
             <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
             <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
-            <span class="fgc-latest-label">${uiText("Current vs:")}</span>
-            ${trendBadge(trendAllTime, uiText("first sample"))}
-            ${trendBadge(trendPrev, uiText("recent sample"))}
+            <span class="fgc-latest-label">${uiText("current_vs")}</span>
+            ${trendBadge(trendAllTime, uiText("first_sample"))}
+            ${trendBadge(trendPrev, uiText("recent_sample"))}
           </div>
           <div class="fgc-buttons">
             <label class="compare-label"

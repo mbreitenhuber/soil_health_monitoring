@@ -105,7 +105,7 @@ def _api_base_url() -> str:
 
 
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
-STATIC_CSS_VERSION = "6"
+STATIC_CSS_VERSION = "7"
 
 import math
 
@@ -378,6 +378,9 @@ DASHBOARD_UI = {
         "all_time": "All-time",
         "vs_prev": "vs. prev.",
         "latest_avg_oc": "Latest Avg OC",
+        "current_vs": "Current vs:",
+        "first_sample": "First sample:",
+        "recent_sample": "Recent sample:",
         "select_compare": "Select for comparison",
         "click_explore": "Click to explore ›",
         "oc_over_time": "OC over time",
@@ -413,6 +416,9 @@ DASHBOARD_UI = {
         "all_time": "Gesamt",
         "vs_prev": "vs. vorh.",
         "latest_avg_oc": "Aktueller Ø OC",
+        "current_vs": "Aktuell vs.:",
+        "first_sample": "Erste Messung:",
+        "recent_sample": "Letzte Messung:",
         "select_compare": "Zum Vergleich auswählen",
         "click_explore": "Zum Erkunden klicken ›",
         "oc_over_time": "OC im Zeitverlauf",
