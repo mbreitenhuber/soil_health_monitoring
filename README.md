@@ -17,31 +17,39 @@ The generated results can support farmers, agronomists, and researchers in both 
 
 ```
 .
-├── AgroScan/                 # Core model and pipeline code for training, inference, and satellite-data processing.
-│   ├── nutrients_predictor/  # Predictor modules and training/inference helpers for soil nutrients.
-│   ├── satellite_utils/      # Satellite data access and preprocessing utilities (Sentinel, USGS, etc.).
-│   └── scripts/              # Pipeline helper scripts for data preparation and execution.
 ├── backend/                  # FastAPI backend for the website, including API routes and server-side rendering.
-│   ├── persistent-data/       # Mounted volume for durable runtime data, including agroscan.db.
+│   ├── AgroScan/             # Core model and pipeline code for training, inference, and satellite-data processing.
+│   │   ├── nutrients_predictor/  # Predictor modules and training/inference helpers for soil nutrients.
+│   │   ├── satellite_utils/      # Satellite data access and preprocessing utilities (Sentinel, USGS, etc.).
+│   │   └── scripts/              # Pipeline helper scripts for data preparation and execution.
+│   ├── data/                     # Datasets, model artifacts, input/output files.
+│   ├── frontend/                 # Jinja templates and static assets for the web UI.
+│   │   ├── templates/
+│   │   └── static/
 │   ├── main.py               # FastAPI application entrypoint and HTTP routes.
+│   ├── oc_classification.py  
+│   ├── .env                  # Environment variables for setup
+│   ├── requirements.txt      # Shared Python dependencies for the repo.
 │   └── Dockerfile
-├── frontend/                 # Jinja templates and static assets for the web UI.
-│   ├── templates/
-│   └── static/
 ├── helm/                     # Helm charts and configuration for Kubernetes deployment.
 │   └── values.yaml
-├── data/                     # Datasets, model artifacts, input/output files.
-├── .env.expampe              # Example environment variables for local setup.
-├── .gitignore                 
-├── .gitlab-ci.yml            
+├── persistent-data/          # Mounted volume for durable runtime data (sentinel outputs, models, DB).
+├── Project Pitch/            # Course related documents
+├── Visualization/            # Visualization scripts for report
 ├── band_ranges.json          # Band range configuration data for data processing. 
 ├── environment.yml           # Conda environment definition for the Python setup.
 ├── index_ranges.json         # Index range configuration data for data processing.
-├── README.md                 
-└── requirements.txt          # Shared Python dependencies for the repo.
-```
+└── README.md
 
-> **Sidenote:** _The repository currently contains additional files and legacy folders that are not required to run the project. The tree above lists the files and directories needed to start and run the repository; other files will be cleaned up in a future refactor._
+```
+---
+
+## Team Contribution
+
+- **Clara Buller** — Interactive ML model development, Website UX design support, Website content development, Project report, Literature review.
+- **Margarete Breitenhuber** — Interactive ML model development, Website-ML model communication, Website UX design support, User case research, Literature review.
+- **Jerome Reiter** — Backend and frontend development, Map design and personal dashboard, Project pitch, Literature review.
+- **Claudio Bussinger** — Backend and frontend development, Map design and website design, Project pitch, Literature review.
 
 ---
 
