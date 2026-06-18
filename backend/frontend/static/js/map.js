@@ -514,7 +514,9 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
 
   hideAnalysisHint();
   document.getElementById("btn-analyse").disabled = true;
-  document.getElementById("loader").classList.add("visible");
+  const loader = document.getElementById("loader");
+  loader.classList.add("visible");
+  loader.setAttribute("aria-hidden", "false");
   setResultsVisible(false);
 
   resultLayer.clearLayers();
@@ -601,7 +603,9 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     }
     alert(MAP_UI.backend_unreachable.replace("{msg}", err.message));
   } finally {
-    document.getElementById("loader").classList.remove("visible");
+    const loader = document.getElementById("loader");
+    loader.classList.remove("visible");
+    loader.setAttribute("aria-hidden", "true");
   }
 });
 

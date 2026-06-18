@@ -34,7 +34,8 @@
   "status": ("Status" if lang == "en" else "Status"),
   "no_polygon": ("No Polygon" if lang == "en" else "Kein Polygon"),
   "start_analysis": ("Start analysis" if lang == "en" else "Analyse starten"),
-  "calculating": ("The model is calculating…" if lang == "en" else "Das Modell berechnet…"),
+  "calculating": ("The model is calculating. This could take a moment…" if lang == "en" else "Das Modell berechnet. Das könnte einen Moment dauern…"),
+  "calculating_info": ("Please do not leave this page." if lang == "en" else "Bitte verlassen Sie diese Seite nicht."),
   "reset": ("Reset" if lang == "en" else "Zurücksetzen"),
   "result": ("Result" if lang == "en" else "Ergebnis"),
   "zones_analyzed": ("Zones analyzed" if lang == "en" else "Analysierte Zonen"),
@@ -140,11 +141,6 @@
         ⟶ {{ t.start_analysis }}
       </button>
 
-      <div class="loader" id="loader">
-        <div class="spinner"></div>
-        <span>{{ t.calculating }}</span>
-      </div>
-
       <button class="btn-reset" id="btn-reset">{{ t.reset }}</button>
     </div>
 
@@ -196,6 +192,14 @@
 
   <main><div id="map"></div></main>
 
+</div>
+
+<div class="analysis-loader" id="loader" role="status" aria-live="polite" aria-hidden="true">
+  <div class="analysis-loader-card">
+    {% include "partials/logo-agroscan-loader.svg" %}
+    <p class="analysis-loader-text">{{ t.calculating }}</p>
+    <p class="analysis-loader-text">{{ t.calculating_info }}</p>
+  </div>
 </div>
 
 <!-- SAVE POPUP -->
