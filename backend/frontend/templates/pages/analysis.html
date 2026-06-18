@@ -21,8 +21,13 @@
   "instructions": ("Instructions" if lang == "en" else "Anleitung"),
   "step1_lead": ("Draw your agricultural field on the map (use the " if lang == "en" else "Zeichne deine landwirtschaftliche Fläche auf der Karte ("),
   "step1_tail": (" tool)" if lang == "en" else "-Werkzeug)"),
-  "step2": ("Check the detected vertices and area" if lang == "en" else "Prüfe die erkannten Eckpunkte und die Fläche"),
-  "step3": ("Choose the date — Start the analysis — the ML model calculates the zone map" if lang == "en" else "Wähle das Datum — Starte die Analyse — das ML-Modell berechnet die Zonenkarte"),
+  "step1_summary": ("1 Selecting field" if lang == "en" else "1 Feld auswählen"),
+  "step2": ("Select the date for your analysis." if lang == "en" else "Wähle das Datum für die Analyse."),
+  "step2_summary": ("2 Selecting date" if lang == "en" else "2 Datum auswählen"),
+  "step3": ("You can now start the analysis." if lang == "en" else "Du kannst jetzt die Analyse starten."),
+  "step3_summary": ("3 Start analysis" if lang == "en" else "3 Analyse starten"),
+  "select_today": ("Select today" if lang == "en" else "Heute wählen"),
+  "select_date_hint": ("Please select an analysis date first" if lang == "en" else "Bitte wähle zuerst ein Analysedatum"),
   "area": ("Area" if lang == "en" else "Fläche"),
   "vertices": ("Vertices" if lang == "en" else "Eckpunkte"),
   "area_approx": ("Area (approx.)" if lang == "en" else "Fläche (ca.)"),
@@ -91,17 +96,26 @@
     <div id="instructions-panel">
       <div class="section-label">{{ t.instructions }}</div>
       <div class="steps" id="steps-container">
-        <div class="step active" id="step-1">
-          <div class="step-num">1</div>
-          <div class="step-text">{{ t.step1_lead }}<span class="step-polygon-icon" aria-hidden="true" title="Polygon"></span>{{ t.step1_tail }}</div>
+        <div class="step-slot" data-step="1">
+          <div class="step-summary hidden" id="step-1-summary">{{ t.step1_summary }}</div>
+          <div class="step active" id="step-1">
+            <div class="step-num">1</div>
+            <div class="step-text">{{ t.step1_lead }}<span class="step-polygon-icon" aria-hidden="true" title="Polygon"></span>{{ t.step1_tail }}</div>
+          </div>
         </div>
-        <div class="step" id="step-2">
-          <div class="step-num">2</div>
-          <div class="step-text">{{ t.step2 }}</div>
+        <div class="step-slot" data-step="2">
+          <div class="step-summary" id="step-2-summary">{{ t.step2_summary }}</div>
+          <div class="step hidden" id="step-2">
+            <div class="step-num">2</div>
+            <div class="step-text">{{ t.step2 }}</div>
+          </div>
         </div>
-        <div class="step" id="step-3">
-          <div class="step-num">3</div>
-          <div class="step-text">{{ t.step3 }}</div>
+        <div class="step-slot" data-step="3">
+          <div class="step-summary" id="step-3-summary">{{ t.step3_summary }}</div>
+          <div class="step hidden" id="step-3">
+            <div class="step-num">3</div>
+            <div class="step-text">{{ t.step3 }}</div>
+          </div>
         </div>
       </div>
       <div class="analysis-howto-cta" id="analysis-howto-cta">
@@ -110,25 +124,18 @@
       </div>
     </div>
 
-    <div>
-      <div class="section-label">{{ t.area }}</div>
-      <div class="poly-info">
-        <div class="poly-stat"><span>{{ t.vertices }}</span><span class="val" id="stat-points">–</span></div>
-        <div class="poly-stat"><span>{{ t.area_approx }}</span><span class="val" id="stat-area">–</span></div>
-        <div class="poly-stat"><span>{{ t.status }}</span><span class="val" id="stat-status">{{ t.no_polygon }}</span></div>
+    <div class="analysis-date-box" id="sidebar-date-box" hidden>
+      <label for="analysis-date">{{ t.analysis_date }}</label>
+      <div class="analysis-date-row">
+        <input type="date" id="analysis-date">
+        <button type="button" class="btn-select-today" id="btn-select-today">{{ t.select_today }}</button>
       </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:10px;">
-
-      <!-- DATE SELECTOR -->
-      <div class="analysis-date-box">
-        <label for="analysis-date">{{ t.analysis_date }}</label>
-        <input type="date" id="analysis-date">
-      </div>
-
-      <!-- ANALYSE BUTTON -->
-      <p class="analysis-hint" id="analysis-hint" role="alert" hidden>{{ t.select_field_hint }}</p>
+    <div class="sidebar-actions" style="display:flex;flex-direction:column;gap:10px;">
+      <p class="analysis-hint" id="analysis-hint" role="alert" hidden
+         data-hint-field="{{ t.select_field_hint }}"
+         data-hint-date="{{ t.select_date_hint }}">{{ t.select_field_hint }}</p>
       <button class="btn-analyse" id="btn-analyse" type="button">
         ⟶ {{ t.start_analysis }}
       </button>
@@ -139,10 +146,19 @@
       </div>
 
       <button class="btn-reset" id="btn-reset">{{ t.reset }}</button>
-
     </div>
 
-    <div>
+    <div id="sidebar-area-panel" hidden>
+      <div class="section-label">{{ t.area }}</div>
+      <div class="poly-info">
+        <div class="poly-stat"><span>{{ t.vertices }}</span><span class="val" id="stat-points">–</span></div>
+        <div class="poly-stat"><span>{{ t.area_approx }}</span><span class="val" id="stat-area">–</span></div>
+        <div class="poly-stat"><span>{{ t.status }}</span><span class="val" id="stat-status">{{ t.no_polygon }}</span></div>
+      </div>
+    </div>
+
+
+    <div id="sidebar-result-panel" hidden>
       <div class="section-label">{{ t.result }}</div>
       <div class="result-box" id="result-box">
         <button class="btn-save" id="btn-save-dashboard" style="display:none;margin: 0 0 10px 0;">{{ t.save_to_dashboard }}</button>

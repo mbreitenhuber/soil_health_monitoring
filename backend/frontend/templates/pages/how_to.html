@@ -31,7 +31,7 @@
   <!-- Quick Steps Overview -->
   <section class="about-section" style="padding-top:0;">
     <div class="section-eyebrow">{{ "Overview" if lang == "en" else "Überblick" }}</div>
-    <h2 class="section-title">{{ "Three steps to your SOC map" if lang == "en" else "Drei Schritte zu deiner SOC Karte" }}</h2>
+    <h2 class="section-title">{{ "Three steps to your SOC map" if lang == "en" else "Drei Schritte zu deiner SOC-Karte" }}</h2>
     <div class="howto-steps-grid">
 
       <div class="howto-step-card">
@@ -49,13 +49,13 @@
 
       <div class="howto-step-card">
         <div class="howto-step-num">02</div>
-        <div class="howto-step-icon">⟶</div>
-        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+        <div class="howto-step-icon">📅</div>
+        <h3>{{ "Select the analysis date" if lang == "en" else "Analysedatum wählen" }}</h3>
         <p>
           {% if lang == "en" %}
-            Once your polygon is drawn, choose a date and click <strong>Start analysis</strong> in the sidebar. The ML model will process your field.
+            After drawing your field, the sidebar shows the area details and a date picker. Choose a date for the satellite data, or click <strong>Select today</strong> for the most recent image.
           {% else %}
-            Sobald dein Polygon gezeichnet ist, wähle ein Datum und klicke in der Seitenleiste auf <strong>Analyse starten</strong>. Das ML-Modell verarbeitet dein Feld.
+            Nach dem Zeichnen zeigt die Seitenleiste Flächendetails und eine Datumsauswahl. Wähle ein Datum für die Satellitendaten oder klicke auf <strong>Heute wählen</strong> für das aktuellste Bild.
           {% endif %}
         </p>
       </div>
@@ -63,12 +63,12 @@
       <div class="howto-step-card">
         <div class="howto-step-num">03</div>
         <div class="howto-step-icon">🗺️</div>
-        <h3>{{ "Read your zone map" if lang == "en" else "Zonenkarte lesen" }}</h3>
+        <h3>{{ "Start the analysis & read your zone map" if lang == "en" else "Analyse starten & Zonenkarte lesen" }}</h3>
         <p>
           {% if lang == "en" %}
-            Your field is divided into color-coded grid cells using a plasma scale tied to LUCAS (Germany) reference percentiles, darker purples are lower SOC, brighter yellows are higher.
+            Once a date is set, click <strong>Start analysis</strong>. The ML model builds a color-coded zone map on your field using a plasma scale.
           {% else %}
-            Dein Feld wird in farbcodierte Rasterzellen unterteilt mit einer Plasma-Skala an LUCAS-Referenz-Perzentilen (Deutschland): dunklere Violetttöne bedeuten niedrigeren SOC, hellere Gelbtöne höheren.
+            Sobald ein Datum gesetzt ist, klicke auf <strong>Analyse starten</strong>. Das ML-Modell erstellt eine farbcodierte Zonenkarte mit einer Plasma-Skala.
           {% endif %}
         </p>
       </div>
@@ -93,6 +93,13 @@
             Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.
           {% else %}
             Klicke in der oberen Navigation auf <strong>Analyse</strong> oder nutze auf der Startseite den Button <em>Jetzt analysieren</em>. Du siehst eine Vollbildkarte mit Fokus auf Deutschland.
+          {% endif %}
+        </p>
+        <p style="margin-top:12px;">
+          {% if lang == "en" %}
+            The sidebar on the left guides you through three steps: <strong>1 Selecting field</strong>, <strong>2 Selecting date</strong>, and <strong>3 Start analysis</strong>. At the beginning you only see step 1, the <strong>Start analysis</strong> and <strong>Reset</strong> buttons, and the legend. A short note also points you to this full guide on the <strong>How to Use</strong> page.
+          {% else %}
+            Die Seitenleiste links führt dich in drei Schritten: <strong>1 Feld auswählen</strong>, <strong>2 Datum auswählen</strong> und <strong>3 Analyse starten</strong>. Am Anfang siehst du nur Schritt 1, die Buttons <strong>Analyse starten</strong> und <strong>Zurücksetzen</strong> sowie die Legende. Ein kurzer Hinweis verweist auf diese ausführliche Anleitung unter <strong>Anleitung</strong>.
           {% endif %}
         </p>
         <div class="howto-tip">
@@ -139,9 +146,16 @@
         </ol>
         <p style="margin-top:16px;">
           {% if lang == "en" %}
-            The sidebar updates automatically with the number of vertices and the approximate area. If you need to start over, use <strong>Reset</strong> in the sidebar after an analysis, or draw a new polygon once the field is cleared.
+            Once the polygon is closed, the sidebar moves to <strong>step 2</strong>: step 1 and the guide note disappear, the <strong>Area</strong> box appears with the number of vertices and approximate area, and the date picker becomes visible. Completed and upcoming steps stay visible as faded one-line hints above and below the active step.
           {% else %}
-            Die Seitenleiste zeigt automatisch die Anzahl der Eckpunkte und die ungefähre Fläche. Zum Neustart nutze nach einer Analyse <strong>Zurücksetzen</strong> in der Seitenleiste oder zeichne ein neues Polygon, sobald das Feld geleert ist.
+            Sobald das Polygon geschlossen ist, wechselt die Seitenleiste zu <strong>Schritt 2</strong>: Schritt 1 und der Hinweis auf die Anleitung verschwinden, die <strong>Fläche</strong>-Box mit Eckpunkten und ungefährer Fläche erscheint, und die Datumsauswahl wird sichtbar. Erledigte und kommende Schritte bleiben als ausgebleichte Einzeiler über und unter dem aktiven Schritt sichtbar.
+          {% endif %}
+        </p>
+        <p style="margin-top:12px;">
+          {% if lang == "en" %}
+            To start over after an analysis, use <strong>Reset</strong> in the sidebar. While drawing a new field, you can also delete the polygon with the map toolbar and draw again.
+          {% else %}
+            Für einen Neustart nach einer Analyse nutze <strong>Zurücksetzen</strong> in der Seitenleiste. Beim Zeichnen eines neuen Feldes kannst du das Polygon auch über die Karten-Werkzeugleiste löschen und neu zeichnen.
           {% endif %}
         </p>
         <div class="howto-tip">
@@ -159,26 +173,23 @@
     <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">{{ "Step 3" if lang == "en" else "Schritt 3" }}</div>
-        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+        <h3>{{ "Select the analysis date" if lang == "en" else "Analysedatum wählen" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.
+            In <strong>step 2</strong> of the sidebar, choose the date for which satellite data should be used. Pick a date from the calendar, or click <strong>Select today</strong> next to the date field to use the most recent available image. Future dates are not allowed.
           {% else %}
-            Sobald ein Polygon gezeichnet ist, wählst du das Datum für die Analyse. Der Button <strong>Analyse starten</strong> in der Seitenleiste wird aktiv. Klicke darauf. Während das Modell läuft, erscheint ein Ladeindikator.
+            In <strong>Schritt 2</strong> der Seitenleiste wählst du das Datum, für das Satellitendaten verwendet werden sollen. Wähle ein Datum im Kalender oder klicke neben dem Datumsfeld auf <strong>Heute wählen</strong>, um das aktuellste verfügbare Bild zu nutzen. Zukünftige Daten sind nicht erlaubt.
           {% endif %}
         </p>
-        <div class="howto-tip">
-          <span class="howto-tip-label">⚠️ {{ "Note" if lang == "en" else "Hinweis" }}</span>
+        <p style="margin-top:12px;">
           {% if lang == "en" %}
-            The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis.
-            <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
+            After a date is selected, the sidebar advances to <strong>step 3</strong>. The date picker stays visible, but the <strong>Select today</strong> button is hidden so you only see the chosen date.
           {% else %}
-            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern. Je grösser das Feld, desto länger dauert es. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
-            <p> Bleibt der Button inaktiv, prüfe, ob dein Polygon auf der Karte vollständig geschlossen ist. </p>
+            Nach der Datumsauswahl wechselt die Seitenleiste zu <strong>Schritt 3</strong>. Die Datumsauswahl bleibt sichtbar, der Button <strong>Heute wählen</strong> verschwindet — du siehst nur noch das gewählte Datum.
           {% endif %}
-        </div>
+        </p>
       </div>
     </div>
 
@@ -186,38 +197,65 @@
     <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">{{ "Step 4" if lang == "en" else "Schritt 4" }}</div>
+        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            In <strong>step 3</strong>, the sidebar tells you that you can now start the analysis. Click <strong>Start analysis</strong>. The instruction steps disappear while the model runs, and a loading indicator appears below the button.
+          {% else %}
+            In <strong>Schritt 3</strong> weist dich die Seitenleiste darauf hin, dass du die Analyse jetzt starten kannst. Klicke auf <strong>Analyse starten</strong>. Die Anleitungsschritte verschwinden während das Modell läuft, und unter dem Button erscheint ein Ladeindikator.
+          {% endif %}
+        </p>
+        <div class="howto-tip">
+          <span class="howto-tip-label">⚠️ {{ "Note" if lang == "en" else "Hinweis" }}</span>
+          {% if lang == "en" %}
+            The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis.
+            <p> If you click <strong>Start analysis</strong> before a field or date is set, a short hint appears in the sidebar. </p>
+          {% else %}
+            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern. Je grösser das Feld, desto länger dauert es. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
+            <p> Klickst du auf <strong>Analyse starten</strong>, bevor Feld oder Datum gesetzt sind, erscheint ein kurzer Hinweis in der Seitenleiste. </p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 5" if lang == "en" else "Schritt 5" }}</div>
         <h3>{{ "Read your results" if lang == "en" else "Ergebnisse lesen" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.
+            After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The <strong>Result</strong> section appears in the sidebar with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.
           {% else %}
-            Nach Abschluss der Analyse wird dein Feld nach dem vorhergesagten organischen Kohlenstoff im Boden farbcodiert. In der Seitenleiste siehst du eine Zusammenfassung mit der Anzahl analysierter Zonen, dem durchschnittlichen SOC sowie den höchsten und niedrigsten SOC-Werten.
+            Nach Abschluss der Analyse wird dein Feld nach dem vorhergesagten organischen Kohlenstoff im Boden farbcodiert. Der Bereich <strong>Ergebnis</strong> erscheint in der Seitenleiste mit der Anzahl analysierter Zonen, dem durchschnittlichen SOC sowie den höchsten und niedrigsten SOC-Werten.
           {% endif %}
         </p>
       </div>
     </div>
 
-    <!-- Step 5 -->
+    <!-- Step 6 -->
     <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">{{ "Step 5" if lang == "en" else "Schritt 5" }}</div>
+        <div class="howto-detail-num">{{ "Step 6" if lang == "en" else "Schritt 6" }}</div>
         <h3>{{ "Save your results" if lang == "en" else "Ergebnisse speichern" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            You can save your results by clicking the <strong>Save</strong> button in the sidebar. Further down is a complete step-by-step guide on how to use the personal dashboard.
+            You can save your results by clicking the <strong>Save to Personal Dashboard</strong> button in the sidebar. Further down is a complete step-by-step guide on how to use the personal dashboard.
           {% else %}
-            Du kannst deine Ergebnisse über den Button <strong>Speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zu Mein Dashboard.
+            Du kannst deine Ergebnisse über den Button <strong>In Mein Dashboard speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zu Mein Dashboard.
           {% endif %}
         </p>
         <p style="margin-top:12px;">
           {% if lang == "en" %}
-            To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.
+            To start again, click the <strong>Reset</strong> button to clear all layers and return to step 1.
           {% else %}
-            Für einen Neustart klicke auf <strong>Zurücksetzen</strong>, um alle Layer zu löschen und ein neues Polygon zu zeichnen.
+            Für einen Neustart klicke auf <strong>Zurücksetzen</strong>, um alle Layer zu löschen und zu Schritt 1 zurückzukehren.
           {% endif %}
         </p>
       </div>

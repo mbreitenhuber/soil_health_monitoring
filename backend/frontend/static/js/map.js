@@ -37,11 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
   const dateInput = document.getElementById("analysis-date");
   if (dateInput) {
     const today = new Date();
-    dateInput.valueAsDate = today;
-
-    // ❗ no future dates allowed
+    dateInput.value = "";
     dateInput.max = today.toISOString().split("T")[0];
+    dateInput.addEventListener("change", onAnalysisDateChosen);
   }
+
+  const btnSelectToday = document.getElementById("btn-select-today");
+  if (btnSelectToday) {
+    btnSelectToday.addEventListener("click", setTodayDate);
+  }
+
+  setWorkflowStep(1);
   // ── Restore polygon + save-popup fields from Personal Dashboard ─────────────
   if (_prefill) {
     const _coords = _prefill.polygon;
@@ -323,13 +329,81 @@ function formatOcValue(value) {
   return `${Number(value).toFixed(1)} g/kg`;
 }
 
-function setStep(n) {
-  [1, 2, 3].forEach(i => {
-    const el = document.getElementById(`step-${i}`);
-    el.classList.remove("active", "done");
-    if (i < n) el.classList.add("done");
-    if (i === n) el.classList.add("active");
+function setWorkflowStep(step) {
+  workflowStep = step;
+
+  const isRunning = step === "running";
+  const isComplete = step === "complete";
+  const hideSteps = isRunning || isComplete;
+
+  [1, 2, 3].forEach((i) => {
+    const full = document.getElementById(`step-${i}`);
+    const summary = document.getElementById(`step-${i}-summary`);
+    if (!full || !summary) return;
+
+    if (hideSteps) {
+      full.classList.add("hidden");
+      full.classList.remove("active");
+      summary.classList.add("hidden");
+      return;
+    }
+
+    if (i === step) {
+      full.classList.remove("hidden");
+      full.classList.add("active");
+      summary.classList.add("hidden");
+    } else {
+      full.classList.add("hidden");
+      full.classList.remove("active");
+      summary.classList.remove("hidden");
+    }
   });
+
+  const howto = document.getElementById("analysis-howto-cta");
+  if (howto) howto.hidden = step !== 1;
+
+  const areaPanel = document.getElementById("sidebar-area-panel");
+  const dateBox = document.getElementById("sidebar-date-box");
+  const hasField = !!currentPolygon;
+  const showAreaPanel = hasField && step !== 1;
+  const showDateBox = hasField && (step === 2 || step === 3 || isRunning || isComplete);
+
+  if (areaPanel) areaPanel.hidden = !showAreaPanel;
+  if (dateBox) dateBox.hidden = !showDateBox;
+
+  const btnSelectToday = document.getElementById("btn-select-today");
+  if (btnSelectToday) btnSelectToday.hidden = step !== 2;
+
+  const instructions = document.getElementById("instructions-panel");
+  if (instructions) {
+    instructions.classList.toggle("is-collapsed", hideSteps);
+  }
+
+  const analyseBtn = document.getElementById("btn-analyse");
+  if (analyseBtn) {
+    analyseBtn.disabled = isRunning;
+  }
+
+  hideAnalysisHint();
+}
+
+let workflowStep = 1;
+
+function hasAnalysisDate() {
+  const dateInput = document.getElementById("analysis-date");
+  return !!(dateInput && dateInput.value);
+}
+
+function setTodayDate() {
+  const dateInput = document.getElementById("analysis-date");
+  if (!dateInput) return;
+  dateInput.valueAsDate = new Date();
+  onAnalysisDateChosen();
+}
+
+function onAnalysisDateChosen() {
+  if (!currentPolygon || !hasAnalysisDate()) return;
+  if (workflowStep === 2) setWorkflowStep(3);
 }
 
 function hideAnalysisHint() {
@@ -337,9 +411,15 @@ function hideAnalysisHint() {
   if (hint) hint.hidden = true;
 }
 
-function showAnalysisHint() {
+function showAnalysisHint(kind = "field") {
   const hint = document.getElementById("analysis-hint");
-  if (hint) hint.hidden = false;
+  if (!hint) return;
+  const message =
+    kind === "date"
+      ? hint.dataset.hintDate
+      : hint.dataset.hintField;
+  if (message) hint.textContent = message;
+  hint.hidden = false;
 }
 
 function updateStats(latlngs) {
@@ -347,7 +427,12 @@ function updateStats(latlngs) {
   document.getElementById("stat-area").textContent = calcArea(latlngs).toFixed(2) + " ha";
   document.getElementById("stat-status").textContent = MAP_UI.ready;
   hideAnalysisHint();
-  setStep(2);
+
+  if (hasAnalysisDate()) {
+    setWorkflowStep(3);
+  } else {
+    setWorkflowStep(2);
+  }
 }
 
 // =====================
@@ -359,6 +444,7 @@ map.on(L.Draw.Event.CREATED, e => {
   resultLayer.clearLayers();
 
   document.getElementById("result-box").classList.remove("visible");
+  document.getElementById("sidebar-result-panel").hidden = true;
   document.getElementById("btn-save-dashboard").style.display = "block";
 
   drawnItems.addLayer(e.layer);
@@ -375,6 +461,9 @@ map.on(L.Draw.Event.EDITED, () => {
     updateStats(currentPolygon);
     resultLayer.clearLayers();
     document.getElementById("result-box").classList.remove("visible");
+    document.getElementById("sidebar-result-panel").hidden = true;
+    btnSaveDashboard.classList.remove("visible");
+    document.getElementById("btn-save-dashboard").style.display = "none";
   }
 });
 
@@ -392,9 +481,12 @@ map.on(L.Draw.Event.DELETED, () => {
 
   resultLayer.clearLayers();
   document.getElementById("result-box").classList.remove("visible");
+  document.getElementById("sidebar-result-panel").hidden = true;
 
-  setStep(1);
+  const dateInput = document.getElementById("analysis-date");
+  if (dateInput) dateInput.value = "";
 
+  setWorkflowStep(1);
 });
 
 // =====================
@@ -403,7 +495,12 @@ map.on(L.Draw.Event.DELETED, () => {
 
 document.getElementById("btn-analyse").addEventListener("click", async () => {
   if (!currentPolygon) {
-    showAnalysisHint();
+    showAnalysisHint("field");
+    return;
+  }
+
+  if (workflowStep < 3 || !hasAnalysisDate()) {
+    showAnalysisHint("date");
     return;
   }
 
@@ -411,11 +508,10 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
   document.getElementById("btn-analyse").disabled = true;
   document.getElementById("loader").classList.add("visible");
   document.getElementById("result-box").classList.remove("visible");
+  document.getElementById("sidebar-result-panel").hidden = true;
 
   resultLayer.clearLayers();
-  setStep(3);
-
-  document.getElementById("instructions-panel")?.classList.add("is-collapsed");
+  setWorkflowStep("running");
 
   try {
     const res = await fetch(`${API_URL}/api/predict`, {
@@ -483,15 +579,23 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     document.getElementById("res-min").textContent = formatOcValue(Math.min(...values));
 
     document.getElementById("result-box").classList.add("visible");
+    document.getElementById("sidebar-result-panel").hidden = false;
     btnSaveDashboard.classList.add("visible");
     document.getElementById("btn-save-dashboard").style.display = "block";
 
+    setWorkflowStep("complete");
+
   } catch (err) {
-    document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
+    if (hasAnalysisDate()) {
+      setWorkflowStep(3);
+    } else if (currentPolygon) {
+      setWorkflowStep(2);
+    } else {
+      setWorkflowStep(1);
+    }
     alert(MAP_UI.backend_unreachable.replace("{msg}", err.message));
   } finally {
     document.getElementById("loader").classList.remove("visible");
-    document.getElementById("btn-analyse").disabled = false;
   }
 });
 
@@ -515,6 +619,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   document.getElementById("stat-status").textContent = MAP_UI.no_polygon;
   hideAnalysisHint();
   document.getElementById("result-box").classList.remove("visible");
+  document.getElementById("sidebar-result-panel").hidden = true;
   document.getElementById("btn-save-dashboard").style.display = "none";
 
   closeSavePopup();
@@ -522,15 +627,13 @@ document.getElementById("btn-reset").addEventListener("click", () => {
   btnSaveDashboard.classList.remove("visible");
 
   switchToFieldMode();
-  setStep(1);
-
-  document.getElementById("instructions-panel")?.classList.remove("is-collapsed");
-  document.getElementById("btn-save-dashboard").style.display = "none";
 
   const dateInput = document.getElementById("analysis-date");
   if (dateInput) {
-    dateInput.valueAsDate = new Date();
+    dateInput.value = "";
   }
+
+  setWorkflowStep(1);
 });
 
 // =====================
