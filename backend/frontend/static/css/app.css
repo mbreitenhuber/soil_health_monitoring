@@ -48,9 +48,16 @@
 .poly-stat { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
 .poly-stat:last-child { border-bottom: none; }
 .poly-stat .val { color: var(--accent); font-weight: 500; }
-.btn-analyse { width: 100%; padding: 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--bg); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; cursor: pointer; transition: opacity 0.2s; }
+.btn-analyse { width: 100%; padding: 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--bg); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; cursor: pointer; transition: opacity 0.2s, background 0.2s, color 0.2s; }
 .btn-analyse:hover:not(:disabled) { opacity: 0.88; }
 .btn-analyse:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-analyse.is-inactive {
+  background: var(--muted);
+  color: var(--surface);
+  opacity: 1;
+  cursor: pointer;
+}
+.btn-analyse.is-inactive:hover { opacity: 0.82; }
 .btn-reset { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 0.8rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
 .btn-reset:hover { border-color: var(--danger); color: var(--danger); }
 .loader { display: none; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--text-dim); }
@@ -139,6 +146,7 @@
 #sidebar-date-box[hidden],
 #sidebar-area-panel[hidden],
 #sidebar-result-panel[hidden],
+#sidebar-legend-panel[hidden],
 #btn-select-today[hidden] {
   display: none !important;
 }

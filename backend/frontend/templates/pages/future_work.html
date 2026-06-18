@@ -39,9 +39,9 @@
 
     <p class="report-body">
       {% if lang == "en" %}
-        These ideas focus on day-to-day usability, better guidance, and community. They’re written as a preview — the exact UX and implementation details will evolve.
+        These ideas focus on day-to-day usability, better guidance, and community. They’re written as a preview. The exact UX and implementation details will evolve.
       {% else %}
-        Diese Ideen konzentrieren sich auf den alltäglichen Nutzen, bessere Orientierung und die Community. Sie sind als Vorschau gedacht — das genaue UX-Design und die Umsetzung werden sich im Detail noch weiterentwickeln.
+        Diese Ideen konzentrieren sich auf den alltäglichen Nutzen, bessere Orientierung und die Community. Sie sind als Vorschau gedacht. Das genaue UX-Design und die Umsetzung werden sich im Detail noch weiterentwickeln.
       {% endif %}
     </p>
 
@@ -73,9 +73,9 @@
       </h3>
       <p class="report-body">
         {% if lang == "en" %}
-          A chatbot for sustainable soil management practice recommendations — trained on academic knowledge and local farmer experience — including guidance on techniques, incentives, and carbon-credit ideas.
+          A chatbot for sustainable soil management practice recommendations, trained on academic knowledge and local farmer experience, including guidance on techniques, incentives, and carbon-credit ideas.
         {% else %}
-          Ein Chatbot für Empfehlungen zu nachhaltigem Bodenmanagement — trainiert mit wissenschaftlichen Erkenntnissen und Erfahrungen aus der Landwirtschaft — inklusive Hinweise zu Methoden, Förderungen und Carbon-Credit-Ideen.
+          Ein Chatbot für Empfehlungen zu nachhaltigem Bodenmanagement, trainiert mit wissenschaftlichen Erkenntnissen und Erfahrungen aus der Landwirtschaft, inklusive Hinweise zu Methoden, Förderungen und Carbon-Credit-Ideen.
         {% endif %}
       </p>
 
@@ -102,13 +102,13 @@
       </p>
 
       <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
-        5. {{ "Loading page reinvented" if lang == "en" else "Neu gedachte Loading Page" }}
+        5. {{ "Updating loading page" if lang == "en" else "Lade-Seite überarbeiten" }}
       </h3>
       <p class="report-body" style="margin-bottom: 14px;">
         {% if lang == "en" %}
-          A loading page that shows exactly which step the pipeline is currently running — so waiting feels transparent and predictable.
+          A loading page that shows exactly which step the pipeline is currently running, so waiting feels transparent and predictable.
         {% else %}
-          Eine Loading Page, die transparent zeigt, in welchem Schritt der Pipeline sich die Analyse gerade befindet — damit Wartezeiten nachvollziehbar und planbar werden.
+          Eine Loading Page, die transparent zeigt, in welchem Schritt der Pipeline sich die Analyse gerade befindet, damit Wartezeiten nachvollziehbar und planbar werden.
         {% endif %}
       </p>
     </div>
@@ -138,7 +138,31 @@
 
     <div style="max-width: 820px;">
       <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 20px 0 10px;">
-        1. {{ "Enlarge feature input" if lang == "en" else "Erweiterte Input-Features" }}
+        1. {{ "Improve ML prediction" if lang == "en" else "ML-Vorhersage verbessern" }}
+      </h3>
+      <p class="report-body">
+        {% if lang == "en" %}
+          Key areas for improving the SOC prediction model:
+        {% else %}
+          Zentrale Verbesserungsmöglichkeiten für das SOC-Vorhersagemodell:
+        {% endif %}
+      </p>
+      <ul class="report-infobox-list report-body" style="margin-top: 0;">
+        {% if lang == "en" %}
+          <li><strong>Accuracy</strong> — reduce prediction error through better features, model tuning, and validation on held-out fields.</li>
+          <li><strong>Generalizability</strong> — ensure reliable estimates across regions, soil types, and land-use conditions beyond the current training distribution.</li>
+          <li><strong>Uncertainty estimation</strong> — quantify and communicate prediction uncertainty so users can judge how much to trust a result.</li>
+          <li><strong>Data foundation</strong> — expand and diversify the training dataset (e.g. LUCAS 2022, neighboring EU countries) beyond the current n=270 samples.</li>
+        {% else %}
+          <li><strong>Genauigkeit</strong> — Vorhersagefehler durch bessere Features, Modelloptimierung und Validierung auf ungesehenen Feldern reduzieren.</li>
+          <li><strong>Generalisierbarkeit</strong> — zuverlässige Schätzungen über Regionen, Bodentypen und Landnutzungen hinweg sicherstellen, auch ausserhalb der aktuellen Trainingsverteilung.</li>
+          <li><strong>Unsicherheitsabschätzung</strong> — Vorhersageunsicherheit quantifizieren und transparent kommunizieren, damit Nutzer:innen die Verlässlichkeit einschätzen können.</li>
+          <li><strong>Datengrundlage</strong> — Trainingsdatensatz erweitern und diversifizieren (z.&nbsp;B. LUCAS 2022, benachbarte EU-Länder) über die aktuellen n=270 Stichproben hinaus.</li>
+        {% endif %}
+      </ul>
+
+      <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 20px 0 10px;">
+        2. {{ "Enlarge feature input" if lang == "en" else "Erweiterte Input-Features" }}
       </h3>
       <p class="report-body">
         {% if lang == "en" %}
@@ -149,7 +173,7 @@
       </p>
 
       <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
-        2. {{ "Integrate local input" if lang == "en" else "Lokale Daten integrieren" }}
+        3. {{ "Integrate local input" if lang == "en" else "Lokale Daten integrieren" }}
       </h3>
       <p class="report-body">
         {% if lang == "en" %}
@@ -160,7 +184,7 @@
       </p>
 
       <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
-        3. {{ "Predict more soil characteristics" if lang == "en" else "Erweiterte Bodenparameter" }}
+        4. {{ "Predict more soil characteristics" if lang == "en" else "Erweiterte Bodenparameter" }}
       </h3>
       <p class="report-body">
         {% if lang == "en" %}
@@ -171,7 +195,7 @@
       </p>
 
       <h3 style="font-family: 'Syne', sans-serif; font-weight: 800; letter-spacing: -0.02em; margin: 24px 0 10px;">
-        4. {{ "Improve resolution" if lang == "en" else "Höhere räumliche Auflösung" }}
+        5. {{ "Improve resolution" if lang == "en" else "Höhere räumliche Auflösung" }}
       </h3>
       <p class="report-body">
         {% if lang == "en" %}

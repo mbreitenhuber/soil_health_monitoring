@@ -329,6 +329,15 @@ function formatOcValue(value) {
   return `${Number(value).toFixed(1)} g/kg`;
 }
 
+function setResultsVisible(visible) {
+  const resultPanel = document.getElementById("sidebar-result-panel");
+  const legendPanel = document.getElementById("sidebar-legend-panel");
+  const resultBox = document.getElementById("result-box");
+  if (resultPanel) resultPanel.hidden = !visible;
+  if (legendPanel) legendPanel.hidden = !visible;
+  if (resultBox) resultBox.classList.toggle("visible", visible);
+}
+
 function setWorkflowStep(step) {
   workflowStep = step;
 
@@ -381,6 +390,8 @@ function setWorkflowStep(step) {
 
   const analyseBtn = document.getElementById("btn-analyse");
   if (analyseBtn) {
+    const readyToStart = step === 3 || isComplete;
+    analyseBtn.classList.toggle("is-inactive", !readyToStart && !isRunning);
     analyseBtn.disabled = isRunning;
   }
 
@@ -443,8 +454,7 @@ map.on(L.Draw.Event.CREATED, e => {
   drawnItems.clearLayers();
   resultLayer.clearLayers();
 
-  document.getElementById("result-box").classList.remove("visible");
-  document.getElementById("sidebar-result-panel").hidden = true;
+  setResultsVisible(false);
   document.getElementById("btn-save-dashboard").style.display = "block";
 
   drawnItems.addLayer(e.layer);
@@ -460,8 +470,7 @@ map.on(L.Draw.Event.EDITED, () => {
     currentPolygon = layers[0].getLatLngs()[0];
     updateStats(currentPolygon);
     resultLayer.clearLayers();
-    document.getElementById("result-box").classList.remove("visible");
-    document.getElementById("sidebar-result-panel").hidden = true;
+    setResultsVisible(false);
     btnSaveDashboard.classList.remove("visible");
     document.getElementById("btn-save-dashboard").style.display = "none";
   }
@@ -480,8 +489,7 @@ map.on(L.Draw.Event.DELETED, () => {
   hideAnalysisHint();
 
   resultLayer.clearLayers();
-  document.getElementById("result-box").classList.remove("visible");
-  document.getElementById("sidebar-result-panel").hidden = true;
+  setResultsVisible(false);
 
   const dateInput = document.getElementById("analysis-date");
   if (dateInput) dateInput.value = "";
@@ -507,8 +515,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
   hideAnalysisHint();
   document.getElementById("btn-analyse").disabled = true;
   document.getElementById("loader").classList.add("visible");
-  document.getElementById("result-box").classList.remove("visible");
-  document.getElementById("sidebar-result-panel").hidden = true;
+  setResultsVisible(false);
 
   resultLayer.clearLayers();
   setWorkflowStep("running");
@@ -578,8 +585,7 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
     document.getElementById("res-max").textContent = formatOcValue(Math.max(...values));
     document.getElementById("res-min").textContent = formatOcValue(Math.min(...values));
 
-    document.getElementById("result-box").classList.add("visible");
-    document.getElementById("sidebar-result-panel").hidden = false;
+    setResultsVisible(true);
     btnSaveDashboard.classList.add("visible");
     document.getElementById("btn-save-dashboard").style.display = "block";
 
@@ -618,8 +624,7 @@ document.getElementById("btn-reset").addEventListener("click", () => {
 
   document.getElementById("stat-status").textContent = MAP_UI.no_polygon;
   hideAnalysisHint();
-  document.getElementById("result-box").classList.remove("visible");
-  document.getElementById("sidebar-result-panel").hidden = true;
+  setResultsVisible(false);
   document.getElementById("btn-save-dashboard").style.display = "none";
 
   closeSavePopup();

@@ -90,26 +90,24 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.
+            Open the Analysis page via <strong>Analysis</strong> in the top navigation or the <em>Analyze now</em> button on the home page. A full-screen satellite map opens, centred on Germany by default. On the left you will find a sidebar with short instructions to help you through the process; for the full walkthrough, you are already in the right place.
           {% else %}
-            Klicke in der oberen Navigation auf <strong>Analyse</strong> oder nutze auf der Startseite den Button <em>Jetzt analysieren</em>. Du siehst eine Vollbildkarte mit Fokus auf Deutschland.
+            Öffne die Analyse-Seite über <strong>Analyse</strong> in der oberen Navigation oder den Button <em>Jetzt analysieren</em> auf der Startseite. Eine Vollbild-Satellitenkarte öffnet sich, standardmässig mit Fokus auf Deutschland. Links findest du eine Seitenleiste mit kurzen Anweisungen als Hilfe für den Ablauf; die ausführliche Anleitung liest du hier.
           {% endif %}
         </p>
         <p style="margin-top:12px;">
           {% if lang == "en" %}
-            The sidebar on the left guides you through three steps: <strong>1 Selecting field</strong>, <strong>2 Selecting date</strong>, and <strong>3 Start analysis</strong>. At the beginning you only see step 1, the <strong>Start analysis</strong> and <strong>Reset</strong> buttons, and the legend. A short note also points you to this full guide on the <strong>How to Use</strong> page.
+            Before you draw anything, zoom and pan to your field. The map behaves like any familiar online map: scroll to zoom, click and drag to move. A search bar in the top-right corner lets you jump to a place name or enter coordinates directly, which is often faster than scrolling across the country from the default view.
           {% else %}
-            Die Seitenleiste links führt dich in drei Schritten: <strong>1 Feld auswählen</strong>, <strong>2 Datum auswählen</strong> und <strong>3 Analyse starten</strong>. Am Anfang siehst du nur Schritt 1, die Buttons <strong>Analyse starten</strong> und <strong>Zurücksetzen</strong> sowie die Legende. Ein kurzer Hinweis verweist auf diese ausführliche Anleitung unter <strong>Anleitung</strong>.
+            Bevor du etwas zeichnest, zoome und verschiebe die Karte zu deinem Feld. Sie verhält sich wie eine gewohnte Online-Karte: Scrollen zum Zoomen, Klicken und Ziehen zum Verschieben. Die Suchleiste oben rechts springt zu einem Ortsnamen oder direkt zu Koordinaten, was oft schneller, als vom Standardausschnitt quer durchs Land zu scrollen.
           {% endif %}
         </p>
         <div class="howto-tip">
           <span class="howto-tip-label">💡 {{ "Tip" if lang == "en" else "Tipp" }}</span>
           {% if lang == "en" %}
-            Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
-            To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
+            AgroScan works best for agricultural fields in Germany. When the page loads, a short note reminds you of a few practical limits. For example, very large fields take longer to process and the page should stay open while the model is running.
           {% else %}
-            Zoome mit dem Mausrad oder den <kbd>+</kbd> / <kbd>–</kbd>-Buttons auf der Karte in deine Region, bevor du zeichnest. So setzt du die Polygonpunkte genauer.
-            Du kannst auch nach dem nächsten Ort suchen oder die Koordinaten deines Feldes in die Suchleiste oben rechts eingeben, um direkt dorthin zu springen.
+            AgroScan eignet sich am besten für landwirtschaftliche Felder in Deutschland. Beim Laden erscheint kurz ein Hinweis zu ein paar praktischen Grenzen. Zum Beispiel dauern sehr grosse Felder länger, und die Seite sollte während der Modellberechnung geöffnet bleiben.
           {% endif %}
         </div>
       </div>
@@ -144,13 +142,6 @@
           <li>Zum Nachbearbeiten wähle <strong>Layer bearbeiten</strong> (Stift-Symbol), ziehe die Eckpunkte an die gewünschte Position und klicke auf <strong>Speichern</strong>.</li>
           {% endif %}
         </ol>
-        <p style="margin-top:16px;">
-          {% if lang == "en" %}
-            Once the polygon is closed, the sidebar moves to <strong>step 2</strong>: step 1 and the guide note disappear, the <strong>Area</strong> box appears with the number of vertices and approximate area, and the date picker becomes visible. Completed and upcoming steps stay visible as faded one-line hints above and below the active step.
-          {% else %}
-            Sobald das Polygon geschlossen ist, wechselt die Seitenleiste zu <strong>Schritt 2</strong>: Schritt 1 und der Hinweis auf die Anleitung verschwinden, die <strong>Fläche</strong>-Box mit Eckpunkten und ungefährer Fläche erscheint, und die Datumsauswahl wird sichtbar. Erledigte und kommende Schritte bleiben als ausgebleichte Einzeiler über und unter dem aktiven Schritt sichtbar.
-          {% endif %}
-        </p>
         <p style="margin-top:12px;">
           {% if lang == "en" %}
             To start over after an analysis, use <strong>Reset</strong> in the sidebar. While drawing a new field, you can also delete the polygon with the map toolbar and draw again.
@@ -178,16 +169,16 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            In <strong>step 2</strong> of the sidebar, choose the date for which satellite data should be used. Pick a date from the calendar, or click <strong>Select today</strong> next to the date field to use the most recent available image. Future dates are not allowed.
+            Every analysis is tied to a specific point in time. AgroScan uses Sentinel-2 satellite imagery, and the model needs to know which acquisition date to use for your field. Once your polygon is in place, choose an <strong>Analysis date</strong> in the sidebar. This tells the system which satellite pass to base the prediction on.
           {% else %}
-            In <strong>Schritt 2</strong> der Seitenleiste wählst du das Datum, für das Satellitendaten verwendet werden sollen. Wähle ein Datum im Kalender oder klicke neben dem Datumsfeld auf <strong>Heute wählen</strong>, um das aktuellste verfügbare Bild zu nutzen. Zukünftige Daten sind nicht erlaubt.
+            Jede Analyse bezieht sich auf einen bestimmten Zeitpunkt. AgroScan nutzt Sentinel-2-Satellitenbilder, und das Modell muss wissen, welches Aufnahmedatum für dein Feld verwendet werden soll. Sobald dein Polygon steht, wählst du in der Seitenleiste ein <strong>Analysedatum</strong>. Damit legst du fest, welcher Satellitendurchgang der Vorhersage zugrunde liegt.
           {% endif %}
         </p>
         <p style="margin-top:12px;">
           {% if lang == "en" %}
-            After a date is selected, the sidebar advances to <strong>step 3</strong>. The date picker stays visible, but the <strong>Select today</strong> button is hidden so you only see the chosen date.
+            Open the date picker and select a day from the calendar. Future dates are not available because no satellite image exists yet. If you want the most recent data without browsing the calendar, use <strong>Select today</strong> to set today's date in one click. Comparing the same field across different dates over several weeks or seasons is one of the most useful ways to track how your soil carbon changes over time.
           {% else %}
-            Nach der Datumsauswahl wechselt die Seitenleiste zu <strong>Schritt 3</strong>. Die Datumsauswahl bleibt sichtbar, der Button <strong>Heute wählen</strong> verschwindet — du siehst nur noch das gewählte Datum.
+            Öffne die Datumsauswahl und wähle einen Tag im Kalender. Zukünftige Daten sind nicht verfügbar, weil es dafür noch kein Satellitenbild gibt. Willst du die aktuellsten Daten ohne Kalendersuche, setzt <strong>Heute wählen</strong> das heutige Datum mit einem Klick. Dasselbe Feld an verschiedenen Daten über Wochen oder Saisons hinweg zu vergleichen, ist eine der besten Methoden, um Veränderungen des Bodenkohlenstoffs zu verfolgen.
           {% endif %}
         </p>
       </div>
@@ -202,19 +193,24 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            In <strong>step 3</strong>, the sidebar tells you that you can now start the analysis. Click <strong>Start analysis</strong>. The instruction steps disappear while the model runs, and a loading indicator appears below the button.
+            With your field outlined and a date selected, click <strong>Start analysis</strong>. AgroScan downloads the relevant satellite tiles for your polygon, runs them through the machine-learning model, and divides the field into a grid of 60-metre zones. Each zone receives a predicted soil organic carbon value, which is then colour-coded on the map. A loading message appears while this runs. How long it takes depends mainly on field size and your internet connection.
           {% else %}
-            In <strong>Schritt 3</strong> weist dich die Seitenleiste darauf hin, dass du die Analyse jetzt starten kannst. Klicke auf <strong>Analyse starten</strong>. Die Anleitungsschritte verschwinden während das Modell läuft, und unter dem Button erscheint ein Ladeindikator.
+            Mit umrissener Fläche und gewähltem Datum klickst du auf <strong>Analyse starten</strong>. AgroScan lädt die passenden Satellitenkacheln für dein Polygon, führt sie durch das Machine-Learning-Modell und unterteilt das Feld in ein Raster aus 60-Meter-Zonen. Jede Zone erhält einen vorhergesagten Wert für organischen Bodenkohlenstoff, der auf der Karte farblich dargestellt wird. Währenddessen erscheint eine Lademeldung. Die Dauer hängt vor allem von der Feldgrösse und deiner Internetverbindung ab.
+          {% endif %}
+        </p>
+        <p style="margin-top:12px;">
+          {% if lang == "en" %}
+            Keep the browser tab open until the process finishes. If something goes wrong, for example a dropped connection, you can simply try again. For the most reliable results, analyse individual fields or management zones separately rather than drawing one very large polygon around several parcels at once.
+          {% else %}
+            Lass den Browser-Tab geöffnet, bis der Vorgang abgeschlossen ist. Bei Problemen, etwa einer unterbrochenen Verbindung, kannst du es einfach erneut versuchen. Für verlässliche Ergebnisse analysierst du einzelne Felder oder Bewirtschaftungszonen getrennt, statt ein sehr grosses Polygon um mehrere Parzellen zu legen.
           {% endif %}
         </p>
         <div class="howto-tip">
           <span class="howto-tip-label">⚠️ {{ "Note" if lang == "en" else "Hinweis" }}</span>
           {% if lang == "en" %}
-            The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis.
-            <p> If you click <strong>Start analysis</strong> before a field or date is set, a short hint appears in the sidebar. </p>
+            The analysis requires an active internet connection to download satellite data. Larger fields produce more grid cells and take longer to process.
           {% else %}
-            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern. Je grösser das Feld, desto länger dauert es. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
-            <p> Klickst du auf <strong>Analyse starten</strong>, bevor Feld oder Datum gesetzt sind, erscheint ein kurzer Hinweis in der Seitenleiste. </p>
+            Für die Analyse brauchst du eine aktive Internetverbindung zum Herunterladen der Satellitendaten. Grössere Felder erzeugen mehr Rasterzellen und brauchen länger.
           {% endif %}
         </div>
       </div>
