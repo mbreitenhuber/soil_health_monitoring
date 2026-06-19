@@ -48,9 +48,16 @@ function ocYAxisOptions(values, { dark = true } = {}) {
 // Chart.js global konfigurieren, um Standard-Farben zu eliminieren
 Chart.defaults.responsive = true;
 Chart.defaults.maintainAspectRatio = false;
-Chart.defaults.plugins.legend.display = false; // Wir machen eigene Labels
-Chart.defaults.elements.point.radius = 0;      // Keine Punkte global
-Chart.defaults.elements.line.borderWidth = 2;  // Basis-Dicke
+Chart.defaults.plugins.legend.display = false;
+Chart.defaults.elements.line.borderWidth = 2;
+Chart.defaults.elements.point.radius = 3;
+Chart.defaults.elements.point.hoverRadius = 5;
+Chart.defaults.elements.point.borderWidth = 2;
+Chart.defaults.elements.point.borderColor = "rgba(107, 114, 128, 0.55)";
+Chart.defaults.elements.point.backgroundColor = "transparent";
+Chart.defaults.elements.point.hoverBackgroundColor = "rgba(107, 114, 128, 0.55)";
+Chart.defaults.elements.point.hoverBorderColor = "rgba(107, 114, 128, 0.55)";
+Chart.defaults.elements.point.hoverBorderWidth = 2;
 
 /* ── X-axis: add one null-padded entry on each side ──
    Guarantees visual breathing room (~1 category width)
@@ -207,7 +214,11 @@ document.addEventListener("click", (e) => {
 window.addEventListener("click", (e) => {
   if (!e.target.closest("canvas")) {
     [compareChart, fieldLineChart].forEach(c => {
-      if (c) { c._lockedDataset = null; c.update(); }
+      if (c && c._lockedDataset !== null) {
+        c._lockedDataset = null;
+        c._hoveredDataset = null;
+        c.update("none");
+      }
     });
   }
 });
@@ -231,26 +242,38 @@ const unifiedChartPlugin = {
       const isDimmed = hasFocus && !isActive;
  
       if (!hasFocus) {
-        // Alles gleich: mittelgrau, schmal
-        ds.borderColor   = "rgba(107, 114, 128, 0.55)";
-        ds.borderWidth   = 1.5;
-        ds.pointRadius   = 0;
-        ds.pointHoverRadius = 0;
+        ds.borderColor          = "rgba(107, 114, 128, 0.55)";
+        ds.borderWidth          = 1.5;
+        ds.pointRadius          = 3;
+        ds.pointHoverRadius     = 5;
+        ds.pointBackgroundColor = "transparent";
+        ds.pointBorderColor     = "rgba(107, 114, 128, 0.55)";
+        ds.pointBorderWidth     = 2;
+        ds.pointHoverBackgroundColor = "rgba(107, 114, 128, 0.55)";
+        ds.pointHoverBorderColor     = "rgba(107, 114, 128, 0.55)";
+        ds.pointHoverBorderWidth     = 2;
       } else if (isActive) {
-        // Aktive Linie: voll sichtbar, leicht breiter
-        ds.borderColor   = fgColor;
-        ds.borderWidth   = 2.5;
-        ds.pointRadius   = 4;
-        ds.pointHoverRadius = 6;
-        ds.pointBackgroundColor  = fgColor;
-        ds.pointBorderColor      = fgColor;
-        ds.pointBorderWidth      = 0;
+        ds.borderColor          = fgColor;
+        ds.borderWidth          = 2.5;
+        ds.pointRadius          = 4;
+        ds.pointHoverRadius     = 6;
+        ds.pointBackgroundColor = "transparent";
+        ds.pointBorderColor     = fgColor;
+        ds.pointBorderWidth     = 2;
+        ds.pointHoverBackgroundColor = fgColor;
+        ds.pointHoverBorderColor     = fgColor;
+        ds.pointHoverBorderWidth     = 2;
       } else {
-        // Gedimmte Linien: kaum sichtbar
-        ds.borderColor   = "rgba(107, 114, 128, 0.15)";
-        ds.borderWidth   = 1;
-        ds.pointRadius   = 0;
-        ds.pointHoverRadius = 0;
+        ds.borderColor          = "rgba(107, 114, 128, 0.55)";
+        ds.borderWidth          = 1.5;
+        ds.pointRadius          = 3;
+        ds.pointHoverRadius     = 5;
+        ds.pointBackgroundColor = "transparent";
+        ds.pointBorderColor     = "rgba(107, 114, 128, 0.55)";
+        ds.pointBorderWidth     = 2;
+        ds.pointHoverBackgroundColor = "rgba(107, 114, 128, 0.55)";
+        ds.pointHoverBorderColor     = "rgba(107, 114, 128, 0.55)";
+        ds.pointHoverBorderWidth     = 2;
       }
     });
   },
@@ -286,7 +309,7 @@ const unifiedChartPlugin = {
  
       // Labels: nur sichtbar wenn kein Focus, oder wenn aktiv
       if (hasFocus && isDimmed) {
-        ctx.fillStyle = "rgba(107, 114, 128, 0.3)";
+        ctx.fillStyle = "rgba(107, 114, 128, 0.6)";
       } else if (!hasFocus) {
         ctx.fillStyle = "rgba(107, 114, 128, 0.6)";
       } else {
@@ -815,10 +838,10 @@ function drawSparklines() {
         const isHover = (i === hoverIdx);
         ctx.beginPath();
         ctx.arc(toX(i), toY(v), isHover ? 5 : 3, 0, Math.PI * 2);
-        ctx.fillStyle   = isHover ? "#ffffff" : "#5fa764";
+        ctx.fillStyle   = "transparent";
         ctx.fill();
-        ctx.strokeStyle = isHover ? "#5fa764" : "#ffffff";
-        ctx.lineWidth   = isHover ? 2 : 1.5;
+        ctx.strokeStyle = isHover ? "rgba(107, 114, 128, 0.9)" : "rgba(107, 114, 128, 0.55)";
+        ctx.lineWidth   = 2;
         ctx.stroke();
       });
 
@@ -998,9 +1021,15 @@ function renderFieldLineChart(items) {
  
   const rawLabels = items.map(a => a.date || "");
   const { labels, datasets } = padChart(rawLabels, [
-    { label: "Max", data: items.map(a => roundOc(a.max_value)), tension: 0 },
-    { label: "Avg", data: items.map(a => roundOc(a.avg_value)), tension: 0 },
-    { label: "Min", data: items.map(a => roundOc(a.min_value)), tension: 0 },
+    { label: "Max", data: items.map(a => roundOc(a.max_value)), tension: 0,
+      borderColor: "rgba(107,114,128,0.55)", backgroundColor: "transparent",
+      pointBorderColor: "rgba(107,114,128,0.55)", pointBackgroundColor: "transparent", pointBorderWidth: 2 },
+    { label: "Avg", data: items.map(a => roundOc(a.avg_value)), tension: 0,
+      borderColor: "rgba(107,114,128,0.55)", backgroundColor: "transparent",
+      pointBorderColor: "rgba(107,114,128,0.55)", pointBackgroundColor: "transparent", pointBorderWidth: 2 },
+    { label: "Min", data: items.map(a => roundOc(a.min_value)), tension: 0,
+      borderColor: "rgba(107,114,128,0.55)", backgroundColor: "transparent",
+      pointBorderColor: "rgba(107,114,128,0.55)", pointBackgroundColor: "transparent", pointBorderWidth: 2 },
   ]);
  
   fieldLineChart = new Chart(ctx, {
@@ -1052,6 +1081,7 @@ function renderFieldLineChart(items) {
  
   // Klick → Lock umschalten
   canvas.addEventListener("click", (e) => {
+    e.stopPropagation();
     const idx = getNearestDatasetIndex(fieldLineChart, e);
     toggleDatasetLock(fieldLineChart, idx);
     fieldLineChart._hoveredDataset = null;
@@ -1061,10 +1091,12 @@ function renderFieldLineChart(items) {
   // Mausbewegung → Hover aktualisieren
   canvas.addEventListener("mousemove", (e) => {
     if (!fieldLineChart) return;
-    if (fieldLineChart._lockedDataset !== null && fieldLineChart._lockedDataset !== undefined) return;
     const idx = getNearestDatasetIndex(fieldLineChart, e);
-    fieldLineChart._hoveredDataset = idx;
-    fieldLineChart.update("none");
+    // Immer hoveredDataset aktualisieren, auch wenn locked
+    if (idx !== fieldLineChart._hoveredDataset) {
+      fieldLineChart._hoveredDataset = idx;
+      fieldLineChart.update("none");
+    }
   });
 }
 
@@ -1255,7 +1287,7 @@ function showCompareChart() {
   if (!wrapper) {
     wrapper = document.createElement("div");
     wrapper.id = "compare-chart-wrapper";
-    wrapper.style.cssText = "margin-top:24px; padding:20px; background:var(--color-background-secondary, #1f2937); border-radius:12px;";
+    wrapper.style.cssText = "margin-top:24px; padding:20px; border-radius:12px;";
 
     const canvas = document.createElement("canvas");
     canvas.id = "compare-chart";
@@ -1273,27 +1305,42 @@ function showCompareChart() {
   const ctx = canvas.getContext("2d");
   if (compareChart) compareChart.destroy();
 
-  const rawDatasets = [];
-  const allDates = new Set();
+  const allDates   = new Set();
+  const fieldItems = {};
 
   selectedForCompare.forEach(fieldName => {
     const items = allAnalyses
       .filter(a => fieldKey(a) === fieldName)
       .sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
+    fieldItems[fieldName] = items;
+    items.forEach(i => { if (i.date) allDates.add(i.date); });
+  });
 
+  // Gemeinsames Zeitraster aus allen Feldern
+  const sortedDates = Array.from(allDates).sort();
+
+  // Jeden Feldwert exakt auf seinen Datumsplatz mappen — fehlende Daten = null
+  const rawDatasets = [];
+  selectedForCompare.forEach(fieldName => {
+    const byDate = {};
+    fieldItems[fieldName].forEach(i => {
+      if (i.date) byDate[i.date] = roundOc(i.avg_value);
+    });
     rawDatasets.push({
       label:    fieldName,
-      data:     items.map(a => roundOc(a.avg_value)),
+      data:     sortedDates.map(d => byDate[d] ?? null),
       spanGaps: true,
       tension:  0,
       fill:     false,
+      borderColor:          "rgba(107,114,128,0.55)",
+      backgroundColor:      "transparent",
+      pointBorderColor:     "rgba(107,114,128,0.55)",
+      pointBackgroundColor: "transparent",
+      pointBorderWidth:     2,
     });
-
-    items.forEach(i => allDates.add(i.date));
   });
 
-  const sortedLabels = Array.from(allDates).sort();
-  const { labels, datasets } = padChart(sortedLabels, rawDatasets);
+  const { labels, datasets } = padChart(sortedDates, rawDatasets);
 
   compareChart = new Chart(ctx, {
     type: "line",
@@ -1346,6 +1393,7 @@ function showCompareChart() {
     });
 
     canvas.addEventListener("click", (e) => {
+      e.stopPropagation();
       const idx = getNearestDatasetIndex(compareChart, e);
       toggleDatasetLock(compareChart, idx);
       compareChart._hoveredDataset = null;
@@ -1354,10 +1402,12 @@ function showCompareChart() {
 
     canvas.addEventListener("mousemove", (e) => {
       if (!compareChart) return;
-      if (compareChart._lockedDataset !== null && compareChart._lockedDataset !== undefined) return;
       const idx = getNearestDatasetIndex(compareChart, e);
-      compareChart._hoveredDataset = idx;
-      compareChart.update("none");
+      // Immer hoveredDataset aktualisieren, auch wenn locked
+      if (idx !== compareChart._hoveredDataset) {
+        compareChart._hoveredDataset = idx;
+        compareChart.update("none");
+      }
     });
   }
 }
