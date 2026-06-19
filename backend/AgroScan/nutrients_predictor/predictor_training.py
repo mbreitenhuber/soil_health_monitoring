@@ -13,6 +13,14 @@ import xgboost_predictor
 from dataloader_creator import DataloaderCreator
 
 
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_project_path(path_value: str) -> Path:
+    path = Path(path_value)
+    return path if path.is_absolute() else PROJECT_ROOT / path
+
+
 def run_model(model_var, model_config, target, validation, include_optional_data=True):
     """
     This function trains the selected model (XGBoost, Neural Network, or Random Forest) based on the given
@@ -26,7 +34,7 @@ def run_model(model_var, model_config, target, validation, include_optional_data
     """
 
     model_path = (
-        Path(os.environ["MODEL_PATH"])
+        _resolve_project_path(os.environ["MODEL_PATH"])
         / model_config
         / model_var
         / f"{model_config}_{model_var}_{target}"

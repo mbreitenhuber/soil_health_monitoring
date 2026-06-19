@@ -12,7 +12,7 @@ The input CSV must contain the feature columns listed in
 data/Feature_Cols/model_settings.json for the selected `model_config`.
 The script adds a new column `<target>_pred` to the CSV and saves it.
 """
-# python ./AgroLens/nutrients_predictor/predict_nn.py --input ./data/test.csv --model /Users/clarabuller/PycharmProjects/Nebula/data/models/Model_A/nn/Model_A_nn_OC.pth
+# python ./AgroLens/nutrients_predictor/predict_nn.py --input ./data/test.csv --model ./data/models/Model_A/nn/Model_A_nn_OC.pth
 
 import argparse
 import json
@@ -27,6 +27,14 @@ from dotenv import load_dotenv
 load_dotenv()
 
 import neural_network_predictor as nn_pred
+
+
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+
+
+def _resolve_project_path(path_value: str) -> Path:
+    path = Path(path_value)
+    return path if path.is_absolute() else PROJECT_ROOT / path
 
 
 def parse_args():
@@ -98,7 +106,7 @@ def main():
     if args.model:
         model_path = Path(args.model)
     else:
-        model_base = Path(os.environ.get("MODEL_PATH", ""))
+        model_base = _resolve_project_path(os.environ.get("MODEL_PATH", "./data/models"))
         model_path = model_base / args.model_config / "nn" / f"{args.model_config}_nn_{args.target}.pth"
 
     if not model_path.is_file():

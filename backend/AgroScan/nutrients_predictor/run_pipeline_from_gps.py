@@ -26,6 +26,11 @@ def run_cmd(cmd, env=None):
     subprocess.run(cmd, check=True, env=env)
 
 
+def _resolve_project_path(project_root: Path, path_value: str) -> Path:
+    path = Path(path_value)
+    return path if path.is_absolute() else project_root / path
+
+
 def parse_args():
     p = argparse.ArgumentParser(description="Run full pipeline from GPS-only CSV to OC predictions")
     p.add_argument("--gps", "-g", required=True, help="Input GPS CSV (POINTID,SURVEY_DATE,TH_LAT,TH_LONG)")
@@ -61,7 +66,11 @@ def main():
     # Resolve dataset path (DATASET_PATH env or default)
     dataset_path = Path(os.environ.get("DATASET_PATH", project_root / "data" / "datasets"))
     dataset_path.mkdir(parents=True, exist_ok=True)
-    model_base = Path(args.model_base) if args.model_base else project_root / "data" / "models"
+    model_base = (
+        _resolve_project_path(project_root, args.model_base)
+        if args.model_base
+        else project_root / "data" / "models"
+    )
 
     mapping_file = Path(args.mapping) if args.mapping else dataset_path / "mapping_from_gps.csv"
     sentinel_csv = dataset_path / f"{args.model_config}.csv"
@@ -122,7 +131,7 @@ def main():
     run_cmd([sys.executable, str(feature_transform)], env=env)
 
     # Reset MODEL_PATH to the correct models directory for prediction
-    env["MODEL_PATH"] = os.environ.get("MODEL_PATH", "./data/models")
+    env["MODEL_PATH"] = str(model_base)
 
     # 5) Predict with neural network
     predict_script = project_root / "AgroScan" / "nutrients_predictor" / "predict_nn.py"

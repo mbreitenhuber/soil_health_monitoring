@@ -85,6 +85,8 @@ def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = 
     override = os.environ.get("AGROSCAN_MODEL_PATH")
     if override:
         model_root = Path(override)
+        if not model_root.is_absolute():
+            model_root = PROJECT_ROOT / model_root
         if model_root.suffix == ".pth" and model_root.is_file():
             return model_root
         if model_root.name != "models":
