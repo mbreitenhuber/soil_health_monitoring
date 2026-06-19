@@ -350,8 +350,8 @@
 ========================= */
 
 #compare-chart-wrapper {
-  background: #fff;
-  border: 1px solid #e8e8e8;
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
@@ -1162,3 +1162,21 @@
 .sort-option:hover {
   background: var(--surface);
 }
+
+/* =====================================================
+   OVERVIEW MAP CARD
+===================================================== */
+.overview-map-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+#global-overview-map {
+  border: 1px solid var(--border);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+

@@ -45,6 +45,13 @@ function ocYAxisOptions(values, { dark = true } = {}) {
   };
 }
 
+// Chart.js global konfigurieren, um Standard-Farben zu eliminieren
+Chart.defaults.responsive = true;
+Chart.defaults.maintainAspectRatio = false;
+Chart.defaults.plugins.legend.display = false; // Wir machen eigene Labels
+Chart.defaults.elements.point.radius = 0;      // Keine Punkte global
+Chart.defaults.elements.line.borderWidth = 2;  // Basis-Dicke
+
 /* ── X-axis: add one null-padded entry on each side ──
    Guarantees visual breathing room (~1 category width)
    regardless of how many data points are shown.       */
@@ -65,12 +72,56 @@ function xAxisOpts({ dark = true } = {}) {
     ticks: {
       color: dark ? "#9ca3af" : undefined,
       maxRotation: 30,
-      callback: function(val, idx, ticks) {
-        if (idx === 0 || idx === ticks.length - 1) return "";
-        return this.getLabelForValue(val);
-      },
+      callback: function(val) {
+        const label = this.getLabelForValue(val);
+        if (!label) return "";
+        return label; // komplettes Datum: YYYY-MM-DD
+      }
     },
   };
+}
+
+/**
+ * Findet den Dataset-Index dessen letzter sichtbarer Punkt
+ * der Maus am nächsten liegt (X+Y-Distanz).
+ * Funktioniert zuverlässig auch bei sich kreuzenden Linien.
+ */
+function getNearestDatasetIndex(chart, event) {
+  const rect   = chart.canvas.getBoundingClientRect();
+  const mouseX = event.clientX - rect.left;
+  const mouseY = event.clientY - rect.top;
+ 
+  let bestIdx  = null;
+  let bestDist = Infinity;
+ 
+  chart.data.datasets.forEach((ds, i) => {
+    const meta = chart.getDatasetMeta(i);
+    if (!meta || !meta.data) return;
+ 
+    meta.data.forEach(point => {
+      if (point.x == null || point.y == null) return;
+      const dx   = point.x - mouseX;
+      const dy   = point.y - mouseY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < bestDist) {
+        bestDist = dist;
+        bestIdx  = i;
+      }
+    });
+  });
+ 
+  // Nur reagieren wenn Maus innerhalb 32px eines Punktes
+  return bestDist <= 32 ? bestIdx : null;
+}
+ 
+// Alias für Rückwärtskompatibilität (falls noch irgendwo genutzt)
+function getDatasetHoverIndex(chart, event) {
+  return getNearestDatasetIndex(chart, event);
+}
+
+function toggleDatasetLock(chart, idx) {
+  if (idx === null || idx === undefined) return;
+  chart._lockedDataset = (chart._lockedDataset === idx) ? null : idx;
 }
 
 /* ── Config ─────────────────────────────────────── */
@@ -121,15 +172,15 @@ let compareChart       = null;
 let detailMap                 = null;
 let detailMapInvalidateTimer = null;
 let fieldIndexMap = {};
+let activeDatasetIndex = null;
 
 const API_URL        = dashboardConfig.apiUrl || "http://127.0.0.1:8000";
 const TREND_FLAT_PCT = 1;
 
 const COLORS = {
-  min:     "#ef4444",
-  avg:     "#f59e0b",
-  max:     "#22c55e",
-  compare: ["#C94F4F","#f59e0b","#22c55e","#3b82f6","#a855f7","#ec4899"],
+  active:   "#111827",   // aktive / einzelne Linie  (Dark-Mode: wird per CSS-Var überschrieben)
+  dimmed:   "rgba(156, 163, 175, 0.25)",  // gedimmte Linien
+  grid:     "rgba(255,255,255,0.07)",
 };
 
 
@@ -152,6 +203,102 @@ document.addEventListener("click", (e) => {
   const field = el.dataset.field;
   if (field) openFieldModal(field);
 });
+
+window.addEventListener("click", (e) => {
+  if (!e.target.closest("canvas")) {
+    [compareChart, fieldLineChart].forEach(c => {
+      if (c) { c._lockedDataset = null; c.update(); }
+    });
+  }
+});
+
+const unifiedChartPlugin = {
+  id: "unifiedChartPlugin",
+ 
+  /* Vor dem Zeichnen: Stile setzen */
+  beforeDatasetsDraw(chart) {
+    const locked   = chart._lockedDataset;
+    const hovered  = chart._hoveredDataset;
+    const focused  = locked ?? hovered;       // Lock hat Vorrang vor Hover
+    const hasFocus = focused !== null && focused !== undefined;
+ 
+    // Dark-Mode-safe Vordergrundfarbe auslesen
+    const fgColor  = getComputedStyle(chart.canvas)
+      .getPropertyValue("--color-text-primary").trim() || "#111827";
+ 
+    chart.data.datasets.forEach((ds, i) => {
+      const isActive = (focused === i);
+      const isDimmed = hasFocus && !isActive;
+ 
+      if (!hasFocus) {
+        // Alles gleich: mittelgrau, schmal
+        ds.borderColor   = "rgba(107, 114, 128, 0.55)";
+        ds.borderWidth   = 1.5;
+        ds.pointRadius   = 0;
+        ds.pointHoverRadius = 0;
+      } else if (isActive) {
+        // Aktive Linie: voll sichtbar, leicht breiter
+        ds.borderColor   = fgColor;
+        ds.borderWidth   = 2.5;
+        ds.pointRadius   = 4;
+        ds.pointHoverRadius = 6;
+        ds.pointBackgroundColor  = fgColor;
+        ds.pointBorderColor      = fgColor;
+        ds.pointBorderWidth      = 0;
+      } else {
+        // Gedimmte Linien: kaum sichtbar
+        ds.borderColor   = "rgba(107, 114, 128, 0.15)";
+        ds.borderWidth   = 1;
+        ds.pointRadius   = 0;
+        ds.pointHoverRadius = 0;
+      }
+    });
+  },
+ 
+  /* Nach dem Zeichnen: Dataset-Label am Linienende */
+  afterDatasetsDraw(chart) {
+    const { ctx }  = chart;
+    const locked   = chart._lockedDataset;
+    const hovered  = chart._hoveredDataset;
+    const focused  = locked ?? hovered;
+    const hasFocus = focused !== null && focused !== undefined;
+ 
+    const fgColor  = getComputedStyle(chart.canvas)
+      .getPropertyValue("--color-text-primary").trim() || "#111827";
+ 
+    ctx.save();
+    ctx.textBaseline = "middle";
+    ctx.font         = "500 11px system-ui, sans-serif";
+ 
+    chart.data.datasets.forEach((ds, i) => {
+      const meta = chart.getDatasetMeta(i);
+      if (!meta?.data?.length) return;
+ 
+      // Letzten sichtbaren Punkt finden
+      let lastPoint = null;
+      for (let j = ds.data.length - 1; j >= 0; j--) {
+        if (ds.data[j] != null) { lastPoint = meta.data[j]; break; }
+      }
+      if (!lastPoint) return;
+ 
+      const isActive = (focused === i);
+      const isDimmed = hasFocus && !isActive;
+ 
+      // Labels: nur sichtbar wenn kein Focus, oder wenn aktiv
+      if (hasFocus && isDimmed) {
+        ctx.fillStyle = "rgba(107, 114, 128, 0.3)";
+      } else if (!hasFocus) {
+        ctx.fillStyle = "rgba(107, 114, 128, 0.6)";
+      } else {
+        ctx.fillStyle = fgColor;
+      }
+ 
+      ctx.fillText(ds.label || "", lastPoint.x + 10, lastPoint.y);
+    });
+ 
+    ctx.restore();
+  },
+};
 
 function renderKpiField(elId, fieldName, value, indexMap, type = "") {
   const el = document.getElementById(elId);
@@ -324,6 +471,7 @@ function updateDashboardKPIs(analyses = allAnalyses) {
 document.addEventListener("DOMContentLoaded", () => {
   renderDashboard(allAnalyses, { filtered: false });
   updateDashboardKPIs(allAnalyses);
+  renderGlobalOverviewMap(allAnalyses);
   populateCropFilter();
 
   document.getElementById("download-csv-btn")
@@ -384,8 +532,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function endComparison() {
   if (compareChart) { compareChart.destroy(); compareChart = null; }
+
+  // Nur verstecken, nicht entfernen — sonst ist Canvas weg
   const wrapper = document.getElementById("compare-chart-wrapper");
-  if (wrapper) wrapper.remove();
+  if (wrapper) wrapper.style.display = "none";
+
   selectedForCompare.clear();
   document.querySelectorAll(".compare-checkbox")
     .forEach(cb => (cb.checked = false));
@@ -840,55 +991,80 @@ window.closeFieldModal = function () {
 /* ── Field line chart (Min / Avg / Max over time) ── */
 
 function renderFieldLineChart(items) {
-  const ctx = document.getElementById("field-line-chart").getContext("2d");
+  const canvas = document.getElementById("field-line-chart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
   if (fieldLineChart) fieldLineChart.destroy();
-
-  const rawLabels = items.map(a => a.date || "–");
-  const maxData   = items.map(a => roundOc(a.max_value));
-  const avgData   = items.map(a => roundOc(a.avg_value));
-  const minData   = items.map(a => roundOc(a.min_value));
-  const allY      = [...maxData, ...avgData, ...minData];
-
-  const sharedOpts = {
-    tension: 0,
-    pointRadius:      items.length === 1 ? 7 : 5,
-    pointHoverRadius: 8,
-    borderWidth:      2.5,
-    fill:             false,
-  };
-
+ 
+  const rawLabels = items.map(a => a.date || "");
   const { labels, datasets } = padChart(rawLabels, [
-    { ...sharedOpts, label: uiText("chart_maximum"), data: maxData,
-      borderColor: COLORS.max, pointBackgroundColor: COLORS.max },
-    { ...sharedOpts, label: uiText("chart_average"), data: avgData,
-      borderColor: COLORS.avg, pointBackgroundColor: COLORS.avg },
-    { ...sharedOpts, label: uiText("chart_minimum"), data: minData,
-      borderColor: COLORS.min, pointBackgroundColor: COLORS.min },
+    { label: "Max", data: items.map(a => roundOc(a.max_value)), tension: 0 },
+    { label: "Avg", data: items.map(a => roundOc(a.avg_value)), tension: 0 },
+    { label: "Min", data: items.map(a => roundOc(a.min_value)), tension: 0 },
   ]);
-
+ 
   fieldLineChart = new Chart(ctx, {
     type: "line",
     data: { labels, datasets },
     options: {
-      responsive: true,
-      interaction: { mode: "index", intersect: false },
+      animation: false,
+      interaction: {
+        mode:      "nearest",   // ← nur das nächste Dataset
+        intersect: false,
+      },
       plugins: {
-        legend: {
-          display: true,
-          labels: { color: "#9ca3af", font: { size: 12 }, boxWidth: 16 },
-        },
+        legend: { display: false },
         tooltip: {
-          filter: item => item.parsed.y !== null,
           callbacks: {
-            label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y} g/kg`,
+            title: (items) => {
+              // Datum + Feldname als Titel
+              const item = items[0];
+              const date = item?.label || "";
+              const field = item?.dataset?.label || "";
+              return `${field}  ·  ${date}`;
+            },
+            label: (item) =>
+              ` ${item.raw != null ? Number(item.raw).toFixed(2) + " g/kg" : "–"}`,
           },
         },
       },
       scales: {
-        y: ocYAxisOptions(allY, { dark: true }),
-        x: xAxisOpts({ dark: true }),
+        y: ocYAxisOptions(datasets.flatMap(d => d.data)),
+        x: xAxisOpts(),
+      },
+      onHover: (event, _elements, chart) => {
+        if (chart._lockedDataset !== null && chart._lockedDataset !== undefined) return;
+        const idx = getNearestDatasetIndex(chart, event.native || event);
+        chart._hoveredDataset = idx;
+        chart.update("none");
       },
     },
+    plugins: [unifiedChartPlugin],
+  });
+ 
+  // Maus verlässt Canvas → Hover zurücksetzen
+  canvas.addEventListener("mouseleave", () => {
+    if (fieldLineChart) {
+      fieldLineChart._hoveredDataset = null;
+      fieldLineChart.update("none");
+    }
+  });
+ 
+  // Klick → Lock umschalten
+  canvas.addEventListener("click", (e) => {
+    const idx = getNearestDatasetIndex(fieldLineChart, e);
+    toggleDatasetLock(fieldLineChart, idx);
+    fieldLineChart._hoveredDataset = null;
+    fieldLineChart.update("none");
+  });
+ 
+  // Mausbewegung → Hover aktualisieren
+  canvas.addEventListener("mousemove", (e) => {
+    if (!fieldLineChart) return;
+    if (fieldLineChart._lockedDataset !== null && fieldLineChart._lockedDataset !== undefined) return;
+    const idx = getNearestDatasetIndex(fieldLineChart, e);
+    fieldLineChart._hoveredDataset = idx;
+    fieldLineChart.update("none");
   });
 }
 
@@ -1072,82 +1248,118 @@ function downloadAnalysis(id) {
 ══════════════════════════════════════════════════ */
 
 function showCompareChart() {
-  if (selectedForCompare.size < 2) {
-    alert(uiText("compare_min_fields"));
-    return;
+  if (selectedForCompare.size === 0) return;
+
+  // Wrapper + Canvas dynamisch erstellen falls nicht vorhanden
+  let wrapper = document.getElementById("compare-chart-wrapper");
+  if (!wrapper) {
+    wrapper = document.createElement("div");
+    wrapper.id = "compare-chart-wrapper";
+    wrapper.style.cssText = "margin-top:24px; padding:20px; background:var(--color-background-secondary, #1f2937); border-radius:12px;";
+
+    const canvas = document.createElement("canvas");
+    canvas.id = "compare-chart";
+    canvas.style.height = "320px";
+    wrapper.appendChild(canvas);
+
+    // Nach dem dashboard-container einfügen
+    const container = document.getElementById("dashboard-container");
+    container?.parentNode.insertBefore(wrapper, container);
   }
 
-  const old = document.getElementById("compare-chart-wrapper");
-  if (old) old.remove();
-  if (compareChart) { compareChart.destroy(); compareChart = null; }
+  wrapper.style.display = "";
 
-  const wrapper  = document.createElement("div");
-  wrapper.id     = "compare-chart-wrapper";
-  const title    = document.createElement("p");
-  title.style.cssText =
-    "font-weight:700;font-size:0.95rem;margin:0 0 16px;color:#333;";
-  title.textContent = uiText("compare_title");
-  wrapper.appendChild(title);
+  const canvas = document.getElementById("compare-chart");
+  const ctx = canvas.getContext("2d");
+  if (compareChart) compareChart.destroy();
 
-  const canvas = document.createElement("canvas");
-  wrapper.appendChild(canvas);
-  document.getElementById("dashboard-container")
-    .parentNode.insertBefore(wrapper, document.getElementById("dashboard-container"));
+  const rawDatasets = [];
+  const allDates = new Set();
 
-  const groups  = groupByField(allAnalyses);
-  const dateSet = new Set();
-  selectedForCompare.forEach(name => {
-    (groups[name] || []).forEach(a => { if (a.date) dateSet.add(a.date); });
-  });
-  const rawDates = [...dateSet].sort();
+  selectedForCompare.forEach(fieldName => {
+    const items = allAnalyses
+      .filter(a => fieldKey(a) === fieldName)
+      .sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
 
-  const rawDatasets = [...selectedForCompare].map((fieldName, i) => {
-    const items  = groups[fieldName] || [];
-    const byDate = Object.fromEntries(items.map(a => [a.date, a]));
-    const color  = COLORS.compare[i % COLORS.compare.length];
-    return {
-      label:                fieldName,
-      data:                 rawDates.map(d => byDate[d] ? roundOc(byDate[d].avg_value) : null),
-      borderColor:          color,
-      pointBackgroundColor: color,
-      tension:              0,
-      pointRadius:          5,
-      pointHoverRadius:     7,
-      borderWidth:          2.5,
-      fill:                 false,
-    };
+    rawDatasets.push({
+      label:    fieldName,
+      data:     items.map(a => roundOc(a.avg_value)),
+      spanGaps: true,
+      tension:  0,
+      fill:     false,
+    });
+
+    items.forEach(i => allDates.add(i.date));
   });
 
-  const { labels, datasets } = padChart(rawDates, rawDatasets);
-  const allY = rawDatasets.flatMap(ds => ds.data).filter(v => v != null);
+  const sortedLabels = Array.from(allDates).sort();
+  const { labels, datasets } = padChart(sortedLabels, rawDatasets);
 
-  compareChart = new Chart(canvas, {
+  compareChart = new Chart(ctx, {
     type: "line",
     data: { labels, datasets },
     options: {
-      responsive: true,
-      interaction: { mode: "index", intersect: false },
+      animation: false,
+      interaction: {
+        mode:      "nearest",   // ← nur das nächste Dataset
+        intersect: false,
+      },
       plugins: {
-        legend: { display: true, labels: { font: { size: 12 }, boxWidth: 16 } },
+        legend: { display: false },
         tooltip: {
-          filter: item => item.parsed.y !== null,
           callbacks: {
-            label: ctx =>
-              ` ${ctx.dataset.label}: ${
-                ctx.parsed.y !== null ? ctx.parsed.y + " g/kg" : "–"
-              }`,
+            title: (items) => {
+              // Datum + Feldname als Titel
+              const item = items[0];
+              const date = item?.label || "";
+              const field = item?.dataset?.label || "";
+              return `${field}  ·  ${date}`;
+            },
+            label: (item) =>
+              ` ${item.raw != null ? Number(item.raw).toFixed(2) + " g/kg" : "–"}`,
           },
         },
       },
       scales: {
-        y: ocYAxisOptions(allY, { dark: false }),
-        x: xAxisOpts({ dark: false }),
+        y: ocYAxisOptions(datasets.flatMap(d => d.data)),
+        x: xAxisOpts(),
+      },
+      onHover: (event, _elements, chart) => {
+        if (chart._lockedDataset !== null && chart._lockedDataset !== undefined) return;
+        const idx = getNearestDatasetIndex(chart, event.native || event);
+        chart._hoveredDataset = idx;
+        chart.update("none");
       },
     },
+    plugins: [unifiedChartPlugin],
   });
 
-  updateEndCompareBtn();
-  wrapper.scrollIntoView({ behavior: "smooth", block: "start" });
+  // Event Listener nur einmalig registrieren
+  if (!canvas._compareListenersAttached) {
+    canvas._compareListenersAttached = true;
+
+    canvas.addEventListener("mouseleave", () => {
+      if (compareChart) {
+        compareChart._hoveredDataset = null;
+        compareChart.update("none");
+      }
+    });
+
+    canvas.addEventListener("click", (e) => {
+      const idx = getNearestDatasetIndex(compareChart, e);
+      toggleDatasetLock(compareChart, idx);
+      compareChart._hoveredDataset = null;
+      compareChart.update("none");
+    });
+
+    canvas.addEventListener("mousemove", (e) => {
+      if (!compareChart) return;
+      if (compareChart._lockedDataset !== null && compareChart._lockedDataset !== undefined) return;
+      const idx = getNearestDatasetIndex(compareChart, e);
+      compareChart._hoveredDataset = idx;
+      compareChart.update("none");
+    });
+  }
 }
 
 /* ══════════════════════════════════════════════════
@@ -1347,4 +1559,65 @@ function sortGroups(groups, mode) {
   }
 
   return enriched;
+}
+
+/* ══════════════════════════════════════════════════
+   GLOBAL OVERVIEW MAP
+══════════════════════════════════════════════════ */
+let globalOverviewMap = null;
+
+function renderGlobalOverviewMap(analyses) {
+  const container = document.getElementById("global-overview-map");
+  if (!container) return;
+
+  if (!globalOverviewMap) {
+    globalOverviewMap = L.map(container, {
+      zoomControl: true,
+      attributionControl: false,
+      scrollWheelZoom: true,
+      preferCanvas: true,
+    });
+
+    L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      { attribution: "Tiles © Esri" }
+    ).addTo(globalOverviewMap);
+  }
+
+  // Bereits eingezeichnete Layer entfernen, um Duplikate zu vermeiden
+  globalOverviewMap.eachLayer((layer) => {
+    if (!layer._url) globalOverviewMap.removeLayer(layer);
+  });
+
+  const bounds = [];
+  const drawnFields = new Set();
+
+  analyses.forEach(item => {
+    if (!item.polygon || drawnFields.has(item.field_name)) return;
+    drawnFields.add(item.field_name);
+
+    // Nutzt das bereits importierte FieldGradientOverlay
+    const viz = FieldGradientOverlay.addFieldVisualization({
+      map: globalOverviewMap,
+      polygon: item.polygon,
+      zones: item.zones || [],
+      classification: ocClassification,
+      valueToColor: valueToColor,
+      formatTooltip: (zone) =>
+        `<b>${item.field_name}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`,
+    });
+
+    if (viz.borderLayer) {
+      bounds.push(viz.borderLayer.getBounds());
+      // Optional: Tooltip mit Feldnamen direkt auf dem Polygon
+      viz.borderLayer.bindTooltip(`<b>${item.field_name}</b>`, { direction: 'center', permanent: false });
+    } else if (item.polygon.length >= 3) {
+      bounds.push(L.latLngBounds(item.polygon.map(p => [p.lat, p.lng])));
+    }
+  });
+
+  if (bounds.length) {
+    const combined = bounds.reduce((acc, b) => acc.extend(b), bounds[0].pad(0));
+    globalOverviewMap.fitBounds(combined, { padding: [24, 24] });
+  }
 }

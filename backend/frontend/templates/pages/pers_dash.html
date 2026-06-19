@@ -95,6 +95,11 @@
 
     </div>
 
+    <div class="analysis-card overview-map-card" style="margin-bottom: 24px;">
+      <div class="field-section-label" style="margin-bottom: 8px;">{{ 'Fields Overview' if lang == 'en' else 'Globale Feldübersicht' }}</div>
+      <div id="global-overview-map" style="height: 400px; width: 100%; border-radius: 12px; z-index: 1;"></div>
+    </div>
+
     <div class="dashboard-controls">
 
       <!-- LEFT SIDE -->
@@ -197,7 +202,7 @@
         <button class="btn-control" id="download-csv-btn">{{ t.download_all }}</button>
         <button class="btn-control" id="compare-btn">{{ t.compare }}</button>
 
-        <button class="btn-end-compare" id="end-compare-btn" style="display:none;">
+        <button class="btn-end-compare" id="end-compare-btn" style="display:none;">    
           {{ t.end_compare }}
         </button>
 
