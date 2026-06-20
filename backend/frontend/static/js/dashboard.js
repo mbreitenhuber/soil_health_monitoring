@@ -578,6 +578,39 @@ function updateEndCompareBtn() {
    NEW LAYOUT: 3-column sketch design
 ══════════════════════════════════════════════════ */
 
+function getCropDisplay(cropName) {
+    if (!cropName) return "";
+    
+    // Alles in Kleinbuchstaben, damit "Mais" und "mais" gleich behandelt werden
+    const name = cropName.toLowerCase().trim();
+    
+    // Mapping der Standard-Crops (Englisch + Deutsch)
+    const icons = {
+        // Weizen
+        'wheat': '🌾', 'weizen': '🌾',
+        
+        // Mais
+        'corn': '🌽', 'mais': '🌽',
+        
+        // Gerste
+        'barley': '🌾', 'gerste': '🌾',
+        
+        // Kartoffel
+        'potato': '🥔', 'kartoffel': '🥔',
+        
+        // Sojabohne
+        'soybean': '🫘', 'soja': '🫘', 'sojabohne': '🫘',
+        
+        // Reis
+        'rice': '🌾', 'reis': '🌾'
+    };
+
+    // Wählt das Icon aus, oder default 🌱
+    const icon = icons[name] || '🌱';
+    
+    return `${icon} ${escapeHtml(cropName)}`;
+}
+
 function renderDashboard(analyses, { filtered = false } = {}) {
   const container = document.getElementById("dashboard-container");
   if (!container) return;
@@ -651,7 +684,7 @@ function renderDashboard(analyses, { filtered = false } = {}) {
           </div>
           <div class="fgc-meta-list">
             <span>📅 ${dateRange}</span>
-            ${latest.crop          ? `<span>🌱 ${escapeHtml(latest.crop)}</span>`          : ""}
+            ${latest.crop ? `<span>${getCropDisplay(latest.crop)}</span>` : ""}
             ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
           </div>
           <div class="fgc-count">
