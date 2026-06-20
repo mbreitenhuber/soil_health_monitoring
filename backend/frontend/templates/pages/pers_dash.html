@@ -51,6 +51,7 @@
 
 {% block head_styles %}
 <link rel="stylesheet" href="/static/css/dashboard.css?v={{ static_css_version }}" />
+<link rel="stylesheet" href="/static/css/compare-toggle.css?v={{ static_css_version }}" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
@@ -124,6 +125,30 @@
               {{ 'Open source' if lang == 'en' else 'Quelle öffnen' }}
             </a>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Compare Toggle ───────────────────────────── -->
+    <div class="compare-toggle-section">
+      <button class="compare-toggle-header" id="compare-toggle-btn" aria-expanded="false">
+        <span class="compare-toggle-title">
+          {{ '⚖ Field Comparison' if lang == 'en' else '⚖ Felder vergleichen' }}
+        </span>
+        <span class="compare-toggle-meta" id="compare-toggle-meta">
+          {{ 'Select fields below to compare' if lang == 'en' else 'Felder unten auswählen' }}
+        </span>
+        <span class="compare-toggle-chevron" id="compare-toggle-chevron">▾</span>
+      </button>
+
+      <div class="compare-toggle-body" id="compare-toggle-body">
+        <div class="compare-fields-bar" id="compare-fields-bar">
+          <span class="compare-fields-hint" id="compare-fields-hint">
+            {{ 'No fields selected yet — use the checkboxes on the field cards below.' if lang == 'en' else 'Noch keine Felder ausgewählt — Checkboxen auf den Feldkarten verwenden.' }}
+          </span>
+        </div>
+        <div class="compare-chart-inner" id="compare-chart-wrapper" style="display:none;">
+          <canvas id="compare-chart" style="height:320px;"></canvas>
         </div>
       </div>
     </div>
@@ -228,11 +253,6 @@
       <div class="controls-right">
 
         <button class="btn-control" id="download-csv-btn">{{ t.download_all }}</button>
-        <button class="btn-control" id="compare-btn">{{ t.compare }}</button>
-
-        <button class="btn-end-compare" id="end-compare-btn" style="display:none;">    
-          {{ t.end_compare }}
-        </button>
 
       </div>
 

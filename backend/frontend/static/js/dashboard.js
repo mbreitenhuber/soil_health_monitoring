@@ -69,10 +69,10 @@ Chart.defaults.elements.point.hoverBorderWidth = 2;
    Guarantees visual breathing room (~1 category width)
    regardless of how many data points are shown.       */
 function padChart(labels, datasets) {
-  const pLabels = ["", ...labels, ""];
+  const pLabels = ["", ...labels, "", ""];
   const pDatasets = datasets.map(ds => ({
     ...ds,
-    data: [null, ...ds.data, null],
+    data: [null, ...ds.data, null, null],
     spanGaps: true,
   }));
   return { labels: pLabels, datasets: pDatasets };
@@ -512,10 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("download-csv-btn")
     ?.addEventListener("click", () =>
       window.open(`${API_URL}/api/analyses/csv`, "_blank"));
-  document.getElementById("compare-btn")
-    ?.addEventListener("click", showCompareChart);
-  document.getElementById("end-compare-btn")
-    ?.addEventListener("click", endComparison);
+  initCompareToggle();
   document.getElementById("save-details")
     ?.addEventListener("click", saveDetails);
 
@@ -740,13 +737,6 @@ function renderDashboard(analyses, { filtered = false } = {}) {
             ${trendBadge(trendPrev, uiText("recent_sample"))}
           </div>
           <div class="fgc-buttons">
-            <label class="compare-label"
-                   style="cursor:pointer; font-size:0.78rem; color:var(--text-dim);
-                          display:flex; gap:7px; align-items:center; user-select:none;">
-              <input type="checkbox" class="compare-checkbox"
-                     data-field="${safeField}" ${checked}>
-              ${uiText("select_compare")}
-            </label>
             <button class="fgc-explore-btn" data-field="${safeField}">
               ${uiText("click_explore")}
             </button>
@@ -994,12 +984,7 @@ function onCardClick(e) {
 }
 
 function onCardChange(e) {
-  const cb = e.target.closest(".compare-checkbox");
-  if (!cb || !cb.dataset.field) return;
-  const field = decodeURIComponent(cb.dataset.field);
-  if (cb.checked) selectedForCompare.add(field);
-  else            selectedForCompare.delete(field);
-  updateEndCompareBtn();
+  // Checkboxes removed — handler kept as no-op for safety
 }
 
 /* ══════════════════════════════════════════════════
@@ -1101,6 +1086,9 @@ function renderFieldLineChart(items) {
     data: { labels, datasets },
     options: {
       animation: false,
+      layout: {
+        padding: { right: 80 }
+      },
       interaction: {
         mode:      "nearest",   // ← nur das nächste Dataset
         intersect: false,
@@ -1344,58 +1332,75 @@ function downloadAnalysis(id) {
 ══════════════════════════════════════════════════ */
 
 function showCompareChart() {
-  if (selectedForCompare.size === 0) return;
+  const wrapper = document.getElementById("compare-chart-wrapper");
+  const bar     = document.getElementById("compare-fields-bar");
+  const hint    = document.getElementById("compare-fields-hint");
 
-  // Wrapper + Canvas dynamisch erstellen falls nicht vorhanden
-  let wrapper = document.getElementById("compare-chart-wrapper");
-  if (!wrapper) {
-    wrapper = document.createElement("div");
-    wrapper.id = "compare-chart-wrapper";
-    wrapper.style.cssText = "margin-top:24px; padding:20px; border-radius:12px;";
+  const groups  = groupByField(allAnalyses);
+  const allFieldNames = Object.keys(groups);
 
-    const canvas = document.createElement("canvas");
-    canvas.id = "compare-chart";
-    canvas.style.height = "320px";
-    wrapper.appendChild(canvas);
-
-    // Nach dem dashboard-container einfügen
-    const container = document.getElementById("dashboard-container");
-    container?.parentNode.insertBefore(wrapper, container);
+  if (!allFieldNames.length) {
+    if (wrapper) wrapper.style.display = "none";
+    return;
   }
 
-  wrapper.style.display = "";
+  if (hint)    hint.style.display = "none";
+  if (wrapper) wrapper.style.display = "block";
 
-  const canvas = document.getElementById("compare-chart");
-  const ctx = canvas.getContext("2d");
-  if (compareChart) compareChart.destroy();
+  // hiddenFields: Set of field names currently toggled off
+  if (!showCompareChart._hidden) showCompareChart._hidden = new Set();
+  const hidden = showCompareChart._hidden;
 
-  const allDates   = new Set();
+  // ── Build chips bar ───────────────────────────────
+  if (bar) {
+    bar.innerHTML = allFieldNames.map(fieldName => {
+      const isHidden = hidden.has(fieldName);
+      return `
+        <span class="compare-field-chip ${isHidden ? "compare-field-chip--off" : ""}"
+              data-field="${encodeURIComponent(fieldName)}"
+              title="${isHidden ? "Show" : "Hide"} ${escapeHtml(fieldName)}">
+          ${escapeHtml(fieldName)}
+        </span>
+      `;
+    }).join("");
+
+    bar.querySelectorAll(".compare-field-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        const field = decodeURIComponent(chip.dataset.field);
+        if (hidden.has(field)) hidden.delete(field);
+        else                   hidden.add(field);
+        showCompareChart();
+      });
+    });
+  }
+
+  // ── Build datasets ────────────────────────────────
+  const allDates  = new Set();
   const fieldItems = {};
 
-  selectedForCompare.forEach(fieldName => {
-    const items = allAnalyses
-      .filter(a => fieldKey(a) === fieldName)
+  allFieldNames.forEach(fieldName => {
+    const items = (groups[fieldName] || [])
+      .slice()
       .sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
     fieldItems[fieldName] = items;
     items.forEach(i => { if (i.date) allDates.add(i.date); });
   });
 
-  // Gemeinsames Zeitraster aus allen Feldern
   const sortedDates = Array.from(allDates).sort();
-
-  // Jeden Feldwert exakt auf seinen Datumsplatz mappen — fehlende Daten = null
   const rawDatasets = [];
-  selectedForCompare.forEach(fieldName => {
+
+  allFieldNames.forEach(fieldName => {
     const byDate = {};
     fieldItems[fieldName].forEach(i => {
       if (i.date) byDate[i.date] = roundOc(i.avg_value);
     });
     rawDatasets.push({
-      label:    fieldName,
-      data:     sortedDates.map(d => byDate[d] ?? null),
-      spanGaps: true,
-      tension:  0,
-      fill:     false,
+      label:                fieldName,
+      data:                 sortedDates.map(d => byDate[d] ?? null),
+      hidden:               hidden.has(fieldName),
+      spanGaps:             true,
+      tension:              0,
+      fill:                 false,
       borderColor:          "rgba(107,114,128,0.55)",
       backgroundColor:      "transparent",
       pointBorderColor:     "rgba(107,114,128,0.55)",
@@ -1406,25 +1411,28 @@ function showCompareChart() {
 
   const { labels, datasets } = padChart(sortedDates, rawDatasets);
 
+  // ── Chart ─────────────────────────────────────────
+  const canvas = document.getElementById("compare-chart");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  if (compareChart) compareChart.destroy();
+
   compareChart = new Chart(ctx, {
     type: "line",
     data: { labels, datasets },
     options: {
       animation: false,
-      interaction: {
-        mode:      "nearest",   // ← nur das nächste Dataset
-        intersect: false,
+      layout: {
+        padding: { right: 80 }
       },
+      interaction: { mode: "nearest", intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
           callbacks: {
             title: (items) => {
-              // Datum + Feldname als Titel
               const item = items[0];
-              const date = item?.label || "";
-              const field = item?.dataset?.label || "";
-              return `${field}  ·  ${date}`;
+              return `${item?.dataset?.label || ""}  ·  ${item?.label || ""}`;
             },
             label: (item) =>
               ` ${item.raw != null ? Number(item.raw).toFixed(2) + " g/kg" : "–"}`,
@@ -1445,7 +1453,6 @@ function showCompareChart() {
     plugins: [unifiedChartPlugin],
   });
 
-  // Event Listener nur einmalig registrieren
   if (!canvas._compareListenersAttached) {
     canvas._compareListenersAttached = true;
 
@@ -1455,7 +1462,6 @@ function showCompareChart() {
         compareChart.update("none");
       }
     });
-
     canvas.addEventListener("click", (e) => {
       e.stopPropagation();
       const idx = getNearestDatasetIndex(compareChart, e);
@@ -1463,17 +1469,17 @@ function showCompareChart() {
       compareChart._hoveredDataset = null;
       compareChart.update("none");
     });
-
     canvas.addEventListener("mousemove", (e) => {
       if (!compareChart) return;
       const idx = getNearestDatasetIndex(compareChart, e);
-      // Immer hoveredDataset aktualisieren, auch wenn locked
       if (idx !== compareChart._hoveredDataset) {
         compareChart._hoveredDataset = idx;
         compareChart.update("none");
       }
     });
   }
+
+  updateCompareToggleMeta();
 }
 
 /* ══════════════════════════════════════════════════
@@ -1840,3 +1846,70 @@ function renderGlobalOverviewMap(analyses) {
     if (e.key === "Escape") closePopup();
   });
 })();
+
+/* ══════════════════════════════════════════════════
+   COMPARE TOGGLE
+══════════════════════════════════════════════════ */
+
+function updateCompareToggleMeta() {
+  const meta   = document.getElementById("compare-toggle-meta");
+  if (!meta) return;
+  const total  = Object.keys(groupByField(allAnalyses)).length;
+  const hidden = showCompareChart._hidden ? showCompareChart._hidden.size : 0;
+  const shown  = total - hidden;
+  meta.textContent = total
+    ? `${shown} of ${total} field${total > 1 ? "s" : ""} visible`
+    : "No fields yet";
+}
+
+function updateCompareFieldsBar() {
+  const bar = document.getElementById("compare-fields-bar");
+  if (!bar) return;
+
+  if (selectedForCompare.size === 0) {
+    bar.innerHTML = `<span class="compare-fields-hint" id="compare-fields-hint">
+      No fields selected yet — use the checkboxes on the field cards below.
+    </span>`;
+    return;
+  }
+
+  bar.innerHTML = Array.from(selectedForCompare).map(fieldName => `
+    <span class="compare-field-chip">
+      ${escapeHtml(fieldName)}
+      <button class="compare-chip-remove" data-field="${encodeURIComponent(fieldName)}"
+              title="Remove">✕</button>
+    </span>
+  `).join("");
+
+  bar.querySelectorAll(".compare-chip-remove").forEach(btn => {
+    btn.addEventListener("click", e => {
+      e.stopPropagation();
+      const field = decodeURIComponent(btn.dataset.field);
+      selectedForCompare.delete(field);
+
+      // Uncheck the card checkbox
+      document.querySelectorAll(`.compare-checkbox[data-field="${encodeURIComponent(field)}"]`)
+        .forEach(cb => (cb.checked = false));
+
+      showCompareChart();
+      updateCompareToggleMeta();
+    });
+  });
+}
+
+function initCompareToggle() {
+  const btn  = document.getElementById("compare-toggle-btn");
+  const body = document.getElementById("compare-toggle-body");
+  const chev = document.getElementById("compare-toggle-chevron");
+  if (!btn || !body) return;
+
+  btn.addEventListener("click", () => {
+    const isOpen = body.classList.contains("open");
+    body.classList.toggle("open", !isOpen);
+    btn.setAttribute("aria-expanded", String(!isOpen));
+    if (chev) chev.textContent = isOpen ? "▾" : "▴";
+
+    // Render chart on first open
+    if (!isOpen) showCompareChart();
+  });
+}

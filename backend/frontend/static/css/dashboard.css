@@ -1381,3 +1381,218 @@
 .btn-close-x:active {
   transform: translateY(0);
 }
+
+/* =====================================================
+   compare-toggle.css — Field Comparison Toggle Section
+===================================================== */
+
+/* ── Wrapper ─────────────────────────────────────── */
+
+.compare-toggle-section {
+  margin-bottom: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+/* ── Header / Toggle button ──────────────────────── */
+
+.compare-toggle-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 16px 20px;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  text-align: left;
+  transition: background 0.18s ease;
+}
+
+.compare-toggle-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.compare-toggle-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.compare-toggle-meta {
+  flex: 1;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-toggle-chevron {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+/* ── Body (collapsed by default) ─────────────────── */
+
+.compare-toggle-body {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 0 20px 20px;
+
+  border-top: 1px solid var(--border);
+}
+
+.compare-toggle-body.open {
+  display: flex;
+}
+
+/* ── Selected fields bar ─────────────────────────── */
+
+.compare-fields-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 32px;
+  align-items: center;
+  padding-top: 16px;
+}
+
+.compare-fields-hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Field chips ─────────────────────────────────── */
+
+.compare-field-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 10px 4px 12px;
+
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+
+  font-size: 0.75rem;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-chip-remove {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  padding: 0;
+
+  transition: background 0.15s, color 0.15s;
+}
+
+.compare-chip-remove:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* ── Chart area ──────────────────────────────────── */
+
+.compare-chart-inner {
+  width: 100%;
+  position: relative;
+}
+
+.compare-chart-inner canvas {
+  width: 100% !important;
+  height: 320px !important;
+  display: block;
+}
+
+/* ── Compact checkbox on field cards ─────────────── */
+
+.compare-label-compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  transition: color 0.15s;
+}
+
+.compare-label-compact:hover {
+  color: var(--text);
+}
+
+.compare-label-compact input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.compare-label-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* ── Hidden / toggled-off chip state ─────────────── */
+
+.compare-field-chip {
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.compare-field-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.compare-field-chip--off {
+  opacity: 0.35;
+  text-decoration: line-through;
+  border-color: var(--border);
+}
+
+.compare-field-chip--off:hover {
+  opacity: 0.65;
+  text-decoration: none;
+  color: var(--text);
+  border-color: var(--border2);
+}
