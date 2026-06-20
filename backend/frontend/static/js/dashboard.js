@@ -737,6 +737,12 @@ function renderDashboard(analyses, { filtered = false } = {}) {
             ${trendBadge(trendPrev, uiText("recent_sample"))}
           </div>
           <div class="fgc-buttons">
+            <button class="fgc-explore-btn fgc-new-analysis-btn" data-field="${safeField}"
+                    data-location="${escapeHtml(latest.location_name || "")}"
+                    data-crop="${escapeHtml(latest.crop || "")}"
+                    data-polygon="${encodeURIComponent(JSON.stringify(latest.polygon || []))}">
+              ${uiText("+ New Analysis")}
+            </button>
             <button class="fgc-explore-btn" data-field="${safeField}">
               ${uiText("click_explore")}
             </button>
@@ -973,14 +979,31 @@ function drawSparklines() {
 ══════════════════════════════════════════════════ */
 
 function onCardClick(e) {
-  // Only the "Click to explore" button opens the field modal
+  const newBtn = e.target.closest(".fgc-new-analysis-btn");
+  if (newBtn) {
+    e.stopPropagation();
+    const fieldName = decodeURIComponent(newBtn.dataset.field);
+    const prefill = {
+      field_name:    fieldName,
+      location_name: newBtn.dataset.location || "",
+      crop:          newBtn.dataset.crop     || "",
+      polygon:       JSON.parse(decodeURIComponent(newBtn.dataset.polygon || "[]")),
+    };
+    sessionStorage.setItem("dashboard_prefill", JSON.stringify(prefill));
+    const p = new URLSearchParams();
+    p.set("field", fieldName);
+    if (prefill.location_name) p.set("location", prefill.location_name);
+    if (prefill.crop)          p.set("crop",     prefill.crop);
+    window.location.href = `/analyse?${p.toString()}`;
+    return;
+  }
+
   const exploreBtn = e.target.closest(".fgc-explore-btn");
   if (exploreBtn) {
     e.stopPropagation();
     openFieldModal(decodeURIComponent(exploreBtn.dataset.field));
     return;
   }
-  // Checkbox / label — handled by onCardChange, no modal
 }
 
 function onCardChange(e) {
@@ -1035,22 +1058,6 @@ function openFieldModal(fieldName) {
   updateFieldModalStats(items);
   renderFieldLineChart(items);
   renderFieldAnalysesList(items);
-
-  document.getElementById("field-new-analysis-btn").onclick = () => {
-    const prefill = {
-      polygon:       latest.polygon       || [],
-      field_name:    latest.field_name    || fieldName,
-      location_name: latest.location_name || "",
-      crop:          latest.crop          || "",
-    };
-    sessionStorage.setItem("dashboard_prefill", JSON.stringify(prefill));
-
-    const p = new URLSearchParams();
-    p.set("field", fieldName);
-    if (latest.location_name) p.set("location", latest.location_name);
-    if (latest.crop)          p.set("crop",     latest.crop);
-    window.location.href = `/analyse?${p.toString()}`;
-  };
 
   document.getElementById("field-modal").style.display = "flex";
 }
