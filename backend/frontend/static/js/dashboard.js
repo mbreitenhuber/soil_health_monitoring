@@ -186,7 +186,6 @@ let selectedForCompare = new Set();
 let currentItem        = null;
 let currentFieldName   = null;
 let qualityChart       = null;
-let fieldLineChart     = null;
 let compareChart       = null;
 let detailMap                 = null;
 let detailMapInvalidateTimer = null;
@@ -225,13 +224,11 @@ document.addEventListener("click", (e) => {
 
 window.addEventListener("click", (e) => {
   if (!e.target.closest("canvas")) {
-    [compareChart, fieldLineChart].forEach(c => {
-      if (c && c._lockedDataset !== null) {
-        c._lockedDataset = null;
-        c._hoveredDataset = null;
-        c.update("none");
-      }
-    });
+    if (compareChart && compareChart._lockedDataset !== null) {
+      compareChart._lockedDataset = null;
+      compareChart._hoveredDataset = null;
+      compareChart.update("none");
+    }
   }
 });
 
@@ -1056,7 +1053,6 @@ function openFieldModal(fieldName) {
     metaParts.join("  ·  ");
 
   updateFieldModalStats(items);
-  renderFieldLineChart(items);
   renderFieldAnalysesList(items);
 
   document.getElementById("field-modal").style.display = "flex";
@@ -1064,100 +1060,7 @@ function openFieldModal(fieldName) {
 
 window.closeFieldModal = function () {
   document.getElementById("field-modal").style.display = "none";
-  if (fieldLineChart) { fieldLineChart.destroy(); fieldLineChart = null; }
 };
-
-/* ── Field line chart (Min / Avg / Max over time) ── */
-
-function renderFieldLineChart(items) {
-  const canvas = document.getElementById("field-line-chart");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
-  if (fieldLineChart) fieldLineChart.destroy();
- 
-  const rawLabels = items.map(a => a.date || "");
-  const { labels, datasets } = padChart(rawLabels, [
-    { label: "Max", data: items.map(a => roundOc(a.max_value)), tension: 0,
-      borderColor: "rgba(107,114,128,0.55)", backgroundColor: "transparent",
-      pointBorderColor: "rgba(107,114,128,0.55)", pointBackgroundColor: "transparent", pointBorderWidth: 2 },
-    { label: "Avg", data: items.map(a => roundOc(a.avg_value)), tension: 0,
-      borderColor: "rgba(107,114,128,0.55)", backgroundColor: "transparent",
-      pointBorderColor: "rgba(107,114,128,0.55)", pointBackgroundColor: "transparent", pointBorderWidth: 2 },
-    { label: "Min", data: items.map(a => roundOc(a.min_value)), tension: 0,
-      borderColor: "rgba(107,114,128,0.55)", backgroundColor: "transparent",
-      pointBorderColor: "rgba(107,114,128,0.55)", pointBackgroundColor: "transparent", pointBorderWidth: 2 },
-  ]);
- 
-  fieldLineChart = new Chart(ctx, {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      animation: false,
-      layout: {
-        padding: { right: 80 }
-      },
-      interaction: {
-        mode:      "nearest",   // ← nur das nächste Dataset
-        intersect: false,
-      },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            title: (items) => {
-              // Datum + Feldname als Titel
-              const item = items[0];
-              const date = item?.label || "";
-              const field = item?.dataset?.label || "";
-              return `${field}  ·  ${date}`;
-            },
-            label: (item) =>
-              ` ${item.raw != null ? Number(item.raw).toFixed(2) + " g/kg" : "–"}`,
-          },
-        },
-      },
-      scales: {
-        y: ocYAxisOptions(datasets.flatMap(d => d.data)),
-        x: xAxisOpts(),
-      },
-      onHover: (event, _elements, chart) => {
-        if (chart._lockedDataset !== null && chart._lockedDataset !== undefined) return;
-        const idx = getNearestDatasetIndex(chart, event.native || event);
-        chart._hoveredDataset = idx;
-        chart.update("none");
-      },
-    },
-    plugins: [unifiedChartPlugin],
-  });
- 
-  // Maus verlässt Canvas → Hover zurücksetzen
-  canvas.addEventListener("mouseleave", () => {
-    if (fieldLineChart) {
-      fieldLineChart._hoveredDataset = null;
-      fieldLineChart.update("none");
-    }
-  });
- 
-  // Klick → Lock umschalten
-  canvas.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const idx = getNearestDatasetIndex(fieldLineChart, e);
-    toggleDatasetLock(fieldLineChart, idx);
-    fieldLineChart._hoveredDataset = null;
-    fieldLineChart.update("none");
-  });
- 
-  // Mausbewegung → Hover aktualisieren
-  canvas.addEventListener("mousemove", (e) => {
-    if (!fieldLineChart) return;
-    const idx = getNearestDatasetIndex(fieldLineChart, e);
-    // Immer hoveredDataset aktualisieren, auch wenn locked
-    if (idx !== fieldLineChart._hoveredDataset) {
-      fieldLineChart._hoveredDataset = idx;
-      fieldLineChart.update("none");
-    }
-  });
-}
 
 /* ── Analyses list ────────────────────────────── */
 
