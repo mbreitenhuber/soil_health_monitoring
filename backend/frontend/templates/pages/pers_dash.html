@@ -95,9 +95,37 @@
 
     </div>
 
-    <div class="analysis-card overview-map-card" style="margin-bottom: 24px;">
-      <div class="field-section-label" style="margin-bottom: 8px;">{{ 'Fields Overview' if lang == 'en' else 'Globale Feldübersicht' }}</div>
+    <div class="analysis-card overview-map-card" style="margin-bottom: 24px; position: relative;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <div class="field-section-label">{{ 'Fields Overview' if lang == 'en' else 'Globale Feldübersicht' }}</div>
+        <button id="btn-class-info-dashboard" class="btn-secondary"
+                style="font-size: 0.78rem; padding: 4px 10px; line-height: 1.4;"
+                title="{{ 'Soil Classification Info' if lang == 'en' else 'Bodenklassifikation Info' }}">
+          ℹ {{ 'Legend' if lang == 'en' else 'Legende' }}
+        </button>
+      </div>
       <div id="global-overview-map" style="height: 400px; width: 100%; border-radius: 12px; z-index: 1;"></div>
+    </div>
+
+    <!-- OC Classification Info Popup (Dashboard) -->
+    <div class="save-popup" id="class-info-popup-dashboard" aria-hidden="true">
+      <div class="save-popup-card class-info-card">
+        <div class="save-popup-header">
+          <h3>{{ 'OC classification thresholds' if lang == 'en' else 'Boden-OC-Klassifikation' }}</h3>
+          <button type="button" class="btn-close-x" id="close-class-info-dashboard" aria-label="Close">✕</button>
+        </div>
+        <div class="save-popup-content class-info-content">
+          <p class="class-info-note" id="dash-class-info-note"></p>
+          <ul class="class-info-tiers" id="dash-class-info-tiers"></ul>
+          <div class="class-info-meta">
+            <span class="class-info-meta-label">{{ 'Source:' if lang == 'en' else 'Quelle:' }}</span>
+            <span id="dash-class-info-dataset"></span>
+            <a href="#" target="_blank" rel="noopener noreferrer" id="dash-class-info-link">
+              {{ 'Open source' if lang == 'en' else 'Quelle öffnen' }}
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="dashboard-controls">

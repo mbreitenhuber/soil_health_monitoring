@@ -37,6 +37,12 @@ function ocYAxisOptions(values, { dark = true } = {}) {
   return {
     min:  parseFloat(Math.max(0, dMin - pad).toFixed(2)),
     max:  parseFloat((dMax + pad).toFixed(2)),
+    title: {
+      display: true,
+      text: "OC (g/kg)",
+      color: dark ? "#9ca3af" : "#6b7280",
+      font: { size: 11 },
+    },
     grid:  { color: dark ? "rgba(255,255,255,0.07)" : "rgba(0,0,0,0.06)" },
     ticks: {
       color:    dark ? "#9ca3af" : undefined,
@@ -75,6 +81,12 @@ function padChart(labels, datasets) {
 /* ── Shared x-axis options for line charts ────────── */
 function xAxisOpts({ dark = true } = {}) {
   return {
+    title: {
+      display: true,
+      text: "Date",
+      color: dark ? "#9ca3af" : "#6b7280",
+      font: { size: 11 },
+    },
     grid: { display: false },
     ticks: {
       color: dark ? "#9ca3af" : undefined,
@@ -82,7 +94,7 @@ function xAxisOpts({ dark = true } = {}) {
       callback: function(val) {
         const label = this.getLabelForValue(val);
         if (!label) return "";
-        return label; // komplettes Datum: YYYY-MM-DD
+        return label;
       }
     },
   };
@@ -814,23 +826,23 @@ function drawSparklines() {
       ctx.textBaseline = "top";
       ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
 
-      // ── Y gridlines + labels ───────────────────────────────
-      ctx.font = FONT_SM;
-      const yTicks = [yMin + yRange * 0.2, yMin + yRange * 0.8];
-      yTicks.forEach(tv => {
-        const y = toY(tv);
-        ctx.beginPath();
-        ctx.moveTo(pad.left, y);
-        ctx.lineTo(pad.left + iW, y);
-        ctx.strokeStyle = GRID_COLOR;
-        ctx.lineWidth   = 1;
-        ctx.stroke();
+     // ── Y-Axis title ──────────────────────────────────────
+      ctx.save();
+      ctx.font      = "9px system-ui,sans-serif";
+      ctx.fillStyle = TICK_COLOR;
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.translate(10, pad.top + iH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillText("OC (g/kg)", 0, 0);
+      ctx.restore();
 
-        ctx.textAlign    = "right";
-        ctx.textBaseline = "middle";
-        ctx.fillStyle    = TICK_COLOR;
-        ctx.fillText(tv.toFixed(2) + " g/kg", pad.left - 3, y);
-      });
+      // ── X-Axis title ──────────────────────────────────────
+      ctx.font         = "9px system-ui,sans-serif";
+      ctx.fillStyle    = TICK_COLOR;
+      ctx.textAlign    = "center";
+      ctx.textBaseline = "bottom";
+      ctx.fillText(uiText("date") || "Date", pad.left + iW / 2, H - 1);
 
       // ── X baseline ────────────────────────────────────────
       ctx.beginPath();
@@ -1667,6 +1679,9 @@ function sortGroups(groups, mode) {
    GLOBAL OVERVIEW MAP
 ══════════════════════════════════════════════════ */
 let globalOverviewMap = null;
+let _globalSatellite  = null;
+let _globalLabels     = null;
+let _globalMinimal    = null;
 
 function renderGlobalOverviewMap(analyses) {
   const container = document.getElementById("global-overview-map");
@@ -1680,39 +1695,66 @@ function renderGlobalOverviewMap(analyses) {
       preferCanvas: true,
     });
 
-    L.tileLayer(
+    // ── Base layers ──────────────────────────────
+    _globalSatellite = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       { attribution: "Tiles © Esri" }
-    ).addTo(globalOverviewMap);
+    );
+
+    _globalMinimal = L.tileLayer(
+      "https://{s}.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}{r}.png",
+      { attribution: "© OpenStreetMap contributors © CARTO", subdomains: "abcd" }
+    );
+
+    // ── Overlay layers ───────────────────────────
+    _globalLabels = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+      { opacity: 0.8 }
+    );
+
+    // Default: Satellite + Labels
+    _globalSatellite.addTo(globalOverviewMap);
+    _globalLabels.addTo(globalOverviewMap);
+
+    // ── Layer control (same structure as map.js) ─
+    const baseLayers = {
+      "Satellite": _globalSatellite,
+      "Map":       _globalMinimal,
+    };
+    const overlays = {
+      "Labels": _globalLabels,
+    };
+    L.control.layers(baseLayers, overlays).addTo(globalOverviewMap);
   }
 
-  // Bereits eingezeichnete Layer entfernen, um Duplikate zu vermeiden
-  globalOverviewMap.eachLayer((layer) => {
+  // Remove non-tile layers (field drawings) to avoid duplicates
+  globalOverviewMap.eachLayer(layer => {
     if (!layer._url) globalOverviewMap.removeLayer(layer);
   });
 
-  const bounds = [];
+  const bounds    = [];
   const drawnFields = new Set();
 
   analyses.forEach(item => {
     if (!item.polygon || drawnFields.has(item.field_name)) return;
     drawnFields.add(item.field_name);
 
-    // Nutzt das bereits importierte FieldGradientOverlay
     const viz = FieldGradientOverlay.addFieldVisualization({
-      map: globalOverviewMap,
-      polygon: item.polygon,
-      zones: item.zones || [],
+      map:            globalOverviewMap,
+      polygon:        item.polygon,
+      zones:          item.zones || [],
       classification: ocClassification,
-      valueToColor: valueToColor,
-      formatTooltip: (zone) =>
+      valueToColor:   valueToColor,
+      formatTooltip:  zone =>
         `<b>${item.field_name}</b><br>OC: ${Number(zone.value).toFixed(1)} g/kg`,
     });
 
     if (viz.borderLayer) {
       bounds.push(viz.borderLayer.getBounds());
-      // Optional: Tooltip mit Feldnamen direkt auf dem Polygon
-      viz.borderLayer.bindTooltip(`<b>${item.field_name}</b>`, { direction: 'center', permanent: false });
+      viz.borderLayer.bindTooltip(
+        `<b>${item.field_name}</b>`,
+        { direction: "center", permanent: false }
+      );
     } else if (item.polygon.length >= 3) {
       bounds.push(L.latLngBounds(item.polygon.map(p => [p.lat, p.lng])));
     }
@@ -1723,3 +1765,78 @@ function renderGlobalOverviewMap(analyses) {
     globalOverviewMap.fitBounds(combined, { padding: [24, 24] });
   }
 }
+
+/* ══════════════════════════════════════════════════
+   OC CLASSIFICATION INFO POPUP (Dashboard)
+══════════════════════════════════════════════════ */
+
+(function initDashboardClassInfo() {
+  const popup      = document.getElementById("class-info-popup-dashboard");
+  const btnOpen    = document.getElementById("btn-class-info-dashboard");
+  const btnClose   = document.getElementById("close-class-info-dashboard");
+
+  function renderDashboardClassInfo() {
+    const c = ocClassification;
+    if (!c || !popup) return;
+
+    const noteEl    = document.getElementById("dash-class-info-note");
+    const tiersEl   = document.getElementById("dash-class-info-tiers");
+    const datasetEl = document.getElementById("dash-class-info-dataset");
+    const linkEl    = document.getElementById("dash-class-info-link");
+
+    if (noteEl) {
+      noteEl.textContent = [c.dataset_note, c.colormap_note].filter(Boolean).join(" ");
+    }
+    if (datasetEl) {
+      datasetEl.textContent =
+        `${c.dataset_name} · ${c.n_samples} ${c.n_samples === 1 ? "point" : "points"} · ${c.parameter}, ${c.depth_cm} cm`;
+    }
+    if (linkEl && c.reference_url) {
+      linkEl.href = c.reference_url;
+    }
+    if (tiersEl) {
+      if (c.discrete_bin_labels && c.discrete_colors) {
+        tiersEl.innerHTML = c.discrete_bin_labels
+          .map((text, i) => {
+            const swatch = c.discrete_colors[i] || "#888";
+            return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+          })
+          .join("");
+      } else if (c.tier_descriptions) {
+        const order = ["low", "medium", "high"];
+        tiersEl.innerHTML = order
+          .map(tier => {
+            const swatch = (c.colors && c.colors[tier]) || OC_TIER_COLORS[tier];
+            const text   = c.tier_descriptions[tier] || "";
+            return `<li><span class="legend-swatch" style="background:${swatch};display:inline-block;vertical-align:middle;margin-right:8px;"></span>${text}</li>`;
+          })
+          .join("");
+      }
+    }
+  }
+
+  function openPopup() {
+    if (!popup) return;
+    renderDashboardClassInfo();
+    popup.classList.add("visible");
+    popup.setAttribute("aria-hidden", "false");
+  }
+
+  function closePopup() {
+    if (!popup) return;
+    popup.classList.remove("visible");
+    popup.setAttribute("aria-hidden", "true");
+  }
+
+  if (btnOpen)  btnOpen.addEventListener("click", openPopup);
+  if (btnClose) btnClose.addEventListener("click", closePopup);
+  if (popup) {
+    popup.addEventListener("click", e => {
+      if (e.target === popup) closePopup();
+    });
+  }
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closePopup();
+  });
+})();
