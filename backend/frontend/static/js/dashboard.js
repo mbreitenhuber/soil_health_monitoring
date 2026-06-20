@@ -711,6 +711,8 @@ function renderDashboard(analyses, { filtered = false } = {}) {
             <span>📅 ${dateRange}</span>
             ${latest.crop ? `<span>${getCropDisplay(latest.crop)}</span>` : ""}
             ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
+            ${latest.field_area_ha != null ? `<span>🗺 ${Number(latest.field_area_ha).toFixed(2)} ha</span>` : ""}
+            ${Array.isArray(latest.zones) && latest.zones.length ? `<span>📊 ${latest.zones.length} ${uiText("Data points") || "data points"}</span>` : ""}
           </div>
           <div class="fgc-count">
             ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
@@ -1007,32 +1009,6 @@ function onCardChange(e) {
   // Checkboxes removed — handler kept as no-op for safety
 }
 
-/* ══════════════════════════════════════════════════
-   FIELD MODAL
-══════════════════════════════════════════════════ */
-
-function updateFieldModalStats(items) {
-  const latest = items[items.length - 1];
-
-  const fieldArea = `${latest.field_area_ha.toFixed(2)} ha`;
-
-  const datapoints =
-    Array.isArray(latest.zones)
-      ? latest.zones.length
-      : 0;
-
-  document.getElementById("field-stat-count").textContent  = items.length;
-
-  document.getElementById("field-stat-min").textContent =
-    fieldArea;
-
-  document.getElementById("field-stat-max").textContent =
-    datapoints;
-
-  document.getElementById("field-stat-latest").textContent =
-    formatOcGkg(latest.avg_value);
-}
-
 function openFieldModal(fieldName) {
   currentFieldName = fieldName;
 
@@ -1052,7 +1028,6 @@ function openFieldModal(fieldName) {
   document.getElementById("field-modal-meta").textContent =
     metaParts.join("  ·  ");
 
-  updateFieldModalStats(items);
   renderFieldAnalysesList(items);
 
   document.getElementById("field-modal").style.display = "flex";
@@ -1125,8 +1100,6 @@ async function deleteAnalysisFromField(id) {
       selectedForCompare.delete(currentFieldName);
       closeFieldModal();
     } else {
-      updateFieldModalStats(remaining);
-      renderFieldLineChart(remaining);
       renderFieldAnalysesList(remaining);
     }
   } catch (err) {
