@@ -611,6 +611,25 @@ function getCropDisplay(cropName) {
     return `${icon} ${escapeHtml(cropName)}`;
 }
 
+function formatMonthYear(dateString) {
+    if (!dateString || dateString === "–") return "–";
+    
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString; 
+
+    // Holt sich das Attribut direkt aus dem HTML-Tag (<html lang="de">)
+    // Wenn nichts gesetzt ist, wird 'en' als Standard genommen
+    const langAttr = document.documentElement.lang || 'en';
+    
+    // Wir schauen: Startet der Wert mit 'de'? Dann 'de-DE', sonst 'en-US'
+    const locale = (langAttr.startsWith('de')) ? 'de-DE' : 'en-US';
+
+    const month = date.toLocaleString(locale, { month: 'long' });
+    const year = date.getFullYear();
+    
+    return `${month} ${year}`;
+}
+
 function renderDashboard(analyses, { filtered = false } = {}) {
   const container = document.getElementById("dashboard-container");
   if (!container) return;
@@ -662,12 +681,14 @@ function renderDashboard(analyses, { filtered = false } = {}) {
       </span>`;
     }
 
-    const checked   = selectedForCompare.has(name) ? "checked" : "";
-    const safeField = encodeURIComponent(name);
+    const currentLang = typeof lang !== 'undefined' ? lang : 'en';
 
     const dateRange = items.length > 1
-      ? `${escapeHtml(first.date)} – ${escapeHtml(latest.date)}`
-      : escapeHtml(latest.date || "–");
+      ? `${formatMonthYear(first.date, currentLang)} – ${formatMonthYear(latest.date, currentLang)}`
+      : formatMonthYear(latest.date || "–", currentLang);
+
+    const checked   = selectedForCompare.has(name) ? "checked" : "";
+    const safeField = encodeURIComponent(name);
 
     // Sparkline data
     const sparkItems = items.filter(i => parseOc(i.avg_value) != null);
@@ -676,8 +697,6 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
     return `
       <div class="analysis-card field-group-card" data-field="${safeField}">
-
-        <!-- COL 1: Field info -->
         <div class="fgc-info">
           <div class="analysis-title">
             ${fieldIndexMap[name] ?? "–"}. ${escapeHtml(name)}
