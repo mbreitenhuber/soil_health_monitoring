@@ -703,49 +703,73 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
     return `
       <div class="analysis-card field-group-card" data-field="${safeField}">
-        <div class="fgc-info">
-          <div class="analysis-title">
-            ${fieldIndexMap[name] ?? "–"}. ${escapeHtml(name)}
+
+        <div class="fgc-main">
+          <div class="fgc-info">
+            <div class="analysis-title">
+              ${fieldIndexMap[name] ?? "–"}. ${escapeHtml(name)}
+            </div>
+            <div class="fgc-meta-list">
+              <span>📅 ${dateRange}</span>
+              ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
+              ${latest.field_area_ha != null ? `<span>🗺 ${Number(latest.field_area_ha).toFixed(2)} ha</span>` : ""}
+              ${Array.isArray(latest.zones) && latest.zones.length ? `<span>📊 ${latest.zones.length} ${uiText("Data points") || "data points"}</span>` : ""}
+            </div>
           </div>
-          <div class="fgc-meta-list">
-            <span>📅 ${dateRange}</span>
-            ${latest.crop ? `<span>${getCropDisplay(latest.crop)}</span>` : ""}
-            ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
-            ${latest.field_area_ha != null ? `<span>🗺 ${Number(latest.field_area_ha).toFixed(2)} ha</span>` : ""}
-            ${Array.isArray(latest.zones) && latest.zones.length ? `<span>📊 ${latest.zones.length} ${uiText("Data points") || "data points"}</span>` : ""}
+
+          <div class="fgc-chart">
+            <canvas class="fgc-sparkline"
+                    data-values="${sparkData.join(",")}"
+                    data-labels="${sparkDates.join("|")}"></canvas>
           </div>
-          <div class="fgc-count">
+
+          <div class="fgc-actions">
+            <div class="fgc-latest">
+              <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
+              <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
+              <span class="fgc-latest-label">${uiText("current_vs")}</span>
+              ${trendBadge(trendAllTime, uiText("first_sample"))}
+              ${trendBadge(trendPrev, uiText("recent_sample"))}
+            </div>
+            <div class="fgc-buttons">
+              <button class="fgc-explore-btn fgc-new-analysis-btn"
+                      data-field="${safeField}"
+                      data-location="${escapeHtml(latest.location_name || "")}"
+                      data-crop="${escapeHtml(latest.crop || "")}"
+                      data-polygon="${encodeURIComponent(JSON.stringify(latest.polygon || []))}">
+                ${uiText("+ New Analysis")}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Analyses toggle ── -->
+        <button class="fgc-analyses-toggle" data-field="${safeField}">
+          <span class="fgc-analyses-toggle-label">
             ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
-          </div>
-        </div>
+          </span>
+          <span class="fgc-analyses-chevron">▾</span>
+        </button>
 
-        <!-- COL 2: Sparkline chart (avg only, coloured segments) -->
-        <div class="fgc-chart">
-          <canvas class="fgc-sparkline"
-                  data-values="${sparkData.join(",")}"
-                  data-labels="${sparkDates.join("|")}"></canvas>
-        </div>
-
-        <!-- COL 3: Latest value + actions -->
-        <div class="fgc-actions">
-          <div class="fgc-latest">
-            <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
-            <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
-            <span class="fgc-latest-label">${uiText("current_vs")}</span>
-            ${trendBadge(trendAllTime, uiText("first_sample"))}
-            ${trendBadge(trendPrev, uiText("recent_sample"))}
-          </div>
-          <div class="fgc-buttons">
-            <button class="fgc-explore-btn fgc-new-analysis-btn" data-field="${safeField}"
-                    data-location="${escapeHtml(latest.location_name || "")}"
-                    data-crop="${escapeHtml(latest.crop || "")}"
-                    data-polygon="${encodeURIComponent(JSON.stringify(latest.polygon || []))}">
-              ${uiText("+ New Analysis")}
-            </button>
-            <button class="fgc-explore-btn" data-field="${safeField}">
-              ${uiText("click_explore")}
-            </button>
-          </div>
+        <div class="fgc-analyses-body" data-field="${safeField}">
+          ${[...items].reverse().map(a => `
+            <div class="fgc-analyses-row">
+              <div class="fgc-analyses-row-left">
+                <span class="row-date">📅 ${escapeHtml(a.date || "–")}</span>
+                ${a.crop ? `<span class="row-crop">${getCropDisplay(a.crop)}</span>` : ""}
+                <div class="row-badges">
+                  <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
+                  <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
+                  <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
+                </div>
+              </div>
+              <div class="fgc-analyses-row-right">
+                <button class="btn-secondary fgc-detail-btn"   data-id="${a.id}">${uiText("details")}</button>
+                <button class="btn-secondary fgc-download-btn" data-id="${a.id}">⬇</button>
+                <button class="btn-danger    fgc-delete-btn"   data-id="${a.id}">${uiText("delete")}</button>
+              </div>
+            </div>
+          `).join("")}
         </div>
 
       </div>
@@ -978,6 +1002,7 @@ function drawSparklines() {
 ══════════════════════════════════════════════════ */
 
 function onCardClick(e) {
+  // ── New analysis ──────────────────────────────────
   const newBtn = e.target.closest(".fgc-new-analysis-btn");
   if (newBtn) {
     e.stopPropagation();
@@ -997,11 +1022,56 @@ function onCardClick(e) {
     return;
   }
 
-  const exploreBtn = e.target.closest(".fgc-explore-btn");
-  if (exploreBtn) {
+  // ── Analyses toggle ───────────────────────────────
+  const toggleBtn = e.target.closest(".fgc-analyses-toggle");
+  if (toggleBtn) {
     e.stopPropagation();
-    openFieldModal(decodeURIComponent(exploreBtn.dataset.field));
+    const field  = toggleBtn.dataset.field;
+    const body   = document.querySelector(`.fgc-analyses-body[data-field="${field}"]`);
+    const chev   = toggleBtn.querySelector(".fgc-analyses-chevron");
+    if (!body) return;
+    const isOpen = body.classList.contains("open");
+    body.classList.toggle("open", !isOpen);
+    toggleBtn.classList.toggle("open", !isOpen);
+    if (chev) chev.textContent = isOpen ? "▾" : "▴";
+
+    if (!isOpen && !body._bound) {
+      body._bound = true;
+      body.querySelectorAll(".fgc-detail-btn").forEach(btn =>
+        btn.addEventListener("click", ev => {
+          ev.stopPropagation();
+          const item = allAnalyses.find(a => String(a.id) === btn.dataset.id);
+          if (item) openDetailModal(item);
+        })
+      );
+      body.querySelectorAll(".fgc-download-btn").forEach(btn =>
+        btn.addEventListener("click", ev => {
+          ev.stopPropagation();
+          downloadAnalysis(btn.dataset.id);
+        })
+      );
+      body.querySelectorAll(".fgc-delete-btn").forEach(btn =>
+        btn.addEventListener("click", ev => {
+          ev.stopPropagation();
+          deleteAnalysisFromCard(btn.dataset.id);
+        })
+      );
+    }
     return;
+  }
+}
+
+async function deleteAnalysisFromCard(id) {
+  if (!confirm(uiText("delete_confirm"))) return;
+  try {
+    const res = await fetch(`${API_URL}/api/analyses/${id}`, { method: "DELETE" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    allAnalyses = allAnalyses.filter(a => String(a.id) !== id);
+    applyFilters();
+    refreshCropFilter();
+    showCompareChart();
+  } catch (err) {
+    alert(uiText("delete_failed", { msg: err.message }));
   }
 }
 

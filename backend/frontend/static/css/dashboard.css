@@ -45,14 +45,16 @@
 .field-group-card {
   cursor: pointer;
   position: relative;
+  overflow: visible !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* Override base card flex: use grid for 3 columns */
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 0.85fr;
-  gap: 0;
-  padding: 0;
-  align-items: stretch;
-  min-height: 160px;
+.field-group-card .fgc-info,
+.field-group-card .fgc-chart,
+.field-group-card .fgc-actions {
+  /* Die drei Spalten als Grid-Wrapper drinnen */
 }
 
 .field-group-card:hover {
@@ -1595,4 +1597,100 @@
   text-decoration: none;
   color: var(--text);
   border-color: var(--border2);
+}
+
+/* Card: flex-column, Toggle + Body als eigene volle Zeilen */
+.field-group-card {
+  cursor: pointer;
+  position: relative;
+  overflow: visible !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Die 3-Spalten-Zeile */
+.fgc-main {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 0.85fr;
+  gap: 0;
+  padding: 20px;
+  align-items: stretch;
+  min-height: 160px;
+}
+
+/* Toggle: volle Breite, kein negativer Margin nötig */
+.fgc-analyses-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 20px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 0 0 var(--radius, 12px) var(--radius, 12px);
+}
+
+.fgc-analyses-toggle:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.fgc-analyses-toggle.open {
+  border-radius: 0;
+}
+
+.fgc-analyses-toggle-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.fgc-analyses-chevron {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+/* Body: volle Breite */
+.fgc-analyses-body {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 0 0 var(--radius, 12px) var(--radius, 12px);
+  overflow: hidden;
+}
+
+.fgc-analyses-body.open {
+  display: flex;
+}
+
+.fgc-analyses-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  transition: background 0.12s;
+}
+
+.fgc-analyses-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.fgc-analyses-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fgc-analyses-row-right {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
 }

@@ -267,32 +267,6 @@
 
 
 <!-- ════════════════════════════════════════════════
-     FIELD MODAL — history + line chart for one field
-═══════════════════════════════════════════════════ -->
-<div id="field-modal" class="detail-modal">
-  <div class="detail-card field-modal-card">
-
-    <div class="detail-header">
-      <div>
-        <h2 id="field-modal-name">–</h2>
-        <p id="field-modal-meta" class="field-modal-meta"></p>
-      </div>
-      <button class="btn-close-x" onclick="closeFieldModal()">✕</button>
-    </div>
-
-    <!-- Per-analysis list -->
-    <div class="field-section-label">{{ t.all_analyses }}</div>
-    <div id="field-analyses-list" class="field-analyses-list"></div>
-
-    <div class="detail-actions">
-        <button class="btn-close-modal" onclick="closeFieldModal()">{{ t.close }}</button>
-      </div>
-
-  </div>
-</div>
-
-
-<!-- ════════════════════════════════════════════════
      DETAIL MODAL — single analysis edit + map view
 ═══════════════════════════════════════════════════ -->
 <div id="detail-modal" class="detail-modal">
