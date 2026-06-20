@@ -651,7 +651,7 @@ function renderDashboard(analyses, { filtered = false } = {}) {
           </div>
           <div class="fgc-meta-list">
             <span>📅 ${dateRange}</span>
-            ${latest.crop          ? `<span>🌾 ${escapeHtml(latest.crop)}</span>`          : ""}
+            ${latest.crop          ? `<span>🌱 ${escapeHtml(latest.crop)}</span>`          : ""}
             ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
           </div>
           <div class="fgc-count">
