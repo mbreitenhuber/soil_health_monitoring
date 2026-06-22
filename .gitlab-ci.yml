@@ -23,6 +23,7 @@ default:
 ###############################
 
 export-environment:
+  extends: .deploy-only-rules
   image:
     name: alpine:3.19.1
     entrypoint: [ "bash" ]
@@ -54,7 +55,17 @@ export-environment:
 # DEFINE TRIGGER RULES #
 ########################
 
-.deployment-trigger-rules:
+
+.build-trigger-rules:
+  rules:
+    - if: >
+        $CI_COMMIT_BRANCH == "main"
+      changes:
+        - backend/**/*
+      when: on_success
+    - when: never
+
+.deploy-only-rules:
   rules:
     - if: >
         $CI_COMMIT_BRANCH == "main"
@@ -66,7 +77,7 @@ export-environment:
 ###########################################
 
 build:buildah:
-  extends: .deployment-trigger-rules
+  extends: .build-trigger-rules
   stage: build
   image:
     name: quay.io/buildah/stable:latest
@@ -103,7 +114,7 @@ build:buildah:
 ###########################################
 
 .deploy-template:
-  extends: .deployment-trigger-rules
+  extends: .deploy-only-rules
   image:
     name: alpine/helm:3.14.1
     entrypoint: [ "bash" ]

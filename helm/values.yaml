@@ -3,12 +3,11 @@ components:
   backend:
     enabled: true
     updateStrategy: Recreate
-    affinity:
-      ivia.ch/nodetype: gpu
-    tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/gpu
-        operator: Exists
+
+    # GPU scheduling (ivia-generic-helm-chart): requires gpu nodes, adds tolerations.
+    requests:
+      gpu: true
+
     image:
       repository: null  # set via --set in CI
       tag: latest
