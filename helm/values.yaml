@@ -19,6 +19,9 @@ components:
       AGROSCAN_API_URL: ""
       AGROSCAN_DB_PATH: /persistent-data/agroscan.db
       AGROSCAN_MODEL_PATH: /persistent-data
+      DATASET_PATH: /persistent-data/datasets
+      SENTINEL_DIR: /persistent-data/sentinel_output
+      TMP_DIR: /persistent-data/tmp
     ingress:
       enabled: true
       url: null  # set via --set in CI

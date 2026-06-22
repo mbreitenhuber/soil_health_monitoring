@@ -15,6 +15,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -81,6 +82,42 @@ REQUIRED_SATELLITE_ENV_VARS = [
 ]
 
 
+def _persistent_root() -> Path:
+    return Path(os.environ.get("AGROSCAN_PERSISTENT_ROOT", PROJECT_ROOT.parent / "persistent-data"))
+
+
+def _default_sentinel_dir() -> Path:
+    override = os.environ.get("SENTINEL_DIR")
+    if override:
+        return Path(override)
+    return _persistent_root() / "sentinel_output"
+
+
+def _default_tmp_dir() -> Path:
+    override = os.environ.get("TMP_DIR")
+    if override:
+        return Path(override)
+    return _persistent_root() / "tmp"
+
+
+def _default_dataset_path() -> Path:
+    return Path(os.environ.get("DATASET_PATH", PROJECT_ROOT / "data" / "datasets"))
+
+
+def _persistent_models_dir() -> Path:
+    override = os.environ.get("AGROSCAN_MODEL_PATH")
+    if override:
+        model_root = Path(override)
+        if not model_root.is_absolute():
+            model_root = PROJECT_ROOT / model_root
+        if model_root.suffix == ".pth":
+            return model_root.parent
+        if model_root.name != "models":
+            model_root = model_root / "models"
+        return model_root
+    return PROJECT_ROOT / "data" / "models"
+
+
 def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = DEFAULT_TARGET) -> Path:
     override = os.environ.get("AGROSCAN_MODEL_PATH")
     if override:
@@ -95,6 +132,71 @@ def _default_model_path(model_config: str = DEFAULT_MODEL_CONFIG, target: str = 
         model_root = PROJECT_ROOT / "data" / "models"
 
     return model_root / model_config / "nn" / f"{model_config}_nn_{target}.pth"
+
+
+def _copy_tree_skip_existing(src: Path, dest: Path) -> int:
+    """Copy files from src into dest, skipping files that already exist."""
+    if not src.is_dir():
+        return 0
+
+    copied = 0
+    for src_path in src.rglob("*"):
+        if src_path.is_dir():
+            continue
+        rel = src_path.relative_to(src)
+        dest_path = dest / rel
+        if dest_path.exists():
+            continue
+        dest_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(src_path, dest_path)
+        copied += 1
+    return copied
+
+
+def init_storage() -> None:
+    """Ensure runtime directories exist and seed persistent storage from bundled data."""
+    required_dirs = [
+        DB_PATH.parent,
+        PIPELINE_WORK_DIR,
+        _default_sentinel_dir(),
+        _default_tmp_dir(),
+        _persistent_models_dir(),
+        _default_dataset_path(),
+    ]
+    for directory in required_dirs:
+        directory.mkdir(parents=True, exist_ok=True)
+
+    bundled_models = PROJECT_ROOT / "data" / "models"
+    persistent_models = _persistent_models_dir()
+    if bundled_models.is_dir() and bundled_models.resolve() != persistent_models.resolve():
+        copied = _copy_tree_skip_existing(bundled_models, persistent_models)
+        if copied:
+            print(
+                f"[backend] init_storage: seeded {copied} model file(s) into {persistent_models}",
+                flush=True,
+            )
+
+    bundled_datasets = PROJECT_ROOT / "data" / "datasets"
+    dataset_dest = _default_dataset_path()
+    if bundled_datasets.is_dir() and bundled_datasets.resolve() != dataset_dest.resolve():
+        copied = _copy_tree_skip_existing(bundled_datasets, dataset_dest)
+        if copied:
+            print(
+                f"[backend] init_storage: seeded {copied} dataset file(s) into {dataset_dest}",
+                flush=True,
+            )
+
+    sentinel_seed = PROJECT_ROOT / "data" / "seed" / "sentinel_output"
+    sentinel_dest = _default_sentinel_dir()
+    if sentinel_seed.is_dir() and sentinel_seed.resolve() != sentinel_dest.resolve():
+        copied = _copy_tree_skip_existing(sentinel_seed, sentinel_dest)
+        if copied:
+            print(
+                f"[backend] init_storage: seeded {copied} sentinel cache file(s) into {sentinel_dest}",
+                flush=True,
+            )
+
+    print("[backend] init_storage: runtime paths ready", flush=True)
 
 
 def _missing_satellite_env_vars(env: dict[str, str]) -> list[str]:
@@ -222,6 +324,7 @@ def _analysis_from_row(row: sqlite3.Row) -> dict:
     }
 
 
+init_storage()
 init_db()
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -717,10 +820,7 @@ def _metadata_path(result_path: Path) -> Path:
 
 
 def _sentinel_output_root() -> Path:
-    override = os.environ.get("SENTINEL_DIR")
-    if override:
-        return Path(override)
-    return PROJECT_ROOT.parent / "persistent-data" / "sentinel_output"
+    return _default_sentinel_dir()
 
 
 def _grid_match_radius_m() -> float:
@@ -734,6 +834,8 @@ def _grid_match_radius_m() -> float:
 def _cached_sentinel_points_for_date(analysis_date: str | None) -> list[dict]:
     points: list[dict] = []
     root = _sentinel_output_root()
+    if not root.is_dir():
+        return points
 
     def _collect_points(date_root: Path) -> None:
         for entry in sorted(date_root.iterdir(), key=lambda item: item.name):
@@ -1042,7 +1144,10 @@ def run_model(
     print(f"[backend] run_model: pipeline output will be read from {predictions_output}", flush=True)
 
     env = os.environ.copy()
-    env["DATASET_PATH"] = str(PROJECT_ROOT / "data" / "datasets")
+    env["DATASET_PATH"] = str(_default_dataset_path())
+    env.setdefault("SENTINEL_DIR", str(_default_sentinel_dir()))
+    env.setdefault("TMP_DIR", str(_default_tmp_dir()))
+    env.setdefault("MODEL_PATH", str(_persistent_models_dir()))
 
     missing_env_vars = _missing_satellite_env_vars(env)
     if missing_env_vars:
