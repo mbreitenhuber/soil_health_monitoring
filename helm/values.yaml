@@ -23,11 +23,16 @@ components:
       AGROSCAN_MODEL_PATH: /persistent-data
       DATASET_PATH: /persistent-data/datasets
       SENTINEL_DIR: /persistent-data/sentinel_output
-      TMP_DIR: /persistent-data/tmp
-      AGROSCAN_SENTINEL_API_THREADS: "2"
-      AGROSCAN_SENTINEL_DOWNLOAD_THREADS: "2"
-      AGROSCAN_SENTINEL_WORKER_THREADS: "2"
+      TMP_DIR: /tmp/agroscan
+      AGROSCAN_SENTINEL_API_THREADS: "4"
+      AGROSCAN_SENTINEL_DOWNLOAD_THREADS: "6"
+      AGROSCAN_SENTINEL_WORKER_THREADS: "4"
       AGROSCAN_TORCH_DEVICE: cpu
+    emptyDirVolumes:
+      - name: tmp
+        mountPath: /tmp/agroscan
+        medium: Memory
+        sizeLimit: 2Gi
     ingress:
       enabled: true
       url: null  # set via --set in CI

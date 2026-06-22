@@ -12,7 +12,7 @@ variables:
   #
   # Generic helm chart from https://gitlab.inf.ethz.ch/ou-ivia/generic-helm-chart
   HELM_CHART: oci://harbor.ivia.ch/ivia-generic-helm-chart/ivia-generic-helm-chart
-  HELM_CHART_VERSION: 4.1.4
+  HELM_CHART_VERSION: 4.6.3
 
 default:
   tags:
