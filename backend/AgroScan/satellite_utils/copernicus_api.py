@@ -257,7 +257,8 @@ class CopernicusApi:
 
         for file in glob.glob(f"**/*.{extension}", root_dir=path, recursive=True):
             file_path = str(path / file)
-            target_file_path = str(output_root / "IMG_DATA" / file)
+            target_file = file.replace(f".{extension}", ".tif")
+            target_file_path = str(output_root / "IMG_DATA" / target_file)
             Path(target_file_path).parent.mkdir(parents=True, exist_ok=True)
             ImageUtils.crop_location(file_path, target_file_path, latitude, longitude, 50)
 
@@ -266,7 +267,8 @@ class CopernicusApi:
             print(f"Cropping images in '{path}'...")
             for file in glob.glob(f"**/*.{extension}", root_dir=path, recursive=True):
                 file_path = str(path / file)
-                target_file_path = str(output_root / "QI_DATA" / file)
+                target_file = file.replace(f".{extension}", ".tif")
+                target_file_path = str(output_root / "QI_DATA" / target_file)
                 Path(target_file_path).parent.mkdir(parents=True, exist_ok=True)
                 ImageUtils.crop_location(file_path, target_file_path, latitude, longitude, 50)
 

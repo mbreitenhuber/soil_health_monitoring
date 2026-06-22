@@ -33,7 +33,7 @@ class ImageUtils:
         gdal.UseExceptions()
         target_path = Path(target)
         target_path.parent.mkdir(parents=True, exist_ok=True)
-        driver_name = "JP2OpenJPEG" if ImageUtils._is_jp2(target) else "GTiff"
+        driver_name = "GTiff"
         driver = gdal.GetDriverByName(driver_name)
         if driver is None:
             raise OSError(f"GDAL driver '{driver_name}' is not available")
@@ -104,7 +104,7 @@ class ImageUtils:
             width (int): Cropped width
             height (int): Cropped height
         """
-        if ImageUtils._is_jp2(source) or ImageUtils._is_jp2(target):
+        if ImageUtils._is_jp2(source) or str(target).lower().endswith(".tif"):
             gdal.UseExceptions()
             src = gdal.Open(source)
             if src is None:
@@ -114,7 +114,7 @@ class ImageUtils:
                 target,
                 src,
                 srcWin=[x, y, width, height],
-                format="JP2OpenJPEG" if ImageUtils._is_jp2(target) else "GTiff",
+                format="GTiff",
             )
             return
 
@@ -136,7 +136,7 @@ class ImageUtils:
             y (int): Center point (Y)
             radius (int): Radius (determines the image size -> 2 x radius + 1)
         """
-        if ImageUtils._is_jp2(source) or ImageUtils._is_jp2(target):
+        if ImageUtils._is_jp2(source) or str(target).lower().endswith(".tif"):
             img = ImageUtils._read_band_array(source)
             fill_value = 0
             size = 2 * radius + 1
@@ -248,7 +248,7 @@ class ImageUtils:
         Returns:
             int | list: Grayscale integer value of a single pixel or a value matrix (depends on shape)
         """
-        if ImageUtils._is_jp2(image):
+        if ImageUtils._is_jp2(image) or str(image).lower().endswith(".tif"):
             img = ImageUtils._read_band_array(image)
         else:
             img = cv2.imread(image, 0)

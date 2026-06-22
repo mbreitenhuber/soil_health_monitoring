@@ -245,8 +245,10 @@ def main():
         for band in bands:
             for resolution in resolutions:
                 value = None
-                file = path / resolution / f"{band}.jp2"
-                if file.is_file():
+                for extension in (".jp2", ".tif"):
+                    file = path / resolution / f"{band}{extension}"
+                    if not file.is_file():
+                        continue
                     try:
                         value = ImageUtils.get_pixel_value(str(file), 50, 50, shape)
                     except:
@@ -255,7 +257,8 @@ def main():
                             file=sys.stderr,
                         )
                         pass
-
+                    if value is not None:
+                        break
                 if value is not None:
                     output.at[index, band] = value
 

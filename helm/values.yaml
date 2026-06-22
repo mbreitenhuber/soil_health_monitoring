@@ -27,6 +27,7 @@ components:
       AGROSCAN_SENTINEL_API_THREADS: "2"
       AGROSCAN_SENTINEL_DOWNLOAD_THREADS: "2"
       AGROSCAN_SENTINEL_WORKER_THREADS: "2"
+      AGROSCAN_TORCH_DEVICE: cpu
     ingress:
       enabled: true
       url: null  # set via --set in CI

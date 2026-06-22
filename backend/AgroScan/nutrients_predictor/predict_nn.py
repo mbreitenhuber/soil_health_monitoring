@@ -72,6 +72,20 @@ def parse_args():
     return p.parse_args()
 
 
+def _resolve_device() -> torch.device:
+    forced = os.environ.get("AGROSCAN_TORCH_DEVICE", "").strip().lower()
+    if forced:
+        return torch.device(forced)
+    if not torch.cuda.is_available():
+        return torch.device("cpu")
+    try:
+        torch.zeros(1, device="cuda")
+        return torch.device("cuda")
+    except RuntimeError:
+        print("CUDA is visible but unusable for this PyTorch build; falling back to CPU.", flush=True)
+        return torch.device("cpu")
+
+
 def main():
     args = parse_args()
 
@@ -113,7 +127,8 @@ def main():
         raise FileNotFoundError(f"Model file not found: {model_path}")
 
     print(f"Loading model from {model_path}...")
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = _resolve_device()
+    print(f"Using torch device: {device}", flush=True)
     model = nn_pred.TrainingPipeline.load_model(str(model_path))
     model = model.to(device)
     model.eval()
