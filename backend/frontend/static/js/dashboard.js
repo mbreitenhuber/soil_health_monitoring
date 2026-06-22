@@ -34,7 +34,10 @@ function eventIcon(type) {
 }
 
 function formatEventTypeName(type) {
-  if (!type) return "Event";
+  if (!type) return uiText("event");
+  const key = `event_${type}`;
+  const translated = ui[key];
+  if (translated) return translated;
   return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
@@ -44,49 +47,77 @@ function sparklineTextWidth(ctx, text) {
   return [...text].length * 6.5;
 }
 
-/** Icon centered on x; each event shows icon + name, comma-separated. */
-function drawFieldEventLabel(ctx, x, y, events, { fontSize = 10, color = "#4A90E2", bold = true } = {}) {
+function fieldEventLabelTopReserve(_eventCount, fontSize) {
+  return Math.ceil(fontSize * 4) + 10;
+}
+
+/** First icon on the line; further same-day events follow comma-separated on one row. */
+function drawFieldEventLabel(ctx, x, y, events, {
+  fontSize = 10,
+  color = "#4A90E2",
+  bold = true,
+  highlightField = null,
+  highlightColor = "#4A90E2",
+  dimColor = "rgba(74,144,226,0.9)",
+} = {}) {
   if (!events?.length) return;
 
   const segments = events.map(ev => ({
     icon: eventIcon(ev.event_type),
     name: formatEventTypeName(ev.event_type),
+    field_name: ev.field_name,
   }));
   const TEXT_GAP = 10;
-  const font = `${bold ? "bold " : ""}${fontSize}px system-ui,sans-serif`;
   const angle = -Math.PI / 6;
-  const canvasW = ctx.canvas.width / (window.devicePixelRatio || 1);
-  const margin = 6;
+
+  function styleFor(seg) {
+    const highlighted = highlightField
+      ? seg.field_name === highlightField
+      : bold;
+    return {
+      font: `${highlighted ? "bold " : ""}${fontSize}px system-ui,sans-serif`,
+      color: highlightField
+        ? (highlighted ? highlightColor : dimColor)
+        : color,
+    };
+  }
 
   ctx.save();
-  ctx.fillStyle = color;
-  ctx.font = font;
+  ctx.translate(x, y);
+  ctx.textBaseline = "bottom";
 
-  if (segments.length === 1) {
-    const seg = segments[0];
-    ctx.translate(x, y);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    const iconW = sparklineTextWidth(ctx, seg.icon);
-    ctx.fillText(seg.icon, 0, 0);
-    ctx.rotate(angle);
-    ctx.textAlign = "left";
-    ctx.fillText(seg.name, iconW / 2 + TEXT_GAP, 0);
-  } else {
-    const fullText = segments.map(s => `${s.icon} ${s.name}`).join(", ");
-    const labelW = sparklineTextWidth(ctx, fullText);
-    const halfSpan = (labelW / 2) * Math.abs(Math.cos(angle));
+  const firstStyle = styleFor(segments[0]);
+  ctx.fillStyle = firstStyle.color;
+  ctx.font = firstStyle.font;
+  const firstIconW = sparklineTextWidth(ctx, segments[0].icon);
+  ctx.textAlign = "center";
+  ctx.fillText(segments[0].icon, 0, 0);
 
-    let drawX = x;
-    if (drawX + halfSpan > canvasW - margin) drawX = canvasW - margin - halfSpan;
-    if (drawX - halfSpan < margin) drawX = margin + halfSpan;
+  ctx.rotate(angle);
+  ctx.textAlign = "left";
 
-    ctx.translate(drawX, y);
-    ctx.rotate(angle);
-    ctx.textAlign = "center";
-    ctx.textBaseline = "bottom";
-    ctx.fillText(fullText, 0, 0);
-  }
+  let cursorX = firstIconW / 2 + TEXT_GAP;
+  segments.forEach((seg, i) => {
+    const segStyle = styleFor(seg);
+    ctx.font = segStyle.font;
+    ctx.fillStyle = segStyle.color;
+
+    if (i > 0) {
+      const sep = ", ";
+      ctx.font = `${fontSize}px system-ui,sans-serif`;
+      ctx.fillStyle = highlightField ? dimColor : color;
+      ctx.fillText(sep, cursorX, 0);
+      cursorX += sparklineTextWidth(ctx, sep);
+      ctx.fillText(seg.icon, cursorX, 0);
+      cursorX += sparklineTextWidth(ctx, seg.icon);
+      ctx.fillText(" ", cursorX, 0);
+      cursorX += sparklineTextWidth(ctx, " ");
+      ctx.font = segStyle.font;
+      ctx.fillStyle = segStyle.color;
+    }
+    ctx.fillText(seg.name, cursorX, 0);
+    cursorX += sparklineTextWidth(ctx, seg.name);
+  });
 
   ctx.restore();
 }
@@ -111,7 +142,7 @@ function ocYAxisOptions(values, { dark = true } = {}) {
     max:  parseFloat((dMax + pad).toFixed(2)),
     title: {
       display: true,
-      text: "OC (g/kg)",
+      text: uiText("oc_gkg"),
       color: dark ? "#9ca3af" : "#6b7280",
       font: { size: 11 },
     },
@@ -240,15 +271,15 @@ function drawCompareChartEventDecorations(chart, ctx, { labelsOnly = false } = {
     }
 
     if (labelsOnly) {
-      const labelEvents = hasFocus
-        ? allVisible.filter(ev => ev.field_name === focusedLabel)
-        : allVisible;
-      if (!labelEvents.length) return;
+      if (!allVisible.length) return;
 
-      drawFieldEventLabel(ctx, xPixel, chartTop - 6, labelEvents, {
-        fontSize: 10,
-        color:    isHighlighted ? "#4A90E2" : "rgba(74,144,226,0.9)",
-        bold:     isHighlighted,
+      drawFieldEventLabel(ctx, xPixel, chartTop - 6, allVisible, {
+        fontSize:       10,
+        color:          "rgba(74,144,226,0.9)",
+        bold:           false,
+        highlightField: hasFocus ? focusedLabel : null,
+        highlightColor: "#4A90E2",
+        dimColor:       "rgba(74,144,226,0.9)",
       });
     }
   });
@@ -293,7 +324,7 @@ function xAxisOpts({ dark = true } = {}) {
   return {
     title: {
       display: true,
-      text: "Date",
+      text: uiText("date"),
       color: dark ? "#9ca3af" : "#6b7280",
       font: { size: 11 },
     },
@@ -430,12 +461,45 @@ function parseOc(value) {
   return Number.isFinite(n) ? n : null;
 }
 
-document.addEventListener("click", (e) => {
-  const el = e.target.closest(".kpi-link");
-  if (!el) return;
+const FIELD_SCROLL_HIGHLIGHT_MS = 4000;
 
-  const field = el.dataset.field;
-  if (field) openFieldModal(field);
+function scrollToFieldCard(fieldName) {
+  if (!fieldName) return;
+
+  const card = document.querySelector(
+    `.field-group-card[data-field="${encodeURIComponent(fieldName)}"]`
+  );
+  if (!card) return;
+
+  const navH = parseInt(
+    getComputedStyle(document.documentElement).getPropertyValue("--nav-h"),
+    10
+  ) || 64;
+  const top = card.getBoundingClientRect().top + window.scrollY - navH - 20;
+  window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+
+  if (card._scrollHighlightTimer) {
+    clearTimeout(card._scrollHighlightTimer);
+  }
+
+  card.classList.remove("field-group-card--scroll-target");
+  void card.offsetWidth;
+  card.classList.add("field-group-card--scroll-target");
+
+  card._scrollHighlightTimer = window.setTimeout(() => {
+    card.classList.remove("field-group-card--scroll-target");
+    card._scrollHighlightTimer = null;
+  }, FIELD_SCROLL_HIGHLIGHT_MS);
+}
+
+document.addEventListener("click", (e) => {
+  const card = e.target.closest(".kpi-card--best, .kpi-card--worst");
+  if (!card) return;
+
+  const field = card.querySelector(".kpi-link")?.dataset.field;
+  if (!field) return;
+
+  scrollToFieldCard(field);
 });
 
 window.addEventListener("click", (e) => {
@@ -572,13 +636,6 @@ function renderKpiField(elId, fieldName, value, indexMap, type = "") {
   `;
 }
 
-document.addEventListener("click", (e) => {
-  const card = e.target.closest(".kpi-card");
-  if (!card) return;
-
-  const field = card.querySelector(".kpi-link")?.dataset.field;
-  if (field) openFieldModal(field);
-});
 
 function computeFieldMetrics(items) {
   const sorted = [...items].sort((a, b) =>
@@ -842,17 +899,32 @@ function formatMonthYear(dateString) {
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return dateString; 
 
-    // Holt sich das Attribut direkt aus dem HTML-Tag (<html lang="de">)
-    // Wenn nichts gesetzt ist, wird 'en' als Standard genommen
     const langAttr = document.documentElement.lang || 'en';
-    
-    // Wir schauen: Startet der Wert mit 'de'? Dann 'de-DE', sonst 'en-US'
     const locale = (langAttr.startsWith('de')) ? 'de-DE' : 'en-US';
 
     const month = date.toLocaleString(locale, { month: 'long' });
     const year = date.getFullYear();
     
     return `${month} ${year}`;
+}
+
+function formatSparklineAxisDate(label) {
+  if (!label) return "";
+
+  let date;
+  const iso = String(label).match(/^(\d{4})-(\d{2})/);
+  if (iso) {
+    date = new Date(Number(iso[1]), Number(iso[2]) - 1, 1);
+  } else {
+    date = new Date(label);
+  }
+  if (Number.isNaN(date.getTime())) return label;
+
+  const langAttr = document.documentElement.lang || "en";
+  const locale = langAttr.startsWith("de") ? "de-DE" : "en-US";
+  let month = date.toLocaleString(locale, { month: "short" });
+  month = month.replace(/\.$/, "").trim();
+  return `${month} '${String(date.getFullYear()).slice(-2)}`;
 }
 
 function renderDashboard(analyses, { filtered = false } = {}) {
@@ -935,7 +1007,7 @@ function renderDashboard(analyses, { filtered = false } = {}) {
               <span>📅 ${dateRange}</span>
               ${latest.location_name ? `<span>📍 ${escapeHtml(latest.location_name)}</span>` : ""}
               ${latest.field_area_ha != null ? `<span>🗺 ${Number(latest.field_area_ha).toFixed(2)} ha</span>` : ""}
-              ${Array.isArray(latest.zones) && latest.zones.length ? `<span>📊 ${latest.zones.length} ${uiText("Data points") || "data points"}</span>` : ""}
+              ${Array.isArray(latest.zones) && latest.zones.length ? `<span>📊 ${latest.zones.length} ${uiText("data_points")}</span>` : ""}
             </div>
           </div>
 
@@ -959,10 +1031,10 @@ function renderDashboard(analyses, { filtered = false } = {}) {
                       data-location="${escapeHtml(latest.location_name || "")}"
                       data-crop="${escapeHtml(latest.crop || "")}"
                       data-polygon="${encodeURIComponent(JSON.stringify(latest.polygon || []))}">
-                ${uiText("+ New Analysis")}
+                ${uiText("new_analysis")}
               </button>
               <button class="fgc-add-event-btn" data-field="${safeField}">
-                📋 Add Event
+                ${uiText("add_event")}
               </button>
             </div>
           </div>
@@ -970,14 +1042,16 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
         <!-- ── Footer: toggle für Analyses + Events ── -->
         <button class="fgc-combined-toggle" data-field="${safeField}">
-          <span class="fgc-analyses-toggle-label">
-            ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
+          <span class="fgc-combined-toggle-left">
+            <span class="fgc-analyses-toggle-label">
+              ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
+            </span>
+            <span class="fgc-combined-toggle-sep">·</span>
+            <span class="fgc-events-count-label" data-field="${safeField}">${eventsLabel}</span>
           </span>
-          <span class="fgc-combined-toggle-sep">·</span>
-          <span class="fgc-events-count-label" data-field="${safeField}">${eventsLabel}</span>
           <span class="fgc-toggle-trailing">
             <span class="fgc-toggle-hint">${uiText("click_to_see_analyses_events")}</span>
-            <span class="fgc-field-download-btn" data-field="${safeField}" role="button" tabindex="0">
+            <span class="btn-control fgc-field-download-btn" data-field="${safeField}" role="button" tabindex="0">
               ⬇ ${uiText("download_field_data")}
             </span>
             <span class="fgc-analyses-chevron">▾</span>
@@ -993,9 +1067,9 @@ function renderDashboard(analyses, { filtered = false } = {}) {
                 <span class="fgc-list-date">${escapeHtml(a.date || "–")}</span>
                 ${a.crop ? `<span class="fgc-list-meta">${getCropDisplay(a.crop)}</span>` : ""}
                 <div class="row-badges">
-                  <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
-                  <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
-                  <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
+                  <span class="badge-min" title="${uiText("badge_min")}">${formatOcGkg(a.min_value)}</span>
+                  <span class="badge-avg" title="${uiText("badge_avg")}">${formatOcGkg(a.avg_value)}</span>
+                  <span class="badge-max" title="${uiText("badge_max")}">${formatOcGkg(a.max_value)}</span>
                 </div>
               </div>
               <div class="fgc-row-actions">
@@ -1006,7 +1080,7 @@ function renderDashboard(analyses, { filtered = false } = {}) {
           `).join("")}
           <div class="fgc-section-header fgc-section-header--events">${uiText("events_section")}</div>
           <div class="fgc-events-list" data-field="${safeField}">
-            <p class="event-list-loading">Loading…</p>
+            <p class="event-list-loading">${uiText("loading")}</p>
           </div>
         </div>
 
@@ -1055,7 +1129,20 @@ async function initSparklineCanvas(canvas) {
   function redraw(hoverIdx) {
     const events = canvas._sparklineEvents || [];
     const W = canvas.offsetWidth  || 220;
-    const H = canvas.offsetHeight || 130;
+    const EVENT_FS   = 8;
+    const Y_LABEL_W  = 52;
+    const X_LABEL_H  = labels.length > 3 ? 42 : 32;
+    const TITLE_H    = 14;
+    const MIN_PLOT_H = 58;
+
+    const eventLabelReserve = fieldEventLabelTopReserve(1, EVENT_FS);
+    const requiredH = TITLE_H + 4 + eventLabelReserve + MIN_PLOT_H + X_LABEL_H;
+    const targetH = Math.max(130, requiredH);
+    if (Math.abs((canvas.offsetHeight || 0) - targetH) > 1) {
+      canvas.style.height = `${targetH}px`;
+      canvas.style.minHeight = `${targetH}px`;
+    }
+    const H = canvas.offsetHeight || targetH;
     if (W === 0 || H === 0) return;
 
     const dpr = window.devicePixelRatio || 1;
@@ -1070,11 +1157,13 @@ async function initSparklineCanvas(canvas) {
     const TICK_COLOR = "#9ca3af";
     const FONT_SM    = "9.5px system-ui,sans-serif";
     const FONT_TITLE = "bold 9px system-ui,sans-serif";
-    const Y_LABEL_W  = 52;
-    const X_LABEL_H  = 32;
-    const TITLE_H    = 14;
 
-    const pad = { top: TITLE_H + 4, right: 40, bottom: X_LABEL_H, left: Y_LABEL_W };
+    const pad = {
+      top: TITLE_H + 4 + eventLabelReserve,
+      right: 40,
+      bottom: X_LABEL_H,
+      left: Y_LABEL_W,
+    };
     const iW  = W - pad.left - pad.right;
     const iH  = H - pad.top  - pad.bottom;
 
@@ -1102,29 +1191,16 @@ async function initSparklineCanvas(canvas) {
       return { t0: new Date(start).getTime(), t1: new Date(end).getTime() };
     }
 
-    function formatAxisDate(ms) {
-      if (Number.isNaN(ms)) return "";
-      const d = new Date(ms);
-      const mm = String(d.getMonth() + 1).padStart(2, "0");
-      const dd = String(d.getDate()).padStart(2, "0");
-      return `${mm}-${dd}`;
-    }
-
     const dateRange = sparklineDateRange();
-
-    const toX = i => {
-      if (values.length === 1) {
-        return pad.left + X_PAD + (iW - X_PAD * 2) / 2;
-      }
-      return pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2);
-    };
-    const toY = v => pad.top + iH - ((v - yMin) / yRange) * iH;
 
     const dateToX = (dateStr) => {
       const { t0, t1 } = dateRange;
-      if (!labels.length || Number.isNaN(t0) || Number.isNaN(t1) || t1 === t0) {
+      if (!dateStr || Number.isNaN(t0) || Number.isNaN(t1)) {
         if (values.length === 1) return pad.left + X_PAD + (iW - X_PAD * 2) / 2;
         return null;
+      }
+      if (t1 === t0) {
+        return pad.left + X_PAD + (iW - X_PAD * 2) / 2;
       }
       const eventTime = new Date(dateStr).getTime();
       if (Number.isNaN(eventTime)) return null;
@@ -1132,6 +1208,22 @@ async function initSparklineCanvas(canvas) {
       if (ratio < 0 || ratio > 1) return null;
       return pad.left + X_PAD + ratio * (iW - X_PAD * 2);
     };
+
+    const toX = (i) => {
+      const label = labels[i];
+      if (label) {
+        const x = dateToX(label);
+        if (x != null) return x;
+      }
+      if (values.length === 1) {
+        return pad.left + X_PAD + (iW - X_PAD * 2) / 2;
+      }
+      if (values.length <= 1) return pad.left + X_PAD;
+      return pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2);
+    };
+    const toY = v => pad.top + iH - ((v - yMin) / yRange) * iH;
+
+    canvas._sparklineLayout = { toX, toY, values, labels };
 
     // ── Chart title ──────────────────────────────
     ctx.font         = FONT_TITLE;
@@ -1148,7 +1240,7 @@ async function initSparklineCanvas(canvas) {
     ctx.textBaseline = "middle";
     ctx.translate(10, pad.top + iH / 2);
     ctx.rotate(-Math.PI / 2);
-    ctx.fillText("OC (g/kg)", 0, 0);
+    ctx.fillText(uiText("oc_gkg"), 0, 0);
     ctx.restore();
 
     ctx.font         = FONT_SM;
@@ -1169,29 +1261,32 @@ async function initSparklineCanvas(canvas) {
     ctx.lineWidth   = 1;
     ctx.stroke();
 
-    // ── X date tick labels (0, 1/3, 2/3, 1) ───────
-    const xAxisRatio = r => pad.left + X_PAD + r * (iW - X_PAD * 2);
-    const dateAtAxisRatio = r => {
-      const { t0, t1 } = dateRange;
-      if (Number.isNaN(t0) || Number.isNaN(t1) || t1 === t0) {
-        return labels[0] ? labels[0].slice(5) : "";
-      }
-      return formatAxisDate(t0 + r * (t1 - t0));
-    };
+    // ── X date labels at each measurement ───────────
     const xTickY = pad.top + iH + 4;
+    const nDates = labels.length;
+    const rotateDates = nDates > 3;
 
-    if (labels.length >= 1) {
-      ctx.font         = FONT_SM;
+    if (nDates >= 1) {
+      ctx.fillStyle = TICK_COLOR;
       ctx.textBaseline = "top";
-      ctx.fillStyle    = TICK_COLOR;
-      [
-        [0, "left"],
-        [1 / 3, "center"],
-        [2 / 3, "center"],
-        [1, "right"],
-      ].forEach(([r, align]) => {
-        ctx.textAlign = align;
-        ctx.fillText(dateAtAxisRatio(r), xAxisRatio(r), xTickY);
+      ctx.font = nDates > 5 ? "8px system-ui,sans-serif" : FONT_SM;
+
+      labels.forEach((label, i) => {
+        const x = toX(i);
+        const text = formatSparklineAxisDate(label);
+        if (!text) return;
+
+        ctx.save();
+        ctx.translate(x, xTickY);
+        if (rotateDates) {
+          ctx.rotate(-Math.PI / 4);
+          ctx.textAlign = "right";
+          ctx.fillText(text, 0, 0);
+        } else {
+          ctx.textAlign = "center";
+          ctx.fillText(text, 0, 0);
+        }
+        ctx.restore();
       });
     }
 
@@ -1304,26 +1399,28 @@ async function initSparklineCanvas(canvas) {
     canvas._sparklineListeners = true;
 
     function getHoverIndex(e) {
-      const rect   = canvas.getBoundingClientRect();
-      const mx     = e.clientX - rect.left;
-      const W      = canvas.offsetWidth || 220;
-      const Y_LABEL_W = 52;
-      const X_LABEL_H = 32;
-      const TITLE_H   = 14;
-      const X_PAD     = 12;
-      const pad = { left: Y_LABEL_W, right: 8, top: TITLE_H + 4, bottom: X_LABEL_H };
-      const iW  = W - pad.left - pad.right;
+      const layout = canvas._sparklineLayout;
+      if (!layout?.values?.length) return null;
 
-      let closest = null, minDist = Infinity;
-      const singleX = pad.left + X_PAD + (iW - X_PAD * 2) / 2;
-      values.forEach((_, i) => {
-        const x = values.length > 1
-          ? pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2)
-          : singleX;
-        const d = Math.abs(mx - x);
-        if (d < minDist) { minDist = d; closest = i; }
+      const rect = canvas.getBoundingClientRect();
+      const mx   = e.clientX - rect.left;
+      const my   = e.clientY - rect.top;
+      const HIT  = 18;
+
+      let closest = null;
+      let minDist = Infinity;
+
+      layout.values.forEach((v, i) => {
+        const px = layout.toX(i);
+        const py = layout.toY(v);
+        const d  = Math.hypot(mx - px, my - py);
+        if (d < minDist) {
+          minDist = d;
+          closest = i;
+        }
       });
-      return minDist < 24 ? closest : null;
+
+      return minDist <= HIT ? closest : null;
     }
 
     canvas.addEventListener("mousemove", e => {
@@ -1378,7 +1475,7 @@ function onCardClick(e) {
     return;
   }
 
-  // ── Field download (nur wenn Dropdown offen) ─────
+  // ── Field download (im Dropdown-Footer) ───────────
   const fieldDownloadBtn = e.target.closest(".fgc-field-download-btn");
   if (fieldDownloadBtn) {
     e.stopPropagation();
@@ -1445,21 +1542,21 @@ async function deleteAnalysisFromCard(id) {
 
 async function loadInlineEvents(fieldName, listEl) {
   if (!listEl) return;
-  listEl.innerHTML = `<p class="event-list-loading">Loading…</p>`;
+  listEl.innerHTML = `<p class="event-list-loading">${uiText("loading")}</p>`;
 
   const events = (await fetchFieldEvents(fieldName))
     .slice()
     .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   if (!events.length) {
-    listEl.innerHTML = `<p class="event-list-empty">No events yet.</p>`;
+    listEl.innerHTML = `<p class="event-list-empty">${uiText("no_events_yet")}</p>`;
     refreshFieldSparkline(fieldName);
     updateFieldEventCountLabel(fieldName);
     return;
   }
 
   listEl.innerHTML = events.map(ev => {
-    const typeName = ev.event_type.charAt(0).toUpperCase() + ev.event_type.slice(1);
+    const typeName = formatEventTypeName(ev.event_type);
     return `
     <div class="fgc-list-row fgc-event-row" data-id="${ev.id}">
       <div class="fgc-list-row-main">
@@ -1489,7 +1586,7 @@ async function loadInlineEvents(fieldName, listEl) {
           showCompareChart().catch(console.error);
         }
       } catch (err) {
-        alert("Could not delete event: " + err.message);
+        alert(uiText("delete_event_failed", { msg: err.message }));
       }
     });
   });
@@ -1541,9 +1638,9 @@ function renderFieldAnalysesList(items) {
       <div class="field-analysis-row-info">
         <span class="row-date">${escapeHtml(a.date || "–")}</span>
         <div class="row-badges">
-          <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
-          <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
-          <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
+          <span class="badge-min" title="${uiText("badge_min")}">${formatOcGkg(a.min_value)}</span>
+          <span class="badge-avg" title="${uiText("badge_avg")}">${formatOcGkg(a.avg_value)}</span>
+          <span class="badge-max" title="${uiText("badge_max")}">${formatOcGkg(a.max_value)}</span>
         </div>
       </div>
       <div class="field-analysis-row-actions">
@@ -1739,7 +1836,7 @@ async function showCompareChart() {
       return `
         <span class="compare-field-chip ${isHidden ? "compare-field-chip--off" : ""}"
               data-field="${encodeURIComponent(fieldName)}"
-              title="${isHidden ? "Show" : "Hide"} ${escapeHtml(fieldName)}">
+              title="${isHidden ? uiText("show_field") : uiText("hide_field")} ${escapeHtml(fieldName)}">
           ${escapeHtml(fieldName)}
         </span>
       `;
@@ -1810,7 +1907,7 @@ async function showCompareChart() {
   const { labels, datasets } = padChart(sortedDates, rawDatasets);
 
   const eventAnnotations = buildCompareEventAnnotations(allEvents);
-  const topPad = 52;
+  const topPad = 24 + fieldEventLabelTopReserve(1, 10);
 
   // ── Chart ─────────────────────────────────────────
   const canvas = document.getElementById("compare-chart");
@@ -1973,7 +2070,7 @@ let currentEventFieldName = null;
 async function openEventModal(fieldName) {
   currentEventFieldName = fieldName;
   document.getElementById("event-modal-title").textContent =
-    `Field Events — ${fieldName}`;
+    uiText("event_modal_title", { field: fieldName });
 
   const modal = document.getElementById("event-modal");
   modal.style.display = "flex";
@@ -1995,12 +2092,12 @@ function closeEventModal() {
 
 async function renderEventList(fieldName) {
   const list   = document.getElementById("event-list");
-  list.innerHTML = `<p class="event-list-loading">Loading…</p>`;
+  list.innerHTML = `<p class="event-list-loading">${uiText("loading")}</p>`;
 
   const events = await fetchFieldEvents(fieldName);
 
   if (!events.length) {
-    list.innerHTML = `<p class="event-list-empty">No events yet.</p>`;
+    list.innerHTML = `<p class="event-list-empty">${uiText("no_events_yet")}</p>`;
     return;
   }
 
@@ -2027,7 +2124,7 @@ async function renderEventList(fieldName) {
           showCompareChart().catch(console.error);
         }
       } catch (err) {
-        alert("Could not delete event: " + err.message);
+        alert(uiText("delete_event_failed", { msg: err.message }));
       }
     });
   });
@@ -2049,11 +2146,11 @@ function initEventModal() {
     const type     = (typeRaw === "other" && customType) ? customType : typeRaw;
     const desc     = document.getElementById("event-description").value.trim();
 
-    if (!date) { alert("Please select a date."); return; }
+    if (!date) { alert(uiText("select_date")); return; }
     if (typeRaw === "other" && !customType) {
-      alert("Please enter a custom event type."); return;
+      alert(uiText("enter_custom_event_type")); return;
     }
-    if (!desc)  { alert("Please enter a description."); return; }
+    if (!desc)  { alert(uiText("enter_description")); return; }
 
     try {
       await addFieldEvent(currentEventFieldName, date, type, desc);
@@ -2076,7 +2173,7 @@ function initEventModal() {
 
       closeEventModal();
     } catch (err) {
-      alert("Could not add event: " + err.message);
+      alert(uiText("add_event_failed", { msg: err.message }));
     }
   });
 }
@@ -2457,8 +2554,8 @@ function updateCompareToggleMeta() {
   const hidden = showCompareChart._hidden ? showCompareChart._hidden.size : 0;
   const shown  = total - hidden;
   meta.textContent = total
-    ? `${shown} of ${total} field${total > 1 ? "s" : ""} visible`
-    : "No fields yet";
+    ? uiText("compare_fields_visible", { shown, total })
+    : uiText("compare_no_fields");
 }
 
 function updateCompareFieldsBar() {
@@ -2467,7 +2564,7 @@ function updateCompareFieldsBar() {
 
   if (selectedForCompare.size === 0) {
     bar.innerHTML = `<span class="compare-fields-hint" id="compare-fields-hint">
-      No fields selected yet — use the checkboxes on the field cards below.
+      ${uiText("compare_no_selection")}
     </span>`;
     return;
   }
@@ -2476,7 +2573,7 @@ function updateCompareFieldsBar() {
     <span class="compare-field-chip">
       ${escapeHtml(fieldName)}
       <button class="compare-chip-remove" data-field="${encodeURIComponent(fieldName)}"
-              title="Remove">✕</button>
+              title="${uiText("remove")}">✕</button>
     </span>
   `).join("");
 
