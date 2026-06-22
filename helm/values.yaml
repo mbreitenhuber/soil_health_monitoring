@@ -6,9 +6,9 @@ components:
     affinity:
       ivia.ch/nodetype: gpu
     tolerations:
-      effect: NoSchedule
-      key: node-role.kubernetes.io/gpu
-      operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/gpu
+        operator: Exists
     image:
       repository: null  # set via --set in CI
       tag: latest
