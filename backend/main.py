@@ -13,12 +13,15 @@ FastAPI + Jinja2: Seiten werden serverseitig gerendert.
 
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import List, Literal
 import os
 import shutil
 import subprocess
 import sys
 import tempfile
+import threading
+import time
+import uuid
 
 from shapely.geometry import Polygon
 
@@ -209,7 +212,7 @@ def _api_base_url() -> str:
 
 
 # Anhängen an CSS-URLs (?v=…), damit Browser nach Style-Änderungen nicht alte Dateien aus dem Cache laden.
-STATIC_CSS_VERSION = "7"
+STATIC_CSS_VERSION = "8"
 
 import math
 
@@ -765,6 +768,47 @@ class PredictionResponse(BaseModel):
     min_value: float
     max_value: float
 
+
+class PredictJobStartResponse(BaseModel):
+    job_id: str
+
+
+class PredictJobStatusResponse(BaseModel):
+    job_id: str
+    status: Literal["pending", "running", "completed", "failed"]
+    message: str | None = None
+    result: PredictionResponse | None = None
+    error: str | None = None
+
+
+_PREDICT_JOB_TTL_SECONDS = 3600
+_predict_jobs: dict[str, dict] = {}
+_predict_jobs_lock = threading.Lock()
+
+
+def _cleanup_predict_jobs() -> None:
+    cutoff = time.time() - _PREDICT_JOB_TTL_SECONDS
+    stale_ids = [
+        job_id
+        for job_id, job in _predict_jobs.items()
+        if job.get("created_at", 0) < cutoff
+    ]
+    for job_id in stale_ids:
+        _predict_jobs.pop(job_id, None)
+
+
+def _set_predict_job(job_id: str, **updates) -> None:
+    with _predict_jobs_lock:
+        job = _predict_jobs.setdefault(job_id, {"created_at": time.time()})
+        job.update(updates)
+
+
+def _get_predict_job(job_id: str) -> dict | None:
+    with _predict_jobs_lock:
+        job = _predict_jobs.get(job_id)
+        return dict(job) if job else None
+
+
 class SaveRequest(BaseModel):
     date: str
 
@@ -1217,39 +1261,20 @@ def healthz():
     return {"status": "ok"}
 
 
-@app.post("/api/predict", response_model=PredictionResponse)
-def predict(request: FieldRequest, lang: str = Cookie(default="en")):
-    if lang not in ("en", "de"):
-        lang = "de"
+def _build_prediction_response(
+    request: FieldRequest,
+    lang: str,
+) -> PredictionResponse:
     grid_cell_size_m = DEFAULT_GRID_CELL_SIZE_M
-    print(
-        f"[backend] /api/predict: received request with {len(request.polygon)} polygon points "
-        f"and analysis_date={request.analysis_date}",
-        flush=True,
-    )
-    print(
-        f"[backend] /api/predict: building fixed grid with cell_size_m={grid_cell_size_m} and reuse_radius_m={_grid_match_radius_m()}",
-        flush=True,
-    )
-    # 1) Build 60m grid centers (this is your "CSV" table)
     utm_epsg, grid_points = _grid_center_points_in_polygon(
         request.polygon,
         analysis_date=request.analysis_date,
         cell_size_m=grid_cell_size_m,
         include_border=True,
     )
-    print(
-        f"[backend] /api/predict: generated {len(grid_points)} grid cells using UTM EPSG {utm_epsg}",
-        flush=True,
-    )
-
-
-    # 2) Field elevation hook (single value for whole field)
     centroid = _polygon_centroid_latlng(request.polygon)
     field_elevation_m = get_field_elevation_m(centroid.lat, centroid.lng)
 
-    # 3) Build the in-memory CSV rows
-    # Note: you can later add more columns here (satellite features, slope, soil grids, etc.)
     rows = []
     for p in grid_points:
         rows.append(
@@ -1270,12 +1295,8 @@ def predict(request: FieldRequest, lang: str = Cookie(default="en")):
             }
         )
     grid_csv = pd.DataFrame(rows)
-
-    # 4) Model inference (returns one value per 60m cell center)
-    print("[backend] /api/predict: calling run_model", flush=True)
     y = run_model(grid_csv, analysis_date=request.analysis_date)
 
-    # 5) Convert predictions into polygons for the frontend (each cell as a zone)
     t_low, t_high, _ = lucas_oc_percentile_thresholds()
     zones = []
     values = []
@@ -1296,16 +1317,91 @@ def predict(request: FieldRequest, lang: str = Cookie(default="en")):
                 tier=oc_tier(v, t_low, t_high),
             )
         )
-    print(f"[backend] /api/predict: created {len(zones)} prediction zones", flush=True)
 
     classification = OCClassificationMeta(**oc_classification_meta(lang))
-
     return PredictionResponse(
         zones=zones,
         unit="g/kg OC",
         classification=classification,
         min_value=round(min(values), 2) if values else 0.0,
         max_value=round(max(values), 2) if values else 0.0,
+    )
+
+
+def _run_predict_job(job_id: str, request: FieldRequest, lang: str) -> None:
+    try:
+        _set_predict_job(
+            job_id,
+            status="running",
+            message="Downloading satellite data and running model…",
+        )
+        print(
+            f"[backend] predict job {job_id}: starting for {len(request.polygon)} polygon points "
+            f"(analysis_date={request.analysis_date})",
+            flush=True,
+        )
+        result = _build_prediction_response(request, lang)
+        _set_predict_job(
+            job_id,
+            status="completed",
+            message="Analysis complete",
+            result=result,
+            error=None,
+        )
+        print(
+            f"[backend] predict job {job_id}: completed with {len(result.zones)} zones",
+            flush=True,
+        )
+    except Exception as exc:
+        print(f"[backend] predict job {job_id}: failed: {exc}", flush=True)
+        _set_predict_job(
+            job_id,
+            status="failed",
+            message="Analysis failed",
+            error=str(exc),
+            result=None,
+        )
+
+
+@app.post("/api/predict", response_model=PredictJobStartResponse, status_code=202)
+def predict(request: FieldRequest, lang: str = Cookie(default="en")):
+    if lang not in ("en", "de"):
+        lang = "de"
+
+    _cleanup_predict_jobs()
+    job_id = uuid.uuid4().hex
+    _set_predict_job(
+        job_id,
+        status="pending",
+        message="Analysis queued",
+        result=None,
+        error=None,
+        created_at=time.time(),
+    )
+
+    worker = threading.Thread(
+        target=_run_predict_job,
+        args=(job_id, request, lang),
+        daemon=True,
+        name=f"predict-{job_id[:8]}",
+    )
+    worker.start()
+    print(f"[backend] /api/predict: queued job {job_id}", flush=True)
+    return PredictJobStartResponse(job_id=job_id)
+
+
+@app.get("/api/predict/jobs/{job_id}", response_model=PredictJobStatusResponse)
+def predict_job_status(job_id: str):
+    job = _get_predict_job(job_id)
+    if job is None:
+        raise HTTPException(status_code=404, detail="Analysis job not found")
+
+    return PredictJobStatusResponse(
+        job_id=job_id,
+        status=job["status"],
+        message=job.get("message"),
+        result=job.get("result"),
+        error=job.get("error"),
     )
 
 

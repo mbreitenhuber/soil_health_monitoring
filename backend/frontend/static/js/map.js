@@ -11,6 +11,8 @@ const MAP_UI = window.MAP_UI || {
   layer_drawings: "Drawings",
   layer_results: "Results",
   backend_unreachable: "Backend unreachable:\n{msg}",
+  analysis_failed: "Analysis failed:\n{msg}",
+  analysis_timeout: "Analysis timed out. Please try again with a smaller field.",
   custom_crop_required: "Please enter a custom crop name",
   save_failed: "Could not save analysis",
 };
@@ -401,6 +403,45 @@ map.on(L.Draw.Event.DELETED, () => {
 // ANALYSE BUTTON
 // =====================
 
+const ANALYSIS_POLL_INTERVAL_MS = 3000;
+const ANALYSIS_POLL_TIMEOUT_MS = 45 * 60 * 1000;
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function pollPredictJob(jobId) {
+  const deadline = Date.now() + ANALYSIS_POLL_TIMEOUT_MS;
+
+  while (Date.now() < deadline) {
+    const pollRes = await fetch(`${API_URL}/api/predict/jobs/${jobId}`);
+    if (!pollRes.ok) {
+      throw new Error(`HTTP ${pollRes.status}`);
+    }
+
+    const status = await pollRes.json();
+    const loaderText = document.querySelector("#loader span");
+    if (loaderText && status.message) {
+      loaderText.textContent = status.message;
+    }
+
+    if (status.status === "completed") {
+      if (!status.result) {
+        throw new Error("Analysis completed without result data");
+      }
+      return status.result;
+    }
+
+    if (status.status === "failed") {
+      throw new Error(status.error || MAP_UI.analysis_failed.replace("{msg}", "unknown error"));
+    }
+
+    await sleep(ANALYSIS_POLL_INTERVAL_MS);
+  }
+
+  throw new Error(MAP_UI.analysis_timeout);
+}
+
 document.getElementById("btn-analyse").addEventListener("click", async () => {
   if (!currentPolygon) {
     showAnalysisHint();
@@ -429,7 +470,12 @@ document.getElementById("btn-analyse").addEventListener("click", async () => {
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    const data = await res.json();
+    const startPayload = await res.json();
+    if (!startPayload.job_id) {
+      throw new Error("Backend did not return an analysis job id");
+    }
+
+    const data = await pollPredictJob(startPayload.job_id);
     if (data.classification) {
       ocClassification = data.classification;
     }

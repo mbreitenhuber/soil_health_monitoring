@@ -32,11 +32,14 @@ components:
       enabled: true
       url: null  # set via --set in CI
       extraAnnotations: |
-        # F5 NGINX Ingress Controller (nginx.org/*); community nginx.ingress.kubernetes.io/* is ignored.
         nginx.org/client-max-body-size: "16m"
         nginx.org/proxy-read-timeout: "900s"
         nginx.org/proxy-send-timeout: "900s"
         nginx.org/proxy-connect-timeout: "900s"
+        nginx.ingress.kubernetes.io/proxy-body-size: "16m"
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "900"
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "900"
+        nginx.ingress.kubernetes.io/proxy-connect-timeout: "900"
     pvcs:
       - name: data
         mountPath: /persistent-data
