@@ -97,7 +97,20 @@ def main():
     # 1) Download sentinel data (creates mapping CSV)
     sentinel_download = input_dir / "sentinel_download.py"
     #cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file), "--api-threads", "1", "--download-threads", "1", "--worker-threads", "1"]
-    cmd = [sys.executable, str(sentinel_download), "--input", str(gps_input), "--mapping", str(mapping_file)]
+    cmd = [
+        sys.executable,
+        str(sentinel_download),
+        "--input",
+        str(gps_input),
+        "--mapping",
+        str(mapping_file),
+        "--api-threads",
+        os.environ.get("AGROSCAN_SENTINEL_API_THREADS", "2"),
+        "--download-threads",
+        os.environ.get("AGROSCAN_SENTINEL_DOWNLOAD_THREADS", "2"),
+        "--worker-threads",
+        os.environ.get("AGROSCAN_SENTINEL_WORKER_THREADS", "2"),
+    ]
     if args.start and args.start != "1":  # Only add if not the default
         cmd.append("--start")
         cmd.append(str(args.start))

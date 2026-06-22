@@ -7,6 +7,9 @@ components:
     # GPU scheduling (ivia-generic-helm-chart): requires gpu nodes, adds tolerations.
     requests:
       gpu: true
+      memory: 4Gi
+    limits:
+      memory: 8Gi
 
     image:
       repository: null  # set via --set in CI
@@ -21,9 +24,18 @@ components:
       DATASET_PATH: /persistent-data/datasets
       SENTINEL_DIR: /persistent-data/sentinel_output
       TMP_DIR: /persistent-data/tmp
+      AGROSCAN_SENTINEL_API_THREADS: "2"
+      AGROSCAN_SENTINEL_DOWNLOAD_THREADS: "2"
+      AGROSCAN_SENTINEL_WORKER_THREADS: "2"
     ingress:
       enabled: true
       url: null  # set via --set in CI
+      extraAnnotations: |
+        # F5 NGINX Ingress Controller (nginx.org/*); community nginx.ingress.kubernetes.io/* is ignored.
+        nginx.org/client-max-body-size: "16m"
+        nginx.org/proxy-read-timeout: "900s"
+        nginx.org/proxy-send-timeout: "900s"
+        nginx.org/proxy-connect-timeout: "900s"
     pvcs:
       - name: data
         mountPath: /persistent-data
