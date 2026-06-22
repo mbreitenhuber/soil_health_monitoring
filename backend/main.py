@@ -352,7 +352,7 @@ NAV_PAGES = [
     {"id": "how_to",             "label": {"en": "How to use",         "de": "Anleitung"},           "href": "/how_to",             "group": "main"},
     {"id": "unser_analysis",     "label": {"en": "Who We Built AgroScan For",     "de": "Für wen wir AgroScan entwickelt haben"},        "href": "/users_analysis",     "group": "more"},
     {"id": "report",             "label": {"en": "Report",             "de": "Bericht"},             "href": "/report",             "group": "more"},
-    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "main"},
+    {"id": "future_work",        "label": {"en": "Future Work",        "de": "Zukünftige Arbeiten"}, "href": "/future_work",        "group": "more"},
     {"id": "pers_dash",          "label": {"en": "Personal Dashboard", "de": "Mein Dashboard"},      "href": "/personal_dashboard", "group": "right"},
 ]
 
@@ -379,18 +379,27 @@ HOME_FEATURES = [
 ]
 
 ROADMAP = [
-    {"version": "v0.1", "title": {"en": "ML-Model programming and training", "de": "ML-Modell-Programmierung und -Training"}, "done": True,
-     "desc": {"en": "Literature research, programming and training of the ML-model.", "de": "Literaturrecherche, Programmierung und Training des ML-Modells."}},
-    {"version": "v0.2", "title": {"en": "Starting Web-App development", "de": "Start der Web-App-Entwicklung"},    "done": True,
-     "desc": {"en": "Web-App development with FastAPI and Jinja2. Focused on analysis and saving the results.", "de": "Web-App-Entwicklung mit FastAPI und Jinja2. Fokussiert auf Analyse und Speichern der Ergebnisse."}},
-    {"version": "v0.3", "title": {"en": "Integration of the ML-Model into the Web-App", "de": "Integration des ML-Modells in die Web-App"},   "done": True,
-     "desc": {"en": "Connect the Web-App to the ML-Model and make it usable.", "de": "Verbinde die Web-App mit dem ML-Modell und macht es nutzbar."}},
-    {"version": "v0.4", "title": {"en": "Finalizing the Web-App", "de": "Finalisierung der Web-App"},   "done": True,
-     "desc": {"en": "Finalizing the Web-App. Focused on the user experience and the design.", "de": "Die Web-App wird finalisiert. Fokussiert auf die Nutzungserfahrung und das Design."}},
-    {"version": "v1.0", "title": {"en": "Finishing the Project", "de": "Projekt beenden"},"done": True,
-     "desc": {"en": "Final deployment and documentation of the project.", "de": "Finales Deployment und die Dokumentation des Projekts."}},
-     {"version": "v1.1", "title": {"en": "The Presentation", "de": "Die Präsentation"},"done": False,
-     "desc": {"en": "Final presentation of the project.", "de": "Finale Präsentation des Projekts."}},
+    {"version": "v0.1", "title": {"en": "Prototype development", "de": "Prototyp-Entwicklung"}, "done": True,
+     "desc": {"en": "Literature research, ML model programming and training, initial web-app development with FastAPI and Jinja2, and integration of the model into the application.",
+              "de": "Literaturrecherche, Programmierung und Training des ML-Modells, erste Web-App-Entwicklung mit FastAPI und Jinja2 sowie Integration des Modells in die Anwendung."}},
+    {"version": "v1.0", "title": {"en": "First version for project submission", "de": "Erste Version zur Projektabgabe"}, "done": True,
+     "desc": {"en": "Finalizing UX and design, deployment, project documentation, and presentation for course submission — the current AgroScan v1.0.",
+              "de": "Finalisierung von UX und Design, Deployment, Projektdokumentation und Präsentation zur Kursabgabe — die aktuelle AgroScan-Version v1.0."}},
+    {"version": "v2.0", "title": {"en": "ML model improvements", "de": "ML-Modell-Verbesserungen"}, "done": False,
+     "desc": {"en": "More data sources, local input, and higher-resolution predictions.",
+              "de": "Mehr Datenquellen, lokale Eingaben und Vorhersagen in höherer Auflösung."}},
+    {"version": "v2.1", "title": {"en": "Community forum", "de": "Community-Forum"}, "done": False,
+     "desc": {"en": "Connect with other farmers and share AgroScan ideas.",
+              "de": "Mit anderen Landwirt:innen vernetzen und AgroScan-Ideen teilen."}},
+    {"version": "v2.2", "title": {"en": "Baseline & historic analysis", "de": "Baseline- & Verlaufsanalyse"}, "done": False,
+     "desc": {"en": "Historic analyses and baseline charts for your fields.",
+              "de": "Historische Analysen und Baseline-Diagramme für deine Felder."}},
+    {"version": "v2.3", "title": {"en": "Track your progress", "de": "Fortschritt verfolgen"}, "done": False,
+     "desc": {"en": "SOC goals, progress tracking, and light gamification.",
+              "de": "SOC-Ziele, Fortschrittsverfolgung und leichte Gamification."}},
+    {"version": "v2.4", "title": {"en": "Chatbot recommendations", "de": "Chatbot-Empfehlungen"}, "done": False,
+     "desc": {"en": "Personalized recommendations for sustainable soil management.",
+              "de": "Personalisierte Empfehlungen für nachhaltiges Bodenmanagement."}},
 ]
 
 # Neue Teammitglieder: Eintrag hier ergänzen.
@@ -483,6 +492,8 @@ DASHBOARD_UI = {
         "no_match": "No fields match your filters.",
         "one_analysis": "1 analysis",
         "n_analyses": "{n} analyses",
+        "one_event": "1 event",
+        "n_events": "{n} events",
         "all_time": "All-time",
         "vs_prev": "vs. prev.",
         "latest_avg_oc": "Latest Avg OC",
@@ -492,9 +503,43 @@ DASHBOARD_UI = {
         "select_compare": "Select for comparison",
         "click_explore": "Click to explore ›",
         "oc_over_time": "OC over time",
+        "date": "Date",
         "details": "Details",
         "delete": "Delete",
         "download_csv": "Download CSV",
+        "download_field_data": "Download field data",
+        "new_analysis": "+ New Analysis",
+        "add_event": "📋 Add Event",
+        "data_points": "data points",
+        "loading": "Loading…",
+        "no_events_yet": "No events yet.",
+        "event": "Event",
+        "event_planting": "Planting",
+        "event_fertilizing": "Fertilizing",
+        "event_tillage": "Tillage",
+        "event_harvest": "Harvest",
+        "event_irrigation": "Irrigation",
+        "event_pesticide": "Pesticide",
+        "event_other": "Other",
+        "badge_min": "Min",
+        "badge_avg": "Avg",
+        "badge_max": "Max",
+        "delete_event_failed": "Could not delete event: {msg}",
+        "add_event_failed": "Could not add event: {msg}",
+        "select_date": "Please select a date.",
+        "enter_custom_event_type": "Please enter a custom event type.",
+        "enter_description": "Please enter a description.",
+        "compare_fields_visible": "{shown} of {total} fields visible",
+        "compare_no_fields": "No fields yet",
+        "compare_no_selection": "No fields selected yet — use the checkboxes on the field cards below.",
+        "show_field": "Show",
+        "hide_field": "Hide",
+        "remove": "Remove",
+        "event_modal_title": "Field Events — {field}",
+        "oc_gkg": "OC (g/kg)",
+        "click_to_see_analyses_events": "Click to see all analyses and events",
+        "analyses_section": "Analyses",
+        "events_section": "Events",
         "delete_confirm": "Delete this analysis?",
         "delete_failed": "Delete failed: {msg}",
         "save_failed": "Save failed: {msg}",
@@ -521,6 +566,8 @@ DASHBOARD_UI = {
         "no_match": "Keine Felder entsprechen deinen Filtern.",
         "one_analysis": "1 Analyse",
         "n_analyses": "{n} Analysen",
+        "one_event": "1 Ereignis",
+        "n_events": "{n} Ereignisse",
         "all_time": "Gesamt",
         "vs_prev": "vs. vorh.",
         "latest_avg_oc": "Aktueller Ø OC",
@@ -530,9 +577,43 @@ DASHBOARD_UI = {
         "select_compare": "Zum Vergleich auswählen",
         "click_explore": "Zum Erkunden klicken ›",
         "oc_over_time": "OC im Zeitverlauf",
+        "date": "Datum",
         "details": "Details",
         "delete": "Löschen",
         "download_csv": "CSV herunterladen",
+        "download_field_data": "Felddaten herunterladen",
+        "new_analysis": "+ Neue Analyse",
+        "add_event": "📋 Ereignis hinzufügen",
+        "data_points": "Datenpunkte",
+        "loading": "Laden…",
+        "no_events_yet": "Noch keine Ereignisse.",
+        "event": "Ereignis",
+        "event_planting": "Aussaat",
+        "event_fertilizing": "Düngung",
+        "event_tillage": "Bodenbearbeitung",
+        "event_harvest": "Ernte",
+        "event_irrigation": "Bewässerung",
+        "event_pesticide": "Pflanzenschutz",
+        "event_other": "Sonstiges",
+        "badge_min": "Min",
+        "badge_avg": "Ø",
+        "badge_max": "Max",
+        "delete_event_failed": "Ereignis konnte nicht gelöscht werden: {msg}",
+        "add_event_failed": "Ereignis konnte nicht hinzugefügt werden: {msg}",
+        "select_date": "Bitte ein Datum auswählen.",
+        "enter_custom_event_type": "Bitte einen eigenen Ereignistyp eingeben.",
+        "enter_description": "Bitte eine Beschreibung eingeben.",
+        "compare_fields_visible": "{shown} von {total} Feldern sichtbar",
+        "compare_no_fields": "Noch keine Felder",
+        "compare_no_selection": "Noch keine Felder ausgewählt — Checkboxen auf den Feldkarten verwenden.",
+        "show_field": "Einblenden",
+        "hide_field": "Ausblenden",
+        "remove": "Entfernen",
+        "event_modal_title": "Feldeereignisse — {field}",
+        "oc_gkg": "OC (g/kg)",
+        "click_to_see_analyses_events": "Klicken, um alle Analysen und Ereignisse anzuzeigen",
+        "analyses_section": "Analysen",
+        "events_section": "Ereignisse",
         "delete_confirm": "Diese Analyse löschen?",
         "delete_failed": "Löschen fehlgeschlagen: {msg}",
         "save_failed": "Speichern fehlgeschlagen: {msg}",
@@ -716,6 +797,55 @@ async def users_experience(request: Request, lang: str = Cookie(default="en")):
 #         # my_data=MY_DATA,
 #     ))
 
+def get_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS field_events (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            field_name  TEXT    NOT NULL,
+            date        DATE    NOT NULL,
+            event_type  TEXT    NOT NULL DEFAULT 'other',
+            description TEXT    NOT NULL DEFAULT '',
+            created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    return conn
+
+
+@app.get("/api/field-events/{field_name}")
+def get_field_events(field_name: str):
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT * FROM field_events WHERE field_name = ? ORDER BY date ASC",
+        (field_name,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+@app.post("/api/field-events")
+def create_field_event(payload: dict):
+    conn = get_db()
+    cur = conn.execute(
+        "INSERT INTO field_events (field_name, date, event_type, description) VALUES (?,?,?,?)",
+        (payload["field_name"], payload["date"], payload["event_type"], payload.get("description", ""))
+    )
+    conn.commit()
+    conn.close()
+    return {"id": cur.lastrowid, **payload}
+
+
+@app.delete("/api/field-events/{event_id}")
+def delete_field_event(event_id: int):
+    conn = get_db()
+    conn.execute("DELETE FROM field_events WHERE id = ?", (event_id,))
+    conn.commit()
+    conn.close()
+    return {"deleted": event_id}
 
 # ══════════════════════════════════════════════════════
 # API-ENDPUNKTE (JSON)
@@ -1482,7 +1612,24 @@ import csv
 from io import StringIO
 import json
 
-def _analysis_to_csv(analyses: list[dict]) -> str:
+def _fetch_events(c, field_names: list[str] | None = None) -> list[dict]:
+    if field_names is not None:
+        if not field_names:
+            return []
+        placeholders = ",".join("?" * len(field_names))
+        rows = c.execute(
+            f"SELECT * FROM field_events WHERE field_name IN ({placeholders}) "
+            "ORDER BY date DESC, id DESC",
+            field_names,
+        ).fetchall()
+    else:
+        rows = c.execute(
+            "SELECT * FROM field_events ORDER BY field_name ASC, date DESC, id DESC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _export_to_csv(analyses: list[dict], events: list[dict]) -> str:
     output = StringIO()
     writer = csv.writer(output, delimiter=";")
 
@@ -1499,15 +1646,12 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
         "Polygon Points",
         "Zones Count",
         "Field Area (ha)",
-        "Created At"
+        "Created At",
     ])
 
     for a in analyses:
-
         polygon = a.get("polygon") or []
         zones = a.get("zones") or []
-
-        # SAFE guards (verhindert Internal Server Error)
         poly_len = len(polygon) if isinstance(polygon, list) else 0
         zone_len = len(zones) if isinstance(zones, list) else 0
 
@@ -1527,6 +1671,27 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             a.get("created_at"),
         ])
 
+    writer.writerow([])
+    writer.writerow(["Field Events"])
+    writer.writerow([
+        "Event ID",
+        "Field Name",
+        "Date",
+        "Event Type",
+        "Description",
+        "Created At",
+    ])
+
+    for ev in events:
+        writer.writerow([
+            ev.get("id"),
+            ev.get("field_name"),
+            ev.get("date"),
+            ev.get("event_type"),
+            ev.get("description"),
+            ev.get("created_at"),
+        ])
+
     output.seek(0)
     return output.getvalue()
 
@@ -1540,12 +1705,18 @@ def download_single_csv(id: int):
 
     c.execute("SELECT * FROM analyses WHERE id = ?", (id,))
     r = c.fetchone()
-    conn.close()
 
     if not r:
+        conn.close()
         return {"error": "not found"}
 
-    csv_data = _analysis_to_csv([_analysis_from_row(r)])
+    analysis = _analysis_from_row(r)
+    field_name = (analysis.get("field_name") or "").strip()
+    events = _fetch_events(c, [field_name]) if field_name else []
+
+    conn.close()
+
+    csv_data = _export_to_csv([analysis], events)
 
     return Response(
         content=csv_data,
@@ -1553,6 +1724,37 @@ def download_single_csv(id: int):
         headers={
             "Content-Disposition": f"attachment; filename=analysis_{id}.csv"
         }
+    )
+
+@app.get("/api/analyses/field/{field_name}/csv")
+def download_field_csv(field_name: str):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute(
+        "SELECT * FROM analyses WHERE field_name = ? ORDER BY date DESC",
+        (field_name,),
+    )
+    rows = c.fetchall()
+
+    if not rows:
+        conn.close()
+        return {"error": "not found"}
+
+    analyses = [_analysis_from_row(r) for r in rows]
+    events = _fetch_events(c, [field_name])
+    conn.close()
+
+    safe_name = field_name.replace("/", "_").replace("\\", "_")
+    csv_data = _export_to_csv(analyses, events)
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=field_{safe_name}.csv"
+        },
     )
 
 @app.get("/api/analyses/csv")
@@ -1563,9 +1765,11 @@ def download_all_csv():
 
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
+    analyses = [_analysis_from_row(r) for r in rows]
+    events = _fetch_events(c)
     conn.close()
 
-    csv_data = _analysis_to_csv([_analysis_from_row(r) for r in rows])
+    csv_data = _export_to_csv(analyses, events)
 
     return Response(
         content=csv_data,

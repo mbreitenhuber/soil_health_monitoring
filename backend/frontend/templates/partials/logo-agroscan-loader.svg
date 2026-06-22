@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="analysis-loader-logo" viewBox="12 37 276 186" preserveAspectRatio="xMidYMid meet" role="img" aria-hidden="true">
+  <polygon points="150,60 210,80 230,145 190,200 110,200 70,145 90,80" fill="none" stroke="rgba(31,30,29,0.15)" stroke-width="1.5"/>
+  <polygon points="150,60 210,80 200,130 150,115 100,130 90,80" fill="#EAF3DE"/>
+  <polygon points="100,130 150,115 150,200 110,200 70,145" fill="#E1F5EE"/>
+  <polygon points="150,115 200,130 228,148 190,200 150,200" fill="#C0DD97"/>
+  <line x1="150" y1="60" x2="150" y2="200" stroke="#639922" stroke-width="0.8" opacity="0.5"/>
+  <line x1="90" y1="81" x2="210" y2="81" stroke="#639922" stroke-width="0.8" opacity="0.5"/>
+  <line x1="72" y1="148" x2="228" y2="148" stroke="#639922" stroke-width="0.8" opacity="0.5"/>
+  <ellipse cx="150" cy="130" rx="105" ry="60" fill="none" stroke="#137b36" stroke-width="0.8" stroke-dasharray="4 3" opacity="0.7"/>
+  <polygon points="150,60 210,80 230,145 190,200 110,200 70,145 90,80" fill="none" stroke="#1D9E75" stroke-width="2"/>
+  <g>
+    <circle cx="0" cy="0" r="19" fill="none" stroke="#1D9E75" stroke-width="0.5" opacity="0.25"/>
+    <circle cx="0" cy="0" r="13" fill="none" stroke="#1D9E75" stroke-width="1" opacity="0.5"/>
+    <circle cx="0" cy="0" r="7" fill="#085041"/>
+    <animateMotion
+      dur="5s"
+      repeatCount="indefinite"
+      path="M 225,88 A 105,60 0 1,1 71.86,170.08 A 105,60 0 1,1 225,88"
+    />
+  </g>
+</svg>

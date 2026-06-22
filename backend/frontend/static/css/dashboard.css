@@ -2,11 +2,16 @@
    DASHBOARD LAYOUT
 ========================= */
 
+/* =========================
+   DASHBOARD CONTAINER
+========================= */
+
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   padding: 8px 0 32px;
+  overflow: visible;
 }
 
 /* Tighter gap between hero intro and personas section */
@@ -38,27 +43,51 @@
   transform: translateY(-2px);
 }
 
+.analysis-card.field-group-card:hover,
+.analysis-card.overview-map-card:hover {
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
+}
+
 /* =========================
-   FIELD GROUP CARD — 3-column layout
+   FIELD GROUP CARD
 ========================= */
 
 .field-group-card {
-  cursor: pointer;
+  cursor: default;
   position: relative;
-
-  /* Override base card flex: use grid for 3 columns */
-  display: grid;
-  grid-template-columns: 1fr 1.5fr 0.85fr;
-  gap: 0;
-  padding: 0;
-  align-items: stretch;
-  min-height: 160px;
+  overflow: hidden !important;
+  padding: 0 !important;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  border-radius: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .field-group-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border2);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  border-color: var(--border);
+  box-shadow: none;
+  transform: none;
+}
+
+.field-group-card--scroll-target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(95, 167, 100, 0.25);
+  animation: field-scroll-highlight 4s ease forwards;
+}
+
+@keyframes field-scroll-highlight {
+  0%, 85% {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(95, 167, 100, 0.25);
+  }
+  100% {
+    border-color: var(--border);
+    box-shadow: none;
+  }
 }
 
 /* ── Col 1: Info ── */
@@ -166,7 +195,7 @@
 
   background: var(--accent);
   color: var(--bg, #fff);
-  border: 2px solid transparent;
+  border: none;
 
   padding: 8px 14px;
   border-radius: 8px;
@@ -177,14 +206,13 @@
   letter-spacing: 0.03em;
 
   cursor: pointer;
-  transition: border-color 0.18s, box-shadow 0.18s, transform 0.15s;
+  transition: opacity 0.2s, transform 0.2s;
   white-space: nowrap;
 }
 
 .fgc-explore-btn:hover {
-  border-color: #fff;
-  box-shadow: 0 0 0 2px var(--accent);
-  transform: translateY(-1px);
+  opacity: 0.87;
+  transform: translateY(-2px);
 }
 
 /* trend inside actions col */
@@ -350,8 +378,8 @@
 ========================= */
 
 #compare-chart-wrapper {
-  background: #fff;
-  border: 1px solid #e8e8e8;
+  background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 24px;
@@ -762,6 +790,20 @@
   .fgc-actions {
     padding: 14px 16px;
   }
+  .fgc-combined-toggle {
+    grid-template-columns: 1fr;
+  }
+  .fgc-combined-toggle-left {
+    grid-column: 1;
+  }
+  .fgc-toggle-trailing {
+    grid-column: 1;
+    padding: 8px 0 0;
+    justify-content: flex-end;
+  }
+  .fgc-combined-toggle.open .fgc-toggle-trailing {
+    justify-content: stretch;
+  }
 }
 
 @media (max-width: 600px) {
@@ -1161,4 +1203,864 @@
 
 .sort-option:hover {
   background: var(--surface);
+}
+
+/* =====================================================
+   OVERVIEW MAP CARD
+===================================================== */
+.overview-map-card {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+#global-overview-map {
+  border: 1px solid var(--border);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   OC CLASSIFICATION INFO POPUP (Dashboard)
+========================= */
+
+.save-popup {
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(6px);
+
+  display: grid;
+  place-items: center;
+  padding:
+    calc(var(--nav-h) + var(--popup-gap))
+    20px
+    var(--popup-gap);
+  box-sizing: border-box;
+  overflow: hidden;
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity 0.25s ease;
+
+  z-index: 5000;
+}
+
+.save-popup.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.save-popup-card {
+  width: 420px;
+  max-width: 100%;
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.03);
+
+  overflow: hidden;
+
+  transform: translateY(20px) scale(0.98);
+  transition: transform 0.25s ease;
+}
+
+.save-popup.visible .save-popup-card {
+  transform: translateY(0) scale(1);
+}
+
+.save-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.save-popup-header h3 {
+  margin: 0;
+
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+
+  color: var(--text);
+}
+
+.save-popup-content {
+  padding: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ── Class info card specifics ── */
+
+.class-info-card {
+  width: 440px;
+}
+
+.class-info-content {
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--text-dim);
+}
+
+.class-info-note {
+  margin: 0 0 14px;
+  color: var(--text);
+  font-size: 0.82rem;
+  line-height: 1.6;
+}
+
+.class-info-tiers {
+  margin: 0 0 4px;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.class-info-tiers li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.legend-swatch {
+  width: 28px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: inline-block;
+}
+
+.class-info-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.class-info-meta-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-dim);
+}
+
+.class-info-meta span:not(.class-info-meta-label) {
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.class-info-meta a {
+  font-size: 0.78rem;
+  color: var(--accent);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.class-info-meta a:hover {
+  opacity: 0.75;
+  text-decoration: underline;
+}
+
+/* ── Close button (reused from app.css pattern) ── */
+
+.btn-close-x {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+  transition: opacity 0.2s, transform 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.btn-close-x:hover {
+  border-color: var(--border);
+  color: var(--text);
+  opacity: 0.87;
+  transform: translateY(-2px);
+}
+
+.btn-close-x:active {
+  transform: translateY(0);
+}
+
+/* =====================================================
+   compare-toggle.css — Field Comparison Toggle Section
+===================================================== */
+
+/* ── Wrapper ─────────────────────────────────────── */
+
+.compare-toggle-section {
+  margin-bottom: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+/* ── Header / Toggle button ──────────────────────── */
+
+.compare-toggle-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 16px 20px;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  text-align: left;
+  transition: background 0.18s ease;
+}
+
+.compare-toggle-header:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.compare-toggle-title {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+.compare-toggle-meta {
+  flex: 1;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-toggle-chevron {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  line-height: 1;
+}
+
+/* ── Body (collapsed by default) ─────────────────── */
+
+.compare-toggle-body {
+  display: none;
+  flex-direction: column;
+  gap: 16px;
+
+  padding: 0 20px 20px;
+
+  border-top: 1px solid var(--border);
+}
+
+.compare-toggle-body.open {
+  display: flex;
+  overflow: visible;
+}
+
+/* ── Selected fields bar ─────────────────────────── */
+
+.compare-fields-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 32px;
+  align-items: center;
+  padding-top: 16px;
+}
+
+.compare-fields-hint {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+/* ── Field chips ─────────────────────────────────── */
+
+.compare-field-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 4px 10px 4px 12px;
+
+  border-radius: 999px;
+  border: 1px solid var(--border2);
+  background: var(--bg);
+
+  font-size: 0.75rem;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+
+  white-space: nowrap;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.compare-chip-remove {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+
+  border: none;
+  background: transparent;
+  color: var(--text-dim);
+
+  font-size: 0.65rem;
+  line-height: 1;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+  padding: 0;
+
+  transition: background 0.15s, color 0.15s;
+}
+
+.compare-chip-remove:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+/* ── Chart area ──────────────────────────────────── */
+
+.compare-chart-inner {
+  width: 100%;
+  position: relative;
+  overflow: visible;
+}
+
+.compare-chart-inner canvas {
+  width: 100% !important;
+  height: 340px !important;
+  display: block;
+}
+
+/* ── Compact checkbox on field cards ─────────────── */
+
+.compare-label-compact {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  transition: color 0.15s;
+}
+
+.compare-label-compact:hover {
+  color: var(--text);
+}
+
+.compare-label-compact input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.compare-label-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+}
+
+/* ── Hidden / toggled-off chip state ─────────────── */
+
+.compare-field-chip {
+  cursor: pointer;
+  transition: opacity 0.15s, background 0.15s, border-color 0.15s;
+}
+
+.compare-field-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.compare-field-chip--off {
+  opacity: 0.35;
+  text-decoration: line-through;
+  border-color: var(--border);
+}
+
+.compare-field-chip--off:hover {
+  opacity: 0.65;
+  text-decoration: none;
+  color: var(--text);
+  border-color: var(--border2);
+}
+
+/* ── 3-Spalten Hauptbereich ── */
+.fgc-main {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 0.85fr;
+  gap: 0;
+  padding: 20px;
+  align-items: stretch;
+  min-height: 160px;
+  flex-shrink: 0;
+}
+
+/* Toggle: volle Breite, kein negativer Margin nötig */
+.fgc-analyses-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 20px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 0 0 var(--radius, 12px) var(--radius, 12px);
+}
+
+.fgc-analyses-toggle:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.fgc-analyses-toggle.open {
+  border-radius: 0;
+}
+
+.fgc-analyses-toggle-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.fgc-analyses-chevron {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+/* Body: volle Breite */
+.fgc-analyses-body {
+  display: none;
+  flex-direction: column;
+  width: 100%;
+  border-radius: 0 0 var(--radius, 12px) var(--radius, 12px);
+  overflow: hidden;
+}
+
+.fgc-analyses-body.open {
+  display: flex;
+}
+
+.fgc-analyses-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+  transition: background 0.12s;
+}
+
+.fgc-analyses-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.fgc-analyses-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fgc-analyses-row-right {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   FGC Combined Toggle + Body
+===================================================== */
+
+/* ── Toggle: volle Breite, nach unten ── */
+.fgc-combined-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr 0.85fr;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+  padding: 11px 20px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  border-radius: 0 0 16px 16px;
+  box-sizing: border-box;
+}
+
+.fgc-combined-toggle-left {
+  grid-column: 1 / 3;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fgc-toggle-trailing {
+  grid-column: 3;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 0 20px 0 16px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.fgc-combined-toggle.open .fgc-toggle-trailing {
+  justify-content: flex-start;
+  padding-top: 6px;
+}
+
+.fgc-combined-toggle:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.fgc-combined-toggle.open {
+  border-radius: 0;
+}
+
+.fgc-combined-toggle-sep {
+  color: var(--border2);
+}
+
+.fgc-events-count-label {
+  flex: 1;
+  text-align: left;
+  min-width: 0;
+}
+
+.fgc-toggle-hint {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.fgc-combined-toggle.open .fgc-toggle-hint {
+  display: none;
+}
+
+.fgc-field-download-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.25;
+  box-sizing: border-box;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.fgc-field-download-btn:hover {
+  background: #f3f4f6;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.fgc-combined-toggle.open .fgc-field-download-btn {
+  display: inline-flex;
+  margin-top: 20px;
+}
+
+.fgc-analyses-chevron {
+  flex-shrink: 0;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1;
+}
+
+/* ── Combined body: einspaltig, Analysen dann Events ── */
+.fgc-combined-body {
+  display: none;
+  width: 100%;
+  position: static;
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+  flex-direction: column;
+  max-height: 0;
+  transition: max-height 0.25s ease;
+}
+
+.fgc-combined-body.open {
+  display: flex;
+  max-height: 700px;
+  overflow-y: auto;
+}
+
+.fgc-section-header {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-dim);
+  padding: 10px 20px 6px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.fgc-section-header:first-child {
+  border-top: none;
+  border-bottom: none;
+  background: transparent;
+  padding-top: 8px;
+}
+
+.fgc-section-header--events {
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+}
+
+.fgc-analysis-row:has(+ .fgc-section-header--events) {
+  border-bottom: none;
+}
+
+/* Einheitliche Listenzeilen */
+.fgc-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  transition: background 0.12s;
+}
+
+.fgc-list-row:last-child {
+  border-bottom: none;
+}
+
+.fgc-list-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.fgc-list-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-width: 0;
+  flex: 1;
+}
+
+.fgc-list-date {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  min-width: 88px;
+}
+
+.fgc-list-meta {
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.fgc-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.fgc-row-actions .btn-secondary,
+.fgc-row-actions .btn-danger {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+}
+
+.fgc-combined-body .row-badges {
+  display: flex;
+  gap: 6px;
+}
+
+/* Events-Liste */
+.fgc-events-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.fgc-event-delete-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  line-height: 1;
+}
+.event-list-empty,
+.event-list-loading {
+  font-size: 0.82rem;
+  color: var(--text-dim);
+  padding: 16px 20px;
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Add Event button ── */
+.fgc-add-event-btn {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s, transform 0.15s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.fgc-add-event-btn:hover {
+  border-color: var(--border);
+  color: var(--text);
+  background: rgba(255,255,255,0.03);
+  transform: translateY(-1px);
+}
+
+.event-modal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.event-modal-card .detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  margin: 0;
+}
+
+/* ── Event modal form fixes ── */
+.event-form-date {
+  flex: 0 0 160px !important;
+  min-width: 160px !important;
+}
+
+.event-form-date input[type="date"] {
+  width: 100%;
+  min-width: 150px;
+  box-sizing: border-box;
+}
+
+.event-form-type {
+  flex: 0 0 160px !important;
+  min-width: 160px !important;
+}
+
+.event-form-type select {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.event-form-type select:focus {
+  border-color: var(--accent);
+}
+
+/* ── Add button aligned to bottom of form row ── */
+.event-form-row {
+  display: flex;
+  align-items: flex-end;   /* ← aligns button to bottom of inputs */
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.event-add-btn {
+  flex-shrink: 0;
+  align-self: flex-end;    /* ← extra safety */
+  margin-bottom: 0;
+  white-space: nowrap;
 }

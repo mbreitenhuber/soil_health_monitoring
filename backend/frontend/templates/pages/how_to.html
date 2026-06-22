@@ -31,7 +31,7 @@
   <!-- Quick Steps Overview -->
   <section class="about-section" style="padding-top:0;">
     <div class="section-eyebrow">{{ "Overview" if lang == "en" else "Überblick" }}</div>
-    <h2 class="section-title">{{ "Three steps to your SOC map" if lang == "en" else "Drei Schritte zu deiner SOC Karte" }}</h2>
+    <h2 class="section-title">{{ "Three steps to your SOC map" if lang == "en" else "Drei Schritte zu deiner SOC-Karte" }}</h2>
     <div class="howto-steps-grid">
 
       <div class="howto-step-card">
@@ -49,13 +49,13 @@
 
       <div class="howto-step-card">
         <div class="howto-step-num">02</div>
-        <div class="howto-step-icon">⟶</div>
-        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+        <div class="howto-step-icon">📅</div>
+        <h3>{{ "Select the analysis date" if lang == "en" else "Analysedatum wählen" }}</h3>
         <p>
           {% if lang == "en" %}
-            Once your polygon is drawn, choose a date and click <strong>Start analysis</strong> in the sidebar. The ML model will process your field.
+            After drawing your field, the sidebar shows the area details and a date picker. Choose a date for the satellite data, or click <strong>Select today</strong> for the most recent image.
           {% else %}
-            Sobald dein Polygon gezeichnet ist, wähle ein Datum und klicke in der Seitenleiste auf <strong>Analyse starten</strong>. Das ML-Modell verarbeitet dein Feld.
+            Nach dem Zeichnen zeigt die Seitenleiste Flächendetails und eine Datumsauswahl. Wähle ein Datum für die Satellitendaten oder klicke auf <strong>Heute wählen</strong> für das aktuellste Bild.
           {% endif %}
         </p>
       </div>
@@ -63,12 +63,12 @@
       <div class="howto-step-card">
         <div class="howto-step-num">03</div>
         <div class="howto-step-icon">🗺️</div>
-        <h3>{{ "Read your zone map" if lang == "en" else "Zonenkarte lesen" }}</h3>
+        <h3>{{ "Start the analysis & read your zone map" if lang == "en" else "Analyse starten & Zonenkarte lesen" }}</h3>
         <p>
           {% if lang == "en" %}
-            Your field is divided into color-coded grid cells using a plasma scale tied to LUCAS (Germany) reference percentiles, darker purples are lower SOC, brighter yellows are higher.
+            Once a date is set, click <strong>Start analysis</strong>. The ML model builds a color-coded zone map on your field using a plasma scale.
           {% else %}
-            Dein Feld wird in farbcodierte Rasterzellen unterteilt mit einer Plasma-Skala an LUCAS-Referenz-Perzentilen (Deutschland): dunklere Violetttöne bedeuten niedrigeren SOC, hellere Gelbtöne höheren.
+            Sobald ein Datum gesetzt ist, klicke auf <strong>Analyse starten</strong>. Das ML-Modell erstellt eine farbcodierte Zonenkarte mit einer Plasma-Skala.
           {% endif %}
         </p>
       </div>
@@ -90,19 +90,24 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Click <strong>Analysis</strong> in the top navigation bar, or use the <em>Analyze now</em> button on the home page. You will see a full-screen map centered on Germany.
+            Open the Analysis page via <strong>Analysis</strong> in the top navigation or the <em>Analyze now</em> button on the home page. A full-screen satellite map opens, centred on Germany by default. On the left you will find a sidebar with short instructions to help you through the process; for the full walkthrough, you are already in the right place.
           {% else %}
-            Klicke in der oberen Navigation auf <strong>Analyse</strong> oder nutze auf der Startseite den Button <em>Jetzt analysieren</em>. Du siehst eine Vollbildkarte mit Fokus auf Deutschland.
+            Öffne die Analyse-Seite über <strong>Analyse</strong> in der oberen Navigation oder den Button <em>Jetzt analysieren</em> auf der Startseite. Eine Vollbild-Satellitenkarte öffnet sich, standardmässig mit Fokus auf Deutschland. Links findest du eine Seitenleiste mit kurzen Anweisungen als Hilfe für den Ablauf; die ausführliche Anleitung liest du hier.
+          {% endif %}
+        </p>
+        <p style="margin-top:12px;">
+          {% if lang == "en" %}
+            Before you draw anything, zoom and pan to your field. The map behaves like any familiar online map: scroll to zoom, click and drag to move. A search bar in the top-right corner lets you jump to a place name or enter coordinates directly, which is often faster than scrolling across the country from the default view.
+          {% else %}
+            Bevor du etwas zeichnest, zoome und verschiebe die Karte zu deinem Feld. Sie verhält sich wie eine gewohnte Online-Karte: Scrollen zum Zoomen, Klicken und Ziehen zum Verschieben. Die Suchleiste oben rechts springt zu einem Ortsnamen oder direkt zu Koordinaten, was oft schneller, als vom Standardausschnitt quer durchs Land zu scrollen.
           {% endif %}
         </p>
         <div class="howto-tip">
           <span class="howto-tip-label">💡 {{ "Tip" if lang == "en" else "Tipp" }}</span>
           {% if lang == "en" %}
-            Use the scroll wheel or the <kbd>+</kbd> / <kbd>–</kbd> buttons on the map to zoom into your region before drawing. This makes it easier to place accurate polygon points.
-            To find your field more quickly, you can search for the nearest village or city, or enter the coordinates of your field into the search bar in the top right-hand corner. This will take you directly to your location.
+            AgroScan works best for agricultural fields in Germany. When the page loads, a short note reminds you of a few practical limits. For example, very large fields take longer to process and the page should stay open while the model is running.
           {% else %}
-            Zoome mit dem Mausrad oder den <kbd>+</kbd> / <kbd>–</kbd>-Buttons auf der Karte in deine Region, bevor du zeichnest. So setzt du die Polygonpunkte genauer.
-            Du kannst auch nach dem nächsten Ort suchen oder die Koordinaten deines Feldes in die Suchleiste oben rechts eingeben, um direkt dorthin zu springen.
+            AgroScan eignet sich am besten für landwirtschaftliche Felder in Deutschland. Beim Laden erscheint kurz ein Hinweis zu ein paar praktischen Grenzen. Zum Beispiel dauern sehr grosse Felder länger, und die Seite sollte während der Modellberechnung geöffnet bleiben.
           {% endif %}
         </div>
       </div>
@@ -137,11 +142,11 @@
           <li>Zum Nachbearbeiten wähle <strong>Layer bearbeiten</strong> (Stift-Symbol), ziehe die Eckpunkte an die gewünschte Position und klicke auf <strong>Speichern</strong>.</li>
           {% endif %}
         </ol>
-        <p style="margin-top:16px;">
+        <p style="margin-top:12px;">
           {% if lang == "en" %}
-            The sidebar updates automatically with the number of vertices and the approximate area. If you need to start over, use <strong>Reset</strong> in the sidebar after an analysis, or draw a new polygon once the field is cleared.
+            To start over after an analysis, use <strong>Reset</strong> in the sidebar. While drawing a new field, you can also delete the polygon with the map toolbar and draw again.
           {% else %}
-            Die Seitenleiste zeigt automatisch die Anzahl der Eckpunkte und die ungefähre Fläche. Zum Neustart nutze nach einer Analyse <strong>Zurücksetzen</strong> in der Seitenleiste oder zeichne ein neues Polygon, sobald das Feld geleert ist.
+            Für einen Neustart nach einer Analyse nutze <strong>Zurücksetzen</strong> in der Seitenleiste. Beim Zeichnen eines neuen Feldes kannst du das Polygon auch über die Karten-Werkzeugleiste löschen und neu zeichnen.
           {% endif %}
         </p>
         <div class="howto-tip">
@@ -159,26 +164,23 @@
     <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">{{ "Step 3" if lang == "en" else "Schritt 3" }}</div>
-        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+        <h3>{{ "Select the analysis date" if lang == "en" else "Analysedatum wählen" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Once a polygon is drawn, you can choose a date at which you want your field to be analysed. The <strong>Start analysis</strong> button in the sidebar becomes active. Click it to start analysing your field. A loading indicator will appear while the model runs.
+            Every analysis is tied to a specific point in time. AgroScan uses Sentinel-2 satellite imagery, and the model needs to know which acquisition date to use for your field. Once your polygon is in place, choose an <strong>Analysis date</strong> in the sidebar. This tells the system which satellite pass to base the prediction on.
           {% else %}
-            Sobald ein Polygon gezeichnet ist, wählst du das Datum für die Analyse. Der Button <strong>Analyse starten</strong> in der Seitenleiste wird aktiv. Klicke darauf. Während das Modell läuft, erscheint ein Ladeindikator.
+            Jede Analyse bezieht sich auf einen bestimmten Zeitpunkt. AgroScan nutzt Sentinel-2-Satellitenbilder, und das Modell muss wissen, welches Aufnahmedatum für dein Feld verwendet werden soll. Sobald dein Polygon steht, wählst du in der Seitenleiste ein <strong>Analysedatum</strong>. Damit legst du fest, welcher Satellitendurchgang der Vorhersage zugrunde liegt.
           {% endif %}
         </p>
-        <div class="howto-tip">
-          <span class="howto-tip-label">⚠️ {{ "Note" if lang == "en" else "Hinweis" }}</span>
+        <p style="margin-top:12px;">
           {% if lang == "en" %}
-            The analysis requires an active internet connection in order to download satellite data. Depending on the size of your field, this may take a while. The larger the field, the longer it takes. It is better to analyse all fields separately than to combine them in one analysis.
-            <p> If the button remains inactive, ensure that your polygon is properly closed on the map. </p>
+            Open the date picker and select a day from the calendar. Future dates are not available because no satellite image exists yet. If you want the most recent data without browsing the calendar, use <strong>Select today</strong> to set today's date in one click. Comparing the same field across different dates over several weeks or seasons is one of the most useful ways to track how your soil carbon changes over time.
           {% else %}
-            Für die Analyse brauchst du eine aktive Internetverbindung, um Satellitendaten herunterzuladen. Je nach Feldgrösse kann das eine Weile dauern. Je grösser das Feld, desto länger dauert es. Analysiere Felder lieber einzeln statt mehrere in einer Analyse zu kombinieren.
-            <p> Bleibt der Button inaktiv, prüfe, ob dein Polygon auf der Karte vollständig geschlossen ist. </p>
+            Öffne die Datumsauswahl und wähle einen Tag im Kalender. Zukünftige Daten sind nicht verfügbar, weil es dafür noch kein Satellitenbild gibt. Willst du die aktuellsten Daten ohne Kalendersuche, setzt <strong>Heute wählen</strong> das heutige Datum mit einem Klick. Dasselbe Feld an verschiedenen Daten über Wochen oder Saisons hinweg zu vergleichen, ist eine der besten Methoden, um Veränderungen des Bodenkohlenstoffs zu verfolgen.
           {% endif %}
-        </div>
+        </p>
       </div>
     </div>
 
@@ -186,38 +188,70 @@
     <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">{{ "Step 4" if lang == "en" else "Schritt 4" }}</div>
+        <h3>{{ "Start the analysis" if lang == "en" else "Analyse starten" }}</h3>
+      </div>
+      <div class="howto-detail-body">
+        <p>
+          {% if lang == "en" %}
+            With your field outlined and a date selected, click <strong>Start analysis</strong>. AgroScan downloads the relevant satellite tiles for your polygon, runs them through the machine-learning model, and divides the field into a grid of 60-metre zones. Each zone receives a predicted soil organic carbon value, which is then colour-coded on the map. A loading message appears while this runs. How long it takes depends mainly on field size and your internet connection.
+          {% else %}
+            Mit umrissener Fläche und gewähltem Datum klickst du auf <strong>Analyse starten</strong>. AgroScan lädt die passenden Satellitenkacheln für dein Polygon, führt sie durch das Machine-Learning-Modell und unterteilt das Feld in ein Raster aus 60-Meter-Zonen. Jede Zone erhält einen vorhergesagten Wert für organischen Bodenkohlenstoff, der auf der Karte farblich dargestellt wird. Währenddessen erscheint eine Lademeldung. Die Dauer hängt vor allem von der Feldgrösse und deiner Internetverbindung ab.
+          {% endif %}
+        </p>
+        <p style="margin-top:12px;">
+          {% if lang == "en" %}
+            Keep the browser tab open until the process finishes. If something goes wrong, for example a dropped connection, you can simply try again. For the most reliable results, analyse individual fields or management zones separately rather than drawing one very large polygon around several parcels at once.
+          {% else %}
+            Lass den Browser-Tab geöffnet, bis der Vorgang abgeschlossen ist. Bei Problemen, etwa einer unterbrochenen Verbindung, kannst du es einfach erneut versuchen. Für verlässliche Ergebnisse analysierst du einzelne Felder oder Bewirtschaftungszonen getrennt, statt ein sehr grosses Polygon um mehrere Parzellen zu legen.
+          {% endif %}
+        </p>
+        <div class="howto-tip">
+          <span class="howto-tip-label">⚠️ {{ "Note" if lang == "en" else "Hinweis" }}</span>
+          {% if lang == "en" %}
+            The analysis requires an active internet connection to download satellite data. Larger fields produce more grid cells and take longer to process.
+          {% else %}
+            Für die Analyse brauchst du eine aktive Internetverbindung zum Herunterladen der Satellitendaten. Grössere Felder erzeugen mehr Rasterzellen und brauchen länger.
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="howto-detail">
+      <div class="howto-detail-header">
+        <div class="howto-detail-num">{{ "Step 5" if lang == "en" else "Schritt 5" }}</div>
         <h3>{{ "Read your results" if lang == "en" else "Ergebnisse lesen" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The sidebar also shows a summary with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.
+            After the analysis is completed, your field will be color-coded based on the predicted soil organic carbon content. The <strong>Result</strong> section appears in the sidebar with the number of zones analyzed, the average SOC content, and the highest and lowest SOC values.
           {% else %}
-            Nach Abschluss der Analyse wird dein Feld nach dem vorhergesagten organischen Kohlenstoff im Boden farbcodiert. In der Seitenleiste siehst du eine Zusammenfassung mit der Anzahl analysierter Zonen, dem durchschnittlichen SOC sowie den höchsten und niedrigsten SOC-Werten.
+            Nach Abschluss der Analyse wird dein Feld nach dem vorhergesagten organischen Kohlenstoff im Boden farbcodiert. Der Bereich <strong>Ergebnis</strong> erscheint in der Seitenleiste mit der Anzahl analysierter Zonen, dem durchschnittlichen SOC sowie den höchsten und niedrigsten SOC-Werten.
           {% endif %}
         </p>
       </div>
     </div>
 
-    <!-- Step 5 -->
+    <!-- Step 6 -->
     <div class="howto-detail" style="border-bottom:none;padding-bottom:0;">
       <div class="howto-detail-header">
-        <div class="howto-detail-num">{{ "Step 5" if lang == "en" else "Schritt 5" }}</div>
+        <div class="howto-detail-num">{{ "Step 6" if lang == "en" else "Schritt 6" }}</div>
         <h3>{{ "Save your results" if lang == "en" else "Ergebnisse speichern" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            You can save your results by clicking the <strong>Save</strong> button in the sidebar. Further down is a complete step-by-step guide on how to use the personal dashboard.
+            You can save your results by clicking the <strong>Save to Personal Dashboard</strong> button in the sidebar. Further down is a complete step-by-step guide on how to use the personal dashboard.
           {% else %}
-            Du kannst deine Ergebnisse über den Button <strong>Speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zu Mein Dashboard.
+            Du kannst deine Ergebnisse über den Button <strong>In Mein Dashboard speichern</strong> in der Seitenleiste sichern. Weiter unten findest du eine vollständige Schritt-für-Schritt-Anleitung zu Mein Dashboard.
           {% endif %}
         </p>
         <p style="margin-top:12px;">
           {% if lang == "en" %}
-            To start again, click the  <strong>Reset</strong> button to clear all layers and draw a new polygon.
+            To start again, click the <strong>Reset</strong> button to clear all layers and return to step 1.
           {% else %}
-            Für einen Neustart klicke auf <strong>Zurücksetzen</strong>, um alle Layer zu löschen und ein neues Polygon zu zeichnen.
+            Für einen Neustart klicke auf <strong>Zurücksetzen</strong>, um alle Layer zu löschen und zu Schritt 1 zurückzukehren.
           {% endif %}
         </p>
       </div>

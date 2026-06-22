@@ -132,6 +132,16 @@
         </div>
       {% endfor %}
     </div>
+    <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.8;max-width:720px;">
+      {% if lang == "en" %}
+        The roadmap above is a quick overview. For more detail on all planned features — from model improvements to community tools — visit the Future Work page.
+      {% else %}
+        Die Roadmap oben ist ein kurzer Überblick. Mehr Details zu allen geplanten Features — von Modellverbesserungen bis hin zu Community-Tools — findest du auf der Seite Zukünftige Arbeiten.
+      {% endif %}
+    </p>
+    <div style="margin-top: 18px;">
+      <a class="btn-outline" href="/future_work">→ {{ "Future Work" if lang == "en" else "Zukünftige Arbeiten" }}</a>
+    </div>
   </section>
 
   <section class="about-section">

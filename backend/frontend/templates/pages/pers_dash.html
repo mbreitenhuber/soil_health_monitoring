@@ -51,6 +51,7 @@
 
 {% block head_styles %}
 <link rel="stylesheet" href="/static/css/dashboard.css?v={{ static_css_version }}" />
+<link rel="stylesheet" href="/static/css/compare-toggle.css?v={{ static_css_version }}" />
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 {% endblock %}
 
@@ -93,6 +94,63 @@
         <strong class="kpi-value" id="kpi-worst-field">–</strong>
       </div>
 
+    </div>
+
+    <div class="analysis-card overview-map-card" style="margin-bottom: 24px; position: relative;">
+      <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+        <div class="field-section-label">{{ 'Fields Overview' if lang == 'en' else 'Globale Feldübersicht' }}</div>
+        <button id="btn-class-info-dashboard" class="btn-secondary"
+                style="font-size: 0.78rem; padding: 4px 10px; line-height: 1.4;"
+                title="{{ 'Soil Classification Info' if lang == 'en' else 'Bodenklassifikation Info' }}">
+          ℹ {{ 'Legend' if lang == 'en' else 'Legende' }}
+        </button>
+      </div>
+      <div id="global-overview-map" style="height: 400px; width: 100%; border-radius: 12px; z-index: 1;"></div>
+    </div>
+
+    <!-- OC Classification Info Popup (Dashboard) -->
+    <div class="save-popup" id="class-info-popup-dashboard" aria-hidden="true">
+      <div class="save-popup-card class-info-card">
+        <div class="save-popup-header">
+          <h3>{{ 'OC classification thresholds' if lang == 'en' else 'Boden-OC-Klassifikation' }}</h3>
+          <button type="button" class="btn-close-x" id="close-class-info-dashboard" aria-label="Close">✕</button>
+        </div>
+        <div class="save-popup-content class-info-content">
+          <p class="class-info-note" id="dash-class-info-note"></p>
+          <ul class="class-info-tiers" id="dash-class-info-tiers"></ul>
+          <div class="class-info-meta">
+            <span class="class-info-meta-label">{{ 'Source:' if lang == 'en' else 'Quelle:' }}</span>
+            <span id="dash-class-info-dataset"></span>
+            <a href="#" target="_blank" rel="noopener noreferrer" id="dash-class-info-link">
+              {{ 'Open source' if lang == 'en' else 'Quelle öffnen' }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Compare Toggle ───────────────────────────── -->
+    <div class="compare-toggle-section">
+      <button class="compare-toggle-header" id="compare-toggle-btn" aria-expanded="false">
+        <span class="compare-toggle-title">
+          {{ '⚖ Field Comparison' if lang == 'en' else '⚖ Felder vergleichen' }}
+        </span>
+        <span class="compare-toggle-meta" id="compare-toggle-meta">
+          {{ 'Click to compare fields' if lang == 'en' else 'Klicken, um Felder zu vergleichen' }}
+        </span>
+        <span class="compare-toggle-chevron" id="compare-toggle-chevron">▾</span>
+      </button>
+
+      <div class="compare-toggle-body" id="compare-toggle-body">
+        <div class="compare-fields-bar" id="compare-fields-bar">
+          <span class="compare-fields-hint" id="compare-fields-hint">
+            {{ 'No fields selected yet — use the checkboxes on the field cards below.' if lang == 'en' else 'Noch keine Felder ausgewählt — Checkboxen auf den Feldkarten verwenden.' }}
+          </span>
+        </div>
+        <div class="compare-chart-inner" id="compare-chart-wrapper" style="display:none;">
+          <canvas id="compare-chart"></canvas>
+        </div>
+      </div>
     </div>
 
     <div class="dashboard-controls">
@@ -195,11 +253,6 @@
       <div class="controls-right">
 
         <button class="btn-control" id="download-csv-btn">{{ t.download_all }}</button>
-        <button class="btn-control" id="compare-btn">{{ t.compare }}</button>
-
-        <button class="btn-end-compare" id="end-compare-btn" style="display:none;">
-          {{ t.end_compare }}
-        </button>
 
       </div>
 
@@ -210,59 +263,6 @@
     <div id="dashboard-container" class="dashboard-container"></div>
 
   </section>
-</div>
-
-
-<!-- ════════════════════════════════════════════════
-     FIELD MODAL — history + line chart for one field
-═══════════════════════════════════════════════════ -->
-<div id="field-modal" class="detail-modal">
-  <div class="detail-card field-modal-card">
-
-    <div class="detail-header">
-      <div>
-        <h2 id="field-modal-name">–</h2>
-        <p id="field-modal-meta" class="field-modal-meta"></p>
-      </div>
-      <button class="btn-close-x" onclick="closeFieldModal()">✕</button>
-    </div>
-
-    <!-- 4 stat cards -->
-    <div class="detail-stats-grid field-stats-grid">
-      <div class="detail-stat-card">
-        <span>{{ t.analyses }}</span>
-        <strong id="field-stat-count">–</strong>
-      </div>
-      <div class="detail-stat-card stat-min">
-        <span>{{ t.field_area }}</span>
-        <strong id="field-stat-min">–</strong>
-      </div>
-      <div class="detail-stat-card stat-max">
-        <span>{{ t.data_points }}</span>
-        <strong id="field-stat-max">–</strong>
-      </div>
-      <div class="detail-stat-card stat-avg">
-        <span>{{ t.latest_avg }}</span>
-        <strong id="field-stat-latest">–</strong>
-      </div>
-    </div>
-
-    <!-- Line chart — OC development over time -->
-    <div class="field-section-label">{{ t.oc_over_time }}</div>
-    <div class="detail-chart-wrapper">
-      <canvas id="field-line-chart"></canvas>
-    </div>
-
-    <!-- Per-analysis list -->
-    <div class="field-section-label">{{ t.all_analyses }}</div>
-    <div id="field-analyses-list" class="field-analyses-list"></div>
-
-    <div class="detail-actions">
-      <button class="btn-close-modal" onclick="closeFieldModal()">{{ t.close }}</button>
-      <button class="btn-new-analysis" id="field-new-analysis-btn">{{ t.new_analysis }}</button>
-    </div>
-
-  </div>
 </div>
 
 
@@ -334,6 +334,55 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════
+     FIELD EVENT MODAL
+═══════════════════════════════════════════════════ -->
+<div id="event-modal" class="detail-modal" aria-hidden="true">
+  <div class="detail-card event-modal-card">
+
+    <div class="detail-header">
+      <h2 id="event-modal-title">Field Events</h2>
+      <button class="btn-close-x" onclick="closeEventModal()">✕</button>
+    </div>
+
+    <!-- Add new event form -->
+    <div class="event-form">
+      <div class="event-form-row">
+        <div class="detail-field event-form-date">
+          <label>{{ 'Date' if lang == 'en' else 'Datum' }}</label>
+          <input type="date" id="event-date">
+        </div>
+        <div class="detail-field event-form-type">
+          <label>{{ 'Event Type' if lang == 'en' else 'Ereignistyp' }}</label>
+          <select id="event-type" onchange="toggleCustomEventType(this.value)">
+            <option value="planting">🌱 {{ 'Planting' if lang == 'en' else 'Aussaat' }}</option>
+            <option value="fertilizing">🌿 {{ 'Fertilizing' if lang == 'en' else 'Düngung' }}</option>
+            <option value="tillage">🚜 {{ 'Tillage' if lang == 'en' else 'Bodenbearbeitung' }}</option>
+            <option value="harvest">🌾 {{ 'Harvest' if lang == 'en' else 'Ernte' }}</option>
+            <option value="irrigation">💧 {{ 'Irrigation' if lang == 'en' else 'Bewässerung' }}</option>
+            <option value="pesticide">🧪 {{ 'Pesticide' if lang == 'en' else 'Pflanzenschutz' }}</option>
+            <option value="other">📝 {{ 'Other' if lang == 'en' else 'Sonstiges' }}</option>
+          </select>
+        </div>
+        <div class="detail-field event-form-custom-type" id="event-custom-type-wrapper" style="display:none;">
+          <label>{{ 'Custom Type' if lang == 'en' else 'Eigener Typ' }}</label>
+          <input type="text" id="event-custom-type"
+                placeholder="{{ 'e.g. Soil test' if lang == 'en' else 'z. B. Bodenprobe' }}">
+        </div>
+        <div class="detail-field event-form-desc">
+          <label>{{ 'Description' if lang == 'en' else 'Beschreibung' }}</label>
+          <input type="text" id="event-description"
+                placeholder="{{ 'e.g. Winter wheat, variety Kerubino' if lang == 'en' else 'z. B. Winterweizen, Sorte Kerubino' }}">
+        </div>
+        <button class="btn-save event-add-btn" id="event-add-btn">
+          {{ '+ Add' if lang == 'en' else '+ Hinzufügen' }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 {% endblock %}
 
@@ -342,6 +391,7 @@
   {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang, "ocClassification": oc_classification, "ui": dashboard_ui} | tojson }}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
 <!-- Leaflet JS — for the mini satellite map -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/static/js/field-gradient-overlay.js"></script>
