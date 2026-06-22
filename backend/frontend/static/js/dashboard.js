@@ -19,6 +19,20 @@ function escapeHtml(str) {
     .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+const EVENT_TYPE_ICONS = {
+  planting:    "🌱",
+  fertilizing: "🌿",
+  tillage:     "🚜",
+  harvest:     "🌾",
+  irrigation:  "💧",
+  pesticide:   "🧪",
+  other:       "📝",
+};
+
+function eventIcon(type) {
+  return EVENT_TYPE_ICONS[type] || "📝";
+}
+
 function relativeTrendPct(firstVal, latestVal) {
   const first  = Number(firstVal);
   const latest = Number(latestVal);
@@ -510,6 +524,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ?.addEventListener("click", () =>
       window.open(`${API_URL}/api/analyses/csv`, "_blank"));
   initCompareToggle();
+  initEventModal();
   document.getElementById("save-details")
     ?.addEventListener("click", saveDetails);
 
@@ -739,37 +754,52 @@ function renderDashboard(analyses, { filtered = false } = {}) {
                       data-polygon="${encodeURIComponent(JSON.stringify(latest.polygon || []))}">
                 ${uiText("+ New Analysis")}
               </button>
+              <button class="fgc-add-event-btn" data-field="${safeField}">
+                📋 Add Event
+              </button>
             </div>
           </div>
         </div>
 
-        <!-- ── Analyses toggle ── -->
-        <button class="fgc-analyses-toggle" data-field="${safeField}">
+        <!-- ── Footer: single toggle für Analyses + Events ── -->
+        <button class="fgc-combined-toggle" data-field="${safeField}">
           <span class="fgc-analyses-toggle-label">
             ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
           </span>
+          <span class="fgc-combined-toggle-sep">·</span>
+          <span class="fgc-events-count-label" data-field="${safeField}">Events</span>
           <span class="fgc-analyses-chevron">▾</span>
         </button>
 
-        <div class="fgc-analyses-body" data-field="${safeField}">
-          ${[...items].reverse().map(a => `
-            <div class="fgc-analyses-row">
-              <div class="fgc-analyses-row-left">
-                <span class="row-date">📅 ${escapeHtml(a.date || "–")}</span>
-                ${a.crop ? `<span class="row-crop">${getCropDisplay(a.crop)}</span>` : ""}
-                <div class="row-badges">
-                  <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
-                  <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
-                  <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
+        <!-- ── Combined body: Analyses left, Events right ── -->
+        <div class="fgc-combined-body" data-field="${safeField}">
+          <div class="fgc-combined-col fgc-analyses-col">
+            <div class="fgc-col-header">Analyses</div>
+            ${[...items].reverse().map(a => `
+              <div class="fgc-analyses-row">
+                <div class="fgc-analyses-row-left">
+                  <span class="row-date">📅 ${escapeHtml(a.date || "–")}</span>
+                  ${a.crop ? `<span class="row-crop">${getCropDisplay(a.crop)}</span>` : ""}
+                  <div class="row-badges">
+                    <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
+                    <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
+                    <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
+                  </div>
+                </div>
+                <div class="fgc-analyses-row-right">
+                  <button class="btn-secondary fgc-detail-btn"   data-id="${a.id}">${uiText("details")}</button>
+                  <button class="btn-secondary fgc-download-btn" data-id="${a.id}">⬇</button>
+                  <button class="btn-danger    fgc-delete-btn"   data-id="${a.id}">${uiText("delete")}</button>
                 </div>
               </div>
-              <div class="fgc-analyses-row-right">
-                <button class="btn-secondary fgc-detail-btn"   data-id="${a.id}">${uiText("details")}</button>
-                <button class="btn-secondary fgc-download-btn" data-id="${a.id}">⬇</button>
-                <button class="btn-danger    fgc-delete-btn"   data-id="${a.id}">${uiText("delete")}</button>
-              </div>
+            `).join("")}
+          </div>
+          <div class="fgc-combined-col fgc-events-col">
+            <div class="fgc-col-header">Events</div>
+            <div class="fgc-events-list" data-field="${safeField}">
+              <p class="event-list-loading">Loading…</p>
             </div>
-          `).join("")}
+          </div>
         </div>
 
       </div>
@@ -1022,40 +1052,58 @@ function onCardClick(e) {
     return;
   }
 
-  // ── Analyses toggle ───────────────────────────────
-  const toggleBtn = e.target.closest(".fgc-analyses-toggle");
-  if (toggleBtn) {
+  // ── Add Event button (opens modal) ────────────────
+  const addEventBtn = e.target.closest(".fgc-add-event-btn");
+  if (addEventBtn) {
     e.stopPropagation();
-    const field  = toggleBtn.dataset.field;
-    const body   = document.querySelector(`.fgc-analyses-body[data-field="${field}"]`);
-    const chev   = toggleBtn.querySelector(".fgc-analyses-chevron");
+    openEventModal(decodeURIComponent(addEventBtn.dataset.field));
+    return;
+  }
+
+  // ── Combined toggle ───────────────────────────────
+  const combinedToggle = e.target.closest(".fgc-combined-toggle");
+  if (combinedToggle) {
+    e.stopPropagation();
+    const field = decodeURIComponent(combinedToggle.dataset.field);
+    const body  = document.querySelector(
+      `.fgc-combined-body[data-field="${encodeURIComponent(field)}"]`
+    );
+    const chev  = combinedToggle.querySelector(".fgc-analyses-chevron");
     if (!body) return;
+
     const isOpen = body.classList.contains("open");
+
     body.classList.toggle("open", !isOpen);
-    toggleBtn.classList.toggle("open", !isOpen);
+    combinedToggle.classList.toggle("open", !isOpen);
     if (chev) chev.textContent = isOpen ? "▾" : "▴";
 
-    if (!isOpen && !body._bound) {
-      body._bound = true;
-      body.querySelectorAll(".fgc-detail-btn").forEach(btn =>
-        btn.addEventListener("click", ev => {
-          ev.stopPropagation();
-          const item = allAnalyses.find(a => String(a.id) === btn.dataset.id);
-          if (item) openDetailModal(item);
-        })
+    if (!isOpen) {
+      if (!body._bound) {
+        body._bound = true;
+        body.querySelectorAll(".fgc-detail-btn").forEach(btn =>
+          btn.addEventListener("click", ev => {
+            ev.stopPropagation();
+            const item = allAnalyses.find(a => String(a.id) === btn.dataset.id);
+            if (item) openDetailModal(item);
+          })
+        );
+        body.querySelectorAll(".fgc-download-btn").forEach(btn =>
+          btn.addEventListener("click", ev => {
+            ev.stopPropagation();
+            downloadAnalysis(btn.dataset.id);
+          })
+        );
+        body.querySelectorAll(".fgc-delete-btn").forEach(btn =>
+          btn.addEventListener("click", ev => {
+            ev.stopPropagation();
+            deleteAnalysisFromCard(btn.dataset.id);
+          })
+        );
+      }
+      const eventsListEl = body.querySelector(
+        `.fgc-events-list[data-field="${encodeURIComponent(field)}"]`
       );
-      body.querySelectorAll(".fgc-download-btn").forEach(btn =>
-        btn.addEventListener("click", ev => {
-          ev.stopPropagation();
-          downloadAnalysis(btn.dataset.id);
-        })
-      );
-      body.querySelectorAll(".fgc-delete-btn").forEach(btn =>
-        btn.addEventListener("click", ev => {
-          ev.stopPropagation();
-          deleteAnalysisFromCard(btn.dataset.id);
-        })
-      );
+      if (eventsListEl) loadInlineEvents(field, eventsListEl);
     }
     return;
   }
@@ -1069,10 +1117,31 @@ async function deleteAnalysisFromCard(id) {
     allAnalyses = allAnalyses.filter(a => String(a.id) !== id);
     applyFilters();
     refreshCropFilter();
-    showCompareChart();
+    showCompareChart().catch(console.error);
   } catch (err) {
     alert(uiText("delete_failed", { msg: err.message }));
   }
+}
+
+async function loadInlineEvents(fieldName, listEl) {
+  if (!listEl) return;
+  listEl.innerHTML = `<p class="event-list-loading">Loading…</p>`;
+
+  const events = await fetchFieldEvents(fieldName);
+
+  if (!events.length) {
+    listEl.innerHTML = `<p class="event-list-empty">No events yet.</p>`;
+    return;
+  }
+
+  listEl.innerHTML = events.map(ev => `
+    <div class="fgc-event-row">
+      <span class="fgc-event-icon">${eventIcon(ev.event_type)}</span>
+      <span class="fgc-event-type-name">${escapeHtml(ev.event_type.charAt(0).toUpperCase() + ev.event_type.slice(1))}</span>
+      <span class="fgc-event-date">${escapeHtml(ev.date)}</span>
+      <span class="fgc-event-desc">${escapeHtml(ev.description)}</span>
+    </div>
+  `).join("");
 }
 
 function onCardChange(e) {
@@ -1284,7 +1353,7 @@ function downloadAnalysis(id) {
    COMPARE CHART — one line per selected field
 ══════════════════════════════════════════════════ */
 
-function showCompareChart() {
+async function showCompareChart() {
   const wrapper = document.getElementById("compare-chart-wrapper");
   const bar     = document.getElementById("compare-fields-bar");
   const hint    = document.getElementById("compare-fields-hint");
@@ -1322,7 +1391,7 @@ function showCompareChart() {
         const field = decodeURIComponent(chip.dataset.field);
         if (hidden.has(field)) hidden.delete(field);
         else                   hidden.add(field);
-        showCompareChart();
+        showCompareChart().catch(console.error);
       });
     });
   }
@@ -1367,6 +1436,12 @@ function showCompareChart() {
   // ── Chart ─────────────────────────────────────────
   const canvas = document.getElementById("compare-chart");
   if (!canvas) return;
+
+  // ── Fetch events for annotations ──────────────────
+  const allEvents = await fetchAllFieldEvents(
+    allFieldNames.filter(f => !hidden.has(f))
+  );
+
   const ctx = canvas.getContext("2d");
   if (compareChart) compareChart.destroy();
 
@@ -1381,6 +1456,26 @@ function showCompareChart() {
       interaction: { mode: "nearest", intersect: false },
       plugins: {
         legend: { display: false },
+        annotation: {
+          annotations: allEvents.map((ev, i) => ({
+            type:        "line",
+            scaleID:     "x",
+            value:       ev.date,
+            borderColor: "rgba(251, 191, 36, 0.55)",
+            borderWidth: 1,
+            borderDash:  [4, 4],
+            label: {
+              display:    true,
+              content:    `${eventIcon(ev.event_type)} ${ev.description}`,
+              position:   "start",
+              yAdjust:    i % 3 === 0 ? 0 : i % 3 === 1 ? 20 : 40, // stagger overlapping labels
+              font:       { size: 10 },
+              color:      "#9ca3af",
+              backgroundColor: "transparent",
+              borderWidth: 0,
+            },
+          })),
+        },
         tooltip: {
           callbacks: {
             title: (items) => {
@@ -1433,6 +1528,166 @@ function showCompareChart() {
   }
 
   updateCompareToggleMeta();
+}
+
+/* ══════════════════════════════════════════════════
+   FIELD EVENTS
+══════════════════════════════════════════════════ */
+
+const fieldEventsCache = {};   // { fieldName: [events] }
+
+async function fetchFieldEvents(fieldName) {
+  try {
+    const res = await fetch(
+      `${API_URL}/api/field-events/${encodeURIComponent(fieldName)}`
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const events = await res.json();
+    fieldEventsCache[fieldName] = events;
+    return events;
+  } catch (err) {
+    console.error("fetchFieldEvents error:", err);
+    return [];
+  }
+}
+
+async function fetchAllFieldEvents(fieldNames) {
+  const results = await Promise.all(fieldNames.map(fetchFieldEvents));
+  return results.flat();
+}
+
+async function addFieldEvent(fieldName, date, eventType, description) {
+  const res = await fetch(`${API_URL}/api/field-events`, {
+    method:  "POST",
+    headers: { "Content-Type": "application/json" },
+    body:    JSON.stringify({
+      field_name:  fieldName,
+      date,
+      event_type:  eventType,
+      description,
+    }),
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  const event = await res.json();
+  if (!fieldEventsCache[fieldName]) fieldEventsCache[fieldName] = [];
+  fieldEventsCache[fieldName].push(event);
+  fieldEventsCache[fieldName].sort((a, b) => a.date.localeCompare(b.date));
+  return event;
+}
+
+async function deleteFieldEvent(eventId, fieldName) {
+  const res = await fetch(`${API_URL}/api/field-events/${eventId}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  if (fieldEventsCache[fieldName]) {
+    fieldEventsCache[fieldName] =
+      fieldEventsCache[fieldName].filter(e => String(e.id) !== String(eventId));
+  }
+}
+
+/* ── Event Modal ─────────────────────────────────── */
+
+let currentEventFieldName = null;
+
+async function openEventModal(fieldName) {
+  currentEventFieldName = fieldName;
+  document.getElementById("event-modal-title").textContent =
+    `Field Events — ${fieldName}`;
+
+  const modal = document.getElementById("event-modal");
+  modal.style.display = "flex";
+  modal.setAttribute("aria-hidden", "false");
+
+  // Set today as default date
+  const dateInput = document.getElementById("event-date");
+  if (!dateInput.value) {
+    dateInput.value = new Date().toISOString().split("T")[0];
+  }
+}
+
+function closeEventModal() {
+  const modal = document.getElementById("event-modal");
+  modal.style.display = "none";
+  modal.setAttribute("aria-hidden", "true");
+  currentEventFieldName = null;
+}
+
+async function renderEventList(fieldName) {
+  const list   = document.getElementById("event-list");
+  list.innerHTML = `<p class="event-list-loading">Loading…</p>`;
+
+  const events = await fetchFieldEvents(fieldName);
+
+  if (!events.length) {
+    list.innerHTML = `<p class="event-list-empty">No events yet.</p>`;
+    return;
+  }
+
+  list.innerHTML = events.map(ev => `
+    <div class="event-row" data-id="${ev.id}">
+      <span class="event-row-icon">${eventIcon(ev.event_type)}</span>
+      <span class="event-row-date">${escapeHtml(ev.date)}</span>
+      <span class="event-row-desc">${escapeHtml(ev.description)}</span>
+      <button class="event-row-delete btn-danger"
+              data-id="${ev.id}"
+              data-field="${encodeURIComponent(fieldName)}">✕</button>
+    </div>
+  `).join("");
+
+  list.querySelectorAll(".event-row-delete").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const id    = btn.dataset.id;
+      const field = decodeURIComponent(btn.dataset.field);
+      try {
+        await deleteFieldEvent(id, field);
+        await renderEventList(field);
+        // Refresh chart annotations if open
+        if (document.getElementById("compare-toggle-body").classList.contains("open")) {
+          showCompareChart().catch(console.error);
+        }
+      } catch (err) {
+        alert("Could not delete event: " + err.message);
+      }
+    });
+  });
+}
+
+// Wire up add button — called once on DOMContentLoaded
+function initEventModal() {
+  document.getElementById("event-modal")
+    ?.addEventListener("click", e => {
+      if (e.target.id === "event-modal") closeEventModal();
+    });
+
+  document.getElementById("event-add-btn")
+    ?.addEventListener("click", async () => {
+      if (!currentEventFieldName) return;
+      const date  = document.getElementById("event-date").value;
+      const type  = document.getElementById("event-type").value;
+      const desc  = document.getElementById("event-description").value.trim();
+      if (!date)  { alert("Please select a date."); return; }
+      if (!desc)  { alert("Please enter a description."); return; }
+      try {
+        await addFieldEvent(currentEventFieldName, date, type, desc);
+        document.getElementById("event-description").value = "";
+
+        // Refresh inline event list if open
+        const encodedField = encodeURIComponent(currentEventFieldName);
+        const inlineList = document.querySelector(`.fgc-events-list[data-field="${encodedField}"]`);
+        if (inlineList) {
+          await loadInlineEvents(currentEventFieldName, inlineList);
+        }
+
+        if (document.getElementById("compare-toggle-body").classList.contains("open")) {
+          showCompareChart().catch(console.error);
+        }
+
+        closeEventModal();
+      } catch (err) {
+        alert("Could not add event: " + err.message);
+      }
+    });
 }
 
 /* ══════════════════════════════════════════════════
@@ -1844,7 +2099,7 @@ function updateCompareFieldsBar() {
       document.querySelectorAll(`.compare-checkbox[data-field="${encodeURIComponent(field)}"]`)
         .forEach(cb => (cb.checked = false));
 
-      showCompareChart();
+      showCompareChart().catch(console.error);
       updateCompareToggleMeta();
     });
   });
@@ -1863,6 +2118,6 @@ function initCompareToggle() {
     if (chev) chev.textContent = isOpen ? "▾" : "▴";
 
     // Render chart on first open
-    if (!isOpen) showCompareChart();
+    if (!isOpen) showCompareChart().catch(console.error);
   });
 }

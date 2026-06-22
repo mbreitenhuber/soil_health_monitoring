@@ -617,6 +617,55 @@ async def users_experience(request: Request, lang: str = Cookie(default="en")):
 #         # my_data=MY_DATA,
 #     ))
 
+def get_db():
+    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS field_events (
+            id          INTEGER PRIMARY KEY AUTOINCREMENT,
+            field_name  TEXT    NOT NULL,
+            date        DATE    NOT NULL,
+            event_type  TEXT    NOT NULL DEFAULT 'other',
+            description TEXT    NOT NULL DEFAULT '',
+            created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    conn.commit()
+    return conn
+
+
+@app.get("/api/field-events/{field_name}")
+def get_field_events(field_name: str):
+    conn = get_db()
+    rows = conn.execute(
+        "SELECT * FROM field_events WHERE field_name = ? ORDER BY date ASC",
+        (field_name,)
+    ).fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+@app.post("/api/field-events")
+def create_field_event(payload: dict):
+    conn = get_db()
+    cur = conn.execute(
+        "INSERT INTO field_events (field_name, date, event_type, description) VALUES (?,?,?,?)",
+        (payload["field_name"], payload["date"], payload["event_type"], payload.get("description", ""))
+    )
+    conn.commit()
+    conn.close()
+    return {"id": cur.lastrowid, **payload}
+
+
+@app.delete("/api/field-events/{event_id}")
+def delete_field_event(event_id: int):
+    conn = get_db()
+    conn.execute("DELETE FROM field_events WHERE id = ?", (event_id,))
+    conn.commit()
+    conn.close()
+    return {"deleted": event_id}
 
 # ══════════════════════════════════════════════════════
 # API-ENDPUNKTE (JSON)

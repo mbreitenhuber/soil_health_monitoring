@@ -2,11 +2,16 @@
    DASHBOARD LAYOUT
 ========================= */
 
+/* =========================
+   DASHBOARD CONTAINER
+========================= */
+
 .dashboard-container {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   padding: 8px 0 32px;
+  overflow: visible;
 }
 
 /* Tighter gap between hero intro and personas section */
@@ -39,28 +44,32 @@
 }
 
 /* =========================
-   FIELD GROUP CARD — 3-column layout
+   FIELD GROUP CARD
 ========================= */
 
 .field-group-card {
-  cursor: pointer;
+  cursor: default;
   position: relative;
-  overflow: visible !important;
+  overflow: hidden !important;
   padding: 0 !important;
   display: flex;
   flex-direction: column;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  border-radius: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.field-group-card:hover {
+  border-color: var(--border2);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+  transform: none;
 }
 
 .field-group-card .fgc-info,
 .field-group-card .fgc-chart,
 .field-group-card .fgc-actions {
   /* Die drei Spalten als Grid-Wrapper drinnen */
-}
-
-.field-group-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--border2);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.06);
 }
 
 /* ── Col 1: Info ── */
@@ -1599,17 +1608,7 @@
   border-color: var(--border2);
 }
 
-/* Card: flex-column, Toggle + Body als eigene volle Zeilen */
-.field-group-card {
-  cursor: pointer;
-  position: relative;
-  overflow: visible !important;
-  padding: 0 !important;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Die 3-Spalten-Zeile */
+/* ── 3-Spalten Hauptbereich ── */
 .fgc-main {
   display: grid;
   grid-template-columns: 1fr 1.5fr 0.85fr;
@@ -1617,6 +1616,7 @@
   padding: 20px;
   align-items: stretch;
   min-height: 160px;
+  flex-shrink: 0;
 }
 
 /* Toggle: volle Breite, kein negativer Margin nötig */
@@ -1693,4 +1693,267 @@
   display: flex;
   gap: 6px;
   flex-shrink: 0;
+}
+
+/* =====================================================
+   FGC Combined Toggle + Body
+===================================================== */
+
+/* ── Toggle: volle Breite, nach unten ── */
+.fgc-combined-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 20px;
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s;
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  border-radius: 0 0 16px 16px;
+  box-sizing: border-box;
+
+  /* kein position:relative, kein z-index nötig */
+}
+
+.fgc-combined-toggle:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.fgc-combined-toggle.open {
+  border-radius: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.fgc-combined-toggle-sep {
+  color: var(--border2);
+}
+
+.fgc-events-count-label {
+  flex: 1;
+  text-align: left;
+}
+
+.fgc-analyses-chevron {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  line-height: 1;
+  margin-left: auto;
+}
+
+/* ── Combined body: wächst nach unten innerhalb der Card ── */
+.fgc-combined-body {
+  /* kein display:none über CSS — JS steuert das */
+  display: none;
+  width: 100%;
+
+  /* kein position:absolute — normaler Flow */
+  position: static;
+
+  border-top: none;
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+
+  /* max-height Animation */
+  max-height: 0;
+  transition: max-height 0.25s ease;
+}
+
+.fgc-combined-body.open {
+  display: flex;
+  max-height: 600px;   /* groß genug für Inhalt */
+}
+
+/* ── Zwei Spalten ── */
+.fgc-combined-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow-y: auto;
+  max-height: 320px;
+}
+
+.fgc-analyses-col {
+  flex: 1 1 60%;
+  border-right: 1px solid var(--border);
+}
+
+.fgc-events-col {
+  flex: 1 1 40%;
+}
+
+.fgc-col-header {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-dim);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Analysen-Rows */
+.fgc-analyses-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.12s;
+  flex-wrap: wrap;
+}
+
+.fgc-analyses-row:last-child {
+  border-bottom: none;
+}
+
+.fgc-analyses-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.fgc-analyses-row-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.fgc-analyses-row-right {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Events-Rows */
+.fgc-events-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.fgc-event-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  transition: background 0.12s;
+}
+
+.fgc-event-row:last-child {
+  border-bottom: none;
+}
+
+.fgc-event-row:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.fgc-event-icon {
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.fgc-event-type-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+  min-width: 72px;
+}
+
+.fgc-event-date {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.fgc-event-desc {
+  flex: 1;
+  color: var(--text);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-list-empty,
+.event-list-loading {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  padding: 16px;
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Add Event button ── */
+.fgc-add-event-btn {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text-dim);
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.18s, color 0.18s, background 0.18s, transform 0.15s;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.fgc-add-event-btn:hover {
+  border-color: var(--border);
+  color: var(--text);
+  background: rgba(255,255,255,0.03);
+  transform: translateY(-1px);
+}
+
+/* ── Event modal form fixes ── */
+.event-form-date {
+  flex: 0 0 160px !important;
+  min-width: 160px !important;
+}
+
+.event-form-date input[type="date"] {
+  width: 100%;
+  min-width: 150px;
+  box-sizing: border-box;
+}
+
+.event-form-type {
+  flex: 0 0 160px !important;
+  min-width: 160px !important;
+}
+
+.event-form-type select {
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: var(--text);
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.event-form-type select:focus {
+  border-color: var(--accent);
 }

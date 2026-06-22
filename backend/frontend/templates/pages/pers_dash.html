@@ -334,6 +334,56 @@
   </div>
 </div>
 
+<!-- ════════════════════════════════════════════════
+     FIELD EVENT MODAL
+═══════════════════════════════════════════════════ -->
+<div id="event-modal" class="detail-modal" aria-hidden="true">
+  <div class="detail-card event-modal-card">
+
+    <div class="detail-header">
+      <h2 id="event-modal-title">Field Events</h2>
+      <button class="btn-close-x" onclick="closeEventModal()">✕</button>
+    </div>
+
+    <!-- Add new event form -->
+    <div class="event-form">
+      <div class="event-form-row">
+        <div class="detail-field event-form-date">
+          <label>{{ 'Date' if lang == 'en' else 'Datum' }}</label>
+          <input type="date" id="event-date">
+        </div>
+        <div class="detail-field event-form-type">
+          <label>{{ 'Event Type' if lang == 'en' else 'Ereignistyp' }}</label>
+          <select id="event-type">
+            <option value="planting">🌱 {{ 'Planting' if lang == 'en' else 'Aussaat' }}</option>
+            <option value="fertilizing">🌿 {{ 'Fertilizing' if lang == 'en' else 'Düngung' }}</option>
+            <option value="tillage">🚜 {{ 'Tillage' if lang == 'en' else 'Bodenbearbeitung' }}</option>
+            <option value="harvest">🌾 {{ 'Harvest' if lang == 'en' else 'Ernte' }}</option>
+            <option value="irrigation">💧 {{ 'Irrigation' if lang == 'en' else 'Bewässerung' }}</option>
+            <option value="pesticide">🧪 {{ 'Pesticide' if lang == 'en' else 'Pflanzenschutz' }}</option>
+            <option value="other">📝 {{ 'Other' if lang == 'en' else 'Sonstiges' }}</option>
+          </select>
+        </div>
+        <div class="detail-field event-form-desc">
+          <label>{{ 'Description' if lang == 'en' else 'Beschreibung' }}</label>
+          <input type="text" id="event-description"
+                 placeholder="{{ 'e.g. Winter wheat, variety Kerubino' if lang == 'en' else 'z. B. Winterweizen, Sorte Kerubino' }}">
+        </div>
+        <button class="btn-save event-add-btn" id="event-add-btn">
+          {{ '+ Add' if lang == 'en' else '+ Hinzufügen' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="detail-actions">
+      <button class="btn-close-modal" onclick="closeEventModal()">
+        {{ 'Close' if lang == 'en' else 'Schliessen' }}
+      </button>
+    </div>
+
+  </div>
+</div>
+
 
 {% endblock %}
 
@@ -342,6 +392,7 @@
   {{ {"analyses": analyses, "apiUrl": api_url, "lang": lang, "ocClassification": oc_classification, "ui": dashboard_ui} | tojson }}
 </script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3"></script>
 <!-- Leaflet JS — for the mini satellite map -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="/static/js/field-gradient-overlay.js"></script>
