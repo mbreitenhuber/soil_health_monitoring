@@ -1322,6 +1322,7 @@ def run_model(
     env.setdefault("SENTINEL_DIR", str(_default_sentinel_dir()))
     env.setdefault("TMP_DIR", str(_default_tmp_dir()))
     env.setdefault("MODEL_PATH", str(_persistent_models_dir()))
+    env.setdefault("AGROSCAN_SINGLE_SCENE", "true")
 
     missing_env_vars = _missing_satellite_env_vars(env)
     if missing_env_vars:

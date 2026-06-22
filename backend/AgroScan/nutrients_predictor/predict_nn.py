@@ -130,7 +130,15 @@ def main():
     device = _resolve_device()
     print(f"Using torch device: {device}", flush=True)
     model = nn_pred.TrainingPipeline.load_model(str(model_path))
-    model = model.to(device)
+    try:
+        model = model.to(device)
+    except RuntimeError as exc:
+        if device.type != "cpu":
+            print(f"Moving model to {device} failed ({exc}); falling back to CPU.", flush=True)
+            device = torch.device("cpu")
+            model = model.to(device)
+        else:
+            raise
     model.eval()
 
     # prepare features as float32 numpy array
@@ -142,7 +150,17 @@ def main():
     with torch.no_grad():
         for i in range(0, X.shape[0], batch_size):
             xb = torch.from_numpy(X[i : i + batch_size]).to(device)
-            yb = model(xb)
+            try:
+                yb = model(xb)
+            except RuntimeError as exc:
+                if device.type != "cpu":
+                    print(f"Inference on {device} failed ({exc}); retrying on CPU.", flush=True)
+                    device = torch.device("cpu")
+                    model = model.to(device)
+                    xb = xb.to(device)
+                    yb = model(xb)
+                else:
+                    raise
             yb = yb.view(-1).cpu().numpy()
             preds.append(yb)
 

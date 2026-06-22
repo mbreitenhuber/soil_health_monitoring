@@ -137,28 +137,56 @@ class ImageUtils:
             radius (int): Radius (determines the image size -> 2 x radius + 1)
         """
         if ImageUtils._is_jp2(source) or str(target).lower().endswith(".tif"):
-            img = ImageUtils._read_band_array(source)
-            fill_value = 0
-            size = 2 * radius + 1
-            height, width = img.shape[:2]
-            cropped = np.full((size, size), fill_value, dtype=img.dtype)
+            if not str(target).lower().endswith(".tif"):
+                target = str(Path(target).with_suffix(".tif"))
 
+            gdal.UseExceptions()
+            src = gdal.Open(source)
+            if src is None:
+                raise OSError(f"Could not open {source}")
+
+            size = 2 * radius + 1
+            width, height = src.RasterXSize, src.RasterYSize
             x_start, x_end = x - radius, x + radius + 1
             y_start, y_end = y - radius, y + radius + 1
-
             crop_x_start = max(0, x_start)
             crop_x_end = min(width, x_end)
             crop_y_start = max(0, y_start)
             crop_y_end = min(height, y_end)
+            if crop_x_end <= crop_x_start or crop_y_end <= crop_y_start:
+                raise OSError(f"Crop window outside image bounds: {source}")
 
-            patch = img[crop_y_start:crop_y_end, crop_x_start:crop_x_end]
+            patch_ds = gdal.Translate(
+                "",
+                src,
+                format="MEM",
+                srcWin=[
+                    crop_x_start,
+                    crop_y_start,
+                    crop_x_end - crop_x_start,
+                    crop_y_end - crop_y_start,
+                ],
+            )
+            patch = patch_ds.GetRasterBand(1).ReadAsArray()
+            cropped = np.zeros((size, size), dtype=patch.dtype)
             dest_x = max(0, -x_start)
             dest_y = max(0, -y_start)
             cropped[
                 dest_y : dest_y + patch.shape[0],
                 dest_x : dest_x + patch.shape[1],
             ] = patch
-            ImageUtils._write_raster(target, cropped)
+
+            Path(target).parent.mkdir(parents=True, exist_ok=True)
+            mem_drv = gdal.GetDriverByName("MEM")
+            out_mem = mem_drv.Create("", size, size, 1, patch_ds.GetRasterBand(1).DataType)
+            out_mem.GetRasterBand(1).WriteArray(cropped)
+            gtiff_drv = gdal.GetDriverByName("GTiff")
+            if gtiff_drv is None:
+                raise OSError("GTiff driver is not available")
+            result = gtiff_drv.CreateCopy(str(target), out_mem, strict=False)
+            if result is None:
+                raise OSError(f"Could not write cropped raster: {target}")
+            result.FlushCache()
             return
 
         img = cv2.imread(source)

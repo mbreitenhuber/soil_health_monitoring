@@ -80,6 +80,41 @@ data_length = 0
 api_finished = False
 download_finished = False
 
+field_scene_feature: dict | None = None
+
+
+def _single_scene_enabled() -> bool:
+    return os.environ.get("AGROSCAN_SINGLE_SCENE", "true").lower() in ("1", "true", "yes")
+
+
+def _resolve_field_scene(df: pd.DataFrame) -> None:
+    """Resolve one Sentinel scene for the whole field (grid cells share a tile)."""
+    global field_scene_feature
+
+    if not _single_scene_enabled() or df.empty:
+        return
+
+    survey_date = pd.to_datetime(str(df.iloc[0]["SURVEY_DATE"]).strip(), errors="raise").strftime(
+        "%Y-%m-%d"
+    )
+    lat = float(df["TH_LAT"].astype(float).mean())
+    lon = float(df["TH_LONG"].astype(float).mean())
+    print(
+        f"[sentinel] resolving single scene for field centroid "
+        f"({lat}, {lon}) survey_date={survey_date}",
+        flush=True,
+    )
+    data = CopernicusApi.get_data(survey_date, lat, lon)
+    if not data:
+        raise ValueError("No Sentinel data found for field centroid")
+
+    field_scene_feature = data[0]
+    sentinel_date = field_scene_feature["properties"]["startDate"].split("T")[0]
+    print(
+        f"[sentinel] field scene: {field_scene_feature['id']} ({sentinel_date})",
+        flush=True,
+    )
+
 
 def _result_path(date: str, latitude: float, longitude: float) -> Path:
     return Path(os.environ["SENTINEL_DIR"]) / date / f"{latitude} {longitude}"
@@ -353,13 +388,19 @@ def api_thread(thread_index: int) -> None:
             longitude = float(row["TH_LONG"])
             print(f"Date: {date}, Lat: {latitude}, Long: {longitude}")
 
-            data = CopernicusApi.get_data(date, latitude, longitude)
-            if not data:
-                raise ValueError("No Sentinel data found!")
+            if field_scene_feature is not None:
+                data = field_scene_feature
+            else:
+                api_data = CopernicusApi.get_data(date, latitude, longitude)
+                if not api_data:
+                    raise ValueError("No Sentinel data found!")
+                data = api_data[0]
 
-            data = data[0]
             sentinel_date = data["properties"]["startDate"].split("T")[0]
-            print(f"Best dataset: {data['id']} ({sentinel_date})")
+            if field_scene_feature is not None:
+                print(f"Using field scene: {data['id']} ({sentinel_date})")
+            else:
+                print(f"Best dataset: {data['id']} ({sentinel_date})")
 
             result_path = _result_path(sentinel_date, latitude, longitude)
             if result_path.is_dir():
@@ -550,6 +591,8 @@ def main():
     data_length = len(dataframe)
 
     print(f"Loaded {data_length} rows (lines {start+1}-{end or '∞'}).")
+
+    _resolve_field_scene(dataframe)
 
     # create all threads
     threads_api = []

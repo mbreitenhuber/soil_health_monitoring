@@ -4,9 +4,8 @@ components:
     enabled: true
     updateStrategy: Recreate
 
-    # GPU scheduling (ivia-generic-helm-chart): requires gpu nodes, adds tolerations.
+    # GPU scheduling disabled: inference is CPU-fast; avoids incompatible CUDA GPUs.
     requests:
-      gpu: true
       memory: 4Gi
     limits:
       memory: 8Gi
@@ -24,9 +23,10 @@ components:
       DATASET_PATH: /persistent-data/datasets
       SENTINEL_DIR: /persistent-data/sentinel_output
       TMP_DIR: /tmp/agroscan
-      AGROSCAN_SENTINEL_API_THREADS: "4"
-      AGROSCAN_SENTINEL_DOWNLOAD_THREADS: "6"
-      AGROSCAN_SENTINEL_WORKER_THREADS: "4"
+      AGROSCAN_SENTINEL_API_THREADS: "2"
+      AGROSCAN_SENTINEL_DOWNLOAD_THREADS: "4"
+      AGROSCAN_SENTINEL_WORKER_THREADS: "8"
+      AGROSCAN_SINGLE_SCENE: "true"
       AGROSCAN_TORCH_DEVICE: cpu
     emptyDirVolumes:
       - name: tmp
