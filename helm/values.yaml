@@ -26,5 +26,5 @@ components:
       - name: data
         mountPath: /persistent-data
         storageClassName: longhorn
-        storage: 10G
+        storage: "12G"
         accessMode: ReadWriteOnce
