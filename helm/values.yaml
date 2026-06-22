@@ -4,7 +4,17 @@ components:
     enabled: true
     updateStrategy: Recreate
 
-    # GPU scheduling disabled: inference is CPU-fast; avoids incompatible CUDA GPUs.
+    # Pin to GTX 1080 Ti worker; no nvidia.com/gpu request (CPU-only inference).
+    nodeSelector:
+      kubernetes.io/hostname: k8s-ivia-no-42.inf.ethz.ch
+    tolerations:
+      - key: node-role.kubernetes.io/gpu
+        operator: Equal
+        value: "true"
+        effect: NoSchedule
+      - key: nvidia.com/gpu
+        operator: Exists
+        effect: NoSchedule
     requests:
       memory: 4Gi
     limits:
