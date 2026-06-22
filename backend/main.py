@@ -384,6 +384,8 @@ DASHBOARD_UI = {
         "no_match": "No fields match your filters.",
         "one_analysis": "1 analysis",
         "n_analyses": "{n} analyses",
+        "one_event": "1 event",
+        "n_events": "{n} events",
         "all_time": "All-time",
         "vs_prev": "vs. prev.",
         "latest_avg_oc": "Latest Avg OC",
@@ -396,6 +398,10 @@ DASHBOARD_UI = {
         "details": "Details",
         "delete": "Delete",
         "download_csv": "Download CSV",
+        "download_field_data": "Download field data",
+        "click_to_see_analyses_events": "Click to see all analyses and events",
+        "analyses_section": "Analyses",
+        "events_section": "Events",
         "delete_confirm": "Delete this analysis?",
         "delete_failed": "Delete failed: {msg}",
         "save_failed": "Save failed: {msg}",
@@ -422,6 +428,8 @@ DASHBOARD_UI = {
         "no_match": "Keine Felder entsprechen deinen Filtern.",
         "one_analysis": "1 Analyse",
         "n_analyses": "{n} Analysen",
+        "one_event": "1 Ereignis",
+        "n_events": "{n} Ereignisse",
         "all_time": "Gesamt",
         "vs_prev": "vs. vorh.",
         "latest_avg_oc": "Aktueller Ø OC",
@@ -434,6 +442,10 @@ DASHBOARD_UI = {
         "details": "Details",
         "delete": "Löschen",
         "download_csv": "CSV herunterladen",
+        "download_field_data": "Felddaten herunterladen",
+        "click_to_see_analyses_events": "Klicken, um alle Analysen und Ereignisse anzuzeigen",
+        "analyses_section": "Analysen",
+        "events_section": "Ereignisse",
         "delete_confirm": "Diese Analyse löschen?",
         "delete_failed": "Löschen fehlgeschlagen: {msg}",
         "save_failed": "Speichern fehlgeschlagen: {msg}",
@@ -1337,7 +1349,24 @@ import csv
 from io import StringIO
 import json
 
-def _analysis_to_csv(analyses: list[dict]) -> str:
+def _fetch_events(c, field_names: list[str] | None = None) -> list[dict]:
+    if field_names is not None:
+        if not field_names:
+            return []
+        placeholders = ",".join("?" * len(field_names))
+        rows = c.execute(
+            f"SELECT * FROM field_events WHERE field_name IN ({placeholders}) "
+            "ORDER BY date DESC, id DESC",
+            field_names,
+        ).fetchall()
+    else:
+        rows = c.execute(
+            "SELECT * FROM field_events ORDER BY field_name ASC, date DESC, id DESC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
+def _export_to_csv(analyses: list[dict], events: list[dict]) -> str:
     output = StringIO()
     writer = csv.writer(output, delimiter=";")
 
@@ -1354,15 +1383,12 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
         "Polygon Points",
         "Zones Count",
         "Field Area (ha)",
-        "Created At"
+        "Created At",
     ])
 
     for a in analyses:
-
         polygon = a.get("polygon") or []
         zones = a.get("zones") or []
-
-        # SAFE guards (verhindert Internal Server Error)
         poly_len = len(polygon) if isinstance(polygon, list) else 0
         zone_len = len(zones) if isinstance(zones, list) else 0
 
@@ -1382,6 +1408,27 @@ def _analysis_to_csv(analyses: list[dict]) -> str:
             a.get("created_at"),
         ])
 
+    writer.writerow([])
+    writer.writerow(["Field Events"])
+    writer.writerow([
+        "Event ID",
+        "Field Name",
+        "Date",
+        "Event Type",
+        "Description",
+        "Created At",
+    ])
+
+    for ev in events:
+        writer.writerow([
+            ev.get("id"),
+            ev.get("field_name"),
+            ev.get("date"),
+            ev.get("event_type"),
+            ev.get("description"),
+            ev.get("created_at"),
+        ])
+
     output.seek(0)
     return output.getvalue()
 
@@ -1395,12 +1442,18 @@ def download_single_csv(id: int):
 
     c.execute("SELECT * FROM analyses WHERE id = ?", (id,))
     r = c.fetchone()
-    conn.close()
 
     if not r:
+        conn.close()
         return {"error": "not found"}
 
-    csv_data = _analysis_to_csv([_analysis_from_row(r)])
+    analysis = _analysis_from_row(r)
+    field_name = (analysis.get("field_name") or "").strip()
+    events = _fetch_events(c, [field_name]) if field_name else []
+
+    conn.close()
+
+    csv_data = _export_to_csv([analysis], events)
 
     return Response(
         content=csv_data,
@@ -1408,6 +1461,37 @@ def download_single_csv(id: int):
         headers={
             "Content-Disposition": f"attachment; filename=analysis_{id}.csv"
         }
+    )
+
+@app.get("/api/analyses/field/{field_name}/csv")
+def download_field_csv(field_name: str):
+    conn = sqlite3.connect(DB_PATH)
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    c.execute(
+        "SELECT * FROM analyses WHERE field_name = ? ORDER BY date DESC",
+        (field_name,),
+    )
+    rows = c.fetchall()
+
+    if not rows:
+        conn.close()
+        return {"error": "not found"}
+
+    analyses = [_analysis_from_row(r) for r in rows]
+    events = _fetch_events(c, [field_name])
+    conn.close()
+
+    safe_name = field_name.replace("/", "_").replace("\\", "_")
+    csv_data = _export_to_csv(analyses, events)
+
+    return Response(
+        content=csv_data,
+        media_type="text/csv",
+        headers={
+            "Content-Disposition": f"attachment; filename=field_{safe_name}.csv"
+        },
     )
 
 @app.get("/api/analyses/csv")
@@ -1418,9 +1502,11 @@ def download_all_csv():
 
     c.execute("SELECT * FROM analyses ORDER BY id DESC")
     rows = c.fetchall()
+    analyses = [_analysis_from_row(r) for r in rows]
+    events = _fetch_events(c)
     conn.close()
 
-    csv_data = _analysis_to_csv([_analysis_from_row(r) for r in rows])
+    csv_data = _export_to_csv(analyses, events)
 
     return Response(
         content=csv_data,

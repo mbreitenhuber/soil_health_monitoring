@@ -177,6 +177,11 @@ function uiText(key, vars = {}) {
   return s;
 }
 
+function formatEventCountLabel(count) {
+  const n = Number(count) || 0;
+  return n === 1 ? uiText("one_event") : uiText("n_events", { n });
+}
+
 /* ── Zone colour (LUCAS tiers, mirrors map.js) ──── */
 const OC_TIER_COLORS = FieldGradientOverlay.TIER_COLORS;
 
@@ -767,6 +772,9 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
     const checked   = selectedForCompare.has(name) ? "checked" : "";
     const safeField = encodeURIComponent(name);
+    const eventsLabel = fieldEventsCache[name] !== undefined
+      ? formatEventCountLabel(fieldEventsCache[name].length)
+      : "…";
 
     // Sparkline data
     const sparkItems = items.filter(i => parseOc(i.avg_value) != null);
@@ -818,44 +826,45 @@ function renderDashboard(analyses, { filtered = false } = {}) {
           </div>
         </div>
 
-        <!-- ── Footer: single toggle für Analyses + Events ── -->
+        <!-- ── Footer: toggle für Analyses + Events ── -->
         <button class="fgc-combined-toggle" data-field="${safeField}">
           <span class="fgc-analyses-toggle-label">
             ${items.length === 1 ? uiText("one_analysis") : uiText("n_analyses", { n: items.length })}
           </span>
           <span class="fgc-combined-toggle-sep">·</span>
-          <span class="fgc-events-count-label" data-field="${safeField}">Events</span>
-          <span class="fgc-analyses-chevron">▾</span>
+          <span class="fgc-events-count-label" data-field="${safeField}">${eventsLabel}</span>
+          <span class="fgc-toggle-trailing">
+            <span class="fgc-toggle-hint">${uiText("click_to_see_analyses_events")}</span>
+            <span class="fgc-field-download-btn" data-field="${safeField}" role="button" tabindex="0">
+              ⬇ ${uiText("download_field_data")}
+            </span>
+            <span class="fgc-analyses-chevron">▾</span>
+          </span>
         </button>
 
-        <!-- ── Combined body: Analyses left, Events right ── -->
+        <!-- ── Stacked body: Analyses, then Events ── -->
         <div class="fgc-combined-body" data-field="${safeField}">
-          <div class="fgc-combined-col fgc-analyses-col">
-            <div class="fgc-col-header">Analyses</div>
-            ${[...items].reverse().map(a => `
-              <div class="fgc-analyses-row">
-                <div class="fgc-analyses-row-left">
-                  <span class="row-date">📅 ${escapeHtml(a.date || "–")}</span>
-                  ${a.crop ? `<span class="row-crop">${getCropDisplay(a.crop)}</span>` : ""}
-                  <div class="row-badges">
-                    <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
-                    <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
-                    <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
-                  </div>
-                </div>
-                <div class="fgc-analyses-row-right">
-                  <button class="btn-secondary fgc-detail-btn"   data-id="${a.id}">${uiText("details")}</button>
-                  <button class="btn-secondary fgc-download-btn" data-id="${a.id}">⬇</button>
-                  <button class="btn-danger    fgc-delete-btn"   data-id="${a.id}">${uiText("delete")}</button>
+          <div class="fgc-section-header">${uiText("analyses_section")}</div>
+          ${[...items].reverse().map(a => `
+            <div class="fgc-list-row fgc-analysis-row">
+              <div class="fgc-list-row-main">
+                <span class="fgc-list-date">${escapeHtml(a.date || "–")}</span>
+                ${a.crop ? `<span class="fgc-list-meta">${getCropDisplay(a.crop)}</span>` : ""}
+                <div class="row-badges">
+                  <span class="badge-min" title="Min">${formatOcGkg(a.min_value)}</span>
+                  <span class="badge-avg" title="Avg">${formatOcGkg(a.avg_value)}</span>
+                  <span class="badge-max" title="Max">${formatOcGkg(a.max_value)}</span>
                 </div>
               </div>
-            `).join("")}
-          </div>
-          <div class="fgc-combined-col fgc-events-col">
-            <div class="fgc-col-header">Events</div>
-            <div class="fgc-events-list" data-field="${safeField}">
-              <p class="event-list-loading">Loading…</p>
+              <div class="fgc-row-actions">
+                <button class="btn-secondary fgc-detail-btn" data-id="${a.id}">${uiText("details")}</button>
+                <button class="btn-danger    fgc-delete-btn" data-id="${a.id}">${uiText("delete")}</button>
+              </div>
             </div>
+          `).join("")}
+          <div class="fgc-section-header fgc-section-header--events">${uiText("events_section")}</div>
+          <div class="fgc-events-list" data-field="${safeField}">
+            <p class="event-list-loading">Loading…</p>
           </div>
         </div>
 
@@ -865,6 +874,7 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
   // Draw sparklines after DOM update
   requestAnimationFrame(() => drawSparklines());
+  refreshFieldEventCountLabels(sortedGroups.map(g => g.name));
 }
 
 /* ── Draw mini sparkline on each .fgc-sparkline canvas ──
@@ -1162,6 +1172,14 @@ function onCardClick(e) {
     return;
   }
 
+  // ── Field download (nur wenn Dropdown offen) ─────
+  const fieldDownloadBtn = e.target.closest(".fgc-field-download-btn");
+  if (fieldDownloadBtn) {
+    e.stopPropagation();
+    downloadFieldData(decodeURIComponent(fieldDownloadBtn.dataset.field));
+    return;
+  }
+
   // ── Combined toggle ───────────────────────────────
   const combinedToggle = e.target.closest(".fgc-combined-toggle");
   if (combinedToggle) {
@@ -1187,12 +1205,6 @@ function onCardClick(e) {
             ev.stopPropagation();
             const item = allAnalyses.find(a => String(a.id) === btn.dataset.id);
             if (item) openDetailModal(item);
-          })
-        );
-        body.querySelectorAll(".fgc-download-btn").forEach(btn =>
-          btn.addEventListener("click", ev => {
-            ev.stopPropagation();
-            downloadAnalysis(btn.dataset.id);
           })
         );
         body.querySelectorAll(".fgc-delete-btn").forEach(btn =>
@@ -1229,24 +1241,31 @@ async function loadInlineEvents(fieldName, listEl) {
   if (!listEl) return;
   listEl.innerHTML = `<p class="event-list-loading">Loading…</p>`;
 
-  const events = await fetchFieldEvents(fieldName);
+  const events = (await fetchFieldEvents(fieldName))
+    .slice()
+    .sort((a, b) => (b.date || "").localeCompare(a.date || ""));
 
   if (!events.length) {
     listEl.innerHTML = `<p class="event-list-empty">No events yet.</p>`;
     return;
   }
 
-  listEl.innerHTML = events.map(ev => `
-    <div class="fgc-event-row" data-id="${ev.id}">
-      <span class="fgc-event-icon">${eventIcon(ev.event_type)}</span>
-      <span class="fgc-event-type-name">${escapeHtml(ev.event_type.charAt(0).toUpperCase() + ev.event_type.slice(1))}</span>
-      <span class="fgc-event-date">${escapeHtml(ev.date)}</span>
-      <span class="fgc-event-desc">${escapeHtml(ev.description)}</span>
-      <button class="fgc-event-delete-btn btn-danger"
-              data-id="${ev.id}"
-              data-field="${encodeURIComponent(fieldName)}">✕</button>
+  listEl.innerHTML = events.map(ev => {
+    const typeName = ev.event_type.charAt(0).toUpperCase() + ev.event_type.slice(1);
+    return `
+    <div class="fgc-list-row fgc-event-row" data-id="${ev.id}">
+      <div class="fgc-list-row-main">
+        <span class="fgc-list-date">${escapeHtml(ev.date)}</span>
+        <span class="fgc-list-meta">${eventIcon(ev.event_type)} ${escapeHtml(typeName)}${ev.description ? ` — ${escapeHtml(ev.description)}` : ""}</span>
+      </div>
+      <div class="fgc-row-actions">
+        <button class="fgc-event-delete-btn btn-danger"
+                data-id="${ev.id}"
+                data-field="${encodeURIComponent(fieldName)}">✕</button>
+      </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
   listEl.querySelectorAll(".fgc-event-delete-btn").forEach(btn => {
     btn.addEventListener("click", async (e) => {
@@ -1256,6 +1275,7 @@ async function loadInlineEvents(fieldName, listEl) {
       try {
         await deleteFieldEvent(id, field);
         await loadInlineEvents(field, listEl);
+        updateFieldEventCountLabel(field);
         if (document.getElementById("compare-toggle-body").classList.contains("open")) {
           showCompareChart().catch(console.error);
         }
@@ -1264,6 +1284,8 @@ async function loadInlineEvents(fieldName, listEl) {
       }
     });
   });
+
+  updateFieldEventCountLabel(fieldName);
 }
 
 function onCardChange(e) {
@@ -1471,6 +1493,13 @@ function downloadAnalysis(id) {
   window.open(`${API_URL}/api/analyses/${id}/csv`, "_blank");
 }
 
+function downloadFieldData(fieldName) {
+  window.open(
+    `${API_URL}/api/analyses/field/${encodeURIComponent(fieldName)}/csv`,
+    "_blank"
+  );
+}
+
 /* ══════════════════════════════════════════════════
    COMPARE CHART — one line per selected field
 ══════════════════════════════════════════════════ */
@@ -1663,6 +1692,20 @@ async function showCompareChart() {
 
 const fieldEventsCache = {};   // { fieldName: [events] }
 
+function updateFieldEventCountLabel(fieldName) {
+  const el = document.querySelector(
+    `.fgc-events-count-label[data-field="${encodeURIComponent(fieldName)}"]`
+  );
+  if (el) el.textContent = formatEventCountLabel((fieldEventsCache[fieldName] || []).length);
+}
+
+async function refreshFieldEventCountLabels(fieldNames) {
+  await Promise.all(fieldNames.map(async (name) => {
+    if (fieldEventsCache[name] === undefined) await fetchFieldEvents(name);
+    updateFieldEventCountLabel(name);
+  }));
+}
+
 async function fetchFieldEvents(fieldName) {
   try {
     const res = await fetch(
@@ -1820,6 +1863,7 @@ function initEventModal() {
         `.fgc-events-list[data-field="${encodedField}"]`
       );
       if (inlineList) await loadInlineEvents(currentEventFieldName, inlineList);
+      updateFieldEventCountLabel(currentEventFieldName);
 
       if (document.getElementById("compare-toggle-body").classList.contains("open")) {
         showCompareChart().catch(console.error);

@@ -1720,7 +1720,6 @@
 
 .fgc-combined-toggle.open {
   border-radius: 0;
-  border-bottom: 1px solid var(--border);
 }
 
 .fgc-combined-toggle-sep {
@@ -1732,162 +1731,185 @@
   text-align: left;
 }
 
+.fgc-toggle-trailing {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.fgc-toggle-hint {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.fgc-combined-toggle.open .fgc-toggle-hint {
+  display: none;
+}
+
+.fgc-field-download-btn {
+  display: none;
+  align-items: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border2);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.fgc-field-download-btn:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: var(--text-dim);
+}
+
+.fgc-combined-toggle.open .fgc-field-download-btn {
+  display: inline-flex;
+}
+
 .fgc-analyses-chevron {
   font-size: 0.78rem;
   color: var(--text-dim);
   line-height: 1;
-  margin-left: auto;
 }
 
-/* ── Combined body: wächst nach unten innerhalb der Card ── */
+/* ── Combined body: einspaltig, Analysen dann Events ── */
 .fgc-combined-body {
-  /* kein display:none über CSS — JS steuert das */
   display: none;
   width: 100%;
-
-  /* kein position:absolute — normaler Flow */
   position: static;
-
   border-top: none;
   border-radius: 0 0 16px 16px;
   overflow: hidden;
-
-  /* max-height Animation */
+  flex-direction: column;
   max-height: 0;
   transition: max-height 0.25s ease;
 }
 
 .fgc-combined-body.open {
   display: flex;
-  max-height: 600px;   /* groß genug für Inhalt */
-}
-
-/* ── Zwei Spalten ── */
-.fgc-combined-col {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+  max-height: 700px;
   overflow-y: auto;
-  max-height: 320px;
 }
 
-.fgc-analyses-col {
-  flex: 1 1 60%;
-  border-right: 1px solid var(--border);
-}
-
-.fgc-events-col {
-  flex: 1 1 40%;
-}
-
-.fgc-col-header {
-  font-size: 0.65rem;
-  font-weight: 700;
+.fgc-section-header {
+  font-size: 0.72rem;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--text-dim);
-  padding: 8px 16px;
-  border-bottom: 1px solid var(--border);
+  padding: 10px 20px 6px;
   background: var(--surface2);
+  border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
   z-index: 1;
 }
 
-/* Analysen-Rows */
-.fgc-analyses-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  transition: background 0.12s;
-  flex-wrap: wrap;
+.fgc-section-header:first-child {
+  border-top: none;
+  border-bottom: none;
+  background: transparent;
+  padding-top: 8px;
 }
 
-.fgc-analyses-row:last-child {
+.fgc-section-header--events {
+  margin-top: 0;
+  border-top: 1px solid var(--border);
+}
+
+.fgc-analysis-row:has(+ .fgc-section-header--events) {
   border-bottom: none;
 }
 
-.fgc-analyses-row:hover {
+/* Einheitliche Listenzeilen */
+.fgc-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  transition: background 0.12s;
+}
+
+.fgc-list-row:last-child {
+  border-bottom: none;
+}
+
+.fgc-list-row:hover {
   background: rgba(255,255,255,0.02);
 }
 
-.fgc-analyses-row-left {
+.fgc-list-row-main {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   min-width: 0;
+  flex: 1;
 }
 
-.fgc-analyses-row-right {
-  display: flex;
-  gap: 5px;
+.fgc-list-date {
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: var(--text-dim);
   flex-shrink: 0;
+  min-width: 88px;
 }
 
-/* Events-Rows */
+.fgc-list-meta {
+  color: var(--text);
+  font-size: 0.82rem;
+}
+
+.fgc-row-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+  align-items: center;
+}
+
+.fgc-row-actions .btn-secondary,
+.fgc-row-actions .btn-danger {
+  padding: 4px 10px;
+  font-size: 0.78rem;
+}
+
+.fgc-combined-body .row-badges {
+  display: flex;
+  gap: 6px;
+}
+
+/* Events-Liste */
 .fgc-events-list {
   display: flex;
   flex-direction: column;
 }
 
-.fgc-event-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  font-size: 0.8rem;
-  transition: background 0.12s;
-}
-
-.fgc-event-row:last-child {
-  border-bottom: none;
-}
-
-.fgc-event-row:hover {
-  background: rgba(255,255,255,0.02);
-}
-
-.fgc-event-icon {
-  font-size: 0.95rem;
+.fgc-event-delete-btn {
   flex-shrink: 0;
-}
-
-.fgc-event-type-name {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.7rem;
-  color: var(--text-dim);
-  flex-shrink: 0;
-  min-width: 72px;
-}
-
-.fgc-event-date {
-  font-family: 'DM Mono', monospace;
-  font-size: 0.72rem;
-  color: var(--text-dim);
-  flex-shrink: 0;
-}
-
-.fgc-event-desc {
-  flex: 1;
-  color: var(--text);
+  padding: 4px 10px;
   font-size: 0.78rem;
-  line-height: 1.4;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  border-radius: 6px;
+  line-height: 1;
 }
-
 .event-list-empty,
 .event-list-loading {
-  font-size: 0.75rem;
+  font-size: 0.82rem;
   color: var(--text-dim);
-  padding: 16px;
+  padding: 16px 20px;
   text-align: center;
   margin: 0;
 }
@@ -1980,13 +2002,4 @@
   align-self: flex-end;    /* ← extra safety */
   margin-bottom: 0;
   white-space: nowrap;
-}
-
-.fgc-event-delete-btn {
-  flex-shrink: 0;
-  margin-left: auto;
-  padding: 3px 8px;
-  font-size: 0.72rem;
-  border-radius: 6px;
-  line-height: 1;
 }
