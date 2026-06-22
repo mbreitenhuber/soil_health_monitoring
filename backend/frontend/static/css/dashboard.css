@@ -66,12 +66,6 @@
   transform: none;
 }
 
-.field-group-card .fgc-info,
-.field-group-card .fgc-chart,
-.field-group-card .fgc-actions {
-  /* Die drei Spalten als Grid-Wrapper drinnen */
-}
-
 /* ── Col 1: Info ── */
 .fgc-info {
   display: flex;
@@ -1922,6 +1916,21 @@
   transform: translateY(-1px);
 }
 
+.event-modal-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.event-modal-card .detail-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  margin: 0;
+}
+
 /* ── Event modal form fixes ── */
 .event-form-date {
   flex: 0 0 160px !important;
@@ -1956,4 +1965,28 @@
 
 .event-form-type select:focus {
   border-color: var(--accent);
+}
+
+/* ── Add button aligned to bottom of form row ── */
+.event-form-row {
+  display: flex;
+  align-items: flex-end;   /* ← aligns button to bottom of inputs */
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.event-add-btn {
+  flex-shrink: 0;
+  align-self: flex-end;    /* ← extra safety */
+  margin-bottom: 0;
+  white-space: nowrap;
+}
+
+.fgc-event-delete-btn {
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 3px 8px;
+  font-size: 0.72rem;
+  border-radius: 6px;
+  line-height: 1;
 }

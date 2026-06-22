@@ -354,7 +354,7 @@
         </div>
         <div class="detail-field event-form-type">
           <label>{{ 'Event Type' if lang == 'en' else 'Ereignistyp' }}</label>
-          <select id="event-type">
+          <select id="event-type" onchange="toggleCustomEventType(this.value)">
             <option value="planting">🌱 {{ 'Planting' if lang == 'en' else 'Aussaat' }}</option>
             <option value="fertilizing">🌿 {{ 'Fertilizing' if lang == 'en' else 'Düngung' }}</option>
             <option value="tillage">🚜 {{ 'Tillage' if lang == 'en' else 'Bodenbearbeitung' }}</option>
@@ -364,21 +364,20 @@
             <option value="other">📝 {{ 'Other' if lang == 'en' else 'Sonstiges' }}</option>
           </select>
         </div>
+        <div class="detail-field event-form-custom-type" id="event-custom-type-wrapper" style="display:none;">
+          <label>{{ 'Custom Type' if lang == 'en' else 'Eigener Typ' }}</label>
+          <input type="text" id="event-custom-type"
+                placeholder="{{ 'e.g. Soil test' if lang == 'en' else 'z. B. Bodenprobe' }}">
+        </div>
         <div class="detail-field event-form-desc">
           <label>{{ 'Description' if lang == 'en' else 'Beschreibung' }}</label>
           <input type="text" id="event-description"
-                 placeholder="{{ 'e.g. Winter wheat, variety Kerubino' if lang == 'en' else 'z. B. Winterweizen, Sorte Kerubino' }}">
+                placeholder="{{ 'e.g. Winter wheat, variety Kerubino' if lang == 'en' else 'z. B. Winterweizen, Sorte Kerubino' }}">
         </div>
         <button class="btn-save event-add-btn" id="event-add-btn">
           {{ '+ Add' if lang == 'en' else '+ Hinzufügen' }}
         </button>
       </div>
-    </div>
-
-    <div class="detail-actions">
-      <button class="btn-close-modal" onclick="closeEventModal()">
-        {{ 'Close' if lang == 'en' else 'Schliessen' }}
-      </button>
     </div>
 
   </div>

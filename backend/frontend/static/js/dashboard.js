@@ -248,45 +248,37 @@ window.addEventListener("click", (e) => {
 
 const unifiedChartPlugin = {
   id: "unifiedChartPlugin",
- 
-  /* Vor dem Zeichnen: Stile setzen */
+
   beforeDatasetsDraw(chart) {
     const locked   = chart._lockedDataset;
     const hovered  = chart._hoveredDataset;
-    const focused  = locked ?? hovered;       // Lock hat Vorrang vor Hover
+    const focused  = locked ?? hovered;
     const hasFocus = focused !== null && focused !== undefined;
- 
-    // Dark-Mode-safe Vordergrundfarbe auslesen
-    const fgColor  = getComputedStyle(chart.canvas)
+
+    const fgColor = getComputedStyle(chart.canvas)
       .getPropertyValue("--color-text-primary").trim() || "#111827";
- 
+
     chart.data.datasets.forEach((ds, i) => {
       const isActive = (focused === i);
-      const isDimmed = hasFocus && !isActive;
- 
-      if (!hasFocus) {
-        ds.borderColor          = "rgba(107, 114, 128, 0.55)";
-        ds.borderWidth          = 1.5;
-        ds.pointRadius          = 3;
-        ds.pointHoverRadius     = 5;
+
+      if (!hasFocus || isActive) {
+        // Kein Focus: alle gleich — Focus: aktives Dataset hervorgehoben
+        const color = (hasFocus && isActive) ? fgColor : "rgba(107, 114, 128, 0.55)";
+        const width = (hasFocus && isActive) ? 2.5 : 1.5;
+        const radius = (hasFocus && isActive) ? 4 : 3;
+
+        ds.borderColor          = color;
+        ds.borderWidth          = width;
+        ds.pointRadius          = radius;
+        ds.pointHoverRadius     = radius + 2;
         ds.pointBackgroundColor = "transparent";
-        ds.pointBorderColor     = "rgba(107, 114, 128, 0.55)";
+        ds.pointBorderColor     = color;
         ds.pointBorderWidth     = 2;
-        ds.pointHoverBackgroundColor = "rgba(107, 114, 128, 0.55)";
-        ds.pointHoverBorderColor     = "rgba(107, 114, 128, 0.55)";
-        ds.pointHoverBorderWidth     = 2;
-      } else if (isActive) {
-        ds.borderColor          = fgColor;
-        ds.borderWidth          = 2.5;
-        ds.pointRadius          = 4;
-        ds.pointHoverRadius     = 6;
-        ds.pointBackgroundColor = "transparent";
-        ds.pointBorderColor     = fgColor;
-        ds.pointBorderWidth     = 2;
-        ds.pointHoverBackgroundColor = fgColor;
-        ds.pointHoverBorderColor     = fgColor;
+        ds.pointHoverBackgroundColor = color;
+        ds.pointHoverBorderColor     = color;
         ds.pointHoverBorderWidth     = 2;
       } else {
+        // Dimmed: gleiche Farbe wie normal, nur etwas dünner
         ds.borderColor          = "rgba(107, 114, 128, 0.55)";
         ds.borderWidth          = 1.5;
         ds.pointRadius          = 3;
@@ -300,51 +292,116 @@ const unifiedChartPlugin = {
       }
     });
   },
- 
-  /* Nach dem Zeichnen: Dataset-Label am Linienende */
+
   afterDatasetsDraw(chart) {
     const { ctx }  = chart;
     const locked   = chart._lockedDataset;
     const hovered  = chart._hoveredDataset;
     const focused  = locked ?? hovered;
     const hasFocus = focused !== null && focused !== undefined;
- 
-    const fgColor  = getComputedStyle(chart.canvas)
+
+    const fgColor = getComputedStyle(chart.canvas)
       .getPropertyValue("--color-text-primary").trim() || "#111827";
- 
+
+    // ── Dataset end-labels ─────────────────────────
     ctx.save();
     ctx.textBaseline = "middle";
     ctx.font         = "500 11px system-ui, sans-serif";
- 
+
     chart.data.datasets.forEach((ds, i) => {
       const meta = chart.getDatasetMeta(i);
       if (!meta?.data?.length) return;
- 
-      // Letzten sichtbaren Punkt finden
+
       let lastPoint = null;
       for (let j = ds.data.length - 1; j >= 0; j--) {
         if (ds.data[j] != null) { lastPoint = meta.data[j]; break; }
       }
       if (!lastPoint) return;
- 
+
       const isActive = (focused === i);
       const isDimmed = hasFocus && !isActive;
- 
-      // Labels: nur sichtbar wenn kein Focus, oder wenn aktiv
-      if (hasFocus && isDimmed) {
-        ctx.fillStyle = "rgba(107, 114, 128, 0.6)";
-      } else if (!hasFocus) {
-        ctx.fillStyle = "rgba(107, 114, 128, 0.6)";
-      } else {
-        ctx.fillStyle = fgColor;
-      }
- 
+
+      ctx.fillStyle = (hasFocus && isActive)
+        ? fgColor
+        : "rgba(107, 114, 128, 0.6)";
+
       ctx.fillText(ds.label || "", lastPoint.x + 10, lastPoint.y);
     });
- 
+
+    ctx.restore();
+
+    // ── Event annotation highlight ─────────────────
+    if (!hasFocus || !chart._eventAnnotations) return;
+
+    const focusedLabel = chart.data.datasets[focused]?.label;
+    if (!focusedLabel) return;
+
+    const annotations = chart.options.plugins?.annotation?.annotations;
+    if (!annotations?.length) return;
+
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+    if (!xScale || !yScale) return;
+
+    const chartTop    = yScale.top;
+    const chartBottom = yScale.bottom;
+
+    ctx.save();
+    ctx.font = "bold 10px system-ui, sans-serif";
+
+    annotations.forEach((ann, i) => {
+      if (!ann.label?.content) return;
+
+      const isOwn   = ann._fieldName === focusedLabel;
+      const xPixel  = xScale.getPixelForValue(ann.value);
+      if (xPixel < xScale.left || xPixel > xScale.right) return;
+
+      if (isOwn) {
+        // ── Active: durchgehende gelbe Linie ──────
+        ctx.beginPath();
+        ctx.moveTo(xPixel, chartTop);
+        ctx.lineTo(xPixel, chartBottom);
+        ctx.strokeStyle = "#4A90E2";
+        ctx.lineWidth   = 1.5;
+        ctx.setLineDash([]);
+        ctx.stroke();
+
+        // Diagonales Label — kräftig
+        const yPos = chartTop + 4 + (i % 3) * 22;
+        ctx.save();
+        ctx.translate(xPixel + 4, yPos);
+        ctx.rotate(-Math.PI / 6);
+        ctx.fillStyle    = "#4A90E2";
+        ctx.textAlign    = "left";
+        ctx.textBaseline = "top";
+        ctx.fillText(ann.label.content, 0, 0);
+        ctx.restore();
+
+      } else {
+        // ── Dimmed: gestrichelt + ausgegraut ──────
+        ctx.beginPath();
+        ctx.moveTo(xPixel, chartTop);
+        ctx.lineTo(xPixel, chartBottom);
+        ctx.strokeStyle = "rgba(156,163,175,0.12)";
+        ctx.lineWidth   = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    });
+
     ctx.restore();
   },
 };
+
+function toggleCustomEventType(value) {
+  const wrapper = document.getElementById("event-custom-type-wrapper");
+  if (!wrapper) return;
+  wrapper.style.display = value === "other" ? "" : "none";
+  if (value !== "other") {
+    document.getElementById("event-custom-type").value = "";
+  }
+}
 
 function renderKpiField(elId, fieldName, value, indexMap, type = "") {
   const el = document.getElementById(elId);
@@ -815,15 +872,25 @@ function renderDashboard(analyses, { filtered = false } = {}) {
    • Chart title drawn inside canvas top-left
    • Line segments coloured: green=rise, red=fall, black=flat (±0.2 abs)
    • Hover tooltip showing exact value + date                           */
-function drawSparklines() {
-  document.querySelectorAll(".fgc-sparkline").forEach(canvas => {
-    if (canvas._sparklineInit) return; // already set up
+async function drawSparklines() {
+  const allCards = document.querySelectorAll(".fgc-sparkline");
+  
+  for (const canvas of allCards) {
+    if (canvas._sparklineInit) continue;
     canvas._sparklineInit = true;
 
-    const raw    = canvas.dataset.values || "";
-    const labels = (canvas.dataset.labels || "").split("|").map(s => s.trim());
-    const values = raw.split(",").map(v => parseFloat(v)).filter(v => Number.isFinite(v));
-    if (!values.length) return;
+    const raw      = canvas.dataset.values || "";
+    const labels   = (canvas.dataset.labels || "").split("|").map(s => s.trim());
+    const values   = raw.split(",").map(v => parseFloat(v)).filter(v => Number.isFinite(v));
+    if (!values.length) continue;
+
+    // Feldname aus der Card holen
+    const card      = canvas.closest(".field-group-card");
+    const safeField = card?.dataset.field || "";
+    const fieldName = safeField ? decodeURIComponent(safeField) : "";
+
+    // Events laden (aus Cache oder API)
+    const events = fieldName ? await fetchFieldEvents(fieldName) : [];
 
     function redraw(hoverIdx) {
       const W = canvas.offsetWidth  || 220;
@@ -839,20 +906,17 @@ function drawSparklines() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, W, H);
 
-      // ── Layout ────────────────────────────────────────────
       const TICK_COLOR = "#9ca3af";
-      const GRID_COLOR = "rgba(255,255,255,0.08)";
       const FONT_SM    = "9.5px system-ui,sans-serif";
       const FONT_TITLE = "bold 9px system-ui,sans-serif";
-      const Y_LABEL_W  = 52;   // enough for "XX.XX g/kg"
+      const Y_LABEL_W  = 52;
       const X_LABEL_H  = 15;
-      const TITLE_H    = 14;   // space reserved at top for title
+      const TITLE_H    = 14;
 
       const pad = { top: TITLE_H + 4, right: 8, bottom: X_LABEL_H, left: Y_LABEL_W };
       const iW  = W - pad.left - pad.right;
       const iH  = H - pad.top  - pad.bottom;
 
-      // ── Y range (30 % padding) ─────────────────────────────
       const dMin  = Math.min(...values);
       const dMax  = Math.max(...values);
       const range = Math.max(dMax - dMin, 0.5);
@@ -861,39 +925,51 @@ function drawSparklines() {
       const yMax  = dMax + rPad;
       const yRange = yMax - yMin;
 
+      const X_PAD = 12;
       const toX = i => {
-        const X_PAD = 12; // inner margin on each side so line doesn't touch edge
         if (values.length === 1) return pad.left + iW / 2;
         return pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2);
       };
       const toY = v => pad.top + iH - ((v - yMin) / yRange) * iH;
 
-      // ── Chart title (centred over plot area) ──────────────
-      ctx.font      = FONT_TITLE;
-      ctx.fillStyle = TICK_COLOR;
-      ctx.textAlign = "center";
+      // Datum → X-Position (für Events)
+      const dateToX = (dateStr) => {
+        if (!labels.length || values.length < 2) return null;
+        const firstDate  = new Date(labels[0]).getTime();
+        const lastDate   = new Date(labels[values.length - 1]).getTime();
+        const eventDate  = new Date(dateStr).getTime();
+        if (isNaN(eventDate) || lastDate === firstDate) return null;
+        const ratio = (eventDate - firstDate) / (lastDate - firstDate);
+        if (ratio < 0 || ratio > 1) return null;
+        return pad.left + X_PAD + ratio * (iW - X_PAD * 2);
+      };
+
+      // ── Chart title ──────────────────────────────
+      ctx.font         = FONT_TITLE;
+      ctx.fillStyle    = TICK_COLOR;
+      ctx.textAlign    = "center";
       ctx.textBaseline = "top";
       ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
 
-     // ── Y-Axis title ──────────────────────────────────────
+      // ── Y-Axis title ──────────────────────────────
       ctx.save();
-      ctx.font      = "9px system-ui,sans-serif";
-      ctx.fillStyle = TICK_COLOR;
-      ctx.textAlign = "center";
+      ctx.font         = "9px system-ui,sans-serif";
+      ctx.fillStyle    = TICK_COLOR;
+      ctx.textAlign    = "center";
       ctx.textBaseline = "middle";
       ctx.translate(10, pad.top + iH / 2);
       ctx.rotate(-Math.PI / 2);
       ctx.fillText("OC (g/kg)", 0, 0);
       ctx.restore();
 
-      // ── X-Axis title ──────────────────────────────────────
+      // ── X-Axis title ──────────────────────────────
       ctx.font         = "9px system-ui,sans-serif";
       ctx.fillStyle    = TICK_COLOR;
       ctx.textAlign    = "center";
       ctx.textBaseline = "bottom";
       ctx.fillText(uiText("date") || "Date", pad.left + iW / 2, H - 1);
 
-      // ── X baseline ────────────────────────────────────────
+      // ── X baseline ────────────────────────────────
       ctx.beginPath();
       ctx.moveTo(pad.left, pad.top + iH);
       ctx.lineTo(pad.left + iW, pad.top + iH);
@@ -901,12 +977,12 @@ function drawSparklines() {
       ctx.lineWidth   = 1;
       ctx.stroke();
 
-      // ── X date labels (first + last) ──────────────────────
+      // ── X date labels ─────────────────────────────
       if (labels.length >= values.length && values.length >= 1) {
         ctx.font         = FONT_SM;
         ctx.textBaseline = "top";
         ctx.fillStyle    = TICK_COLOR;
-        const fmt = s => s ? s.slice(5) : ""; // "MM-DD"
+        const fmt = s => s ? s.slice(5) : "";
         ctx.textAlign = "left";
         ctx.fillText(fmt(labels[0]), pad.left, pad.top + iH + 3);
         if (values.length > 1) {
@@ -915,7 +991,7 @@ function drawSparklines() {
         }
       }
 
-      // ── Gradient fill (neutral green) ─────────────────────
+      // ── Gradient fill ─────────────────────────────
       const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + iH);
       grad.addColorStop(0, "rgba(95,167,100,0.18)");
       grad.addColorStop(1, "rgba(95,167,100,0.00)");
@@ -927,15 +1003,13 @@ function drawSparklines() {
       ctx.fillStyle = grad;
       ctx.fill();
 
-      // ── Coloured line segments ─────────────────────────────
-      // Threshold: 0.2 absolute change → flat (black)
+      // ── Coloured line segments ─────────────────────
       const FLAT_ABS = 0.2;
       for (let i = 0; i < values.length - 1; i++) {
         const diff  = values[i + 1] - values[i];
         const color = diff >  FLAT_ABS ? "#22c55e"
                     : diff < -FLAT_ABS ? "#ef4444"
                     : "#6b7280";
-
         ctx.beginPath();
         ctx.moveTo(toX(i),     toY(values[i]));
         ctx.lineTo(toX(i + 1), toY(values[i + 1]));
@@ -946,19 +1020,50 @@ function drawSparklines() {
         ctx.stroke();
       }
 
-      // ── Dots ──────────────────────────────────────────────
+      // ── Dots ──────────────────────────────────────
       values.forEach((v, i) => {
         const isHover = (i === hoverIdx);
         ctx.beginPath();
         ctx.arc(toX(i), toY(v), isHover ? 5 : 3, 0, Math.PI * 2);
         ctx.fillStyle   = "transparent";
         ctx.fill();
-        ctx.strokeStyle = isHover ? "rgba(107, 114, 128, 0.9)" : "rgba(107, 114, 128, 0.55)";
+        ctx.strokeStyle = isHover ? "rgba(107,114,128,0.9)" : "rgba(107,114,128,0.55)";
         ctx.lineWidth   = 2;
         ctx.stroke();
       });
 
-      // ── Hover tooltip ──────────────────────────────────────
+      // ── Event lines + diagonal labels ─────────────
+      events.forEach((ev, idx) => {
+        const x = dateToX(ev.date);
+        if (x === null) return;
+
+        // Vertikale gestrichelte Linie
+        ctx.save();
+        ctx.beginPath();
+        ctx.moveTo(x, pad.top);
+        ctx.lineTo(x, pad.top + iH);
+        ctx.strokeStyle = "#4A90E2";
+        ctx.lineWidth   = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Diagonales Label (rechts oben, gestaffelt)
+        const icon    = eventIcon(ev.event_type);
+        const label   = `${icon} ${ev.description}`;
+        const yStart  = pad.top + 2 + (idx % 3) * 14; // staffeln
+
+        ctx.translate(x + 4, yStart);
+        ctx.rotate(-Math.PI / 6); // 30° diagonal nach rechts oben
+        ctx.font         = "bold 8px system-ui,sans-serif";
+        ctx.fillStyle    = "#4A90E2";
+        ctx.textAlign    = "left";
+        ctx.textBaseline = "top";
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+      });
+
+      // ── Hover tooltip ──────────────────────────────
       if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < values.length) {
         const tx   = toX(hoverIdx);
         const ty   = toY(values[hoverIdx]);
@@ -967,13 +1072,12 @@ function drawSparklines() {
         const fullText = dateText ? `${dateText}: ${text}` : text;
 
         ctx.font = "bold 10px system-ui,sans-serif";
-        const tw = ctx.measureText(fullText).width;
+        const tw  = ctx.measureText(fullText).width;
         const bPad = 5;
-        const bW = tw + bPad * 2;
-        const bH = 18;
+        const bW  = tw + bPad * 2;
+        const bH  = 18;
         let bx = tx - bW / 2;
         let by = ty - bH - 8;
-        // keep inside canvas
         bx = Math.max(pad.left, Math.min(bx, W - pad.right - bW));
         by = Math.max(2, by);
 
@@ -989,14 +1093,12 @@ function drawSparklines() {
       }
     }
 
-    // Initial draw
     redraw(null);
 
-    // ── Hover interaction ──────────────────────────────────────
     function getHoverIndex(e) {
       const rect   = canvas.getBoundingClientRect();
       const mx     = e.clientX - rect.left;
-      const W      = canvas.offsetWidth  || 220;
+      const W      = canvas.offsetWidth || 220;
       const Y_LABEL_W = 52;
       const X_LABEL_H = 15;
       const TITLE_H   = 14;
@@ -1024,7 +1126,7 @@ function drawSparklines() {
       canvas.style.cursor = "default";
       redraw(null);
     });
-  });
+  }
 }
 
 /* ══════════════════════════════════════════════════
@@ -1135,13 +1237,33 @@ async function loadInlineEvents(fieldName, listEl) {
   }
 
   listEl.innerHTML = events.map(ev => `
-    <div class="fgc-event-row">
+    <div class="fgc-event-row" data-id="${ev.id}">
       <span class="fgc-event-icon">${eventIcon(ev.event_type)}</span>
       <span class="fgc-event-type-name">${escapeHtml(ev.event_type.charAt(0).toUpperCase() + ev.event_type.slice(1))}</span>
       <span class="fgc-event-date">${escapeHtml(ev.date)}</span>
       <span class="fgc-event-desc">${escapeHtml(ev.description)}</span>
+      <button class="fgc-event-delete-btn btn-danger"
+              data-id="${ev.id}"
+              data-field="${encodeURIComponent(fieldName)}">✕</button>
     </div>
   `).join("");
+
+  listEl.querySelectorAll(".fgc-event-delete-btn").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id    = btn.dataset.id;
+      const field = decodeURIComponent(btn.dataset.field);
+      try {
+        await deleteFieldEvent(id, field);
+        await loadInlineEvents(field, listEl);
+        if (document.getElementById("compare-toggle-body").classList.contains("open")) {
+          showCompareChart().catch(console.error);
+        }
+      } catch (err) {
+        alert("Could not delete event: " + err.message);
+      }
+    });
+  });
 }
 
 function onCardChange(e) {
@@ -1358,7 +1480,7 @@ async function showCompareChart() {
   const bar     = document.getElementById("compare-fields-bar");
   const hint    = document.getElementById("compare-fields-hint");
 
-  const groups  = groupByField(allAnalyses);
+  const groups        = groupByField(allAnalyses);
   const allFieldNames = Object.keys(groups);
 
   if (!allFieldNames.length) {
@@ -1369,7 +1491,6 @@ async function showCompareChart() {
   if (hint)    hint.style.display = "none";
   if (wrapper) wrapper.style.display = "block";
 
-  // hiddenFields: Set of field names currently toggled off
   if (!showCompareChart._hidden) showCompareChart._hidden = new Set();
   const hidden = showCompareChart._hidden;
 
@@ -1397,7 +1518,7 @@ async function showCompareChart() {
   }
 
   // ── Build datasets ────────────────────────────────
-  const allDates  = new Set();
+  const allDates   = new Set();
   const fieldItems = {};
 
   allFieldNames.forEach(fieldName => {
@@ -1433,14 +1554,36 @@ async function showCompareChart() {
 
   const { labels, datasets } = padChart(sortedDates, rawDatasets);
 
-  // ── Chart ─────────────────────────────────────────
-  const canvas = document.getElementById("compare-chart");
-  if (!canvas) return;
-
-  // ── Fetch events for annotations ──────────────────
+  // ── Fetch events ──────────────────────────────────
   const allEvents = await fetchAllFieldEvents(
     allFieldNames.filter(f => !hidden.has(f))
   );
+
+  // ── Build annotations ─────────────────────────────
+  const builtAnnotations = allEvents.map((ev, i) => ({
+    type:        "line",
+    scaleID:     "x",
+    value:       ev.date,
+    borderColor: "#4A90E2",
+    borderWidth: 1.5,
+    borderDash:  [4, 4],
+    _fieldName:  ev.field_name,
+    label: {
+      display:         true,
+      content:         `${eventIcon(ev.event_type)} ${ev.description}`,
+      position:        "start",
+      yAdjust:         -(i % 3) * 22,
+      rotation:        -30,
+      font:            { size: 10, weight: "bold" },
+      color:           "#4A90E2",
+      backgroundColor: "transparent",
+      borderWidth:     0,
+    },
+  }));
+
+  // ── Chart ─────────────────────────────────────────
+  const canvas = document.getElementById("compare-chart");
+  if (!canvas) return;
 
   const ctx = canvas.getContext("2d");
   if (compareChart) compareChart.destroy();
@@ -1450,31 +1593,12 @@ async function showCompareChart() {
     data: { labels, datasets },
     options: {
       animation: false,
-      layout: {
-        padding: { right: 80 }
-      },
+      layout: { padding: { right: 80 } },
       interaction: { mode: "nearest", intersect: false },
       plugins: {
         legend: { display: false },
         annotation: {
-          annotations: allEvents.map((ev, i) => ({
-            type:        "line",
-            scaleID:     "x",
-            value:       ev.date,
-            borderColor: "rgba(251, 191, 36, 0.55)",
-            borderWidth: 1,
-            borderDash:  [4, 4],
-            label: {
-              display:    true,
-              content:    `${eventIcon(ev.event_type)} ${ev.description}`,
-              position:   "start",
-              yAdjust:    i % 3 === 0 ? 0 : i % 3 === 1 ? 20 : 40, // stagger overlapping labels
-              font:       { size: 10 },
-              color:      "#9ca3af",
-              backgroundColor: "transparent",
-              borderWidth: 0,
-            },
-          })),
+          annotations: builtAnnotations,
         },
         tooltip: {
           callbacks: {
@@ -1500,6 +1624,9 @@ async function showCompareChart() {
     },
     plugins: [unifiedChartPlugin],
   });
+
+  // Annotations für Plugin-Zugriff speichern
+  compareChart._eventAnnotations = builtAnnotations;
 
   if (!canvas._compareListenersAttached) {
     canvas._compareListenersAttached = true;
@@ -1552,7 +1679,13 @@ async function fetchFieldEvents(fieldName) {
 }
 
 async function fetchAllFieldEvents(fieldNames) {
-  const results = await Promise.all(fieldNames.map(fetchFieldEvents));
+  const results = await Promise.all(
+    fieldNames.map(async name => {
+      const events = await fetchFieldEvents(name);
+      // field_name an jedes Event anhängen falls API es nicht liefert
+      return events.map(ev => ({ ...ev, field_name: ev.field_name || name }));
+    })
+  );
   return results.flat();
 }
 
@@ -1661,33 +1794,42 @@ function initEventModal() {
     });
 
   document.getElementById("event-add-btn")
-    ?.addEventListener("click", async () => {
-      if (!currentEventFieldName) return;
-      const date  = document.getElementById("event-date").value;
-      const type  = document.getElementById("event-type").value;
-      const desc  = document.getElementById("event-description").value.trim();
-      if (!date)  { alert("Please select a date."); return; }
-      if (!desc)  { alert("Please enter a description."); return; }
-      try {
-        await addFieldEvent(currentEventFieldName, date, type, desc);
-        document.getElementById("event-description").value = "";
+  ?.addEventListener("click", async () => {
+    if (!currentEventFieldName) return;
+    const date     = document.getElementById("event-date").value;
+    const typeRaw  = document.getElementById("event-type").value;
+    const customType = document.getElementById("event-custom-type").value.trim();
+    const type     = (typeRaw === "other" && customType) ? customType : typeRaw;
+    const desc     = document.getElementById("event-description").value.trim();
 
-        // Refresh inline event list if open
-        const encodedField = encodeURIComponent(currentEventFieldName);
-        const inlineList = document.querySelector(`.fgc-events-list[data-field="${encodedField}"]`);
-        if (inlineList) {
-          await loadInlineEvents(currentEventFieldName, inlineList);
-        }
+    if (!date) { alert("Please select a date."); return; }
+    if (typeRaw === "other" && !customType) {
+      alert("Please enter a custom event type."); return;
+    }
+    if (!desc)  { alert("Please enter a description."); return; }
 
-        if (document.getElementById("compare-toggle-body").classList.contains("open")) {
-          showCompareChart().catch(console.error);
-        }
+    try {
+      await addFieldEvent(currentEventFieldName, date, type, desc);
+      document.getElementById("event-description").value = "";
+      document.getElementById("event-custom-type").value = "";
+      document.getElementById("event-type").value = "planting";
+      toggleCustomEventType("planting");
 
-        closeEventModal();
-      } catch (err) {
-        alert("Could not add event: " + err.message);
+      const encodedField = encodeURIComponent(currentEventFieldName);
+      const inlineList = document.querySelector(
+        `.fgc-events-list[data-field="${encodedField}"]`
+      );
+      if (inlineList) await loadInlineEvents(currentEventFieldName, inlineList);
+
+      if (document.getElementById("compare-toggle-body").classList.contains("open")) {
+        showCompareChart().catch(console.error);
       }
-    });
+
+      closeEventModal();
+    } catch (err) {
+      alert("Could not add event: " + err.message);
+    }
+  });
 }
 
 /* ══════════════════════════════════════════════════
