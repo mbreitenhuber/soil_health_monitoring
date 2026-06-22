@@ -38,6 +38,59 @@ function formatEventTypeName(type) {
   return type.charAt(0).toUpperCase() + type.slice(1);
 }
 
+function sparklineTextWidth(ctx, text) {
+  const w = ctx.measureText(text).width;
+  if (w > 0) return w;
+  return [...text].length * 6.5;
+}
+
+/** Icon centered on x; each event shows icon + name, comma-separated. */
+function drawFieldEventLabel(ctx, x, y, events, { fontSize = 10, color = "#4A90E2", bold = true } = {}) {
+  if (!events?.length) return;
+
+  const segments = events.map(ev => ({
+    icon: eventIcon(ev.event_type),
+    name: formatEventTypeName(ev.event_type),
+  }));
+  const TEXT_GAP = 10;
+  const font = `${bold ? "bold " : ""}${fontSize}px system-ui,sans-serif`;
+  const angle = -Math.PI / 6;
+  const canvasW = ctx.canvas.width / (window.devicePixelRatio || 1);
+  const margin = 6;
+
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = font;
+
+  if (segments.length === 1) {
+    const seg = segments[0];
+    ctx.translate(x, y);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    const iconW = sparklineTextWidth(ctx, seg.icon);
+    ctx.fillText(seg.icon, 0, 0);
+    ctx.rotate(angle);
+    ctx.textAlign = "left";
+    ctx.fillText(seg.name, iconW / 2 + TEXT_GAP, 0);
+  } else {
+    const fullText = segments.map(s => `${s.icon} ${s.name}`).join(", ");
+    const labelW = sparklineTextWidth(ctx, fullText);
+    const halfSpan = (labelW / 2) * Math.abs(Math.cos(angle));
+
+    let drawX = x;
+    if (drawX + halfSpan > canvasW - margin) drawX = canvasW - margin - halfSpan;
+    if (drawX - halfSpan < margin) drawX = margin + halfSpan;
+
+    ctx.translate(drawX, y);
+    ctx.rotate(angle);
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(fullText, 0, 0);
+  }
+
+  ctx.restore();
+}
+
 function relativeTrendPct(firstVal, latestVal) {
   const first  = Number(firstVal);
   const latest = Number(latestVal);
@@ -163,57 +216,40 @@ function drawCompareChartEventDecorations(chart, ctx, { labelsOnly = false } = {
 
   ctx.save();
 
-  eventAnnotations.forEach((ann) => {
-    if (chart._hiddenFields?.has(ann._fieldName)) return;
+  eventAnnotations.forEach((group) => {
+    const allVisible = (group.events || []).filter(ev =>
+      !chart._hiddenFields?.has(ev.field_name)
+    );
+    if (!allVisible.length) return;
 
-    const xPixel = getCompareChartDateX(chart, ann.value);
+    const xPixel = getCompareChartDateX(chart, group.value);
     if (xPixel == null || xPixel < chartLeft || xPixel > chartRight) return;
 
-    const isOwn = !hasFocus || ann._fieldName === focusedLabel;
+    const isHighlighted = hasFocus &&
+      allVisible.some(ev => ev.field_name === focusedLabel);
 
-    if (!labelsOnly && isOwn) {
+    if (!labelsOnly) {
       ctx.beginPath();
       ctx.moveTo(xPixel, chartTop);
       ctx.lineTo(xPixel, chartBottom);
-      ctx.strokeStyle = hasFocus ? "#4A90E2" : "rgba(74,144,226,0.55)";
-      ctx.lineWidth   = hasFocus ? 1.5 : 1;
-      ctx.setLineDash(hasFocus ? [] : [4, 4]);
-      ctx.stroke();
-      ctx.setLineDash([]);
-    } else if (!labelsOnly && hasFocus && !isOwn) {
-      ctx.beginPath();
-      ctx.moveTo(xPixel, chartTop);
-      ctx.lineTo(xPixel, chartBottom);
-      ctx.strokeStyle = "rgba(156,163,175,0.12)";
-      ctx.lineWidth   = 1;
-      ctx.setLineDash([4, 4]);
+      ctx.strokeStyle = isHighlighted ? "#4A90E2" : "rgba(74,144,226,0.55)";
+      ctx.lineWidth   = isHighlighted ? 2 : 1;
+      ctx.setLineDash(isHighlighted ? [] : [4, 4]);
       ctx.stroke();
       ctx.setLineDash([]);
     }
 
-    if (labelsOnly && isOwn) {
-      const peers = eventAnnotations
-        .filter(a =>
-          a.value === ann.value &&
-          !chart._hiddenFields?.has(a._fieldName) &&
-          (!hasFocus || a._fieldName === focusedLabel)
-        )
-        .sort((a, b) => (a._fieldName || "").localeCompare(b._fieldName || ""));
-      const slot  = Math.max(0, peers.indexOf(ann));
-      const yPos  = chartTop - 10 - slot * 22;
-      const xPos  = xPixel + 8 + slot * 12;
+    if (labelsOnly) {
+      const labelEvents = hasFocus
+        ? allVisible.filter(ev => ev.field_name === focusedLabel)
+        : allVisible;
+      if (!labelEvents.length) return;
 
-      ctx.save();
-      ctx.translate(xPos, yPos);
-      ctx.rotate(-Math.PI / 6);
-      ctx.fillStyle    = hasFocus ? "#4A90E2" : "rgba(74,144,226,0.9)";
-      ctx.font         = hasFocus
-        ? "bold 10px system-ui, sans-serif"
-        : "500 10px system-ui, sans-serif";
-      ctx.textAlign    = "left";
-      ctx.textBaseline = "top";
-      ctx.fillText(ann.content, 0, 0);
-      ctx.restore();
+      drawFieldEventLabel(ctx, xPixel, chartTop - 6, labelEvents, {
+        fontSize: 10,
+        color:    isHighlighted ? "#4A90E2" : "rgba(74,144,226,0.9)",
+        bold:     isHighlighted,
+      });
     }
   });
 
@@ -227,27 +263,20 @@ function buildCompareEventAnnotations(allEvents) {
     return (a.field_name || "").localeCompare(b.field_name || "");
   });
 
-  const slotByDate = {};
-  return sorted.map((ev) => {
+  const byDate = new Map();
+  sorted.forEach(ev => {
     const dateKey = ev.date || "";
-    const slot    = slotByDate[dateKey] || 0;
-    slotByDate[dateKey] = slot + 1;
-    return {
-      value:      ev.date,
-      _fieldName: ev.field_name,
-      _slot:      slot,
-      content:    `${eventIcon(ev.event_type)} ${formatEventTypeName(ev.event_type)}`,
-    };
+    if (!byDate.has(dateKey)) byDate.set(dateKey, []);
+    byDate.get(dateKey).push(ev);
   });
-}
 
-function maxEventsOnSameDate(annotations) {
-  const counts = {};
-  annotations.forEach(a => {
-    const key = a.value || "";
-    counts[key] = (counts[key] || 0) + 1;
-  });
-  return Math.max(0, ...Object.values(counts));
+  return Array.from(byDate.entries()).map(([date, events]) => ({
+    value:  date,
+    events,
+    content: events
+      .map(ev => `${eventIcon(ev.event_type)} ${formatEventTypeName(ev.event_type)}`)
+      .join(", "),
+  }));
 }
 
 function getCachedFieldEvents(fieldNames) {
@@ -990,250 +1019,307 @@ function renderDashboard(analyses, { filtered = false } = {}) {
   refreshFieldEventCountLabels(sortedGroups.map(g => g.name));
 }
 
-/* ── Draw mini sparkline on each .fgc-sparkline canvas ──
-   • Y-axis labels fully visible (wider left pad)
-   • Chart title drawn inside canvas top-left
-   • Line segments coloured: green=rise, red=fall, black=flat (±0.2 abs)
-   • Hover tooltip showing exact value + date                           */
-async function drawSparklines() {
-  const allCards = document.querySelectorAll(".fgc-sparkline");
-  
-  for (const canvas of allCards) {
-    if (canvas._sparklineInit) continue;
-    canvas._sparklineInit = true;
+function sparklineCanvasForField(fieldName) {
+  const safeField = encodeURIComponent(fieldName);
+  return document.querySelector(
+    `.field-group-card[data-field="${safeField}"] .fgc-sparkline`
+  );
+}
 
-    const raw      = canvas.dataset.values || "";
-    const labels   = (canvas.dataset.labels || "").split("|").map(s => s.trim());
-    const values   = raw.split(",").map(v => parseFloat(v)).filter(v => Number.isFinite(v));
-    if (!values.length) continue;
+function refreshFieldSparkline(fieldName) {
+  const canvas = sparklineCanvasForField(fieldName);
+  if (!canvas) return;
+  if (canvas._sparklineRedraw) {
+    fetchFieldEvents(fieldName).then(events => {
+      canvas._sparklineEvents = events;
+      canvas._sparklineRedraw(null);
+    });
+  } else {
+    initSparklineCanvas(canvas);
+  }
+}
 
-    // Feldname aus der Card holen
-    const card      = canvas.closest(".field-group-card");
-    const safeField = card?.dataset.field || "";
-    const fieldName = safeField ? decodeURIComponent(safeField) : "";
+/* ── Draw mini sparkline on each .fgc-sparkline canvas ── */
+async function initSparklineCanvas(canvas) {
+  const raw    = canvas.dataset.values || "";
+  const labels = (canvas.dataset.labels || "").split("|").map(s => s.trim());
+  const values = raw.split(",").map(v => parseFloat(v)).filter(v => Number.isFinite(v));
+  if (!values.length) return;
 
-    // Events laden (aus Cache oder API)
-    const events = fieldName ? await fetchFieldEvents(fieldName) : [];
+  const card      = canvas.closest(".field-group-card");
+  const safeField = card?.dataset.field || "";
+  const fieldName = safeField ? decodeURIComponent(safeField) : "";
 
-    function redraw(hoverIdx) {
-      const W = canvas.offsetWidth  || 220;
-      const H = canvas.offsetHeight || 120;
-      if (W === 0 || H === 0) return;
+  canvas._sparklineEvents = fieldName ? await fetchFieldEvents(fieldName) : [];
 
-      const dpr = window.devicePixelRatio || 1;
-      if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
-        canvas.width  = W * dpr;
-        canvas.height = H * dpr;
+  function redraw(hoverIdx) {
+    const events = canvas._sparklineEvents || [];
+    const W = canvas.offsetWidth  || 220;
+    const H = canvas.offsetHeight || 130;
+    if (W === 0 || H === 0) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    if (canvas.width !== W * dpr || canvas.height !== H * dpr) {
+      canvas.width  = W * dpr;
+      canvas.height = H * dpr;
+    }
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+
+    const TICK_COLOR = "#9ca3af";
+    const FONT_SM    = "9.5px system-ui,sans-serif";
+    const FONT_TITLE = "bold 9px system-ui,sans-serif";
+    const Y_LABEL_W  = 52;
+    const X_LABEL_H  = 32;
+    const TITLE_H    = 14;
+
+    const pad = { top: TITLE_H + 4, right: 40, bottom: X_LABEL_H, left: Y_LABEL_W };
+    const iW  = W - pad.left - pad.right;
+    const iH  = H - pad.top  - pad.bottom;
+
+    const dMin  = Math.min(...values);
+    const dMax  = Math.max(...values);
+    const range = Math.max(dMax - dMin, 0.5);
+    const rPad  = Math.max(range * 0.30, 0.5);
+    const yMin  = Math.max(0, dMin - rPad);
+    const yMax  = dMax + rPad;
+    const yRange = yMax - yMin;
+
+    const X_PAD = 12;
+    const SINGLE_DATE_PAD_DAYS = 3;
+    const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+    function sparklineDateRange() {
+      const centerLabel = labels[0] || "";
+      const centerTime  = new Date(centerLabel).getTime();
+      if (values.length === 1 && !Number.isNaN(centerTime)) {
+        const padMs = SINGLE_DATE_PAD_DAYS * MS_PER_DAY;
+        return { t0: centerTime - padMs, t1: centerTime + padMs };
       }
-      const ctx = canvas.getContext("2d");
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, W, H);
-
-      const TICK_COLOR = "#9ca3af";
-      const FONT_SM    = "9.5px system-ui,sans-serif";
-      const FONT_TITLE = "bold 9px system-ui,sans-serif";
-      const Y_LABEL_W  = 52;
-      const X_LABEL_H  = 15;
-      const TITLE_H    = 14;
-
-      const pad = { top: TITLE_H + 4, right: 8, bottom: X_LABEL_H, left: Y_LABEL_W };
-      const iW  = W - pad.left - pad.right;
-      const iH  = H - pad.top  - pad.bottom;
-
-      const dMin  = Math.min(...values);
-      const dMax  = Math.max(...values);
-      const range = Math.max(dMax - dMin, 0.5);
-      const rPad  = Math.max(range * 0.30, 0.5);
-      const yMin  = Math.max(0, dMin - rPad);
-      const yMax  = dMax + rPad;
-      const yRange = yMax - yMin;
-
-      const X_PAD = 12;
-      const toX = i => {
-        if (values.length === 1) return pad.left + iW / 2;
-        return pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2);
-      };
-      const toY = v => pad.top + iH - ((v - yMin) / yRange) * iH;
-
-      // Datum → X-Position (für Events)
-      const dateToX = (dateStr) => {
-        if (!labels.length || values.length < 2) return null;
-        const firstDate  = new Date(labels[0]).getTime();
-        const lastDate   = new Date(labels[values.length - 1]).getTime();
-        const eventDate  = new Date(dateStr).getTime();
-        if (isNaN(eventDate) || lastDate === firstDate) return null;
-        const ratio = (eventDate - firstDate) / (lastDate - firstDate);
-        if (ratio < 0 || ratio > 1) return null;
-        return pad.left + X_PAD + ratio * (iW - X_PAD * 2);
-      };
-
-      // ── Chart title ──────────────────────────────
-      ctx.font         = FONT_TITLE;
-      ctx.fillStyle    = TICK_COLOR;
-      ctx.textAlign    = "center";
-      ctx.textBaseline = "top";
-      ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
-
-      // ── Y-Axis title ──────────────────────────────
-      ctx.save();
-      ctx.font         = "9px system-ui,sans-serif";
-      ctx.fillStyle    = TICK_COLOR;
-      ctx.textAlign    = "center";
-      ctx.textBaseline = "middle";
-      ctx.translate(10, pad.top + iH / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillText("OC (g/kg)", 0, 0);
-      ctx.restore();
-
-      // ── X-Axis title ──────────────────────────────
-      ctx.font         = "9px system-ui,sans-serif";
-      ctx.fillStyle    = TICK_COLOR;
-      ctx.textAlign    = "center";
-      ctx.textBaseline = "bottom";
-      ctx.fillText(uiText("date") || "Date", pad.left + iW / 2, H - 1);
-
-      // ── X baseline ────────────────────────────────
-      ctx.beginPath();
-      ctx.moveTo(pad.left, pad.top + iH);
-      ctx.lineTo(pad.left + iW, pad.top + iH);
-      ctx.strokeStyle = "rgba(156,163,175,0.25)";
-      ctx.lineWidth   = 1;
-      ctx.stroke();
-
-      // ── X date labels ─────────────────────────────
-      if (labels.length >= values.length && values.length >= 1) {
-        ctx.font         = FONT_SM;
-        ctx.textBaseline = "top";
-        ctx.fillStyle    = TICK_COLOR;
-        const fmt = s => s ? s.slice(5) : "";
-        ctx.textAlign = "left";
-        ctx.fillText(fmt(labels[0]), pad.left, pad.top + iH + 3);
-        if (values.length > 1) {
-          ctx.textAlign = "right";
-          ctx.fillText(fmt(labels[values.length - 1]), pad.left + iW, pad.top + iH + 3);
-        }
-      }
-
-      // ── Gradient fill ─────────────────────────────
-      const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + iH);
-      grad.addColorStop(0, "rgba(95,167,100,0.18)");
-      grad.addColorStop(1, "rgba(95,167,100,0.00)");
-      ctx.beginPath();
-      values.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
-      ctx.lineTo(toX(values.length - 1), pad.top + iH);
-      ctx.lineTo(toX(0), pad.top + iH);
-      ctx.closePath();
-      ctx.fillStyle = grad;
-      ctx.fill();
-
-      // ── Coloured line segments ─────────────────────
-      const FLAT_ABS = 0.2;
-      for (let i = 0; i < values.length - 1; i++) {
-        const diff  = values[i + 1] - values[i];
-        const color = diff >  FLAT_ABS ? "#22c55e"
-                    : diff < -FLAT_ABS ? "#ef4444"
-                    : "#6b7280";
-        ctx.beginPath();
-        ctx.moveTo(toX(i),     toY(values[i]));
-        ctx.lineTo(toX(i + 1), toY(values[i + 1]));
-        ctx.strokeStyle = color;
-        ctx.lineWidth   = 2.5;
-        ctx.lineJoin    = "round";
-        ctx.lineCap     = "round";
-        ctx.stroke();
-      }
-
-      // ── Dots ──────────────────────────────────────
-      values.forEach((v, i) => {
-        const isHover = (i === hoverIdx);
-        ctx.beginPath();
-        ctx.arc(toX(i), toY(v), isHover ? 5 : 3, 0, Math.PI * 2);
-        ctx.fillStyle   = "transparent";
-        ctx.fill();
-        ctx.strokeStyle = isHover ? "rgba(107,114,128,0.9)" : "rgba(107,114,128,0.55)";
-        ctx.lineWidth   = 2;
-        ctx.stroke();
-      });
-
-      // ── Event lines + diagonal labels ─────────────
-      events.forEach((ev, idx) => {
-        const x = dateToX(ev.date);
-        if (x === null) return;
-
-        // Vertikale gestrichelte Linie
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(x, pad.top);
-        ctx.lineTo(x, pad.top + iH);
-        ctx.strokeStyle = "#4A90E2";
-        ctx.lineWidth   = 1;
-        ctx.setLineDash([3, 3]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Diagonales Label (rechts oben, gestaffelt)
-        const icon    = eventIcon(ev.event_type);
-        const label   = `${icon} ${ev.description}`;
-        const yStart  = pad.top + 2 + (idx % 3) * 14; // staffeln
-
-        ctx.translate(x + 4, yStart);
-        ctx.rotate(-Math.PI / 6); // 30° diagonal nach rechts oben
-        ctx.font         = "bold 8px system-ui,sans-serif";
-        ctx.fillStyle    = "#4A90E2";
-        ctx.textAlign    = "left";
-        ctx.textBaseline = "top";
-        ctx.fillText(label, 0, 0);
-        ctx.restore();
-      });
-
-      // ── Hover tooltip ──────────────────────────────
-      if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < values.length) {
-        const tx   = toX(hoverIdx);
-        const ty   = toY(values[hoverIdx]);
-        const text = `${values[hoverIdx].toFixed(2)} g/kg`;
-        const dateText = labels[hoverIdx] || "";
-        const fullText = dateText ? `${dateText}: ${text}` : text;
-
-        ctx.font = "bold 10px system-ui,sans-serif";
-        const tw  = ctx.measureText(fullText).width;
-        const bPad = 5;
-        const bW  = tw + bPad * 2;
-        const bH  = 18;
-        let bx = tx - bW / 2;
-        let by = ty - bH - 8;
-        bx = Math.max(pad.left, Math.min(bx, W - pad.right - bW));
-        by = Math.max(2, by);
-
-        ctx.fillStyle = "rgba(31,41,55,0.92)";
-        ctx.beginPath();
-        ctx.roundRect(bx, by, bW, bH, 4);
-        ctx.fill();
-
-        ctx.fillStyle    = "#f9fafb";
-        ctx.textAlign    = "center";
-        ctx.textBaseline = "middle";
-        ctx.fillText(fullText, bx + bW / 2, by + bH / 2);
-      }
+      const start = labels[0];
+      const end   = labels[values.length - 1] || labels[labels.length - 1];
+      return { t0: new Date(start).getTime(), t1: new Date(end).getTime() };
     }
 
-    redraw(null);
+    function formatAxisDate(ms) {
+      if (Number.isNaN(ms)) return "";
+      const d = new Date(ms);
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${mm}-${dd}`;
+    }
+
+    const dateRange = sparklineDateRange();
+
+    const toX = i => {
+      if (values.length === 1) {
+        return pad.left + X_PAD + (iW - X_PAD * 2) / 2;
+      }
+      return pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2);
+    };
+    const toY = v => pad.top + iH - ((v - yMin) / yRange) * iH;
+
+    const dateToX = (dateStr) => {
+      const { t0, t1 } = dateRange;
+      if (!labels.length || Number.isNaN(t0) || Number.isNaN(t1) || t1 === t0) {
+        if (values.length === 1) return pad.left + X_PAD + (iW - X_PAD * 2) / 2;
+        return null;
+      }
+      const eventTime = new Date(dateStr).getTime();
+      if (Number.isNaN(eventTime)) return null;
+      const ratio = (eventTime - t0) / (t1 - t0);
+      if (ratio < 0 || ratio > 1) return null;
+      return pad.left + X_PAD + ratio * (iW - X_PAD * 2);
+    };
+
+    // ── Chart title ──────────────────────────────
+    ctx.font         = FONT_TITLE;
+    ctx.fillStyle    = TICK_COLOR;
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
+
+    // ── Y-Axis title + tick labels ─────────────
+    ctx.save();
+    ctx.font         = "9px system-ui,sans-serif";
+    ctx.fillStyle    = TICK_COLOR;
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "middle";
+    ctx.translate(10, pad.top + iH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText("OC (g/kg)", 0, 0);
+    ctx.restore();
+
+    ctx.font         = FONT_SM;
+    ctx.fillStyle    = TICK_COLOR;
+    ctx.textAlign    = "right";
+    ctx.textBaseline = "middle";
+    [0, 1 / 3, 2 / 3, 1].forEach(t => {
+      const yVal = yMin + t * yRange;
+      const yPos = pad.top + iH - t * iH;
+      ctx.fillText(yVal.toFixed(1), pad.left - 4, yPos);
+    });
+
+    // ── X baseline ────────────────────────────────
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top + iH);
+    ctx.lineTo(pad.left + iW, pad.top + iH);
+    ctx.strokeStyle = "rgba(156,163,175,0.25)";
+    ctx.lineWidth   = 1;
+    ctx.stroke();
+
+    // ── X date tick labels (0, 1/3, 2/3, 1) ───────
+    const xAxisRatio = r => pad.left + X_PAD + r * (iW - X_PAD * 2);
+    const dateAtAxisRatio = r => {
+      const { t0, t1 } = dateRange;
+      if (Number.isNaN(t0) || Number.isNaN(t1) || t1 === t0) {
+        return labels[0] ? labels[0].slice(5) : "";
+      }
+      return formatAxisDate(t0 + r * (t1 - t0));
+    };
+    const xTickY = pad.top + iH + 4;
+
+    if (labels.length >= 1) {
+      ctx.font         = FONT_SM;
+      ctx.textBaseline = "top";
+      ctx.fillStyle    = TICK_COLOR;
+      [
+        [0, "left"],
+        [1 / 3, "center"],
+        [2 / 3, "center"],
+        [1, "right"],
+      ].forEach(([r, align]) => {
+        ctx.textAlign = align;
+        ctx.fillText(dateAtAxisRatio(r), xAxisRatio(r), xTickY);
+      });
+    }
+
+    // ── X-Axis title (below tick labels) ──────────
+    ctx.font         = "9px system-ui,sans-serif";
+    ctx.fillStyle    = TICK_COLOR;
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "top";
+    ctx.fillText(uiText("date"), pad.left + iW / 2, pad.top + iH + 18);
+
+    // ── Gradient fill ─────────────────────────────
+    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + iH);
+    grad.addColorStop(0, "rgba(95,167,100,0.18)");
+    grad.addColorStop(1, "rgba(95,167,100,0.00)");
+    ctx.beginPath();
+    values.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+    ctx.lineTo(toX(values.length - 1), pad.top + iH);
+    ctx.lineTo(toX(0), pad.top + iH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+
+    // ── Coloured line segments ─────────────────────
+    const FLAT_ABS = 0.2;
+    for (let i = 0; i < values.length - 1; i++) {
+      const diff  = values[i + 1] - values[i];
+      const color = diff >  FLAT_ABS ? "#22c55e"
+                  : diff < -FLAT_ABS ? "#ef4444"
+                  : "#6b7280";
+      ctx.beginPath();
+      ctx.moveTo(toX(i),     toY(values[i]));
+      ctx.lineTo(toX(i + 1), toY(values[i + 1]));
+      ctx.strokeStyle = color;
+      ctx.lineWidth   = 2.5;
+      ctx.lineJoin    = "round";
+      ctx.lineCap     = "round";
+      ctx.stroke();
+    }
+
+    // ── Dots ──────────────────────────────────────
+    values.forEach((v, i) => {
+      const isHover = (i === hoverIdx);
+      ctx.beginPath();
+      ctx.arc(toX(i), toY(v), isHover ? 5 : 3, 0, Math.PI * 2);
+      ctx.fillStyle   = "transparent";
+      ctx.fill();
+      ctx.strokeStyle = isHover ? "rgba(107,114,128,0.9)" : "rgba(107,114,128,0.55)";
+      ctx.lineWidth   = 2;
+      ctx.stroke();
+    });
+
+    // ── Event lines + labels ────────────────────
+    const eventsByDate = new Map();
+    events.forEach(ev => {
+      const key = ev.date || "";
+      if (!eventsByDate.has(key)) eventsByDate.set(key, []);
+      eventsByDate.get(key).push(ev);
+    });
+
+    eventsByDate.forEach((dayEvents, dateKey) => {
+      const x = dateToX(dateKey);
+      if (x === null) return;
+
+      ctx.beginPath();
+      ctx.moveTo(x, pad.top);
+      ctx.lineTo(x, pad.top + iH);
+      ctx.strokeStyle = "#4A90E2";
+      ctx.lineWidth   = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      drawFieldEventLabel(ctx, x, pad.top + 4, dayEvents, { fontSize: 8 });
+    });
+
+    // ── Hover tooltip ──────────────────────────────
+    if (hoverIdx != null && hoverIdx >= 0 && hoverIdx < values.length) {
+      const tx   = toX(hoverIdx);
+      const ty   = toY(values[hoverIdx]);
+      const text = `${values[hoverIdx].toFixed(2)} g/kg`;
+      const dateText = labels[hoverIdx] || "";
+      const fullText = dateText ? `${dateText}: ${text}` : text;
+
+      ctx.font = "bold 10px system-ui,sans-serif";
+      const tw  = ctx.measureText(fullText).width;
+      const bPad = 5;
+      const bW  = tw + bPad * 2;
+      const bH  = 18;
+      let bx = tx - bW / 2;
+      let by = ty - bH - 8;
+      bx = Math.max(pad.left, Math.min(bx, W - pad.right - bW));
+      by = Math.max(2, by);
+
+      ctx.fillStyle = "rgba(31,41,55,0.92)";
+      ctx.beginPath();
+      ctx.roundRect(bx, by, bW, bH, 4);
+      ctx.fill();
+
+      ctx.fillStyle    = "#f9fafb";
+      ctx.textAlign    = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText(fullText, bx + bW / 2, by + bH / 2);
+    }
+  }
+
+  canvas._sparklineRedraw = redraw;
+  redraw(null);
+
+  if (!canvas._sparklineListeners) {
+    canvas._sparklineListeners = true;
 
     function getHoverIndex(e) {
       const rect   = canvas.getBoundingClientRect();
       const mx     = e.clientX - rect.left;
       const W      = canvas.offsetWidth || 220;
       const Y_LABEL_W = 52;
-      const X_LABEL_H = 15;
+      const X_LABEL_H = 32;
       const TITLE_H   = 14;
       const X_PAD     = 12;
       const pad = { left: Y_LABEL_W, right: 8, top: TITLE_H + 4, bottom: X_LABEL_H };
       const iW  = W - pad.left - pad.right;
 
       let closest = null, minDist = Infinity;
+      const singleX = pad.left + X_PAD + (iW - X_PAD * 2) / 2;
       values.forEach((_, i) => {
         const x = values.length > 1
           ? pad.left + X_PAD + (i / (values.length - 1)) * (iW - X_PAD * 2)
-          : pad.left + iW / 2;
+          : singleX;
         const d = Math.abs(mx - x);
         if (d < minDist) { minDist = d; closest = i; }
       });
@@ -1249,6 +1335,13 @@ async function drawSparklines() {
       canvas.style.cursor = "default";
       redraw(null);
     });
+  }
+}
+
+async function drawSparklines() {
+  const allCards = document.querySelectorAll(".fgc-sparkline");
+  for (const canvas of allCards) {
+    await initSparklineCanvas(canvas);
   }
 }
 
@@ -1360,6 +1453,8 @@ async function loadInlineEvents(fieldName, listEl) {
 
   if (!events.length) {
     listEl.innerHTML = `<p class="event-list-empty">No events yet.</p>`;
+    refreshFieldSparkline(fieldName);
+    updateFieldEventCountLabel(fieldName);
     return;
   }
 
@@ -1389,6 +1484,7 @@ async function loadInlineEvents(fieldName, listEl) {
         await deleteFieldEvent(id, field);
         await loadInlineEvents(field, listEl);
         updateFieldEventCountLabel(field);
+        refreshFieldSparkline(field);
         if (document.getElementById("compare-toggle-body").classList.contains("open")) {
           showCompareChart().catch(console.error);
         }
@@ -1399,6 +1495,7 @@ async function loadInlineEvents(fieldName, listEl) {
   });
 
   updateFieldEventCountLabel(fieldName);
+  refreshFieldSparkline(fieldName);
 }
 
 function onCardChange(e) {
@@ -1713,7 +1810,7 @@ async function showCompareChart() {
   const { labels, datasets } = padChart(sortedDates, rawDatasets);
 
   const eventAnnotations = buildCompareEventAnnotations(allEvents);
-  const topPad = 40 + maxEventsOnSameDate(eventAnnotations) * 22;
+  const topPad = 52;
 
   // ── Chart ─────────────────────────────────────────
   const canvas = document.getElementById("compare-chart");
@@ -1970,6 +2067,7 @@ function initEventModal() {
         `.fgc-events-list[data-field="${encodedField}"]`
       );
       if (inlineList) await loadInlineEvents(currentEventFieldName, inlineList);
+      else refreshFieldSparkline(currentEventFieldName);
       updateFieldEventCountLabel(currentEventFieldName);
 
       if (document.getElementById("compare-toggle-body").classList.contains("open")) {
