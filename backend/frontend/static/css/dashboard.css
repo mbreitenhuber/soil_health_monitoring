@@ -1462,6 +1462,7 @@
 
 .compare-toggle-body.open {
   display: flex;
+  overflow: visible;
 }
 
 /* ── Selected fields bar ─────────────────────────── */
@@ -1537,11 +1538,12 @@
 .compare-chart-inner {
   width: 100%;
   position: relative;
+  overflow: visible;
 }
 
 .compare-chart-inner canvas {
   width: 100% !important;
-  height: 320px !important;
+  height: 340px !important;
   display: block;
 }
 

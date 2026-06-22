@@ -33,6 +33,11 @@ function eventIcon(type) {
   return EVENT_TYPE_ICONS[type] || "📝";
 }
 
+function formatEventTypeName(type) {
+  if (!type) return "Event";
+  return type.charAt(0).toUpperCase() + type.slice(1);
+}
+
 function relativeTrendPct(firstVal, latestVal) {
   const first  = Number(firstVal);
   const latest = Number(latestVal);
@@ -92,6 +97,168 @@ function padChart(labels, datasets) {
   return { labels: pLabels, datasets: pDatasets };
 }
 
+/** X pixel for an event/analysis date on the compare chart (interpolates between labels). */
+function getCompareChartDateX(chart, dateStr) {
+  const xScale = chart.scales.x;
+  if (!xScale || !dateStr) return null;
+
+  const labels = chart.data.labels || [];
+  const points = [];
+  labels.forEach((label, idx) => {
+    if (!label) return;
+    const t = new Date(label).getTime();
+    if (!Number.isNaN(t)) points.push({ idx, t, label });
+  });
+  if (!points.length) return null;
+
+  const eventT = new Date(dateStr).getTime();
+  if (Number.isNaN(eventT)) return null;
+
+  const exact = points.find(p => p.label === dateStr);
+  if (exact) return xScale.getPixelForValue(exact.idx);
+
+  if (eventT <= points[0].t) return xScale.getPixelForValue(points[0].idx);
+  if (eventT >= points[points.length - 1].t) {
+    return xScale.getPixelForValue(points[points.length - 1].idx);
+  }
+
+  for (let i = 0; i < points.length - 1; i++) {
+    const a = points[i];
+    const b = points[i + 1];
+    if (eventT >= a.t && eventT <= b.t) {
+      const ratio = (eventT - a.t) / (b.t - a.t);
+      const xA = xScale.getPixelForValue(a.idx);
+      const xB = xScale.getPixelForValue(b.idx);
+      return xA + ratio * (xB - xA);
+    }
+  }
+  return null;
+}
+
+function isChartDatasetVisible(chart, i) {
+  const meta = chart.getDatasetMeta(i);
+  if (!meta) return false;
+  if (typeof chart.isDatasetVisible === "function") return chart.isDatasetVisible(i);
+  return !meta.hidden;
+}
+
+function drawCompareChartEventDecorations(chart, ctx, { labelsOnly = false } = {}) {
+  const eventAnnotations = chart._eventAnnotations;
+  if (!eventAnnotations?.length) return;
+
+  const locked   = chart._lockedDataset;
+  const hovered  = chart._hoveredDataset;
+  const focused  = locked ?? hovered;
+  const hasFocus = focused !== null && focused !== undefined;
+  const focusedLabel = hasFocus ? chart.data.datasets[focused]?.label : null;
+
+  const xScale = chart.scales.x;
+  const yScale = chart.scales.y;
+  if (!xScale || !yScale) return;
+
+  const chartTop    = yScale.top;
+  const chartBottom = yScale.bottom;
+  const chartLeft   = xScale.left;
+  const chartRight  = xScale.right;
+
+  ctx.save();
+
+  eventAnnotations.forEach((ann) => {
+    if (chart._hiddenFields?.has(ann._fieldName)) return;
+
+    const xPixel = getCompareChartDateX(chart, ann.value);
+    if (xPixel == null || xPixel < chartLeft || xPixel > chartRight) return;
+
+    const isOwn = !hasFocus || ann._fieldName === focusedLabel;
+
+    if (!labelsOnly && isOwn) {
+      ctx.beginPath();
+      ctx.moveTo(xPixel, chartTop);
+      ctx.lineTo(xPixel, chartBottom);
+      ctx.strokeStyle = hasFocus ? "#4A90E2" : "rgba(74,144,226,0.55)";
+      ctx.lineWidth   = hasFocus ? 1.5 : 1;
+      ctx.setLineDash(hasFocus ? [] : [4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    } else if (!labelsOnly && hasFocus && !isOwn) {
+      ctx.beginPath();
+      ctx.moveTo(xPixel, chartTop);
+      ctx.lineTo(xPixel, chartBottom);
+      ctx.strokeStyle = "rgba(156,163,175,0.12)";
+      ctx.lineWidth   = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+
+    if (labelsOnly && isOwn) {
+      const peers = eventAnnotations
+        .filter(a =>
+          a.value === ann.value &&
+          !chart._hiddenFields?.has(a._fieldName) &&
+          (!hasFocus || a._fieldName === focusedLabel)
+        )
+        .sort((a, b) => (a._fieldName || "").localeCompare(b._fieldName || ""));
+      const slot  = Math.max(0, peers.indexOf(ann));
+      const yPos  = chartTop - 10 - slot * 22;
+      const xPos  = xPixel + 8 + slot * 12;
+
+      ctx.save();
+      ctx.translate(xPos, yPos);
+      ctx.rotate(-Math.PI / 6);
+      ctx.fillStyle    = hasFocus ? "#4A90E2" : "rgba(74,144,226,0.9)";
+      ctx.font         = hasFocus
+        ? "bold 10px system-ui, sans-serif"
+        : "500 10px system-ui, sans-serif";
+      ctx.textAlign    = "left";
+      ctx.textBaseline = "top";
+      ctx.fillText(ann.content, 0, 0);
+      ctx.restore();
+    }
+  });
+
+  ctx.restore();
+}
+
+function buildCompareEventAnnotations(allEvents) {
+  const sorted = [...allEvents].sort((a, b) => {
+    const byDate = (a.date || "").localeCompare(b.date || "");
+    if (byDate !== 0) return byDate;
+    return (a.field_name || "").localeCompare(b.field_name || "");
+  });
+
+  const slotByDate = {};
+  return sorted.map((ev) => {
+    const dateKey = ev.date || "";
+    const slot    = slotByDate[dateKey] || 0;
+    slotByDate[dateKey] = slot + 1;
+    return {
+      value:      ev.date,
+      _fieldName: ev.field_name,
+      _slot:      slot,
+      content:    `${eventIcon(ev.event_type)} ${formatEventTypeName(ev.event_type)}`,
+    };
+  });
+}
+
+function maxEventsOnSameDate(annotations) {
+  const counts = {};
+  annotations.forEach(a => {
+    const key = a.value || "";
+    counts[key] = (counts[key] || 0) + 1;
+  });
+  return Math.max(0, ...Object.values(counts));
+}
+
+function getCachedFieldEvents(fieldNames) {
+  return fieldNames.flatMap(name =>
+    (fieldEventsCache[name] || []).map(ev => ({
+      ...ev,
+      field_name: ev.field_name || name,
+    }))
+  );
+}
+
 /* ── Shared x-axis options for line charts ────────── */
 function xAxisOpts({ dark = true } = {}) {
   return {
@@ -128,6 +295,7 @@ function getNearestDatasetIndex(chart, event) {
   let bestDist = Infinity;
  
   chart.data.datasets.forEach((ds, i) => {
+    if (!isChartDatasetVisible(chart, i)) return;
     const meta = chart.getDatasetMeta(i);
     if (!meta || !meta.data) return;
  
@@ -314,6 +482,7 @@ const unifiedChartPlugin = {
     ctx.font         = "500 11px system-ui, sans-serif";
 
     chart.data.datasets.forEach((ds, i) => {
+      if (!isChartDatasetVisible(chart, i)) return;
       const meta = chart.getDatasetMeta(i);
       if (!meta?.data?.length) return;
 
@@ -335,67 +504,11 @@ const unifiedChartPlugin = {
 
     ctx.restore();
 
-    // ── Event annotation highlight ─────────────────
-    if (!hasFocus || !chart._eventAnnotations) return;
+    drawCompareChartEventDecorations(chart, ctx, { labelsOnly: false });
+  },
 
-    const focusedLabel = chart.data.datasets[focused]?.label;
-    if (!focusedLabel) return;
-
-    const annotations = chart.options.plugins?.annotation?.annotations;
-    if (!annotations?.length) return;
-
-    const xScale = chart.scales.x;
-    const yScale = chart.scales.y;
-    if (!xScale || !yScale) return;
-
-    const chartTop    = yScale.top;
-    const chartBottom = yScale.bottom;
-
-    ctx.save();
-    ctx.font = "bold 10px system-ui, sans-serif";
-
-    annotations.forEach((ann, i) => {
-      if (!ann.label?.content) return;
-
-      const isOwn   = ann._fieldName === focusedLabel;
-      const xPixel  = xScale.getPixelForValue(ann.value);
-      if (xPixel < xScale.left || xPixel > xScale.right) return;
-
-      if (isOwn) {
-        // ── Active: durchgehende gelbe Linie ──────
-        ctx.beginPath();
-        ctx.moveTo(xPixel, chartTop);
-        ctx.lineTo(xPixel, chartBottom);
-        ctx.strokeStyle = "#4A90E2";
-        ctx.lineWidth   = 1.5;
-        ctx.setLineDash([]);
-        ctx.stroke();
-
-        // Diagonales Label — kräftig
-        const yPos = chartTop + 4 + (i % 3) * 22;
-        ctx.save();
-        ctx.translate(xPixel + 4, yPos);
-        ctx.rotate(-Math.PI / 6);
-        ctx.fillStyle    = "#4A90E2";
-        ctx.textAlign    = "left";
-        ctx.textBaseline = "top";
-        ctx.fillText(ann.label.content, 0, 0);
-        ctx.restore();
-
-      } else {
-        // ── Dimmed: gestrichelt + ausgegraut ──────
-        ctx.beginPath();
-        ctx.moveTo(xPixel, chartTop);
-        ctx.lineTo(xPixel, chartBottom);
-        ctx.strokeStyle = "rgba(156,163,175,0.12)";
-        ctx.lineWidth   = 1;
-        ctx.setLineDash([4, 4]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-      }
-    });
-
-    ctx.restore();
+  afterDraw(chart) {
+    drawCompareChartEventDecorations(chart, chart.ctx, { labelsOnly: true });
   },
 };
 
@@ -1261,7 +1374,7 @@ async function loadInlineEvents(fieldName, listEl) {
       <div class="fgc-row-actions">
         <button class="fgc-event-delete-btn btn-danger"
                 data-id="${ev.id}"
-                data-field="${encodeURIComponent(fieldName)}">✕</button>
+                data-field="${encodeURIComponent(fieldName)}">${uiText("delete")}</button>
       </div>
     </div>
   `;
@@ -1517,8 +1630,7 @@ async function showCompareChart() {
     return;
   }
 
-  if (hint)    hint.style.display = "none";
-  if (wrapper) wrapper.style.display = "block";
+  if (hint) hint.style.display = "none";
 
   if (!showCompareChart._hidden) showCompareChart._hidden = new Set();
   const hidden = showCompareChart._hidden;
@@ -1546,22 +1658,40 @@ async function showCompareChart() {
     });
   }
 
-  // ── Build datasets ────────────────────────────────
+  // ── Build datasets (nur sichtbare Felder) ─────────
+  const visibleFieldNames = allFieldNames.filter(f => !hidden.has(f));
+
+  if (!visibleFieldNames.length) {
+    if (wrapper) wrapper.style.display = "none";
+    if (compareChart) { compareChart.destroy(); compareChart = null; }
+    updateCompareToggleMeta();
+    return;
+  }
+
+  if (wrapper) wrapper.style.display = "block";
+
+  const needsFetch = visibleFieldNames.some(n => fieldEventsCache[n] === undefined);
+  let allEvents = getCachedFieldEvents(visibleFieldNames);
+  if (needsFetch) {
+    allEvents = await fetchAllFieldEvents(visibleFieldNames);
+  }
+
   const allDates   = new Set();
   const fieldItems = {};
 
-  allFieldNames.forEach(fieldName => {
+  visibleFieldNames.forEach(fieldName => {
     const items = (groups[fieldName] || [])
       .slice()
       .sort((a, b) => new Date(a.date || 0) - new Date(b.date || 0));
     fieldItems[fieldName] = items;
     items.forEach(i => { if (i.date) allDates.add(i.date); });
   });
+  allEvents.forEach(ev => { if (ev.date) allDates.add(ev.date); });
 
   const sortedDates = Array.from(allDates).sort();
   const rawDatasets = [];
 
-  allFieldNames.forEach(fieldName => {
+  visibleFieldNames.forEach(fieldName => {
     const byDate = {};
     fieldItems[fieldName].forEach(i => {
       if (i.date) byDate[i.date] = roundOc(i.avg_value);
@@ -1569,7 +1699,6 @@ async function showCompareChart() {
     rawDatasets.push({
       label:                fieldName,
       data:                 sortedDates.map(d => byDate[d] ?? null),
-      hidden:               hidden.has(fieldName),
       spanGaps:             true,
       tension:              0,
       fill:                 false,
@@ -1583,32 +1712,8 @@ async function showCompareChart() {
 
   const { labels, datasets } = padChart(sortedDates, rawDatasets);
 
-  // ── Fetch events ──────────────────────────────────
-  const allEvents = await fetchAllFieldEvents(
-    allFieldNames.filter(f => !hidden.has(f))
-  );
-
-  // ── Build annotations ─────────────────────────────
-  const builtAnnotations = allEvents.map((ev, i) => ({
-    type:        "line",
-    scaleID:     "x",
-    value:       ev.date,
-    borderColor: "#4A90E2",
-    borderWidth: 1.5,
-    borderDash:  [4, 4],
-    _fieldName:  ev.field_name,
-    label: {
-      display:         true,
-      content:         `${eventIcon(ev.event_type)} ${ev.description}`,
-      position:        "start",
-      yAdjust:         -(i % 3) * 22,
-      rotation:        -30,
-      font:            { size: 10, weight: "bold" },
-      color:           "#4A90E2",
-      backgroundColor: "transparent",
-      borderWidth:     0,
-    },
-  }));
+  const eventAnnotations = buildCompareEventAnnotations(allEvents);
+  const topPad = 40 + maxEventsOnSameDate(eventAnnotations) * 22;
 
   // ── Chart ─────────────────────────────────────────
   const canvas = document.getElementById("compare-chart");
@@ -1622,13 +1727,11 @@ async function showCompareChart() {
     data: { labels, datasets },
     options: {
       animation: false,
-      layout: { padding: { right: 80 } },
+      layout: { padding: { top: topPad, right: 100 } },
       interaction: { mode: "nearest", intersect: false },
       plugins: {
         legend: { display: false },
-        annotation: {
-          annotations: builtAnnotations,
-        },
+        annotation: { annotations: {} },
         tooltip: {
           callbacks: {
             title: (items) => {
@@ -1654,8 +1757,9 @@ async function showCompareChart() {
     plugins: [unifiedChartPlugin],
   });
 
-  // Annotations für Plugin-Zugriff speichern
-  compareChart._eventAnnotations = builtAnnotations;
+  // Event-Daten für Plugin-Zeichnung
+  compareChart._eventAnnotations = eventAnnotations;
+  compareChart._hiddenFields     = hidden;
 
   if (!canvas._compareListenersAttached) {
     canvas._compareListenersAttached = true;
@@ -1707,6 +1811,9 @@ async function refreshFieldEventCountLabels(fieldNames) {
 }
 
 async function fetchFieldEvents(fieldName) {
+  if (fieldEventsCache[fieldName] !== undefined) {
+    return fieldEventsCache[fieldName];
+  }
   try {
     const res = await fetch(
       `${API_URL}/api/field-events/${encodeURIComponent(fieldName)}`
