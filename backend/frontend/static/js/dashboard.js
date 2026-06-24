@@ -388,9 +388,9 @@ function toggleDatasetLock(chart, idx) {
 /* ── Config ─────────────────────────────────────── */
 function readDashboardConfig() {
   const el = document.getElementById("dashboard-config");
-  if (!el) return { analyses: [], apiUrl: "http://127.0.0.1:8000" };
+  if (!el) return { analyses: [], apiUrl: window.location.origin };
   try { return JSON.parse(el.textContent); }
-  catch { return { analyses: [], apiUrl: "http://127.0.0.1:8000" }; }
+  catch { return { analyses: [], apiUrl: window.location.origin }; }
 }
 
 const dashboardConfig  = readDashboardConfig();
@@ -439,7 +439,7 @@ let detailMapInvalidateTimer = null;
 let fieldIndexMap = {};
 let activeDatasetIndex = null;
 
-const API_URL        = dashboardConfig.apiUrl || "http://127.0.0.1:8000";
+const API_URL        = dashboardConfig.apiUrl || window.location.origin;
 const TREND_FLAT_PCT = 1;
 
 const COLORS = {
