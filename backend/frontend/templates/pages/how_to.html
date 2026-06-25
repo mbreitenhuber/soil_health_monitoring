@@ -265,9 +265,9 @@
 
     <p style="font-size:0.85rem;color:var(--text-dim);line-height:1.85;max-width:720px;margin-bottom:32px;">
       {% if lang == "en" %}
-        Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each saved run keeps your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values. Analyses with the <strong>same field name</strong> are grouped together so you can track development over time. The walkthrough below follows a typical path through the dashboard, from saving on the Analysis page to comparing fields and exporting data.
+        Once an analysis has finished on the map, you can store it in your <strong>Personal Dashboard</strong>. Each saved run keeps your field polygon, the analysis date, every 60 m zone with its predicted SOC (g/kg), and the summary min, average, and max values. Analyses with the <strong>same field name</strong> are grouped on one card so you can track development over time and log field events. The walkthrough below follows a typical path through the dashboard, from saving on the Analysis page to comparing fields and exporting data.
       {% else %}
-        Sobald eine Analyse auf der Karte fertig ist, kannst du sie im <strong>Mein Dashboard</strong> speichern. Jeder gespeicherte Lauf enthält dein Feld-Polygon, das Analysedatum, jede 60-m-Zone mit vorhergesagtem SOC (g/kg) sowie Min-, Durchschnitts- und Max-Werte. Analysen mit <strong>demselben Feldnamen</strong> werden gruppiert, damit du die Entwicklung über die Zeit verfolgen kannst. Die Anleitung unten führt dich vom Speichern auf der Analyse-Seite bis zum Feldvergleich und Export.
+        Sobald eine Analyse auf der Karte fertig ist, kannst du sie im <strong>Mein Dashboard</strong> speichern. Jeder gespeicherte Lauf enthält dein Feld-Polygon, das Analysedatum, jede 60-m-Zone mit vorhergesagtem SOC (g/kg) sowie Min-, Durchschnitts- und Max-Werte. Analysen mit <strong>demselben Feldnamen</strong> werden auf einer Karte gruppiert, damit du die Entwicklung über die Zeit und Feldereignisse verfolgen kannst. Die Anleitung unten führt dich vom Speichern auf der Analyse-Seite bis zum Feldvergleich und Export.
       {% endif %}
     </p>
 
@@ -313,9 +313,9 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Go to <strong>Personal Dashboard</strong> via the top navigation or the link in the save confirmation. At the top you will see five summary cards:
+            Go to <strong>Personal Dashboard</strong> via the top navigation or the link in the save confirmation. At the top you will see five summary cards, then a <strong>Fields Overview</strong> map and a collapsible <strong>⚖ Field Comparison</strong> section:
           {% else %}
-            Wechsle über die obere Navigation oder den Link in der Speicherbestätigung zu <strong>Mein Dashboard</strong>. Oben siehst du fünf Übersichtskarten:
+            Wechsle über die obere Navigation oder den Link in der Speicherbestätigung zu <strong>Mein Dashboard</strong>. Oben siehst du fünf Übersichtskarten, darunter eine <strong>Globale Feldübersicht</strong> und einen ausklappbaren Bereich <strong>⚖ Felder vergleichen</strong>:
           {% endif %}
         </p>
         <ol class="howto-list">
@@ -323,12 +323,14 @@
           <li><strong>Total Fields</strong> — how many distinct field names you have saved.</li>
           <li><strong>Total Analyses</strong> — the total number of individual analysis runs.</li>
           <li><strong>Average Field</strong> — the mean of each field's latest average SOC.</li>
-          <li><strong>Best Field</strong> and <strong>Worst Field</strong> — the fields with the highest and lowest latest average SOC. Click either card to jump straight to that field's history.</li>
+          <li><strong>Best Field</strong> and <strong>Worst Field</strong> — the fields with the highest and lowest latest average SOC. Click either card to scroll to that field card below.</li>
+          <li><strong>Fields Overview</strong> — a map of all saved polygons coloured by latest SOC. Use <strong>Legend</strong> to read the classification thresholds.</li>
           {% else %}
           <li><strong>Felder gesamt</strong> — wie viele verschiedene Feldnamen du gespeichert hast.</li>
           <li><strong>Analysen gesamt</strong> — die Gesamtzahl einzelner Analyse-Läufe.</li>
           <li><strong>Durchschnittliches Feld</strong> — der Mittelwert des jeweils aktuellen durchschnittlichen SOC pro Feld.</li>
-          <li><strong>Bestes Feld</strong> und <strong>Schlechtestes Feld</strong> — Felder mit dem höchsten bzw. niedrigsten aktuellen Durchschnitts-SOC. Klicke auf eine Karte, um direkt zur Feldhistorie zu springen.</li>
+          <li><strong>Bestes Feld</strong> und <strong>Schlechtestes Feld</strong> — Felder mit dem höchsten bzw. niedrigsten aktuellen Durchschnitts-SOC. Klicke auf eine Karte, um zur Feldkarte weiter unten zu scrollen.</li>
+          <li><strong>Globale Feldübersicht</strong> — Karte aller gespeicherten Polygone, eingefärbt nach aktuellem SOC. Über <strong>Legende</strong> liest du die Klassifikationsschwellen.</li>
           {% endif %}
         </ol>
       </div>
@@ -338,27 +340,27 @@
     <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">{{ "Step 3" if lang == "en" else "Schritt 3" }}</div>
-        <h3>{{ "Sort, filter, and scan your field list" if lang == "en" else "Feldliste sortieren, filtern & durchsuchen" }}</h3>
+        <h3>{{ "Sort, filter, and browse your field cards" if lang == "en" else "Feldkarten sortieren, filtern & durchsuchen" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Below the summary, the control bar lets you organise the list before you open any field:
+            Below the overview map, the control bar lets you organise the field cards before you expand any of them:
           {% else %}
-            Unter der Übersicht organisierst du die Liste über die Steuerleiste, bevor du ein Feld öffnest:
+            Unter der Übersichtskarte organisierst du die Feldkarten über die Steuerleiste, bevor du eine ausklappst:
           {% endif %}
         </p>
         <ol class="howto-list">
           {% if lang == "en" %}
           <li>Use <strong>Sort ▾</strong> to reorder fields by latest OC, best OC, worst OC, or most improved over time.</li>
           <li>Open <strong>Filters ▾</strong> to narrow the list by field name, crop, or date range. Click <strong>✕ Reset</strong> inside the filter panel to clear all filters.</li>
-          <li>Each field row shows its number, name, date span, crop and location (if set), how many analyses are stored, a small <strong>OC over time</strong> sparkline, and the <strong>Latest Avg OC</strong> plus a percentage trend (<strong>First sample</strong>: change since the first stored analysis, and <strong>Recent sample</strong>: change vs. the previous analysis).</li>
-          <li>Click <strong>Click to explore ›</strong> on a row to open that field's full history. The rest of the row is for sorting and comparison, not for opening the field.</li>
+          <li>Each field card shows its number, name, date span, location, field area (ha), and data-point count, plus a sparkline of <strong>OC over time</strong> and the <strong>Latest Avg OC</strong> with percentage trends (<strong>First sample</strong>: change since the first stored analysis; <strong>Recent sample</strong>: change vs. the previous analysis).</li>
+          <li>Use <strong>+ New Analysis</strong> to re-run the same parcel on a new date, or <strong>📋 Add Event</strong> to log management actions such as planting or fertilizing.</li>
           {% else %}
           <li>Nutze <strong>Sortieren ▾</strong>, um Felder nach aktuellem OC, bestem OC, schlechtestem OC oder grösster Verbesserung zu ordnen.</li>
           <li>Öffne <strong>Filter ▾</strong>, um nach Feldname, Pflanzenart oder Datumsbereich einzugrenzen. Klicke im Filterpanel auf <strong>✕ Zurücksetzen</strong>, um alle Filter zu löschen.</li>
-          <li>Jede Zeile zeigt Nummer, Name, Datumsbereich, Pflanzenart und Standort (falls gesetzt), Anzahl gespeicherter Analysen, eine kleine <strong>OC im Zeitverlauf</strong>-Sparkline sowie <strong>Aktueller Ø OC</strong> plus prozentualen Trend (<strong>Erste Messung</strong>: Änderung seit der ersten gespeicherten Analyse, <strong>Letzte Messung</strong>: Änderung gegenüber der vorherigen Analyse).</li>
-          <li>Klicke in einer Zeile auf <strong>Zum Erkunden klicken ›</strong>, um die vollständige Feldhistorie zu öffnen. Der Rest der Zeile dient Sortierung und Vergleich, nicht dem Öffnen des Feldes.</li>
+          <li>Jede Feldkarte zeigt Nummer, Name, Datumsbereich, Standort, Feldfläche (ha) und Datenpunkte, dazu eine Sparkline <strong>OC im Zeitverlauf</strong> sowie <strong>Aktueller Ø OC</strong> mit prozentualem Trend (<strong>Erste Messung</strong>: Änderung seit der ersten gespeicherten Analyse; <strong>Letzte Messung</strong>: Änderung gegenüber der vorherigen Analyse).</li>
+          <li>Mit <strong>+ Neue Analyse</strong> analysierst du dieselbe Parzelle zu einem neuen Datum; mit <strong>📋 Ereignis hinzufügen</strong> protokollierst du Massnahmen wie Aussaat oder Düngung.</li>
           {% endif %}
         </ol>
       </div>
@@ -368,34 +370,32 @@
     <div class="howto-detail">
       <div class="howto-detail-header">
         <div class="howto-detail-num">{{ "Step 4" if lang == "en" else "Schritt 4" }}</div>
-        <h3>{{ "Explore a field's history" if lang == "en" else "Feldhistorie erkunden" }}</h3>
+        <h3>{{ "Expand a field card" if lang == "en" else "Feldkarte ausklappen" }}</h3>
       </div>
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            The field panel opens when you click <strong>Click to explore ›</strong> or a best/worst field chip in the summary. It shows:
+            Click the footer on any field card — <strong>Click to see all analyses and events</strong> — or use a best/worst summary card to scroll there. The expanded section shows:
           {% else %}
-            Das Feldpanel öffnet sich über <strong>Zum Erkunden klicken ›</strong> oder einen Bestes-/Schlechtestes-Feld-Chip in der Übersicht. Es zeigt:
+            Klicke in der Fusszeile einer Feldkarte auf <strong>Klicken, um alle Analysen und Ereignisse anzuzeigen</strong> oder nutze eine Bestes-/Schlechtestes-Feld-Karte in der Übersicht zum Scrollen. Der ausgeklappte Bereich zeigt:
           {% endif %}
         </p>
         <ol class="howto-list">
           {% if lang == "en" %}
-          <li>Field name, location, and crop at the top.</li>
-          <li>Four stats: number of analyses, field area (ha), number of grid data points, and latest average SOC.</li>
-          <li>A line chart of <strong>OC Development over Time</strong> with minimum, average, and maximum values for each analysis date.</li>
-          <li>An <strong>All Analyses</strong> list — newest first — with min, avg, and max badges per run, plus action buttons for each entry.</li>
+          <li>An <strong>Analyses</strong> list (newest first) with date, crop (if set), and min, avg, and max badges per run.</li>
+          <li>An <strong>Events</strong> list of logged management actions for that field, shown on the sparkline when present.</li>
+          <li><strong>⬇ Download field data</strong> in the footer to export all analyses for that field as CSV.</li>
           {% else %}
-          <li>Oben Feldname, Standort und Pflanzenart.</li>
-          <li>Vier Kennzahlen: Anzahl Analysen, Feldfläche (ha), Raster-Datenpunkte und aktueller Durchschnitts-SOC.</li>
-          <li>Ein Liniendiagramm <strong>OC-Entwicklung im Zeitverlauf</strong> mit Min-, Mittel- und Max-Werten je Analysedatum.</li>
-          <li>Liste <strong>Alle Analysen</strong> — neueste zuerst — mit Min-/Ø-/Max-Badges pro Lauf und Aktionen je Eintrag.</li>
+          <li>Liste <strong>Analysen</strong> (neueste zuerst) mit Datum, Pflanzenart (falls gesetzt) und Min-/Ø-/Max-Badges pro Lauf.</li>
+          <li>Liste <strong>Ereignisse</strong> mit protokollierten Massnahmen für das Feld, die in der Sparkline erscheinen.</li>
+          <li><strong>⬇ Felddaten herunterladen</strong> in der Fusszeile exportiert alle Analysen dieses Feldes als CSV.</li>
           {% endif %}
         </ol>
         <p style="margin-top:16px;">
           {% if lang == "en" %}
-            From this list you can open <strong>Details</strong> for one run, download it with <strong>⬇</strong>, or remove it with <strong>Delete</strong>. Use <strong>+ New Analysis</strong> at the bottom to analyse the same parcel again on a new date (the polygon and metadata are prefilled on the Analysis page).
+            From the analyses list you can open <strong>Details</strong> for one run or remove it with <strong>Delete</strong>. <strong>+ New Analysis</strong> on the card header prefills the polygon and metadata on the Analysis page.
           {% else %}
-            Aus der Liste öffnest du <strong>Details</strong> zu einem Lauf, lädst ihn mit <strong>⬇</strong> herunter oder entfernst ihn mit <strong>Löschen</strong>. Mit <strong>+ Neue Analyse</strong> unten analysierst du dieselbe Parzelle zu einem neuen Datum (Polygon und Metadaten sind auf der Analyse-Seite vorausgefüllt).
+            Aus der Analysenliste öffnest du <strong>Details</strong> zu einem Lauf oder entfernst ihn mit <strong>Löschen</strong>. <strong>+ Neue Analyse</strong> in der Kartenkopfzeile füllt Polygon und Metadaten auf der Analyse-Seite vor.
           {% endif %}
         </p>
       </div>
@@ -410,9 +410,9 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Click <strong>Details</strong> on any run in the field history to open the analysis panel. Here you can:
+            Click <strong>Details</strong> on any run in an expanded field card to open the <strong>Analysis Details</strong> modal. Here you can:
           {% else %}
-            Klicke in der Feldhistorie bei einem Lauf auf <strong>Details</strong>, um das Analyse-Panel zu öffnen. Dort kannst du:
+            Klicke in einer ausgeklappten Feldkarte bei einem Lauf auf <strong>Details</strong>, um das Modal <strong>Analyse-Details</strong> zu öffnen. Dort kannst du:
           {% endif %}
         </p>
         <ol class="howto-list">
@@ -440,20 +440,20 @@
       <div class="howto-detail-body">
         <p>
           {% if lang == "en" %}
-            Back on the main dashboard view, you can work across several fields at once:
+            On the main dashboard view you can compare fields and export your data:
           {% else %}
-            In der Hauptansicht des Dashboards kannst du mit mehreren Feldern gleichzeitig arbeiten:
+            In der Hauptansicht des Dashboards kannst du Felder vergleichen und Daten exportieren:
           {% endif %}
         </p>
         <ol class="howto-list">
           {% if lang == "en" %}
-          <li>Tick <strong>Select for comparison</strong> on at least two field rows, then click <strong>⚖ Compare Fields</strong>. A chart appears above the list plotting each field's average SOC over time as a separate line.</li>
-          <li>Click <strong>✕ End Comparison</strong> to hide the chart and clear your selection.</li>
-          <li>Click <strong>⬇ Download All</strong> to export every saved analysis in one CSV file, or use the <strong>⬇</strong> button on an individual run inside a field's history for a single-analysis export.</li>
+          <li>Open <strong>⚖ Field Comparison</strong> below the overview map. A chart plots each field's average SOC over time; click field chips to hide or show individual lines. Field events appear as markers on the chart.</li>
+          <li>Collapse the comparison section to hide the chart again.</li>
+          <li>Click <strong>⬇ Download All</strong> in the control bar to export every saved analysis in one CSV file, or use <strong>⬇ Download field data</strong> on an expanded field card for a single-field export.</li>
           {% else %}
-          <li>Aktiviere <strong>Zum Vergleich auswählen</strong> bei mindestens zwei Feldzeilen, dann <strong>⚖ Felder vergleichen</strong>. Über der Liste erscheint ein Diagramm mit der durchschnittlichen SOC-Entwicklung je Feld als eigene Linie.</li>
-          <li><strong>✕ Vergleich beenden</strong> blendet das Diagramm aus und löscht die Auswahl.</li>
-          <li><strong>⬇ Alle herunterladen</strong> exportiert alle gespeicherten Analysen in einer CSV-Datei; mit <strong>⬇</strong> bei einem einzelnen Lauf in der Feldhistorie exportierst du nur diesen Lauf.</li>
+          <li>Öffne <strong>⚖ Felder vergleichen</strong> unter der Übersichtskarte. Ein Diagramm zeigt die durchschnittliche SOC-Entwicklung je Feld; per Feld-Chips blendest du einzelne Linien ein oder aus. Feldereignisse erscheinen als Markierungen im Diagramm.</li>
+          <li>Klappe den Vergleichsbereich wieder zu, um das Diagramm auszublenden.</li>
+          <li><strong>⬇ Alle herunterladen</strong> in der Steuerleiste exportiert alle gespeicherten Analysen in einer CSV-Datei; <strong>⬇ Felddaten herunterladen</strong> auf einer ausgeklappten Feldkarte exportiert nur dieses Feld.</li>
           {% endif %}
         </ol>
       </div>
@@ -463,9 +463,9 @@
       <span class="howto-tip-label">📌 {{ "Tip" if lang == "en" else "Tipp" }}</span>
       <p>
         {% if lang == "en" %}
-          Use a consistent field name for each physical parcel and save after every new analysis date. That way your sparklines, timeline charts, and field comparison reflect real changes on the ground, for example after irrigation, reduced tillage, or cover crops.
+          Use a consistent field name for each physical parcel, save after every new analysis date, and log field events when you plant, fertilize, or harvest. That way your sparklines, comparison chart, and overview map reflect real changes on the ground.
         {% else %}
-          Nutze für jede physische Parzelle einen einheitlichen Feldnamen und speichere nach jedem neuen Analysedatum. So zeigen Sparklines, Zeitverlaufsdiagramme und Feldvergleich echte Veränderungen vor Ort, z. B. nach Bewässerung, reduzierter Bodenbearbeitung oder Zwischenfrüchten.
+          Nutze für jede physische Parzelle einen einheitlichen Feldnamen, speichere nach jedem neuen Analysedatum und protokolliere Feldereignisse bei Aussaat, Düngung oder Ernte. So zeigen Sparklines, Vergleichsdiagramm und Übersichtskarte echte Veränderungen vor Ort.
         {% endif %}
       </p>
       <a class="btn-primary" href="/personal_dashboard">{{ "→ Go to Personal Dashboard" if lang == "en" else "→ Zum Personal Dashboard" }}</a>
