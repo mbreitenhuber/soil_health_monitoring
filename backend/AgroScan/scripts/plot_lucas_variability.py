@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from pathlib import Path
 
-# Use website main font if available ('DM Mono'), with sensible fallbacks
+# Use website data font if available ('JetBrains Mono'), with sensible fallbacks
 plt.rcParams['font.family'] = 'monospace'
-plt.rcParams['font.monospace'] = ['DM Mono', 'DejaVu Sans Mono', 'Courier New', 'monospace']
+plt.rcParams['font.monospace'] = ['JetBrains Mono', 'DejaVu Sans Mono', 'Courier New', 'monospace']
 
 # Read the Excel file
 file_path = Path(__file__).parent.parent.parent / "data" / "datasets" / "LUCAS_variability_DE.xlsx"

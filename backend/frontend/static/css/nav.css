@@ -1,6 +1,6 @@
 /* nav.css */
 nav { position: fixed; top: 0; left: 0; right: 0; height: var(--nav-h); background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 32px; z-index: 9999; }
-.nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; color: var(--accent); display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.nav-logo { font-family: var(--font-display); font-weight: 800; font-size: 1.35rem; letter-spacing: -0.03em; color: var(--accent); display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .nav-logo-wordmark { white-space: nowrap; }
 .nav-logo-wordmark span { color: var(--text-dim); font-weight: 400; }
 .nav-logo-mark { height: 2.25rem; width: auto; min-width: 0; flex: 0 0 auto; display: block; }

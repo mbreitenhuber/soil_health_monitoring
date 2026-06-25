@@ -64,7 +64,7 @@
 }
 
 .testimonial-name {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
   letter-spacing: -0.02em;
@@ -73,7 +73,7 @@
 }
 
 .testimonial-role {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.7rem;
   color: var(--text-dim);
   text-transform: uppercase;
@@ -81,7 +81,7 @@
 }
 
 .testimonial-stars {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.82rem;
   color: var(--accent);
   letter-spacing: 0.08em;
@@ -110,7 +110,7 @@
 }
 
 .ti-label {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.7rem;
   color: var(--text-dim);
   text-transform: uppercase;
@@ -118,7 +118,7 @@
 }
 
 .ti-pill {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.72rem;
   color: var(--accent);
   background: var(--surface);
@@ -172,7 +172,7 @@
 /* ── Persona name ───────────────────────────────── */
 
 .persona-name {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 1.15rem;
   letter-spacing: -0.02em;
@@ -233,7 +233,7 @@
 /* ── Persona question / answer ──────────────────── */
 
 .persona-q {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.72rem;
   letter-spacing: 0.05em;

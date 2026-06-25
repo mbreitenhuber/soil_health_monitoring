@@ -164,7 +164,7 @@
 }
 
 .fgc-latest-value {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.1rem;
   font-weight: 700;
   color: var(--text);
@@ -200,7 +200,7 @@
   padding: 8px 14px;
   border-radius: 8px;
 
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.03em;
@@ -240,7 +240,7 @@
 ========================= */
 
 .analysis-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 1.0rem;
   font-weight: 700;
   color: var(--text);
@@ -343,7 +343,7 @@
 
 /* New-analysis CTA inside field modal */
 .btn-new-analysis {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700; 
   font-size: 0.9rem;
   padding: 12px 28px; 
@@ -660,7 +660,7 @@
 }
 
 .btn-save {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700; 
   font-size: 0.9rem;
   padding: 12px 28px; 
@@ -822,7 +822,7 @@
 }
 
 .btn-new-analysis {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
 
@@ -848,7 +848,7 @@
 }
 
 .btn-close-modal {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
 
@@ -893,7 +893,7 @@
   align-items: center;
   justify-content: center;
 
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
   line-height: 1;
@@ -937,35 +937,33 @@
 
 .kpi-main {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
+  justify-content: flex-start;
+  align-items: baseline;
+  gap: 6px;
+  min-height: 36px;
+  flex-wrap: nowrap;
 }
 
 .kpi-value {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
 
-  font-size: 1.9rem;
+  font-size: 1.45rem;
   font-weight: 700;
 
   color: var(--text);
-}
 
-.kpi-value {
   display: flex;
   align-items: baseline;
-  gap: 8px;
+  gap: 6px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .kpi-link {
   font-weight: 700;
+  font-size: 1.45rem;
   cursor: pointer;
   color: var(--text);
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 6px;
   background: rgba(255,255,255,0.05);
 }
@@ -986,13 +984,17 @@
   flex-direction: column;
   justify-content: space-between;
 
-  overflow: hidden;
+  overflow: visible;
 }
 
 .kpi-unit {
-  font-size: 1.25rem;
+  font-size: 0.9rem;
   color: var(--text-dim);
   font-weight: 500;
+}
+
+.kpi-main .kpi-unit {
+  font-size: 1.05rem;
 }
 
 .field-id-badge {
@@ -1092,6 +1094,7 @@
   border: 1px solid rgba(0,0,0,0.08);
   padding: 10px 14px;
   border-radius: 10px;
+  font-family: var(--font-body);
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1294,7 +1297,7 @@
 .save-popup-header h3 {
   margin: 0;
 
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
 
@@ -1403,7 +1406,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
   line-height: 1;
@@ -1461,7 +1464,7 @@
 }
 
 .compare-toggle-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.88rem;
   color: var(--text);
@@ -1534,7 +1537,7 @@
 
   font-size: 0.75rem;
   color: var(--text);
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
 
   white-space: nowrap;
   max-width: 220px;
@@ -1677,7 +1680,7 @@
 }
 
 .fgc-analyses-toggle-label {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.75rem;
   color: var(--text-dim);
 }
@@ -1745,7 +1748,7 @@
   border-top: 1px solid var(--border);
   cursor: pointer;
   transition: background 0.15s;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.75rem;
   color: var(--text-dim);
   border-radius: 0 0 16px 16px;
@@ -1795,7 +1798,7 @@
 }
 
 .fgc-toggle-hint {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--text-dim);
@@ -1815,7 +1818,6 @@
   min-height: 42px;
   padding: 10px 14px;
   border-radius: 10px;
-  font-family: 'DM Mono', monospace;
   font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.25;
@@ -1983,7 +1985,7 @@
   border: 1px solid var(--border2);
   background: transparent;
   color: var(--text-dim);
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.82rem;
   cursor: pointer;

@@ -14,7 +14,7 @@
 }
 
 .report-page .section-eyebrow {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.85rem;
   letter-spacing: 0.14em;
@@ -38,7 +38,7 @@
 }
 
 .report-body code {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.8em;
   color: var(--text);
   background: rgba(255, 255, 255, 0.04);
@@ -64,7 +64,7 @@
 /* ── Pull quote ────────────────────────────────── */
 
 .report-pullquote {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
   font-size: 1.05rem;
   color: var(--text);
@@ -149,7 +149,7 @@
   position: relative;
   display: block;
   padding: 14px 44px 14px 18px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.82rem;
   color: var(--text);
@@ -180,7 +180,7 @@
   right: 16px;
   top: 50%;
   transform: translateY(-50%);
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 1rem;
   font-weight: 500;
   color: var(--accent);
@@ -233,7 +233,7 @@
 }
 
 .report-infobox .report-table thead th {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.72rem;
   line-height: 1.35;
@@ -274,7 +274,7 @@
 .report-infobox .report-table tbody td:nth-child(2) {
   text-align: center;
   white-space: nowrap;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.68rem;
   color: var(--text);
@@ -286,13 +286,13 @@
 }
 
 .report-infobox .report-table thead th:nth-child(3) {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 0.72rem;
   text-align: right;
 }
 
 .report-infobox .report-table tbody td:nth-child(3) {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.64rem;
   line-height: 1.4;
   text-align: right;
@@ -312,7 +312,7 @@
 }
 
 .report-infobox-body code {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.8em;
   color: var(--text);
   background: rgba(255, 255, 255, 0.04);
@@ -376,7 +376,7 @@
 }
 
 .report-figure-placeholder-title {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.85rem;
   color: var(--text);
@@ -391,7 +391,7 @@
 }
 
 .report-figure-placeholder-hint {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.72rem;
   color: var(--text-dim);
   opacity: 0.85;
@@ -423,7 +423,7 @@
 
 .report-table thead th {
   text-align: left;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.78rem;
   color: var(--text);
@@ -466,7 +466,7 @@
 }
 
 .report-highlight-label {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.88rem;
   color: var(--text);
@@ -501,7 +501,7 @@
 }
 
 .report-pill {
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.75rem;
   color: var(--accent);
   background: var(--surface);
@@ -581,7 +581,7 @@
   position: absolute;
   left: 16px;
   top: 16px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.85rem;
   color: var(--accent);
@@ -597,7 +597,7 @@
 /* ── Inline reference links ────────────────────── */
 
 .ref-link {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--accent);
@@ -621,7 +621,7 @@ body.report-page {
 .ref-url {
   display: inline-block;
   margin-top: 4px;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.73rem;
   color: var(--accent);
   text-decoration: none;

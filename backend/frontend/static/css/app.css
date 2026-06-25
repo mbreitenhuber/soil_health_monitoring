@@ -16,7 +16,7 @@
 .step.hidden { display: none; }
 .step.active { border-color: var(--accent); background: rgba(74,222,128,0.04); }
 .step.done   { border-color: var(--muted); }
-.step-num { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-family: 'Syne', sans-serif; font-weight: 700; flex-shrink: 0; color: var(--text-dim); transition: all 0.2s; }
+.step-num { width: 24px; height: 24px; border-radius: 50%; border: 1.5px solid var(--muted); display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-family: var(--font-display); font-weight: 700; flex-shrink: 0; color: var(--text-dim); transition: all 0.2s; }
 .step.active .step-num { border-color: var(--accent); color: var(--accent); }
 .step.done .step-num   { background: var(--muted); border-color: var(--muted); color: var(--text); }
 .step-text { font-size: 0.8rem; line-height: 1.5; color: var(--text-dim); }
@@ -47,8 +47,8 @@
 .poly-info { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
 .poly-stat { display: flex; justify-content: space-between; font-size: 0.78rem; padding: 4px 0; border-bottom: 1px solid var(--border); }
 .poly-stat:last-child { border-bottom: none; }
-.poly-stat .val { color: var(--accent); font-weight: 500; }
-.btn-analyse { width: 100%; padding: 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--bg); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; cursor: pointer; transition: opacity 0.2s, background 0.2s, color 0.2s; }
+.poly-stat .val { color: var(--accent); font-weight: 500; font-family: var(--font-data); }
+.btn-analyse { width: 100%; padding: 14px; border-radius: 8px; border: none; background: var(--accent); color: var(--bg); font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; letter-spacing: 0.04em; cursor: pointer; transition: opacity 0.2s, background 0.2s, color 0.2s; }
 .btn-analyse:hover:not(:disabled) { opacity: 0.88; }
 .btn-analyse:disabled { opacity: 0.35; cursor: not-allowed; }
 .btn-analyse.is-inactive {
@@ -58,7 +58,7 @@
   cursor: pointer;
 }
 .btn-analyse.is-inactive:hover { opacity: 0.82; }
-.btn-reset { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-family: 'DM Mono', monospace; font-size: 0.8rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+.btn-reset { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); font-family: var(--font-body); font-size: 0.8rem; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
 .btn-reset:hover { border-color: var(--danger); color: var(--danger); }
 .analysis-loader {
   position: fixed;
@@ -96,7 +96,7 @@
 .analysis-loader-text {
   margin: 0;
   max-width: 280px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 600;
   line-height: 1.45;
@@ -112,7 +112,7 @@
 .legend-sub { font-size: 0.7rem; color: var(--text-dim); line-height: 1.5; margin: 0 0 10px; }
 .btn-class-info {
   width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--border2);
-  background: var(--bg); color: var(--text-dim); font-family: 'Syne', sans-serif;
+  background: var(--bg); color: var(--text-dim); font-family: var(--font-display);
   font-weight: 700; font-size: 0.72rem; cursor: pointer; line-height: 1;
   transition: border-color 0.2s, color 0.2s, background 0.2s;
 }
@@ -211,7 +211,7 @@
   border: 1px solid var(--border2);
   background: var(--surface);
   color: var(--text-dim);
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
   font-size: 0.68rem;
   white-space: nowrap;
   cursor: pointer;
@@ -236,7 +236,7 @@
 
   padding: 6px 0;
   outline: none;
-  font-family: 'DM Mono', monospace;
+  font-family: var(--font-data);
 }
 
 /* Kalender Icon anpassen */
@@ -269,7 +269,7 @@
   background: var(--accent);
 
   color: var(--bg);
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
 
   font-size: 0.85rem;
@@ -321,7 +321,7 @@
   border: 1px solid var(--border2);
   background: var(--surface);
   color: var(--text);
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.78rem;
   text-decoration: none;
@@ -407,7 +407,7 @@
 .save-popup-header h3 {
   margin: 0;
 
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-size: 1rem;
   font-weight: 700;
 
@@ -416,7 +416,7 @@
 
 /* Modal close controls (aligned with dashboard.css) */
 .btn-close-modal {
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
   padding: 12px 28px;
@@ -450,7 +450,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.9rem;
   line-height: 1;
@@ -561,7 +561,7 @@
   background: var(--accent);
   color: var(--bg);
 
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.92rem;
 
@@ -590,7 +590,7 @@
 .btn-save-success-primary {
   padding: 12px 14px;
   border-radius: 10px;
-  font-family: 'Syne', sans-serif;
+  font-family: var(--font-display);
   font-weight: 700;
   font-size: 0.82rem;
   text-align: center;
@@ -614,7 +614,7 @@
 }
 
 .leaflet-tooltip.field-value-tooltip {
-  font-family: "DM Mono", monospace;
+  font-family: var(--font-data);
   font-size: 0.8rem;
   padding: 8px 12px;
   border-radius: 10px;
