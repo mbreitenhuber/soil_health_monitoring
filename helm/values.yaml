@@ -59,10 +59,10 @@ components:
       - name: data
         mountPath: /persistent-data
         storageClassName: longhorn
-        storage: "150G"
+        storage: 150Gi
         accessMode: ReadWriteOnce
       - name: db
         mountPath: /persistent-db
         storageClassName: longhorn
-        storage: "1G"
+        storage: 1Gi
         accessMode: ReadWriteOnce
