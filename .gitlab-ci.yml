@@ -142,7 +142,6 @@ deploy-app:
       --version ${HELM_CHART_VERSION}
       --namespace "${K8S_NAMESPACE}"
       --install
-      --atomic
       -f "helm/values.yaml"
       --timeout "${HELM_TIMEOUT}"
       --set components.backend.image.repository="${CI_REGISTRY_IMAGE}-backend"
