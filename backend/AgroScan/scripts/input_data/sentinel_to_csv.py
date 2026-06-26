@@ -44,6 +44,33 @@ BAND_REFERENCE_RANGES = {
   "B12": {"min": 0.0,"max": 34.0}
 }
 
+# Sentinel-2 L2A stores surface reflectance as integer DN.
+## Adjusting Band values to match our current training data (downloaded with OpenCV), now switched to GDAL.
+# Training data and BAND_REFERENCE_RANGES use (DN + offset) / (quantification / 100).
+S2_L2A_ADD_OFFSET = -1000
+S2_L2A_QUANTIFICATION = 10000
+# Values at or below this are treated as already on the model scale (legacy OpenCV reads).
+_LEGACY_MODEL_SCALE_MAX_DN = 100
+
+
+def sentinel_l2a_dn_to_model_scale(value):
+    """
+    Convert Sentinel-2 L2A digital numbers to the band scale expected by the model.
+
+    GDAL returns raw uint16 DN from cropped .tif/.jp2 files. The NN was trained on
+    values in roughly the 0–53 range derived from the same physical reflectance.
+    """
+    arr = np.asarray(value, dtype=np.float64)
+    if arr.size > 0 and np.nanmax(arr) <= _LEGACY_MODEL_SCALE_MAX_DN:
+        return value
+
+    scaled = (arr + S2_L2A_ADD_OFFSET) / (S2_L2A_QUANTIFICATION / 100.0)
+    scaled = np.clip(scaled, 0, None)
+
+    if scaled.shape == ():
+        return float(scaled)
+    return scaled
+
 
 def setup_parser() -> argparse.Namespace:
     """
@@ -251,6 +278,7 @@ def main():
                         continue
                     try:
                         value = ImageUtils.get_pixel_value(str(file), 50, 50, shape)
+                        value = sentinel_l2a_dn_to_model_scale(value)
                     except:
                         print(
                             f"Could not get value of point {row['POINTID']}, band {band} ({resolution})!",
