@@ -1090,18 +1090,24 @@ function renderDashboard(analyses, { filtered = false } = {}) {
 
           <div class="fgc-actions">
             <div class="fgc-latest">
-              <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
-              <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
               <span class="fgc-latest-label">
-                ${uiText("latest_avg_som")}
-                <button type="button" class="btn-class-info" onclick="openSomInfoPopup()"
-                        title="${uiText('som_info_btn')}"
-                        aria-label="${uiText('som_info_btn')}">i</button>
+                ${uiText("latest average")}
+                
               </span>
-              <span class="fgc-latest-value">
-                ${latestVal != null ? (latestVal * 1.724).toFixed(2) + " g/kg" : "–"}
+              <span class="fgc-latest-value fgc-latest-value--split">
+                <span class="fgc-split-row">
+                  <span class="fgc-split-label">SOC:</span>
+                  <span>${formatOcGkg(latest.avg_value)}</span>
+                </span>
+                <span class="fgc-split-row">
+                  <span class="fgc-split-label">SOM:</span>
+                  <span>${latestVal != null ? (latestVal * 1.724).toFixed(2) + " g/kg" : "–"}</span>
+                  <button type="button" class="btn-class-info som-info-icon" onclick="openSomInfoPopup()"
+                        title="${uiText('som_info_btn') || 'SOM Info'}"
+                        aria-label="${uiText('som_info_btn') || 'SOM Info'}">i</button>
+                </span>
               </span>
-              <span class="fgc-latest-label">${uiText("current_vs")}</span>
+              <span class="fgc-latest-label">${uiText("current SOC vs")}</span>
               ${trendBadge(trendAllTime, uiText("first_sample"))}
               ${trendBadge(trendPrev, uiText("recent_sample"))}
             </div>
@@ -1431,18 +1437,6 @@ async function initSparklineCanvas(canvas) {
     ctx.textAlign    = "center";
     ctx.textBaseline = "top";
     ctx.fillText(uiText("date"), pad.left + iW / 2, pad.top + iH + 18);
-
-    // ── Gradient fill ─────────────────────────────
-    const grad = ctx.createLinearGradient(0, pad.top, 0, pad.top + iH);
-    grad.addColorStop(0, "rgba(95,167,100,0.18)");
-    grad.addColorStop(1, "rgba(95,167,100,0.00)");
-    ctx.beginPath();
-    values.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
-    ctx.lineTo(toX(values.length - 1), pad.top + iH);
-    ctx.lineTo(toX(0), pad.top + iH);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
 
     // ── Coloured line segments ─────────────────────
     const FLAT_ABS = 0.2;
