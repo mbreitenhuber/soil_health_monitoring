@@ -512,10 +512,35 @@ window.addEventListener("click", (e) => {
   }
 });
 
+/* ── Shared uncertainty band layers ─────────────── */
+const UNCERTAINTY_LAYERS = [
+  { w: 2.00, a: 0.005 },
+  { w: 1.90, a: 0.010 },
+  { w: 1.80, a: 0.015 },
+  { w: 1.70, a: 0.020 },
+  { w: 1.60, a: 0.025 },
+  { w: 1.50, a: 0.030 },
+  { w: 1.40, a: 0.038 },
+  { w: 1.30, a: 0.046 },
+  { w: 1.20, a: 0.055 },
+  { w: 1.10, a: 0.064 },
+  { w: 1.00, a: 0.074 },
+  { w: 0.90, a: 0.085 },
+  { w: 0.80, a: 0.097 },
+  { w: 0.70, a: 0.110 },
+  { w: 0.60, a: 0.124 },
+  { w: 0.50, a: 0.139 },
+  { w: 0.40, a: 0.155 },
+  { w: 0.30, a: 0.172 },
+  { w: 0.20, a: 0.190 },
+  { w: 0.10, a: 0.210 },
+];
+
 const unifiedChartPlugin = {
   id: "unifiedChartPlugin",
 
   beforeDatasetsDraw(chart) {
+    const { ctx } = chart;
     const locked   = chart._lockedDataset;
     const hovered  = chart._hoveredDataset;
     const focused  = locked ?? hovered;
@@ -528,34 +553,81 @@ const unifiedChartPlugin = {
       const isActive = (focused === i);
 
       if (!hasFocus || isActive) {
-        // Kein Focus: alle gleich — Focus: aktives Dataset hervorgehoben
-        const color = (hasFocus && isActive) ? fgColor : "rgba(107, 114, 128, 0.55)";
-        const width = (hasFocus && isActive) ? 2.5 : 1.5;
+        const color  = (hasFocus && isActive) ? fgColor : "rgba(107, 114, 128, 0.55)";
+        const width  = (hasFocus && isActive) ? 2.5 : 1.5;
         const radius = (hasFocus && isActive) ? 4 : 3;
 
-        ds.borderColor          = color;
-        ds.borderWidth          = width;
-        ds.pointRadius          = radius;
-        ds.pointHoverRadius     = radius + 2;
-        ds.pointBackgroundColor = "transparent";
-        ds.pointBorderColor     = color;
-        ds.pointBorderWidth     = 2;
+        ds.borderColor               = color;
+        ds.borderWidth               = width;
+        ds.pointRadius               = radius;
+        ds.pointHoverRadius          = radius + 2;
+        ds.pointBackgroundColor      = "transparent";
+        ds.pointBorderColor          = color;
+        ds.pointBorderWidth          = 2;
         ds.pointHoverBackgroundColor = color;
         ds.pointHoverBorderColor     = color;
         ds.pointHoverBorderWidth     = 2;
       } else {
-        // Dimmed: gleiche Farbe wie normal, nur etwas dünner
-        ds.borderColor          = "rgba(107, 114, 128, 0.55)";
-        ds.borderWidth          = 1.5;
-        ds.pointRadius          = 3;
-        ds.pointHoverRadius     = 5;
-        ds.pointBackgroundColor = "transparent";
-        ds.pointBorderColor     = "rgba(107, 114, 128, 0.55)";
-        ds.pointBorderWidth     = 2;
+        ds.borderColor               = "rgba(107, 114, 128, 0.55)";
+        ds.borderWidth               = 1.5;
+        ds.pointRadius               = 3;
+        ds.pointHoverRadius          = 5;
+        ds.pointBackgroundColor      = "transparent";
+        ds.pointBorderColor          = "rgba(107, 114, 128, 0.55)";
+        ds.pointBorderWidth          = 2;
         ds.pointHoverBackgroundColor = "rgba(107, 114, 128, 0.55)";
         ds.pointHoverBorderColor     = "rgba(107, 114, 128, 0.55)";
         ds.pointHoverBorderWidth     = 2;
       }
+    });
+
+    // ── Uncertainty bands ±0.5 g/kg (drawn before datasets) ──
+    const yScale = chart.scales.y;
+    const xScale = chart.scales.x;
+    if (!yScale || !xScale) return;
+
+    const PX_PER_UNIT = Math.abs(
+      yScale.getPixelForValue(0) - yScale.getPixelForValue(1)
+    );
+    const BAND_PX = 0.5 * PX_PER_UNIT;
+
+    chart.data.datasets.forEach((ds, i) => {
+      if (!isChartDatasetVisible(chart, i)) return;
+      const meta = chart.getDatasetMeta(i);
+      if (!meta?.data?.length) return;
+
+      const isActive = (focused === i);
+      const isDimmed = hasFocus && !isActive;
+      const factor   = isDimmed ? 0.08 : (isActive ? 0.4 : 0.2);
+
+      const pts = [];
+      ds.data.forEach((val, j) => {
+        if (val == null || !Number.isFinite(val)) return;
+        const px = meta.data[j]?.x;
+        if (px == null) return;
+        pts.push({ x: px, y: yScale.getPixelForValue(val) });
+      });
+      if (pts.length < 1) return;
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(xScale.left, yScale.top,
+               xScale.right - xScale.left,
+               yScale.bottom - yScale.top);
+      ctx.clip();
+
+      ctx.lineJoin = "round";
+      ctx.lineCap  = "round";
+
+      UNCERTAINTY_LAYERS.forEach(({ w, a }) => {
+        ctx.beginPath();
+        pts.forEach((p, j) => j === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+        ctx.strokeStyle = `rgba(74,144,226,${(a * factor).toFixed(3)})`;
+        ctx.lineWidth   = BAND_PX * w;
+        ctx.stroke();
+      });
+
+      ctx.restore();
     });
   },
 
@@ -567,7 +639,7 @@ const unifiedChartPlugin = {
     const hasFocus = focused !== null && focused !== undefined;
 
     const fgColor = getComputedStyle(chart.canvas)
-      .getPropertyValue("--color-text-primary").trim() || "#111827";
+      .getPropertyValue("--color-text-primary").trim() || "#010203";
 
     // ── Dataset end-labels ─────────────────────────
     ctx.save();
@@ -586,7 +658,6 @@ const unifiedChartPlugin = {
       if (!lastPoint) return;
 
       const isActive = (focused === i);
-      const isDimmed = hasFocus && !isActive;
 
       ctx.fillStyle = (hasFocus && isActive)
         ? fgColor
@@ -1021,6 +1092,14 @@ function renderDashboard(analyses, { filtered = false } = {}) {
             <div class="fgc-latest">
               <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
               <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
+              <span class="fgc-latest-label">
+                ${uiText("latest avg som") || "Latest Avg. SOM"}
+                <button class="som-info-icon" onclick="openSomInfoPopup()" 
+                        aria-label="SOM Konvertierung Info">i</button>
+              </span>
+              <span class="fgc-latest-value">
+                ${latestVal != null ? (latestVal * 1.724).toFixed(2) + " g/kg" : "–"}
+              </span>
               <span class="fgc-latest-label">${uiText("current_vs")}</span>
               ${trendBadge(trendAllTime, uiText("first_sample"))}
               ${trendBadge(trendPrev, uiText("recent_sample"))}
@@ -1231,6 +1310,61 @@ async function initSparklineCanvas(canvas) {
     ctx.textAlign    = "center";
     ctx.textBaseline = "top";
     ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
+
+    // ── Uncertainty band ±0.5 g/kg ──────────────────
+    if (values.length >= 1) {
+      const BAND_PX = 0.5 * (iH / yRange);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(pad.left, pad.top, iW, iH);
+      ctx.clip();
+
+      // Pfad entlang der Datenpunkte
+      function drawDataPath() {
+        ctx.beginPath();
+        values.forEach((v, i) => {
+          i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v));
+        });
+      }
+
+      ctx.lineJoin = "round";
+      ctx.lineCap  = "round";
+
+      // DEZENTER GEMACHT: Die Alpha-Werte (a) wurden spürbar reduziert,
+      // damit der Glow-Effekt weniger drückt und feiner wirkt.
+      const layers = [
+        { w: 2.00, a: 0.001 },
+        { w: 1.90, a: 0.002 },
+        { w: 1.80, a: 0.003 },
+        { w: 1.70, a: 0.004 },
+        { w: 1.60, a: 0.005 },
+        { w: 1.50, a: 0.006 },
+        { w: 1.40, a: 0.008 },
+        { w: 1.30, a: 0.010 },
+        { w: 1.20, a: 0.012 },
+        { w: 1.10, a: 0.014 },
+        { w: 1.00, a: 0.016 },
+        { w: 0.90, a: 0.018 },
+        { w: 0.80, a: 0.022 },
+        { w: 0.70, a: 0.026 },
+        { w: 0.60, a: 0.030 },
+        { w: 0.50, a: 0.035 },
+        { w: 0.40, a: 0.040 },
+        { w: 0.30, a: 0.045 },
+        { w: 0.20, a: 0.050 },
+        { w: 0.10, a: 0.060 },
+      ];
+
+      layers.forEach(({ w, a }) => {
+        drawDataPath();
+        ctx.strokeStyle = `rgba(74,144,226,${a})`;
+        ctx.lineWidth   = BAND_PX * w;
+        ctx.stroke();
+      });
+
+      ctx.restore();
+    }
 
     // ── Y-Axis title + tick labels ─────────────
     ctx.save();
@@ -2609,3 +2743,28 @@ function initCompareToggle() {
     if (!isOpen) showCompareChart().catch(console.error);
   });
 }
+
+function openSomInfoPopup() {
+  const popup = document.getElementById("som-info-popup");
+  if (!popup) return;
+  popup.classList.add("visible");
+  popup.setAttribute("aria-hidden", "false");
+}
+
+function closeSomInfoPopup() {
+  const popup = document.getElementById("som-info-popup");
+  if (!popup) return;
+  popup.classList.remove("visible");
+  popup.setAttribute("aria-hidden", "true");
+}
+
+// Klick außerhalb schließt Popup
+document.getElementById("som-info-popup")
+  ?.addEventListener("click", e => {
+    if (e.target.id === "som-info-popup") closeSomInfoPopup();
+  });
+
+// ESC schließt Popup
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closeSomInfoPopup();
+});

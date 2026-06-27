@@ -129,6 +129,33 @@
       </div>
     </div>
 
+    <div class="save-popup" id="som-info-popup" aria-hidden="true">
+      <div class="save-popup-card class-info-card">
+        <div class="save-popup-header">
+          <h3>SOM Berechnung</h3>
+          <button class="btn-close-x" onclick="closeSomInfoPopup()">✕</button>
+        </div>
+        <div class="save-popup-content class-info-content">
+          <p class="class-info-note">
+            Der Soil Organic Matter (SOM) Wert wird aus dem gemessenen 
+            Soil Organic Carbon (SOC) berechnet.
+          </p>
+          <p class="class-info-note">
+            <strong>SOM = 1.724 × SOC</strong>
+          </p>
+          <div class="class-info-meta">
+            <span class="class-info-meta-label">Methode</span>
+            <span>Van Bemmelen Faktor (1.724)</span>
+            <span class="class-info-meta-label">Hintergrund</span>
+            <span>
+              Der Van Bemmelen Faktor nimmt an, dass organische Substanz 
+              zu 58 % aus Kohlenstoff besteht (1 ÷ 0.58 ≈ 1.724).
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- ── Compare Toggle ───────────────────────────── -->
     <div class="compare-toggle-section">
       <button class="compare-toggle-header" id="compare-toggle-btn" aria-expanded="false">
