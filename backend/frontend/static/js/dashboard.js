@@ -1093,9 +1093,10 @@ function renderDashboard(analyses, { filtered = false } = {}) {
               <span class="fgc-latest-label">${uiText("latest_avg_oc")}</span>
               <span class="fgc-latest-value">${formatOcGkg(latest.avg_value)}</span>
               <span class="fgc-latest-label">
-                ${uiText("latest avg som") || "Latest Avg. SOM"}
-                <button class="som-info-icon" onclick="openSomInfoPopup()" 
-                        aria-label="SOM Konvertierung Info">i</button>
+                ${uiText("latest_avg_som")}
+                <button type="button" class="btn-class-info" onclick="openSomInfoPopup()"
+                        title="${uiText('som_info_btn')}"
+                        aria-label="${uiText('som_info_btn')}">i</button>
               </span>
               <span class="fgc-latest-value">
                 ${latestVal != null ? (latestVal * 1.724).toFixed(2) + " g/kg" : "–"}

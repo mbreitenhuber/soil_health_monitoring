@@ -45,6 +45,13 @@
   "maximum": ("Maximum" if lang == "en" else "Maximum"),
   "field_map": ("Field Map — Soil Quality Zones" if lang == "en" else "Feldkarte — Bodenqualitätszonen"),
   "save_changes": ("Save Changes" if lang == "en" else "Änderungen speichern"),
+  "som_info_btn": ("SOM calculation info" if lang == "en" else "SOM-Berechnung Info"),
+  "som_info_title": ("SOM Calculation" if lang == "en" else "SOM Berechnung"),
+  "som_info_intro": ("The Soil Organic Matter (SOM) value is calculated from the measured Soil Organic Carbon (SOC)." if lang == "en" else "Der Soil Organic Matter (SOM) Wert wird aus dem gemessenen Soil Organic Carbon (SOC) berechnet."),
+  "som_info_method": ("Method" if lang == "en" else "Methode"),
+  "som_info_method_value": ("Van Bemmelen factor (1.724)" if lang == "en" else "Van Bemmelen Faktor (1.724)"),
+  "som_info_background": ("Background" if lang == "en" else "Hintergrund"),
+  "som_info_background_text": ("The Van Bemmelen factor assumes that organic matter consists of 58% carbon (1 ÷ 0.58 ≈ 1.724)." if lang == "en" else "Der Van Bemmelen Faktor nimmt an, dass organische Substanz zu 58 % aus Kohlenstoff besteht (1 ÷ 0.58 ≈ 1.724)."),
 } %}
 
 {% block title %}{{ "Personal Dashboard" if lang == "en" else "Mein Dashboard" }}{% endblock %}
@@ -132,25 +139,19 @@
     <div class="save-popup" id="som-info-popup" aria-hidden="true">
       <div class="save-popup-card class-info-card">
         <div class="save-popup-header">
-          <h3>SOM Berechnung</h3>
-          <button class="btn-close-x" onclick="closeSomInfoPopup()">✕</button>
+          <h3>{{ t.som_info_title }}</h3>
+          <button type="button" class="btn-close-x" onclick="closeSomInfoPopup()" aria-label="{{ t.close }}">✕</button>
         </div>
         <div class="save-popup-content class-info-content">
-          <p class="class-info-note">
-            Der Soil Organic Matter (SOM) Wert wird aus dem gemessenen 
-            Soil Organic Carbon (SOC) berechnet.
-          </p>
+          <p class="class-info-note">{{ t.som_info_intro }}</p>
           <p class="class-info-note">
             <strong>SOM = 1.724 × SOC</strong>
           </p>
           <div class="class-info-meta">
-            <span class="class-info-meta-label">Methode</span>
-            <span>Van Bemmelen Faktor (1.724)</span>
-            <span class="class-info-meta-label">Hintergrund</span>
-            <span>
-              Der Van Bemmelen Faktor nimmt an, dass organische Substanz 
-              zu 58 % aus Kohlenstoff besteht (1 ÷ 0.58 ≈ 1.724).
-            </span>
+            <span class="class-info-meta-label">{{ t.som_info_method }}</span>
+            <span>{{ t.som_info_method_value }}</span>
+            <span class="class-info-meta-label">{{ t.som_info_background }}</span>
+            <span>{{ t.som_info_background_text }}</span>
           </div>
         </div>
       </div>
