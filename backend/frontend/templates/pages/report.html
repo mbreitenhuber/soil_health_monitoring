@@ -31,30 +31,23 @@
       {% if lang == "en" %}
         Soils represent the largest terrestrial carbon pool globally and play a critical role as
         carbon sinks through soil carbon sequestration, where atmospheric CO₂ is stored as
-        soil organic matter via photosynthesis (Paustian et.al, 2019)<a href="#ref1" class="ref-link">[1]</a>. Agricultural soils with high
+        soil organic matter (Paustian et al., 2019)<a href="#ref1" class="ref-link">[1]</a>. Agricultural soils with high
         soil organic carbon (SOC) content deliver significant environmental and agronomic co-
         benefits: improved long-term productivity, increased biodiversity, and preservation of
-        ecosystem services (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>.
+        ecosystem services (European Commission, 2021)<a href="#ref2" class="ref-link">[2]</a>. Consequently, monitoring and enhancing
+        SOC stocks has become a priority within major policy frameworks, including the EU Soil Strategy for 2030
+        that translates into the EU Soil Monitoring Law (European Commission, 2021<a href="#ref2" class="ref-link">[2]</a>; European Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
       {% else %}
         Böden repräsentieren weltweit den grössten terrestrischen Kohlenstoffpool und erfüllen
         eine zentrale Funktion als Kohlenstoffsenken: Durch Bodensequestrierung wird atmosphärisches
-        CO₂ im Rahmen der Photosynthese als organische Substanz im Boden gebunden (Paustian et.al, 2019)<a href="#ref1" class="ref-link">[1]</a>.
+        CO₂ als organische Substanz im Boden gespeichert (Paustian et al., 2019)<a href="#ref1" class="ref-link">[1]</a>.
         Landwirtschaftliche Böden mit hohem Gehalt an organischem Bodenkohlenstoff (SOC) weisen
         signifikante ökologische und agronomische Co-Benefits auf — darunter eine verbesserte
         langfristige Produktivität, eine gesteigerte Biodiversität sowie den Erhalt von
-        Ökosystemleistungen (Europ. Commission, 2019)<a href="#ref2" class="ref-link">[2]</a>.
-      {% endif %}
-    </p>
-
-    <p class="report-body">
-      {% if lang == "en" %}
-        Consequently, monitoring and enhancing SOC stocks has become a priority within major policy frameworks, including
-        the EU Soil Strategy for 2030 that translates into the EU Soil Monitoring Law (Europ.
-        Commission, 2019<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
-      {% else %}
-        Infolgedessen rücken die Überwachung und der Ausbau von SOC-Vorräten zu einer Priorität
-        innerhalb zentraler politischer Rahmenwerke — darunter die EU-Bodenstrategie für 2030,
-        die in das EU-Bodenüberwachungsgesetz mündet (Europ. Commission, 2019<a href="#ref2" class="ref-link">[2]</a>; Europ. Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
+        Ökosystemleistungen (European Commission, 2021)<a href="#ref2" class="ref-link">[2]</a>. Infolgedessen rücken die Überwachung
+        und der Ausbau von SOC-Vorräten zu einer Priorität innerhalb zentraler politischer Rahmenwerke,
+        darunter die EU-Bodenstrategie für 2030, die in das EU-Bodenüberwachungsgesetz mündet
+        (European Commission, 2021<a href="#ref2" class="ref-link">[2]</a>; European Parliament, 2025)<a href="#ref3" class="ref-link">[3]</a>.
       {% endif %}
     </p>
 
@@ -63,53 +56,83 @@
         Despite this recognized importance, farmers face substantial barriers when integrating
         SOC monitoring into their agricultural practices. Conventional soil sampling requires
         repeated field and laboratory work across extended time periods, creating significant
-        cost, labor, and scalability constraints that limit routine application across large
-        agricultural areas (Ihasusta et.al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
+        cost, labor, and scalability constraints that limit its routine application in large
+        agricultural areas (Ihasusta et al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
       {% else %}
         Trotz dieser anerkannten Bedeutung bestehen für Landwirtinnen und Landwirte erhebliche
         Barrieren bei der Integration von SOC-Monitoring in die landwirtschaftliche Praxis. Die
         konventionelle Bodenprobenahme erfordert wiederholte Feld- und Laborarbeit über
         längere Zeiträume und geht mit signifikanten Kosten-, Arbeits- und Skalierungsproblemen
         einher, die eine routinemässige Anwendung auf grossen landwirtschaftlichen Flächen
-        einschränken (Ihasusta et.al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
+        einschränken (Ihasusta et al., 2026)<a href="#ref4" class="ref-link">[4]</a>.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        Machine learning-based remote sensing models have emerged as a promising
-        approach to address these limitations. By leveraging satellite-derived data, these
-        models offer scalable and cost-efficient SOC estimation and allow a baseline to be
-        established using historic satellite imagery to assess the impact of sustainable soil
-        management (SSM) practices over time. However, many existing tools remain restricted
-        by paywalls, limited accessibility, or insufficient methodological transparency,
-        constraining their adoption in both research and practice.
+        Machine learning-based remote sensing models have emerged as a promising approach to address
+        these limitations (Nguyen et al., 2022<a href="#ref15" class="ref-link">[15]</a>; Yuzugullu et al., 2024<a href="#ref21" class="ref-link">[21]</a>).
+        By leveraging satellite-derived data, these models offer scalable and cost-efficient SOC
+        estimation and allow a baseline to be established using historic satellite imagery to assess
+        the impact of sustainable soil management (SSM) practices over time. Existing SOC prediction
+        tools, however, only provide limited transparency regarding their underlying methodology.
+        Many commercial SOC monitoring platforms are designed for carbon credit generation, compliance,
+        and monetization based on SOC changes on field- or farm-level. This use case provides an
+        accounting system but places less emphasis on model transparency and development of agronomic
+        understanding of the user. As a result, users are constrained in their ability to critically
+        evaluate model outputs, infer drivers of soil evolution patterns, and make adaptive field
+        management decisions.
       {% else %}
         Fernerkundungsmodelle auf Basis maschinellen Lernens haben sich als vielversprechender
-        Ansatz zur Überwindung dieser Limitationen etabliert. Durch die Auswertung satellitengestützter
-        Daten ermöglichen sie skalierbare und kosteneffiziente SOC-Schätzungen und erlauben die
-        Etablierung einer Referenzlinie anhand historischer Satellitenbilddaten, um die Wirkung
-        nachhaltiger Bodenbewirtschaftung (SSM) über die Zeit zu beurteilen. Viele bestehende
-        Werkzeuge sind jedoch durch Paywalls, eingeschränkte Zugänglichkeit oder unzureichende
-        methodische Transparenz limitiert, was ihre Verbreitung in Forschung und Praxis hemmt.
+        Ansatz zur Überwindung dieser Limitationen etabliert (Nguyen et al., 2022<a href="#ref15" class="ref-link">[15]</a>; Yuzugullu et al., 2024<a href="#ref21" class="ref-link">[21]</a>).
+        Durch die Auswertung satellitengestützter Daten ermöglichen sie skalierbare und kosteneffiziente
+        SOC-Schätzungen und erlauben die Etablierung einer Referenzlinie anhand historischer Satellitenbilddaten,
+        um die Wirkung nachhaltiger Bodenbewirtschaftung (SSM) über die Zeit zu beurteilen. Bestehende
+        SOC-Vorhersagewerkzeuge bieten jedoch nur begrenzte Transparenz hinsichtlich ihrer zugrunde
+        liegenden Methodik. Viele kommerzielle SOC-Monitoring-Plattformen sind auf die Generierung von
+        Carbon Credits, Compliance und Monetarisierung von SOC-Veränderungen auf Feld- oder Betriebsebene
+        ausgerichtet. Dieser Anwendungsfall stellt ein Abrechnungssystem bereit, legt jedoch weniger
+        Wert auf Modelltransparenz und die Entwicklung agronomischen Verständnisses bei den Nutzerinnen
+        und Nutzern. Dadurch sind Nutzerinnen und Nutzer eingeschränkt in ihrer Fähigkeit, Modelloutputs
+        kritisch zu bewerten, Treiber von Bodenentwicklungsmustern abzuleiten und adaptive
+        Feldbewirtschaftungsentscheidungen zu treffen.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        AgroScan addresses these gaps by providing a free, open-source platform that enables
-        farmers to assess the SOC content of their fields, monitor the effectiveness of SSM
-        practices, and engage with evidence when advocating to policymakers. As an open-
-        source tool, it provides full transparency on the underlying methodology and allows
-        users to personalize or extend the platform for their own use cases.
+        This motivated the central research question of the present study:
       {% else %}
-        AgroScan adressiert diese Defizite mit einer kostenfreien Open-Source-Plattform, die
-        Landwirtinnen und Landwirten die Bewertung des SOC-Gehalts ihrer Felder, die Überwachung
-        der Wirksamkeit von SSM-Massnahmen sowie die Nutzung belastbarer Evidenz in der
-        Interessenvertretung gegenüber politischen Entscheidungsträgerinnen und -trägern
-        ermöglicht. Als Open-Source-Werkzeug gewährleistet AgroScan volle Transparenz hinsichtlich
-        der zugrunde liegenden Methodik und erlaubt es Nutzerinnen und Nutzern, die Plattform
-        für eigene Anwendungsfälle zu personalisieren oder zu erweitern.
+        Dies motivierte die zentrale Forschungsfrage der vorliegenden Studie:
+      {% endif %}
+    </p>
+
+    <blockquote class="report-pullquote">
+      {% if lang == "en" %}
+        How can visual analytics empower farmers to monitor and manage soil carbon stocks in agricultural soils over the long term?
+      {% else %}
+        Wie kann Visual Analytics Landwirtinnen und Landwirte befähigen, Bodenkohlenstoffvorräte
+        in landwirtschaftlichen Böden langfristig zu überwachen und zu steuern?
+      {% endif %}
+    </blockquote>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        AgroScan addresses this question by providing a novel open-source platform utilizing visual
+        analytics principles as a means of increasing the transparency and interpretability of the
+        model to empower the farmer in their decision-making. Overall, its main contributions are:
+        (1) User requirements derived in initial exploratory interviews, and then confirmed in a
+        final evaluation; (2) ML model prototype for SOC prediction from satellite data;
+        (3) Visual analytics design enabling interpretability of model outputs for decision support;
+        (4) End-to-end integration of model and interface into an open-source deployed platform.
+      {% else %}
+        AgroScan beantwortet diese Frage mit einer neuartigen Open-Source-Plattform, die Visual-Analytics-Prinzipien
+        nutzt, um die Transparenz und Interpretierbarkeit des Modells zu erhöhen und Landwirtinnen und Landwirte
+        in ihrer Entscheidungsfindung zu stärken. Die wesentlichen Beiträge sind: (1) Nutzeranforderungen,
+        die in initialen explorativen Interviews abgeleitet und in einer abschliessenden Evaluation bestätigt wurden;
+        (2) ein ML-Modellprototyp zur SOC-Vorhersage aus Satellitendaten; (3) ein Visual-Analytics-Design,
+        das die Interpretierbarkeit von Modelloutputs für Entscheidungsunterstützung ermöglicht;
+        (4) die End-to-End-Integration von Modell und Interface in eine Open-Source-Plattform.
       {% endif %}
     </p>
   </section>
@@ -161,72 +184,186 @@
 
     <p class="report-body">
       {% if lang == "en" %}
-        Despite this academic progress, the translation into accessible farmer-facing tools
-        remains limited. A review of existing commercial platforms shows a fragmented
-        landscape. Providers such as Agricolus (AGRICOLUS s.r.l., n.d.)<a href="#ref6" class="ref-link">[6]</a>, OneSoil (OneSoil AG,
-        n.d.)<a href="#ref8" class="ref-link">[8]</a>, and GeoPard Agriculture (FlyPard Analytics GmbH, n.d.)<a href="#ref7" class="ref-link">[7]</a> offer a range of remote
-        sensing-based services — including water stress monitoring and crop development
-        tracking — but none advertise dedicated SOC prediction capabilities on their website.
-        Farmonaut (Yuple Inc, n.d.)<a href="#ref9" class="ref-link">[9]</a> represents the most directly relevant commercial offering,
-        providing a carbon monitoring service. However, its platform discloses no information
-        on the underlying methodology, data sources, or model validation. This lack of
-        transparency showcases a broader pattern: where commercial tools exist, they tend to
-        operate as black boxes, are largely behind paywalls, and offer users no agency to
-        interact, adapt, or validate the tool for their specific regional or agronomic context.
+        Based on the academic foundation, several commercial platforms for remote-sensing-based carbon
+        monitoring exist, highlighting the demand for such solutions such as Smart Cloud Farming
+        (Smart Cloud Farming, n.d.)<a href="#ref25" class="ref-link">[25]</a>, Spacenus (Spacenus, n.d.)<a href="#ref26" class="ref-link">[26]</a>,
+        Soyle (Soyle, n.d.)<a href="#ref27" class="ref-link">[27]</a>, Agreena (Agreena, n.d.)<a href="#ref28" class="ref-link">[28]</a>, and Farmonaut
+        (Farmonaut, n.d.)<a href="#ref9" class="ref-link">[9]</a>. Common applications include soil sampling location algorithms,
+        variable-rate fertilization, yield productivity monitoring, and measurement, reporting, and
+        verification (MRV) for carbon credit schemes, enabling farmers to optimize inputs and
+        generate additional income. In contrast, AgroScan targets long-term decision support by
+        providing insights into the effects of crop rotations on soil organic carbon (SOC) and humus
+        levels, a use case for which no dedicated commercial solution was identified. This empowers
+        the farmer to make long-term sustainable decisions. Through visualizations of the temporal
+        evolution of SOC and derived soil organic matter (SOM) content based on the van Bemmelen
+        factor, AgroScan facilitates the identification of long-term trends related to the crop
+        rotation and farming practices. Furthermore, whereas many existing tools lack transparency
+        regarding their underlying models, AgroScan provides methodological explanations tailored
+        to non-technical users, detailed reports, and visualization and communication of prediction
+        uncertainty.
       {% else %}
-        Trotz dieses wissenschaftlichen Fortschritts bleibt die Umsetzung in zugängliche,
-        landwirtschaftspraxisorientierte Werkzeuge begrenzt. Eine Übersicht bestehender
-        kommerzieller Plattformen zeigt ein fragmentiertes Angebot. Anbieter wie Agricolus
-        (AGRICOLUS s.r.l., n.d.)<a href="#ref6" class="ref-link">[6]</a>, OneSoil (OneSoil AG, n.d.)<a href="#ref8" class="ref-link">[8]</a> und GeoPard
-        Agriculture (FlyPard Analytics GmbH, n.d.)<a href="#ref7" class="ref-link">[7]</a> bieten verschiedene fernerkundungsbasierte
-        Dienstleistungen an — darunter Wasserstress-Monitoring und die Verfolgung der
-        Pflanzenartentwicklung —, werben auf ihren Websites jedoch keinesfalls mit dedizierten
-        SOC-Vorhersagefunktionen. Farmonaut (Yuple Inc, n.d.)<a href="#ref9" class="ref-link">[9]</a> stellt das am ehesten
-        vergleichbare kommerzielle Angebot dar und bietet einen Carbon-Monitoring-Dienst an.
-        Die Plattform gibt jedoch keine Auskunft über die zugrunde liegende Methodik, die
-        Datenquellen oder die Modellvalidierung. Diese mangelnde Transparenz verdeutlicht ein
-        breiteres Muster: Wo kommerzielle Werkzeuge existieren, agieren sie häufig als Black
-        Box, stehen weitgehend hinter Paywalls und gewähren Nutzerinnen und Nutzern keinen
-        Handlungsspielraum, das Werkzeug für ihren regionalen oder agronomischen Kontext zu
-        prüfen, anzupassen oder zu validieren.
+        Aufbauend auf der wissenschaftlichen Grundlage existieren mehrere kommerzielle Plattformen
+        für fernerkundungsbasiertes Carbon Monitoring, die die Nachfrage nach solchen Lösungen
+        unterstreichen — etwa Smart Cloud Farming (Smart Cloud Farming, n.d.)<a href="#ref25" class="ref-link">[25]</a>,
+        Spacenus (Spacenus, n.d.)<a href="#ref26" class="ref-link">[26]</a>, Soyle (Soyle, n.d.)<a href="#ref27" class="ref-link">[27]</a>,
+        Agreena (Agreena, n.d.)<a href="#ref28" class="ref-link">[28]</a> und Farmonaut (Farmonaut, n.d.)<a href="#ref9" class="ref-link">[9]</a>.
+        Typische Anwendungen umfassen Algorithmen zur Bodenprobenahme, variable Düngerausbringung,
+        Ertragsmonitoring sowie Measurement, Reporting and Verification (MRV) für Carbon-Credit-Systeme,
+        wodurch Landwirtinnen und Landwirte Inputs optimieren und zusätzliche Einnahmen generieren können.
+        AgroScan zielt im Gegensatz dazu auf langfristige Entscheidungsunterstützung ab, indem es Einblicke
+        in die Wirkung von Fruchtfolgen auf SOC- und Humusgehalt liefert — ein Anwendungsfall, für den
+        keine dedizierte kommerzielle Lösung identifiziert werden konnte. Dadurch werden Landwirtinnen
+        und Landwirte befähigt, langfristig nachhaltige Entscheidungen zu treffen. Durch Visualisierungen
+        der zeitlichen Entwicklung von SOC und abgeleitetem Bodenorganischem Material (SOM) auf Basis
+        des van-Bemmelen-Faktors erleichtert AgroScan die Identifikation langfristiger Trends im
+        Zusammenhang mit Fruchtfolge und Bewirtschaftungspraktiken. Während viele bestehende Werkzeuge
+        hinsichtlich ihrer zugrunde liegenden Modelle intransparent bleiben, bietet AgroScan
+        methodische Erklärungen für nicht-technische Nutzerinnen und Nutzer, detaillierte Berichte
+        sowie Visualisierung und Kommunikation von Vorhersageunsicherheit.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        These gaps — limited availability, lack of methodological transparency and the absence
-        of user agency — motivated the central research question of the present study:
+        Several visual analytics applications have investigated the use of interactive visualizations
+        to support long-term agricultural decision-making. These systems generally aim to enable users
+        to explore temporal developments in agricultural and environmental indicators while relating
+        them to spatial patterns and management interventions. GeoVisage, a web-based agricultural
+        decision support platform co-developed by Nipissing University and agricultural producers in
+        Ontario, Canada, integrated horizon charts and small-multiple visualizations to facilitate the
+        exploration of spatiotemporal datasets (Wachowiak et al., 2017)<a href="#ref29" class="ref-link">[29]</a>. Similarly, Htun et al.
+        proposed a dashboard for identifying water stress and irrigation requirements by combining
+        map-based visualizations with temporal line charts. Their user evaluation, however, revealed
+        high mental demand and effort, highlighting the importance of intuitive workflows and guided
+        analytical processes in agricultural visual analytics systems (Htun et al., 2022)<a href="#ref30" class="ref-link">[30]</a>.
+        Dhaliwal et al. also demonstrated the applicability of line charts for analysing agricultural
+        time-series data, although their implementation lacked a coordinated dashboard environment
+        (Dhaliwal et al., 2023)<a href="#ref31" class="ref-link">[31]</a>. Collectively, these studies indicate the potential of integrating
+        spatial and temporal visualizations for analysing long-term agricultural developments, while
+        also underscoring the need for cohesive interfaces that minimise cognitive load and effectively
+        guide users through exploratory analyses.
       {% else %}
-        Diese Defizite — begrenzte Verfügbarkeit, fehlende methodische Transparenz und der
-        mangelnde Handlungsspielraum der Nutzerinnen und Nutzer — motivierten die zentrale
-        Forschungsfrage der vorliegenden Studie:
+        Mehrere Visual-Analytics-Anwendungen untersuchen den Einsatz interaktiver Visualisierungen
+        zur Unterstützung langfristiger agronomischer Entscheidungen. Diese Systeme ermöglichen es
+        Nutzerinnen und Nutzern in der Regel, zeitliche Entwicklungen agronomischer und
+        Umweltindikatoren zu erkunden und sie mit räumlichen Mustern und Bewirtschaftungsmassnahmen
+        zu verknüpfen. GeoVisage, eine webbasierte agronomische Entscheidungsunterstützungsplattform,
+        die von der Nipissing University und landwirtschaftlichen Produzenten in Ontario, Kanada,
+        mitentwickelt wurde, integrierte Horizon Charts und Small-Multiple-Visualisierungen zur
+        Exploration raumzeitlicher Datensätze (Wachowiak et al., 2017)<a href="#ref29" class="ref-link">[29]</a>. Htun et al. schlugen
+        ein Dashboard zur Identifikation von Wasserstress und Bewässerungsbedarf vor, das
+        kartenbasierte Visualisierungen mit zeitlichen Liniendiagrammen kombiniert. Ihre Nutzerevaluation
+        zeigte jedoch hohe mentale Belastung und Aufwand, was die Bedeutung intuitiver Workflows
+        und geführter Analyseprozesse in agronomischen Visual-Analytics-Systemen unterstreicht
+        (Htun et al., 2022)<a href="#ref30" class="ref-link">[30]</a>. Dhaliwal et al. demonstrierten ebenfalls die Eignung von Liniendiagrammen
+        für die Analyse agronomischer Zeitreihendaten, wenngleich ihre Implementierung keine
+        koordinierte Dashboard-Umgebung bot (Dhaliwal et al., 2023)<a href="#ref31" class="ref-link">[31]</a>. Zusammenfassend zeigen
+        diese Studien das Potenzial der Integration räumlicher und zeitlicher Visualisierungen
+        für die Analyse langfristiger agronomischer Entwicklungen, betonen aber auch den Bedarf
+        an kohärenten Interfaces, die die kognitive Belastung minimieren und Nutzerinnen und Nutzer
+        effektiv durch explorative Analysen führen.
       {% endif %}
     </p>
+  </section>
 
-    <blockquote class="report-pullquote">
-      {% if lang == "en" %}
-        How can interactive machine learning be utilized to empower farmers to monitor and manage carbon stock in their agricultural soils?
-      {% else %}
-        Wie kann interaktives maschinelles Lernen genutzt werden, um Landwirtinnen und Landwirte
-        zu befähigen, den Kohlenstoffvorrat in ihren landwirtschaftlichen Böden zu überwachen
-        und zu steuern?
-      {% endif %}
-    </blockquote>
+  <!-- User Requirements -->
+  <section class="about-section" id="sec-user-requirements">
+    <div class="section-eyebrow">{{ "User Requirements" if lang == "en" else "Nutzeranforderungen" }}</div>
 
     <p class="report-body">
       {% if lang == "en" %}
-        AgroScan addresses this question by providing an open-source, methodologically
-        transparent platform that enables farmers to query SOC predictions for their own fields
-        and track changes over time, placing the farmer as an active participant rather than a
-        passive end user.
+        AgroScan's target users are farmers who use software-based farm management tools, and are
+        interested in carbon farming and sustainable soil management (SSM) practices. To identify
+        user requirements, we conducted exploratory interviews with two farmers in the municipality
+        Eichstätt in Bavaria, Germany. The idea of an interactive remote-sensing SOC prediction tool
+        was derived from literature research and pitched to the farmers to understand its relevance
+        in their work. Subsequently, questions about the tool were asked to identify key user
+        requirements.
       {% else %}
-        AgroScan beantwortet diese Frage mit einer Open-Source-Plattform, die methodisch
-        transparent ist und es Landwirtinnen und Landwirten ermöglicht, SOC-Vorhersagen für
-        ihre eigenen Felder abzufragen und Veränderungen über die Zeit zu verfolgen — und
-        sie dabei als aktive Akteurinnen und Akteure statt als passive Endnutzerinnen und
-        Endnutzer positioniert.
+        Die Zielgruppe von AgroScan sind Landwirtinnen und Landwirte, die softwarebasierte
+        Betriebsmanagement-Werkzeuge nutzen und sich für Carbon Farming sowie nachhaltige
+        Bodenbewirtschaftung (SSM) interessieren. Zur Identifikation der Nutzeranforderungen
+        führten wir explorative Interviews mit zwei Landwirtinnen und Landwirten in der Gemeinde
+        Eichstätt in Bayern durch. Die Idee eines interaktiven fernerkundungsbasierten SOC-Vorhersage-Werkzeugs
+        wurde aus der Literaturrecherche abgeleitet und den Landwirtinnen und Landwirten vorgestellt,
+        um deren Relevanz für die tägliche Arbeit zu verstehen. Anschliessend wurden Fragen zum
+        Werkzeug gestellt, um zentrale Nutzeranforderungen zu identifizieren.
       {% endif %}
     </p>
+
+    <ul class="report-infobox-list report-body">
+      {% if lang == "en" %}
+        <li><strong>J. (28)</strong>, raised on an organic farm with crops and cattle, combines practical farming experience with his current work in agricultural policy as a civil servant in the Bavarian department of agriculture.</li>
+        <li><strong>A. (54)</strong>, is a full-time certified organic farmer managing 145 ha of arable land. He is a professionally trained farmer with formal agricultural education and specializes in organic farming.</li>
+      {% else %}
+        <li><strong>J. (28)</strong>, auf einem Bio-Betrieb mit Ackerbau und Viehhaltung aufgewachsen, verbindet praktische Landwirtschaftserfahrung mit seiner derzeitigen Tätigkeit in der Agrarpolitik als Beamter im Bayerischen Staatsministerium für Ernährung, Landwirtschaft und Forsten.</li>
+        <li><strong>A. (54)</strong>, ist Vollzeit-Biolandwirt mit 145 ha Ackerfläche. Er ist ausgebildeter Landwirt mit formaler agronomischer Ausbildung und spezialisiert auf ökologischen Landbau.</li>
+      {% endif %}
+    </ul>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        A typical use case of a farmer for the AgroScan tool is the routine monitoring of SOC content
+        of their agricultural fields to identify long-term trends in SOC and derived SOM level of their
+        fields in dependence on crop rotation and other targeted SSM practices.
+      {% else %}
+        Ein typischer Anwendungsfall für das AgroScan-Werkzeug ist die routinemässige Überwachung
+        des SOC-Gehalts landwirtschaftlicher Felder, um langfristige Trends im SOC und abgeleitetem
+        SOM-Gehalt in Abhängigkeit von Fruchtfolge und anderen gezielten SSM-Massnahmen zu identifizieren.
+      {% endif %}
+    </p>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        Based on the interviews the following user requirements were defined to inform the website design:
+      {% else %}
+        Auf Basis der Interviews wurden folgende Nutzeranforderungen definiert, um das Website-Design zu informieren:
+      {% endif %}
+    </p>
+
+    <ol class="report-body" style="padding-left: 1.4em;">
+      {% if lang == "en" %}
+        <li style="margin-bottom: 1em;"><strong>Explainable decision support</strong>
+          <ul class="report-infobox-list">
+            <li>The interface guides user through the SOC analysis process while requiring minimal technical expertise and highlighting important information like model limitations</li>
+            <li>SOC predictions are presented together with contextual information like crop rotations, required for interpretation</li>
+            <li>The interface supports perceptual inference by allowing users to visually associate changes in SOC with crop rotations and management measures</li>
+          </ul>
+        </li>
+        <li style="margin-bottom: 1em;"><strong>Integrated field data management dashboard</strong>
+          <ul class="report-infobox-list">
+            <li>The dashboard summarizes and displays all relevant information in a comprehensive and clear manner, both at the field and farm levels.</li>
+            <li>The dashboard functionalities support the identification and assessment of long-term trends in dependence on crop rotation and other SSM practices.</li>
+          </ul>
+        </li>
+        <li style="margin-bottom: 1em;"><strong>Transparent model-user interaction</strong>
+          <ul class="report-infobox-list">
+            <li>The tool adequately informs about the underlying data, methodology and limitations of the model, regardless of the technological expertise of the user.</li>
+            <li>The tool provides several options of interacting with and developing the underlying model, accommodating different levels of technical expertise.</li>
+          </ul>
+        </li>
+      {% else %}
+        <li style="margin-bottom: 1em;"><strong>Erklärbare Entscheidungsunterstützung</strong>
+          <ul class="report-infobox-list">
+            <li>Die Benutzeroberfläche führt Nutzerinnen und Nutzer durch den SOC-Analyseprozess, erfordert minimales technisches Fachwissen und hebt wichtige Informationen wie Modelllimitierungen hervor</li>
+            <li>SOC-Vorhersagen werden zusammen mit Kontextinformationen wie Fruchtfolgen präsentiert, die für die Interpretation erforderlich sind</li>
+            <li>Die Benutzeroberfläche unterstützt perzeptive Inferenz, indem Nutzerinnen und Nutzer SOC-Veränderungen visuell mit Fruchtfolgen und Bewirtschaftungsmassnahmen verknüpfen können</li>
+          </ul>
+        </li>
+        <li style="margin-bottom: 1em;"><strong>Integriertes Felddaten-Management-Dashboard</strong>
+          <ul class="report-infobox-list">
+            <li>Das Dashboard fasst alle relevanten Informationen auf Feld- und Betriebsebene übersichtlich zusammen und stellt sie dar.</li>
+            <li>Die Dashboard-Funktionen unterstützen die Identifikation und Bewertung langfristiger Trends in Abhängigkeit von Fruchtfolge und anderen SSM-Massnahmen.</li>
+          </ul>
+        </li>
+        <li style="margin-bottom: 1em;"><strong>Transparente Modell-Nutzer-Interaktion</strong>
+          <ul class="report-infobox-list">
+            <li>Das Werkzeug informiert angemessen über zugrunde liegende Daten, Methodik und Limitierungen des Modells — unabhängig vom technischen Fachwissen der Nutzerin oder des Nutzers.</li>
+            <li>Das Werkzeug bietet mehrere Optionen zur Interaktion mit und Weiterentwicklung des zugrunde liegenden Modells und berücksichtigt unterschiedliche technische Expertise-Level.</li>
+          </ul>
+        </li>
+      {% endif %}
+    </ol>
   </section>
 
   <!-- Data methodology -->
@@ -832,175 +969,246 @@
 
     <p class="report-body">
       {% if lang == "en" %}
-        <strong>1. Design Objectives and User-Centered Rationale</strong><br />
-        The AgroScan website was designed with the following primary stakeholder in mind: a
-        farmer without programming background but familiar with software-based farm
-        management tools, and an active interest in carbon farming and sustainable soil
-        management (SSM). User requirements were informed by direct conversations with
-        farmers (see <a href="/users_analysis" class="report-internal-link">user profiles</a>) in Landkreis Eichstätt, Bavaria,
-        Germany, and translated into three core design objectives: high usability, learnability,
-        and efficiency of the interface; a field data management system enabling long-term
-        SOC monitoring to assess the impact of SSM practices over time; and meaningful
-        technical agency over the underlying model. These objectives are addressed through
-        three corresponding design solutions: a simple step-by-step analysis workflow, an analytical personal dashboard, 
-        and full methodological transparency through open-source
-        code, public data sources, and accessible documentation.
+        The user requirements are addressed through the following design solutions: a simple step-by-step
+        analysis workflow, an analytical personal dashboard, and full methodological transparency through
+        open-source code, public data sources, and accessible documentation.
       {% else %}
-        <strong>1. Designziele und nutzerzentrierte Begründung</strong><br />
-        Die AgroScan-Website wurde für folgende primäre Zielgruppe konzipiert: Landwirtinnen und
-        Landwirte ohne Programmierhintergrund, die jedoch mit softwarebasierten
-        Betriebsmanagement-Werkzeugen vertraut sind und ein aktives Interesse an Carbon Farming
-        und nachhaltiger Bodenbewirtschaftung (SSM) haben. Die Nutzeranforderungen wurden durch
-        direkte Gespräche mit Landwirtinnen und Landwirten (siehe <a href="/users_analysis" class="report-internal-link">Nutzerprofile</a>) im
-        Landkreis Eichstätt, Bayern, abgeleitet und in drei zentrale Designziele überführt:
-        hohe Usability, Erlernbarkeit und Effizienz der Benutzeroberfläche; ein Felddaten-Managementsystem
-        für langfristiges SOC-Monitoring zur Bewertung der Wirkung von SSM-Massnahmen über die Zeit;
-        sowie bedeutsame technische Handlungsfähigkeit in Bezug auf das zugrunde liegende Modell.
-        Diese Ziele werden durch drei entsprechende Designlösungen adressiert: ein einfacher
-        schrittweiser Analyse-Workflow, ein analytisches persönliches Dashboard sowie volle
-        methodische Transparenz durch Open-Source-Code, öffentliche Datenquellen und zugängliche
-        Dokumentation.
+        Die Nutzeranforderungen werden durch folgende Designlösungen adressiert: ein einfacher
+        schrittweiser Analyse-Workflow, ein analytisches persönliches Dashboard sowie volle methodische
+        Transparenz durch Open-Source-Code, öffentliche Datenquellen und zugängliche Dokumentation.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        <strong>2. Interaction Workflow</strong><br />
-        <strong>Analysis Core User Flow</strong><br />
-        The core user flow follows a step-by-step navigation model illustrated in Figure 4.
-        Several interaction design principles were applied to maximize usability and reduce
-        cognitive load. Pattern affordance is established by consistently coloring every action
-        button that advances the workflow (diamond shape) in AgroScan's signature green
-        helping users to orient themselves. Established icons and interface conventions, e.g., a
-        magnifier for location search and layer icons for map layer selection, build on familiarity
-        with widely used services such as Google Maps. This facilitates familiarization with the
-        website. Additionally, several features for error prevention were implemented: a pop-up
-        summarizing main limitations in application of the model, and if a user tries to start the
-        analysis without a field selected another pop-up message guides them to the field
-        selection. To reduce memory requirements and support first-time users, instructions
-        guide the user in each step in the analysis page, with the current step highlighted in light
-        green.
+        <strong>Interaction Workflow</strong><br />
+        <strong>Analysis Core User Workflow:</strong> The core user workflow follows a step-by-step navigation
+        model illustrated as a green arrow in Fig. 4. Several interaction design principles were applied
+        to maximize usability and reduce cognitive load. Pattern affordance is established by consistently
+        coloring every workflow-advancing button in AgroScan's signature green, which helps users easily
+        orient themselves. To prevent misguidance, these action buttons remain greyed out until they become
+        active in the sequence. Established icons and interface conventions, e.g., a magnifier for location
+        search, build on familiarity with widely used services such as Google Maps. Additionally, several
+        features for error prevention were implemented: a pop-up summarizing the main limitations in the
+        application of the model, and if a user tries to start the analysis without a field selected,
+        another pop-up message guides them to the field selection. To reduce memory requirements and support
+        first-time users, instructions guide the user in each step in the analysis page, with only the
+        current step visible.
       {% else %}
-        <strong>2. Interaktions-Workflow</strong><br />
-        <strong>Kern-User-Flow der Analyse</strong><br />
-        Der zentrale Nutzerfluss folgt einem schrittweisen Navigationsmodell, dargestellt in
-        Abbildung 4. Mehrere Prinzipien des Interaktionsdesigns wurden angewendet, um Usability
-        zu maximieren und die kognitive Belastung zu reduzieren. Pattern Affordance wird durch
-        einheitliche grüne Farbgebung aller den Workflow vorantreibenden Aktionsschaltflächen
-        (Rautenform) in AgroScans Signaturgrün etabliert und unterstützt die Orientierung.
-        Etablierte Icons und Interface-Konventionen — etwa eine Lupe für die Standortsuche und
-        Layer-Icons für die Kartenebenenauswahl — bauen auf der Vertrautheit mit weit verbreiteten
-        Diensten wie Google Maps auf und erleichtern die Einarbeitung. Zudem wurden Funktionen
-        zur Fehlerprävention implementiert: ein Pop-up, das die wichtigsten Anwendungsgrenzen
-        des Modells zusammenfasst, sowie ein weiteres Pop-up, wenn ohne Feldauswahl eine Analyse
-        gestartet wird und der Nutzerin bzw. dem Nutzer zur Feldauswahl geleitet wird. Zur
-        Entlastung des Arbeitsgedächtnisses und zur Unterstützung von Erstnutzerinnen und
-        -nutzern führen Anleitungen auf der Analyse-Seite durch jeden Schritt; der aktuelle
-        Schritt ist hellgrün hervorgehoben.
+        <strong>Interaktions-Workflow</strong><br />
+        <strong>Kern-User-Workflow der Analyse:</strong> Der zentrale Nutzer-Workflow folgt einem schrittweisen
+        Navigationsmodell, dargestellt als grüner Pfeil in Abb. 4. Mehrere Prinzipien des Interaktionsdesigns
+        wurden angewendet, um Usability zu maximieren und die kognitive Belastung zu reduzieren. Pattern
+        Affordance wird durch einheitliche grüne Farbgebung aller den Workflow vorantreibenden Schaltflächen
+        in AgroScans Signaturgrün etabliert und unterstützt die Orientierung. Zur Fehlervermeidung bleiben
+        diese Aktionsschaltflächen ausgegraut, bis sie in der Sequenz aktiv werden. Etablierte Icons und
+        Interface-Konventionen — etwa eine Lupe für die Standortsuche — bauen auf der Vertrautheit mit
+        weit verbreiteten Diensten wie Google Maps auf. Zudem wurden Funktionen zur Fehlerprävention
+        implementiert: ein Pop-up, das die wichtigsten Anwendungsgrenzen des Modells zusammenfasst, sowie
+        ein weiteres Pop-up, wenn ohne Feldauswahl eine Analyse gestartet wird. Zur Entlastung des
+        Arbeitsgedächtnisses und zur Unterstützung von Erstnutzerinnen und -nutzern führen Anleitungen
+        auf der Analyse-Seite durch jeden Schritt; nur der aktuelle Schritt ist sichtbar.
       {% endif %}
     </p>
 
     <figure class="report-figure" id="fig-4">
       <div class="report-figure-media">
-        <img src="/static/assets/image/Core%20Analysis%20Flow.png" alt="{% if lang == 'en' %}Core user flow to conduct analysis of field on AgroScan website{% else %}Kern-User-Flow zur Feldanalyse auf der AgroScan-Website{% endif %}" />
+        <img src="/static/assets/image/Landing_image_1.png" alt="{% if lang == 'en' %}AgroScan workflow overview showing the core user interaction pathway{% else %}AgroScan-Workflow-Übersicht mit dem zentralen Nutzerinteraktionspfad{% endif %}" />
       </div>
       <figcaption class="report-figure-caption">
         {% if lang == "en" %}
-          Fig. 4: Core user flow to conduct analysis of field on AgroScan website. It assumes that at each decision point the decision to advance the analysis workflow is made.
+          Fig. 4: The AgroScan Workflow — schematic overview of the AgroScan web-tool showing the user interaction workflow. The primary user pathway is highlighted in green. Workflow steps executed by frontend, backend, and external resources are represented by solid, dashed, and dash-dotted lines, respectively.
         {% else %}
-          Abb. 4: Kern-User-Flow zur Feldanalyse auf der AgroScan-Website. Es wird angenommen, dass
-          an jedem Entscheidungspunkt der Fortschritt im Analyse-Workflow gewählt wird.
+          Abb. 4: Der AgroScan-Workflow — schematische Übersicht des AgroScan-Web-Tools mit dem Nutzerinteraktions-Workflow. Der primäre Nutzerpfad ist grün hervorgehoben. Workflow-Schritte von Frontend, Backend und externen Ressourcen sind durch durchgezogene, gestrichelte bzw. strichpunktierte Linien dargestellt.
         {% endif %}
       </figcaption>
     </figure>
 
     <p class="report-body">
       {% if lang == "en" %}
-        <strong>Personal Dashboard</strong><br />
-        The personal analytical dashboard uses a card-based, hierarchical information architecture 
-        to enable the farmer to scan field-level information at a glance. At the top of the page a 
-        KPI strip provides a high-level aggregation of field information (total fields, analyses, etc.). 
-        Below, each field is presented as a content card in a card-based layout pattern allowing for 
-        easy scalable information content. Each content card includes embedded field metadata, 
-        and a micro-visualization of OC content over time and inline numeric annotations to reduce 
-        cognitive load. Several UX interaction patterns were integrated. The farmer has the option 
-        refine the visible selection via the sort, filter and comparison function. Additional field-level 
-        analyses details can be accessed via the “Click to explore” button, alongside a dedicated button 
-        to initiate a new analysis for the same field to support long-term SOC monitoring. 
-        Looking ahead, information of future features can be implemented here. 
+        <strong>Personal Dashboard:</strong> The personal analytical dashboard follows Shneiderman's Visual
+        Information Seeking Mantra (Shneiderman, 1996)<a href="#ref32" class="ref-link">[32]</a> by employing a card-based, hierarchical
+        information architecture. An overview map visualizes all fields analyzed by the farmer. Additionally,
+        a KPI strip provides a high-level aggregation of field information (total fields, analyses, etc.).
+        Below, each field is presented as a content card in a card-based layout, allowing for easy scalable
+        information content. Each content card includes embedded field metadata, a micro-visualization of
+        OC content over time, and inline numeric annotations to increase ease-of-use. Several UX interaction
+        patterns were integrated. The farmer has the option to refine the visible selection via the sort,
+        filter, and comparison functions. Additional field-level analyses details can be accessed via the
+        “Click to see all analyses and events” button, alongside a dedicated button to initiate a new analysis
+        for the same field to support long-term SOC monitoring. To support the farmer in identifying the
+        impact of their crop rotation on the SOC level, the planted crop can be added as an event to the
+        line chart of OC over time. Additionally, the SOC value is converted to the more familiar SOM value
+        via the van Bemmelen factor (FAO, n.d.)<a href="#ref34" class="ref-link">[34]</a>. Combined with contextualizing reference information
+        such as SOC variation within the field, and numerical historical changes, the farmer can develop
+        an agronomic understanding of the impact of their crop rotation and derive adaptive field management
+        decisions.
       {% else %}
-        <strong>Persönliches Dashboard</strong><br />
-        Das persönliche Analyse-Dashboard nutzt eine kartenbasierte, hierarchische Informationsarchitektur, 
-        damit der Landwirt die Informationen auf Feldebene auf einen Blick erfassen kann. Am oberen Rand 
-        der Seite bietet ein KPI-Balken eine allgemeine Zusammenfassung der Feldinformationen 
-        (Gesamtzahl der Felder, Analysen usw.). Darunter wird jedes Feld als Inhaltskarte in einem 
-        kartenbasierten Layout dargestellt, was eine einfache Skalierung der Informationsinhalte ermöglicht. 
-        Jede Inhaltskarte enthält eingebettete Feldmetadaten sowie eine Mikrovisualisierung der OC-Inhalte 
-        im Zeitverlauf und integrierte numerische Anmerkungen, um die kognitive Belastung zu reduzieren. 
-        Es wurden mehrere UX-Interaktionsmuster integriert. Der Landwirt hat die Möglichkeit, die sichtbare 
-        Auswahl über die Sortier-, Filter- und Vergleichsfunktionen zu verfeinern. Zusätzliche Details zu 
-        den Analysen auf Feldebene können über die Schaltfläche „Zum Erkunden anklicken“ abgerufen werden, 
-        ebenso wie eine spezielle Schaltfläche zum Starten einer neuen Analyse für dasselbe Feld, um die 
-        langfristige SOC-Überwachung zu unterstützen. Zukünftig können hier Informationen zu 
-        neuen Funktionen implementiert werden. 
+        <strong>Persönliches Dashboard:</strong> Das persönliche Analyse-Dashboard folgt Shneidermans Visual
+        Information Seeking Mantra (Shneiderman, 1996)<a href="#ref32" class="ref-link">[32]</a> durch eine kartenbasierte, hierarchische
+        Informationsarchitektur. Eine Übersichtskarte visualisiert alle vom Landwirt analysierten Felder.
+        Zusätzlich bietet ein KPI-Balken eine aggregierte Zusammenfassung der Feldinformationen
+        (Gesamtzahl der Felder, Analysen usw.). Darunter wird jedes Feld als Inhaltskarte in einem
+        kartenbasierten Layout dargestellt, was eine einfache Skalierung der Informationsinhalte ermöglicht.
+        Jede Inhaltskarte enthält eingebettete Feldmetadaten, eine Mikrovisualisierung des OC-Gehalts
+        im Zeitverlauf sowie inline numerische Annotationen zur Erhöhung der Benutzerfreundlichkeit.
+        Es wurden mehrere UX-Interaktionsmuster integriert. Der Landwirt kann die sichtbare Auswahl über
+        Sortier-, Filter- und Vergleichsfunktionen verfeinern. Zusätzliche Analysedetails auf Feldebene
+        sind über die Schaltfläche „Click to see all analyses and events“ zugänglich, neben einer
+        dedizierten Schaltfläche zum Starten einer neuen Analyse für dasselbe Feld zur Unterstützung
+        langfristigen SOC-Monitorings. Um Landwirtinnen und Landwirten die Identifikation der Wirkung
+        ihrer Fruchtfolge auf den SOC-Gehalt zu erleichtern, kann die angebaute Kultur als Ereignis
+        im Liniendiagramm des OC im Zeitverlauf hinzugefügt werden. Zusätzlich wird der SOC-Wert über
+        den van-Bemmelen-Faktor in den vertrauteren SOM-Wert umgerechnet (FAO, n.d.)<a href="#ref34" class="ref-link">[34]</a>. In Kombination
+        mit kontextualisierenden Referenzinformationen wie der SOC-Variabilität innerhalb des Feldes
+        und numerischen historischen Veränderungen können Landwirtinnen und Landwirte ein agronomisches
+        Verständnis der Wirkung ihrer Fruchtfolge entwickeln und adaptive Feldbewirtschaftungsentscheidungen ableiten.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        <strong>3. ML Explainability and Information Design</strong><br />
-        The SOC prediction results are communicated through a map displaying the spatial
-        variability of SOC content across the selected field. A color gradient from purple 
-        for low SOC content to yellow for high SOC content that is also visible for color-blind 
-        users. It provides an immediate intuitive visual encoding of field conditions. A legend 
-        on the analysis page explains the color codes, which are based on the SOC value distribution 
-        in the LUCAS soil dataset. <a href="#ref16" class="ref-link">[16]</a>. This makes the
-        classification transparent and verifiable using an established reference. The dashboard
-        further supports comparison across fields using absolute SOC values and line charts,
-        enabling farmers to contextualize individual field results within their larger field
-        portfolio.
+        <strong>Information Design</strong><br />
+        Spatial predictions of soil organic carbon (SOC) are communicated through an interactive map that
+        highlights intra-field variability. This allows the identification of low-SOC zones and support
+        targeted interventions. Predicted SOC values are represented using the color-blind-friendly Plasma
+        color palette (Garnier et al., 2024)<a href="#ref33" class="ref-link">[33]</a>, which is applied consistently throughout the map
+        visualizations to ensure visual coherence. The corresponding color classes are derived from the
+        SOC value distribution of the LUCAS soil dataset and are explained via a legend. Grounding the
+        classification in a well-established reference dataset increases the transparency and interpretability
+        of the displayed results.
       {% else %}
-        <strong>3. ML-Erklärbarkeit und Informationsdesign</strong><br />
-        Die SOC-Vorhersageergebnisse werden über eine Karte kommuniziert, die die räumliche
-        Variabilität des SOC-Gehalts im ausgewählten Feld abbildet. Ein Farbverlauf von Violett 
-        für einen niedrigen SOC-Gehalt bis Gelb für einen hohen SOC-Gehalt, der auch für 
-        farbenblinde Nutzer erkennbar ist. Er bietet eine unmittelbare, intuitive visuelle 
-        Darstellung der Bodenbedingungen. Eine Legende auf der Analyseseite erläutert die Farbcodes, 
-        die auf der Verteilung der SOC-Werte im LUCAS-Bodendatensatz basieren. <a href="#ref16" class="ref-link">[16]</a>. 
-        Damit ist die Klassifikation transparent und anhand einer etablierten Referenz überprüfbar. 
-        Das Dashboard unterstützt zudem Feldvergleiche anhand absoluter SOC-Werte und 
-        Liniendiagramme und ermöglicht es Landwirtinnen und Landwirten, einzelne Feldergebnisse 
-        im Kontext ihres gesamten Feldportfolios einzuordnen.
+        <strong>Informationsdesign</strong><br />
+        Räumliche Vorhersagen des organischen Bodenkohlenstoffs (SOC) werden über eine interaktive Karte
+        kommuniziert, die die Variabilität innerhalb des Feldes hervorhebt. Dies ermöglicht die Identifikation
+        von Zonen mit niedrigem SOC und unterstützt gezielte Interventionen. Vorhergesagte SOC-Werte werden
+        mit der farbenblindenfreundlichen Plasma-Farbpalette (Garnier et al., 2024)<a href="#ref33" class="ref-link">[33]</a> dargestellt,
+        die konsistent in allen Kartenvisualisierungen angewendet wird, um visuelle Kohärenz zu gewährleisten.
+        Die entsprechenden Farbklassen leiten sich aus der SOC-Wertverteilung des LUCAS-Bodendatensatzes ab
+        und werden über eine Legende erläutert. Die Einbettung der Klassifikation in einen etablierten
+        Referenzdatensatz erhöht die Transparenz und Interpretierbarkeit der dargestellten Ergebnisse.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        Technical agency is supported through several mechanisms. An export function allows
-        prediction results to be downloaded in .csv format, enabling integration with other farm
-        management platforms. A dedicated how-to-use page explains the ML model in plain
-        language for non-technical users, complemented by a more detailed technical
-        summary for users interested in methodological details. The public GitHub repository
-        provides an additional channel for agency: farmers without a coding background can
-        raise issues or feature requests directly, while technically proficient users can inspect,
-        replicate, or extend the model. Together, these features distinguish AgroScan from the
-        opaque, paywalled commercial tools identified in the literature review, and applies the
-        principle that interactive ML should expand rather than constrain user agency.
+        In addition to the spatial representation that functions as an overview, temporal developments in
+        SOC are visualized using a line chart. The chart is complemented by contextual information, such as
+        crop rotation practices, enabling users to relate changes in predicted SOC levels to management
+        decisions and to identify long-term trends. Presenting multiple coordinated views facilitates the
+        interpretation of both spatial and temporal patterns and supports informed decision-making. Prediction
+        uncertainty is represented by a fading effect as a conceptual placeholder. Meaningful uncertainty
+        estimates cannot currently be derived due to the prototype nature of the ML model but could be
+        incorporated in future iterations through uncertainty quantification methods.
       {% else %}
-        Die technische Handlungsfähigkeit wird durch mehrere Mechanismen unterstützt. Eine
-        Exportfunktion ermöglicht den Download von Vorhersageergebnissen im .csv-Format zur
-        Integration in andere Betriebsmanagement-Plattformen. Eine dedizierte How-to-Seite
-        erklärt das ML-Modell in verständlicher Sprache für nicht-technische Nutzerinnen und
-        Nutzer, ergänzt durch eine detailliertere technische Zusammenfassung für an methodischen
-        Details interessierte Nutzerinnen und Nutzer. Das öffentliche GitHub-Repository bietet
-        einen weiteren Kanal: Landwirtinnen und Landwirte ohne Programmierhintergrund können
-        Issues oder Feature-Requests einreichen, während technisch versierte Nutzerinnen und
-        Nutzer das Modell prüfen, replizieren oder erweitern können. Zusammen heben diese
-        Merkmale AgroScan von undurchsichtigen, kostenpflichtigen kommerziellen Werkzeugen ab
-        und setzen das Prinzip um, dass interaktives maschinelles Lernen den Handlungsspielraum
-        der Nutzerinnen und Nutzer erweitern statt einschränken soll.
+        Ergänzend zur räumlichen Darstellung als Übersicht werden zeitliche SOC-Entwicklungen in einem
+        Liniendiagramm visualisiert. Das Diagramm wird durch Kontextinformationen wie Fruchtfolgepraktiken
+        ergänzt, wodurch Nutzerinnen und Nutzer Veränderungen vorhergesagter SOC-Werte mit Bewirtschaftungsentscheidungen
+        verknüpfen und langfristige Trends identifizieren können. Die Präsentation mehrerer koordinierter
+        Ansichten erleichtert die Interpretation räumlicher und zeitlicher Muster und unterstützt informierte
+        Entscheidungen. Vorhersageunsicherheit wird durch einen Verblassungseffekt als konzeptioneller
+        Platzhalter dargestellt. Aufgrund des Prototyp-Charakters des ML-Modells können derzeit keine
+        aussagekräftigen Unsicherheitsschätzungen abgeleitet werden; diese könnten in zukünftigen Iterationen
+        durch Methoden der Unsicherheitsquantifizierung integriert werden.
       {% endif %}
     </p>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        Technical agency is further promoted through several mechanisms. To accommodate users with varying
+        levels of technical expertise, a dedicated user guide explains the underlying machine learning
+        methodology in accessible language, while a separate technical summary provides additional details
+        for users seeking a deeper understanding. Furthermore, the publicly available
+        <a href="https://github.com/mbreitenhuber/soil_health_monitoring" target="_blank" class="report-internal-link">GitHub repository</a>
+        offers an additional channel for interaction. Farmers without programming experience can submit
+        feature requests or report issues, whereas technically proficient users can inspect the implementation,
+        reproduce results, and contribute to further development.
+      {% else %}
+        Technische Handlungsfähigkeit wird durch mehrere Mechanismen weiter gefördert. Um Nutzerinnen und
+        Nutzer mit unterschiedlichem technischem Fachwissen anzusprechen, erklärt ein dedizierter Leitfaden
+        die zugrunde liegende Machine-Learning-Methodik in verständlicher Sprache, während eine separate
+        technische Zusammenfassung zusätzliche Details für interessierte Nutzerinnen und Nutzer bietet.
+        Das öffentlich verfügbare
+        <a href="https://github.com/mbreitenhuber/soil_health_monitoring" target="_blank" class="report-internal-link">GitHub-Repository</a>
+        bietet einen weiteren Interaktionskanal: Landwirtinnen und Landwirte ohne Programmiererfahrung
+        können Feature-Requests einreichen oder Probleme melden, während technisch versierte Nutzerinnen
+        und Nutzer die Implementierung prüfen, Ergebnisse reproduzieren und zur Weiterentwicklung beitragen können.
+      {% endif %}
+    </p>
+  </section>
+
+  <!-- User Evaluation -->
+  <section class="about-section" id="sec-user-evaluation">
+    <div class="section-eyebrow">{{ "User Evaluation" if lang == "en" else "Nutzer-Evaluation" }}</div>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        An exploratory user evaluation of the analysis workflow and dashboard was conducted with A.,
+        an organic farmer from the Eichstätt region (Germany), in a 1.5-hour remote Zoom session.
+        The evaluation combined task-based interaction with a semi-structured interview, focusing on
+        usability, relevance, and missing functionality.
+      {% else %}
+        Eine explorative Nutzer-Evaluation des Analyse-Workflows und Dashboards wurde mit A.,
+        einem Biolandwirt aus der Region Eichstätt (Deutschland), in einer 1,5-stündigen remote
+        Zoom-Sitzung durchgeführt. Die Evaluation kombinierte aufgabenbasierte Interaktion mit
+        einem halbstrukturierten Interview und fokussierte auf Usability, Relevanz und fehlende Funktionalität.
+      {% endif %}
+    </p>
+
+    <p class="report-body">
+      {% if lang == "en" %}<strong>General remarks</strong>{% else %}<strong>Allgemeine Anmerkungen</strong>{% endif %}
+    </p>
+    <ul class="report-infobox-list report-body">
+      {% if lang == "en" %}
+        <li>The use case was considered highly relevant, particularly in the context of the increasing importance of soil carbon management in agriculture and policy. Continuous involvement of practitioners was emphasized as essential for practical relevance.</li>
+        <li>The participant highlighted the potential of the tool to support more sustainable practices, noting that positive framing is important to encourage adoption rather than critique existing behavior.</li>
+        <li>Model reliability and validation were identified as critical. The participant expressed skepticism toward SOC estimation from remote sensing; AgroScan addresses this through transparency, model limitations, and uncertainty visualization.</li>
+        <li>Integration with existing farm management systems was considered important due to the already high administrative workload.</li>
+      {% else %}
+        <li>Der Anwendungsfall wurde als hochrelevant eingeschätzt, insbesondere im Kontext der zunehmenden Bedeutung von Bodenkohlenstoff-Management in Landwirtschaft und Politik. Die kontinuierliche Einbindung von Praktikerinnen und Praktikern wurde als essenziell für die praktische Relevanz betont.</li>
+        <li>Die Teilnehmerin bzw. der Teilnehmer hob das Potenzial des Werkzeugs hervor, nachhaltigere Praktiken zu unterstützen, und betonte, dass positive Framing wichtig ist, um Adoption zu fördern statt bestehendes Verhalten zu kritisieren.</li>
+        <li>Modellzuverlässigkeit und Validierung wurden als kritisch identifiziert. Es bestand Skepsis gegenüber SOC-Schätzung aus Fernerkundung; AgroScan adressiert dies durch Transparenz, Modelllimitierungen und Unsicherheitsvisualisierung.</li>
+        <li>Die Integration in bestehende Betriebsmanagement-Systeme wurde aufgrund der bereits hohen administrativen Belastung als wichtig erachtet.</li>
+      {% endif %}
+    </ul>
+
+    <p class="report-body">
+      {% if lang == "en" %}<strong>Analysis workflow</strong>{% else %}<strong>Analyse-Workflow</strong>{% endif %}
+    </p>
+    <ul class="report-infobox-list report-body">
+      {% if lang == "en" %}
+        <li>The overall workflow and entry via the home page were perceived positively; model limitations via pop-up were acknowledged.</li>
+        <li>Field selection via the polygon tool was considered unintuitive and only managed after the instruction panel on the left was pointed out; direct selection (e.g., double-click interaction) was preferred.</li>
+        <li>Initial satellite data loading was acceptable if waiting times are communicated; data caching improves repeated analyses time.</li>
+        <li>Saving analyses was straightforward; displaying satellite acquisition dates was suggested to ensure correct crop interpretation.</li>
+      {% else %}
+        <li>Der Gesamt-Workflow und der Einstieg über die Startseite wurden positiv wahrgenommen; Modelllimitierungen via Pop-up wurden anerkannt.</li>
+        <li>Die Feldauswahl über das Polygon-Werkzeug galt als unintuitiv und gelang erst nach Hinweis auf das Anleitungspanel links; direkte Auswahl (z. B. Doppelklick-Interaktion) wurde bevorzugt.</li>
+        <li>Initiales Laden der Satellitendaten war akzeptabel, sofern Wartezeiten kommuniziert werden; Daten-Caching verbessert die Zeit bei wiederholten Analysen.</li>
+        <li>Das Speichern von Analysen war unkompliziert; die Anzeige von Satelliten-Aufnahmedaten wurde vorgeschlagen, um die korrekte Kulturinterpretation sicherzustellen.</li>
+      {% endif %}
+    </ul>
+
+    <p class="report-body">
+      {% if lang == "en" %}<strong>Dashboard</strong>{% else %}<strong>Dashboard</strong>{% endif %}
+    </p>
+    <ul class="report-infobox-list report-body">
+      {% if lang == "en" %}
+        <li>The spatial map and 60 m × 60 m grid were considered effective for identifying intra-field variability.</li>
+        <li>Conversion to soil organic matter using the van Bemmelen factor was valued due to its familiarity in practice and policy contexts.</li>
+        <li>Aggregate KPIs were of limited interest; crop- and field-level trends were preferred for interpreting long-term dynamics.</li>
+        <li>Temporal trend visualization and event annotations were considered most useful for analysis.</li>
+        <li>Field comparisons were useful for assessing management effects, but secondary to temporal analysis.</li>
+        <li>Additional indicators (e.g., nitrogen, phosphorus) were suggested to increase agronomic value.</li>
+      {% else %}
+        <li>Die räumliche Karte und das 60 m × 60 m Raster galten als wirksam zur Identifikation der Variabilität innerhalb des Feldes.</li>
+        <li>Die Umrechnung in Bodenorganische Substanz über den van-Bemmelen-Faktor wurde wegen der Vertrautheit in Praxis und Politik geschätzt.</li>
+        <li>Aggregierte KPIs waren von begrenztem Interesse; Kultur- und feldebene Trends wurden zur Interpretation langfristiger Dynamiken bevorzugt.</li>
+        <li>Zeitliche Trendvisualisierung und Ereignis-Annotationen galten als am nützlichsten für die Analyse.</li>
+        <li>Feldvergleiche waren hilfreich zur Bewertung von Bewirtschaftungseffekten, aber nachrangig zur zeitlichen Analyse.</li>
+        <li>Zusätzliche Indikatoren (z. B. Stickstoff, Phosphor) wurden vorgeschlagen, um den agronomischen Nutzen zu erhöhen.</li>
+      {% endif %}
+    </ul>
   </section>
 
   <!-- Ethical Considerations -->
@@ -1093,81 +1301,96 @@
     </p>
   </section>
 
-  <!-- Evaluation -->
-  <section class="about-section" id="sec-evaluation">
-    <div class="section-eyebrow">{{ "Evaluation" if lang == "en" else "Evaluation" }}</div>
+  <!-- Conclusion -->
+  <section class="about-section" id="sec-conclusion">
+    <div class="section-eyebrow">{{ "Conclusion" if lang == "en" else "Fazit" }}</div>
 
     <p class="report-body">
       {% if lang == "en" %}
-        AgroScan investigated the question: how can interactive machine learning be utilized to
-        empower farmers to monitor and manage carbon stock in their agricultural soils? The
-        project successfully addresses this through three channels. First, a simple step-by-
-        step analysis workflow with an efficient repeated-sampling feature directly fulfills the
-        user requirement of quick, routine SOC assessment. Second, a card-based, hierarchical personal
-        dashboard tailored to carbon farming confers technical agency to the farmer, enabling
-        long-term comparison of SOC trends across fields to evaluate the impact of SSM
-        practices. Third, an open-source architecture with publicly documented methodology
-        closes the transparency and accessibility gaps identified in the literature review. This
-        differentiates AgroScan from existing commercial tools. Taken together, these
-        contributions constitute a working proof of concept for a farmer-facing, interactive SOC
-        monitoring platform.
+        This work investigates how visual analytics can support farmers in monitoring and managing
+        soil organic carbon (SOC) stocks in agricultural soils over the long term. Based on insights
+        from user interviews, the tool design prioritizes enabling farmers to build understanding of
+        soil health dynamics in relation to crop rotation and broader soil and crop management
+        practices, rather than focusing solely on accounting or monetization use cases.
       {% else %}
-        AgroScan untersuchte die Frage: Wie kann interaktives maschinelles Lernen genutzt werden,
-        um Landwirtinnen und Landwirte zu befähigen, den Kohlenstoffvorrat in ihren landwirtschaftlichen
-        Böden zu überwachen und zu steuern? Das Projekt adressiert diese Frage über drei Wege.
-        Erstens erfüllt ein einfacher schrittweiser Analyse-Workflow mit effizienter Funktion für
-        wiederholte Analysen die Nutzeranforderung einer schnellen, routinemässigen SOC-Bewertung.
-        Zweitens verleiht ein kartenbasiertes, hierarchisches persönliches Dashboard, zugeschnitten auf Carbon Farming,
-        Landwirtinnen und Landwirten technische Handlungsfähigkeit und ermöglicht langfristige
-        SOC-Trendvergleiche zur Bewertung der Wirkung von SSM-Massnahmen. Drittens schliesst eine
-        Open-Source-Architektur mit öffentlich dokumentierter Methodik die Transparenz- und
-        Zugänglichkeitsdefizite aus der Literaturübersicht. Damit unterscheidet sich AgroScan von
-        bestehenden kommerziellen Werkzeugen. Insgesamt bilden diese Beiträge einen funktionierenden
-        Proof of Concept für eine landwirtschaftspraxisorientierte, interaktive SOC-Monitoring-Plattform.
+        Diese Arbeit untersucht, wie Visual Analytics Landwirtinnen und Landwirte bei der langfristigen
+        Überwachung und Steuerung von Bodenkohlenstoffvorräten (SOC) in landwirtschaftlichen Böden
+        unterstützen kann. Auf Basis von Erkenntnissen aus Nutzerinterviews priorisiert das Werkzeugdesign
+        die Förderung eines Verständnisses der Bodengesundheitsdynamik im Zusammenhang mit Fruchtfolge
+        und weiteren Boden- und Bewirtschaftungspraktiken — statt sich ausschliesslich auf Abrechnungs-
+        oder Monetarisierungs-Anwendungsfälle zu konzentrieren.
       {% endif %}
     </p>
 
     <p class="report-body">
       {% if lang == "en" %}
-        Given the limited project timeframe, several limitations remain. On the model side, the
-        small training dataset (n=270, LUCAS 2015) constrains predictive accuracy. This can be
-        improved by incorporating data from neighboring EU countries and retraining on the
-        upcoming LUCAS 2022 release expected in Q3 2026. The current feature set further
-        omits predictors with established value, most notably Sentinel-1 SAR-derived features,
-        which Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a> demonstrated correlate more strongly with agricultural SOC
-        than optical data alone, as well as crop yield, weather, and elevation data. Integrating
-        farmer-provided local inputs such as soil type and bulk density could additionally
-        bridge the physical separation inherent to remote sensing and improve model
-        accuracy. Spatially, the current 60×60m pixel resolution limits within-field variability
-        insights for smaller parcels. This could be reduced to 10×10m by leveraging the full
-        Sentinel-2 resolution and applying interpolation for bands with higher resolution. On
-        the visualization side, the current SOC threshold classification is derived from the
-        aggregate LUCAS distribution and does not account for local soil conditions, land use,
-        or climate. Incorporating location and farmer-provided soil type data would enable
-        more regionally specific and agronomically meaningful threshold definitions. A detailed
-        overview of planned platform developments addressing these limitations is provided on
-        the <a href="/future_work" class="report-internal-link">AgroScan Future Features page</a>.
+        To address this objective, we develop a system that provides a simple, step-by-step analytical
+        workflow combined with intuitive visualizations of within-field variability and a repeated-sampling
+        functionality to support targeted intervention analysis and impact assessment. In addition, an
+        integrated dashboard contextualizes SOC development within management decisions, enabling the
+        identification of long-term trends and their underlying drivers. The system is further underpinned
+        by an open-source architecture and a publicly documented methodology aimed at ensuring accessibility
+        for both technical and non-technical users.
       {% else %}
-        Aufgrund des begrenzten Projektzeitraums verbleiben mehrere Einschränkungen. Modellseitig
-        begrenzt der kleine Trainingsdatensatz (n=270, LUCAS 2015) die Vorhersagegenauigkeit.
-        Verbesserungen sind durch die Einbeziehung von Daten benachbarter EU-Länder und ein
-        Retraining mit der für Q3 2026 erwarteten LUCAS-2022-Veröffentlichung möglich. Der
-        aktuelle Feature-Satz lässt etablierte Prädiktoren aus, insbesondere Sentinel-1-SAR-Merkmale,
-        die laut Nguyen et al. (2022)<a href="#ref15" class="ref-link">[15]</a> stärker mit landwirtschaftlichem SOC korrelieren als
-        optische Daten allein, sowie Ertrags-, Wetter- und Höhendaten. Die Integration lokaler
-        Eingaben von Landwirtinnen und Landwirten — etwa Bodentyp und Rohdichte — könnte die
-        physische Distanz der Fernerkundung überbrücken und die Genauigkeit verbessern. Räumlich
-        begrenzt die aktuelle 60×60-m-Pixelauflösung Einblicke in die Variabilität innerhalb kleinerer
-        Parzellen; eine Reduktion auf 10×10 m wäre durch Nutzung der vollen Sentinel-2-Auflösung
-        und Interpolation höher aufgelöster Bänder erreichbar. Visualisierungsseitig leitet sich die
-        SOC-Schwellenklassifikation aus der aggregierten LUCAS-Verteilung ab und berücksichtigt
-        weder lokale Bodenbedingungen, Landnutzung noch Klima. Die Einbeziehung von Standort- und
-        bodentypbezogenen Angaben der Nutzerinnen und Nutzer würde regional spezifischere und
-        agronomisch aussagekräftigere Schwellenwertdefinitionen ermöglichen. Eine detaillierte
-        Übersicht geplanter Plattformentwicklungen, die diese Einschränkungen adressieren, findet
-        sich auf der <a href="/future_work" class="report-internal-link">AgroScan-Seite zu zukünftigen Features</a>.
+        Zur Erreichung dieses Ziels entwickeln wir ein System mit einem einfachen schrittweisen Analyse-Workflow,
+        kombiniert mit intuitiven Visualisierungen der Variabilität innerhalb des Feldes und einer
+        Funktion für wiederholte Probenahme zur Unterstützung gezielter Interventionsanalyse und Wirkungsbewertung.
+        Zusätzlich kontextualisiert ein integriertes Dashboard die SOC-Entwicklung im Rahmen von
+        Bewirtschaftungsentscheidungen und ermöglicht die Identifikation langfristiger Trends und ihrer
+        zugrunde liegenden Treiber. Das System basiert auf einer Open-Source-Architektur und einer
+        öffentlich dokumentierten Methodik, die Zugänglichkeit für technische und nicht-technische
+        Nutzerinnen und Nutzer sicherstellen soll.
       {% endif %}
     </p>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        Several limitations remain. First, the relatively small training dataset (n = 270) and the
+        prototype nature of the machine learning model constrain predictive accuracy as well as the
+        reliability of uncertainty quantification, thereby limiting real-world applicability. Second,
+        the current spatial resolution of 60×60 m restricts the ability to resolve within-field variability,
+        particularly for smaller agricultural parcels; this limitation could be mitigated by leveraging
+        the native 10×10 m Sentinel-2 resolution and applying interpolation for higher-resolution bands.
+        Third, the current SOC threshold classification is based on the aggregated LUCAS distribution
+        and does not incorporate local soil, land use, or climatic conditions, which reduces its agronomic
+        specificity. Integrating geospatial context and farmer-provided soil characteristics would enable
+        more regionally and management-relevant threshold definitions.
+      {% else %}
+        Mehrere Limitationen bleiben bestehen. Erstens schränken der relativ kleine Trainingsdatensatz
+        (n = 270) und der Prototyp-Charakter des Machine-Learning-Modells die Vorhersagegenauigkeit sowie
+        die Zuverlässigkeit der Unsicherheitsquantifizierung ein und limitieren damit die Anwendbarkeit
+        in der Praxis. Zweitens beschränkt die aktuelle räumliche Auflösung von 60×60 m die Fähigkeit,
+        Variabilität innerhalb des Feldes aufzulösen, insbesondere bei kleineren Parzellen; diese
+        Limitation könnte durch Nutzung der nativen 10×10 m Sentinel-2-Auflösung und Interpolation
+        höher aufgelöster Bänder gemildert werden. Drittens basiert die aktuelle SOC-Schwellenklassifikation
+        auf der aggregierten LUCAS-Verteilung und berücksichtigt weder lokale Boden-, Landnutzungs- noch
+        Klimabedingungen, was ihre agronomische Spezifität reduziert. Die Integration geospatialen Kontexts
+        und von Landwirtinnen und Landwirten bereitgestellter Bodeneigenschaften würde regional und
+        bewirtschaftungsrelevantere Schwellenwertdefinitionen ermöglichen.
+      {% endif %}
+    </p>
+
+    <p class="report-body">
+      {% if lang == "en" %}
+        Future work should focus on extending both the predictive capabilities and practical applicability of AgroScan:
+      {% else %}
+        Zukünftige Arbeit sollte sich auf die Erweiterung der Vorhersagefähigkeiten und praktischen Anwendbarkeit von AgroScan konzentrieren:
+      {% endif %}
+    </p>
+
+    <ul class="report-infobox-list report-body">
+      {% if lang == "en" %}
+        <li>Improving the ML model by incorporating additional predictor features, such as Sentinel-1 and climate data, and expanding the training dataset to neighboring European countries and the forthcoming LUCAS 2022 Topsoil dataset.</li>
+        <li>Integrating uncertainty quantification methods to enable users to distinguish between highly certain and uncertain SOC estimates.</li>
+        <li>Developing a prognosis model to identify crops with positive and negative effects on soil organic matter and estimate the long-term impact of a farm's crop rotation on SOC and SOM levels.</li>
+        <li>Integrating AgroScan with existing farm reporting systems, such as government-mandated fertilization reporting, to automatically retrieve relevant information and minimize additional data management effort for farmers.</li>
+      {% else %}
+        <li>Verbesserung des ML-Modells durch Einbeziehung zusätzlicher Prädiktorvariablen wie Sentinel-1 und Klimadaten sowie Erweiterung des Trainingsdatensatzes auf benachbarte europäische Länder und den kommenden LUCAS-2022-Topsoil-Datensatz.</li>
+        <li>Integration von Methoden der Unsicherheitsquantifizierung, damit Nutzerinnen und Nutzer zwischen hochsicheren und unsicheren SOC-Schätzungen unterscheiden können.</li>
+        <li>Entwicklung eines Prognosemodells zur Identifikation von Kulturen mit positiven und negativen Effekten auf Bodenorganische Substanz und Schätzung der langfristigen Wirkung der Betriebsfruchtfolge auf SOC- und SOM-Werte.</li>
+        <li>Integration von AgroScan in bestehende Betriebsreporting-Systeme, etwa behördlich vorgeschriebene Düngeberichte, zur automatischen Abfrage relevanter Informationen und Minimierung zusätzlichen Datenmanagement-Aufwands für Landwirtinnen und Landwirte.</li>
+      {% endif %}
+    </ul>
   </section>
 
   <!-- AI Statement -->
@@ -1314,6 +1537,54 @@
         Marechal, A., &amp; Jones, A. (2022). LUCAS 2018 soil module: Presentation of dataset and
         results (EUR 31144 EN). Publications Office of the European
         Union. <a href="https://doi.org/10.2760/215013" target="_blank" class="ref-url">https://doi.org/10.2760/215013</a>
+      </li>
+      <li id="ref25">
+        Smart Cloud Farming. (n.d.). Smart Cloud Farming – About.
+        <a href="https://smartcloudfarming.com/about" target="_blank" class="ref-url">https://smartcloudfarming.com/about</a>
+      </li>
+      <li id="ref26">
+        Spacenus. (n.d.). Spacenus – Nitrogen Rate Recommendations (Precision Farming).
+        <a href="https://www.spacenus.com/#nitrogen-rate-recommendations" target="_blank" class="ref-url">https://www.spacenus.com/#nitrogen-rate-recommendations</a>
+      </li>
+      <li id="ref27">
+        Soyle. (n.d.). Soyle – How It Works.
+        <a href="https://www.soyle.io/#how" target="_blank" class="ref-url">https://www.soyle.io/#how</a>
+      </li>
+      <li id="ref28">
+        Agreena. (n.d.). Agreena – Regenerative Agriculture Platform.
+        <a href="https://agreena.com" target="_blank" class="ref-url">https://agreena.com</a>
+      </li>
+      <li id="ref29">
+        Wachowiak, M. P., Walters, D. F., Kovacs, J. M., Wachowiak-Smolíková, R., &amp; James, A. L. (2017).
+        Visual analytics and remote sensing imagery to support community-based research for precision
+        agriculture in emerging areas. Computers and Electronics in Agriculture, 143, 149–164.
+        <a href="https://doi.org/10.1016/j.compag.2017.09.035" target="_blank" class="ref-url">https://doi.org/10.1016/j.compag.2017.09.035</a>
+      </li>
+      <li id="ref30">
+        Htun, N.-N., Rojo, D., Ooge, J., De Croon, R., Kasimati, A., &amp; Verbert, K. (2022).
+        Developing Visual-Assisted Decision Support Systems across Diverse Agricultural Use Cases.
+        Agriculture, 12(7), 1027.
+        <a href="https://doi.org/10.3390/agriculture12071027" target="_blank" class="ref-url">https://doi.org/10.3390/agriculture12071027</a>
+      </li>
+      <li id="ref31">
+        Dhaliwal, J. K., Galbraith, M. E., Leung, C. K., &amp; Tan, D. (2023). A Data Discovery and
+        Visualization Tool for Visual Analytics of Time Series in Digital Agriculture. 2023 27th
+        International Conference Information Visualisation (IV), 268–271.
+        <a href="https://doi.org/10.1109/IV60283.2023.00053" target="_blank" class="ref-url">https://doi.org/10.1109/IV60283.2023.00053</a>
+      </li>
+      <li id="ref32">
+        Shneiderman, B. (1996). The Eyes Have It: A Task by Data Type Taxonomy for Information
+        Visualizations. Proceedings of the IEEE Symposium on Visual Languages, 336–343.
+        <a href="https://doi.org/10.1109/VL.1996.545307" target="_blank" class="ref-url">https://doi.org/10.1109/VL.1996.545307</a>
+      </li>
+      <li id="ref33">
+        Garnier, S., Ross, N., Rudis, R., Camargo, A. P., Sciaini, M., &amp; Scherer, C. (2024).
+        viridis(Lite) – Colorblind-Friendly Color Maps for R (Version 0.6.5).
+        <a href="https://doi.org/10.5281/zenodo.4679423" target="_blank" class="ref-url">https://doi.org/10.5281/zenodo.4679423</a>
+      </li>
+      <li id="ref34">
+        Food and Agriculture Organization of the United Nations (FAO). (n.d.). FAO Knowledge Repository.
+        <a href="https://openknowledge.fao.org/server/api/core/bitstreams/1b2e9dac-65e6-426e-8f7f-a111e6d305e5/content" target="_blank" class="ref-url">https://openknowledge.fao.org/server/api/core/bitstreams/1b2e9dac-65e6-426e-8f7f-a111e6d305e5/content</a>
       </li>
     </ol>
   </section>
