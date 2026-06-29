@@ -512,29 +512,56 @@ window.addEventListener("click", (e) => {
   }
 });
 
-/* ── Shared uncertainty band layers ─────────────── */
+/* ── Shared uncertainty band layers (vertical fill, ±0.5 g/kg) ── */
 const UNCERTAINTY_LAYERS = [
-  { w: 2.00, a: 0.005 },
-  { w: 1.90, a: 0.010 },
-  { w: 1.80, a: 0.015 },
-  { w: 1.70, a: 0.020 },
-  { w: 1.60, a: 0.025 },
-  { w: 1.50, a: 0.030 },
-  { w: 1.40, a: 0.038 },
-  { w: 1.30, a: 0.046 },
-  { w: 1.20, a: 0.055 },
-  { w: 1.10, a: 0.064 },
-  { w: 1.00, a: 0.074 },
-  { w: 0.90, a: 0.085 },
-  { w: 0.80, a: 0.097 },
-  { w: 0.70, a: 0.110 },
-  { w: 0.60, a: 0.124 },
-  { w: 0.50, a: 0.139 },
-  { w: 0.40, a: 0.155 },
-  { w: 0.30, a: 0.172 },
-  { w: 0.20, a: 0.190 },
-  { w: 0.10, a: 0.210 },
+  { margin: 1.00, a: 0.012 },
+  { margin: 0.95, a: 0.015 },
+  { margin: 0.90, a: 0.018 },
+  { margin: 0.85, a: 0.021 },
+  { margin: 0.80, a: 0.024 },
+  { margin: 0.75, a: 0.027 },
+  { margin: 0.70, a: 0.030 },
+  { margin: 0.65, a: 0.033 },
+  { margin: 0.60, a: 0.036 },
+  { margin: 0.55, a: 0.041 },
+  { margin: 0.50, a: 0.046 },
+  { margin: 0.45, a: 0.051 },
+  { margin: 0.40, a: 0.056 },
+  { margin: 0.35, a: 0.061 },
+  { margin: 0.30, a: 0.066 },
+  { margin: 0.25, a: 0.071 },
+  { margin: 0.20, a: 0.076 },
+  { margin: 0.15, a: 0.080 },
+  { margin: 0.10, a: 0.083 },
 ];
+
+/** Filled band above/below the line only — no horizontal bleed at endpoints. */
+function drawVerticalUncertaintyBand(ctx, pts, bandPx, opacityFactor = 1) {
+  if (!pts.length || bandPx <= 0) return;
+
+  const fillLayer = (offset) => {
+    if (pts.length === 1) {
+      const p = pts[0];
+      const halfW = 4;
+      ctx.fillRect(p.x - halfW, p.y - offset, halfW * 2, offset * 2);
+      return;
+    }
+    ctx.beginPath();
+    pts.forEach((p, i) => {
+      i === 0 ? ctx.moveTo(p.x, p.y - offset) : ctx.lineTo(p.x, p.y - offset);
+    });
+    for (let i = pts.length - 1; i >= 0; i--) {
+      ctx.lineTo(pts[i].x, pts[i].y + offset);
+    }
+    ctx.closePath();
+    ctx.fill();
+  };
+
+  UNCERTAINTY_LAYERS.forEach(({ margin, a }) => {
+    ctx.fillStyle = `rgba(74,144,226,${(a * opacityFactor).toFixed(3)})`;
+    fillLayer(bandPx * margin);
+  });
+}
 
 const unifiedChartPlugin = {
   id: "unifiedChartPlugin",
@@ -616,16 +643,7 @@ const unifiedChartPlugin = {
                yScale.bottom - yScale.top);
       ctx.clip();
 
-      ctx.lineJoin = "round";
-      ctx.lineCap  = "round";
-
-      UNCERTAINTY_LAYERS.forEach(({ w, a }) => {
-        ctx.beginPath();
-        pts.forEach((p, j) => j === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
-        ctx.strokeStyle = `rgba(74,144,226,${(a * factor).toFixed(3)})`;
-        ctx.lineWidth   = BAND_PX * w;
-        ctx.stroke();
-      });
+      drawVerticalUncertaintyBand(ctx, pts, BAND_PX, factor);
 
       ctx.restore();
     });
@@ -1327,48 +1345,8 @@ async function initSparklineCanvas(canvas) {
       ctx.rect(pad.left, pad.top, iW, iH);
       ctx.clip();
 
-      // Pfad entlang der Datenpunkte
-      function drawDataPath() {
-        ctx.beginPath();
-        values.forEach((v, i) => {
-          i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v));
-        });
-      }
-
-      ctx.lineJoin = "round";
-      ctx.lineCap  = "round";
-
-      // DEZENTER GEMACHT: Die Alpha-Werte (a) wurden spürbar reduziert,
-      // damit der Glow-Effekt weniger drückt und feiner wirkt.
-      const layers = [
-        { w: 2.00, a: 0.001 },
-        { w: 1.90, a: 0.002 },
-        { w: 1.80, a: 0.003 },
-        { w: 1.70, a: 0.004 },
-        { w: 1.60, a: 0.005 },
-        { w: 1.50, a: 0.006 },
-        { w: 1.40, a: 0.008 },
-        { w: 1.30, a: 0.010 },
-        { w: 1.20, a: 0.012 },
-        { w: 1.10, a: 0.014 },
-        { w: 1.00, a: 0.016 },
-        { w: 0.90, a: 0.018 },
-        { w: 0.80, a: 0.022 },
-        { w: 0.70, a: 0.026 },
-        { w: 0.60, a: 0.030 },
-        { w: 0.50, a: 0.035 },
-        { w: 0.40, a: 0.040 },
-        { w: 0.30, a: 0.045 },
-        { w: 0.20, a: 0.050 },
-        { w: 0.10, a: 0.060 },
-      ];
-
-      layers.forEach(({ w, a }) => {
-        drawDataPath();
-        ctx.strokeStyle = `rgba(74,144,226,${a})`;
-        ctx.lineWidth   = BAND_PX * w;
-        ctx.stroke();
-      });
+      const pts = values.map((v, i) => ({ x: toX(i), y: toY(v) }));
+      drawVerticalUncertaintyBand(ctx, pts, BAND_PX);
 
       ctx.restore();
     }
