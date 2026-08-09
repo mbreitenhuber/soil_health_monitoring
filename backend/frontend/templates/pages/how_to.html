@@ -354,12 +354,12 @@
           {% if lang == "en" %}
           <li>Use <strong>Sort ▾</strong> to reorder fields by latest OC, best OC, worst OC, or most improved over time.</li>
           <li>Open <strong>Filters ▾</strong> to narrow the list by field name, crop, or date range. Click <strong>✕ Reset</strong> inside the filter panel to clear all filters.</li>
-          <li>Each field card shows its number, name, date span, location, field area (ha), and data-point count, plus a sparkline of <strong>OC over time</strong> with a soft blue <strong>uncertainty band</strong> (±0.5 g/kg) around the line, a visual hint of the model's estimated accuracy. The card also shows <strong>Latest Avg OC</strong> and <strong>Latest Avg. SOM</strong>. <strong>SOM</strong> stands for Soil Organic Matter. Click the round <strong>i</strong> next to SOM for a short explanation. Percentage trends follow (<strong>First sample</strong>: change since the first stored analysis; <strong>Recent sample</strong>: change vs. the previous analysis).</li>
+          <li>Each field card shows its number, name, date span, location, field area (ha), and data-point count, plus a sparkline of <strong>OC over time</strong>. The card also shows <strong>Latest Avg OC</strong> and <strong>Latest Avg. SOM</strong>. <strong>SOM</strong> stands for Soil Organic Matter. Click the round <strong>i</strong> next to SOM for a short explanation. Percentage trends follow (<strong>First sample</strong>: change since the first stored analysis; <strong>Recent sample</strong>: change vs. the previous analysis).</li>
           <li>Use <strong>+ New Analysis</strong> to re-run the same parcel on a new date, or <strong>📋 Add Event</strong> to log management actions such as planting or fertilizing.</li>
           {% else %}
           <li>Nutze <strong>Sortieren ▾</strong>, um Felder nach aktuellem OC, bestem OC, schlechtestem OC oder grösster Verbesserung zu ordnen.</li>
           <li>Öffne <strong>Filter ▾</strong>, um nach Feldname, Pflanzenart oder Datumsbereich einzugrenzen. Klicke im Filterpanel auf <strong>✕ Zurücksetzen</strong>, um alle Filter zu löschen.</li>
-          <li>Jede Feldkarte zeigt Nummer, Name, Datumsbereich, Standort, Feldfläche (ha) und Datenpunkte, dazu eine Sparkline <strong>OC im Zeitverlauf</strong> mit einem dezenten blauen <strong>Unsicherheitsband</strong> (±0.5 g/kg) um die Linie, ein Hinweis auf die geschätzte Modellgenauigkeit. Daneben <strong>Aktueller Ø OC</strong> und <strong>Aktueller Ø SOM</strong>. <strong>SOM</strong> staht für Soil Organic Matter, also organische Substanz. Das runde <strong>i</strong> neben SOM erklärt die Berechnung kurz. Prozentuale Trends (<strong>Erste Messung</strong>: Änderung seit der ersten gespeicherten Analyse; <strong>Letzte Messung</strong>: Änderung gegenüber der vorherigen Analyse) folgen darunter.</li>
+          <li>Jede Feldkarte zeigt Nummer, Name, Datumsbereich, Standort, Feldfläche (ha) und Datenpunkte, dazu eine Sparkline <strong>OC im Zeitverlauf</strong>. Daneben <strong>Aktueller Ø OC</strong> und <strong>Aktueller Ø SOM</strong>. <strong>SOM</strong> steht für Soil Organic Matter, also organische Substanz. Das runde <strong>i</strong> neben SOM erklärt die Berechnung kurz. Prozentuale Trends (<strong>Erste Messung</strong>: Änderung seit der ersten gespeicherten Analyse; <strong>Letzte Messung</strong>: Änderung gegenüber der vorherigen Analyse) folgen darunter.</li>
           <li>Mit <strong>+ Neue Analyse</strong> analysierst du dieselbe Parzelle zu einem neuen Datum; mit <strong>📋 Ereignis hinzufügen</strong> protokollierst du Massnahmen wie Aussaat oder Düngung.</li>
           {% endif %}
         </ol>
@@ -447,11 +447,11 @@
         </p>
         <ol class="howto-list">
           {% if lang == "en" %}
-          <li>Open <strong>⚖ Field Comparison</strong> below the overview map. A chart plots each field's average SOC over time with the same ±0.5 g/kg <strong>uncertainty band</strong> as on the field cards; click field chips to hide or show individual lines. Field events appear as markers on the chart.</li>
+          <li>Open <strong>⚖ Field Comparison</strong> below the overview map. A chart plots each field's average SOC over time; click field chips to hide or show individual lines. Field events appear as markers on the chart.</li>
           <li>Collapse the comparison section to hide the chart again.</li>
           <li>Click <strong>⬇ Download All</strong> in the control bar to export every saved analysis in one CSV file, or use <strong>⬇ Download field data</strong> on an expanded field card for a single-field export.</li>
           {% else %}
-          <li>Öffne <strong>⚖ Felder vergleichen</strong> unter der Übersichtskarte. Ein Diagramm zeigt die durchschnittliche SOC-Entwicklung je Feld mit demselben ±0.5-g/kg-<strong>Unsicherheitsband</strong> wie auf den Feldkarten; per Feld-Chips blendest du einzelne Linien ein oder aus. Feldereignisse erscheinen als Markierungen im Diagramm.</li>
+          <li>Öffne <strong>⚖ Felder vergleichen</strong> unter der Übersichtskarte. Ein Diagramm zeigt die durchschnittliche SOC-Entwicklung je Feld; per Feld-Chips blendest du einzelne Linien ein oder aus. Feldereignisse erscheinen als Markierungen im Diagramm.</li>
           <li>Klappe den Vergleichsbereich wieder zu, um das Diagramm auszublenden.</li>
           <li><strong>⬇ Alle herunterladen</strong> in der Steuerleiste exportiert alle gespeicherten Analysen in einer CSV-Datei; <strong>⬇ Felddaten herunterladen</strong> auf einer ausgeklappten Feldkarte exportiert nur dieses Feld.</li>
           {% endif %}

@@ -512,62 +512,10 @@ window.addEventListener("click", (e) => {
   }
 });
 
-/* ── Shared uncertainty band layers (vertical fill, ±0.5 g/kg) ── */
-const UNCERTAINTY_LAYERS = [
-  { margin: 1.00, a: 0.012 },
-  { margin: 0.95, a: 0.015 },
-  { margin: 0.90, a: 0.018 },
-  { margin: 0.85, a: 0.021 },
-  { margin: 0.80, a: 0.024 },
-  { margin: 0.75, a: 0.027 },
-  { margin: 0.70, a: 0.030 },
-  { margin: 0.65, a: 0.033 },
-  { margin: 0.60, a: 0.036 },
-  { margin: 0.55, a: 0.041 },
-  { margin: 0.50, a: 0.046 },
-  { margin: 0.45, a: 0.051 },
-  { margin: 0.40, a: 0.056 },
-  { margin: 0.35, a: 0.061 },
-  { margin: 0.30, a: 0.066 },
-  { margin: 0.25, a: 0.071 },
-  { margin: 0.20, a: 0.076 },
-  { margin: 0.15, a: 0.080 },
-  { margin: 0.10, a: 0.083 },
-];
-
-/** Filled band above/below the line only — no horizontal bleed at endpoints. */
-function drawVerticalUncertaintyBand(ctx, pts, bandPx, opacityFactor = 1) {
-  if (!pts.length || bandPx <= 0) return;
-
-  const fillLayer = (offset) => {
-    if (pts.length === 1) {
-      const p = pts[0];
-      const halfW = 4;
-      ctx.fillRect(p.x - halfW, p.y - offset, halfW * 2, offset * 2);
-      return;
-    }
-    ctx.beginPath();
-    pts.forEach((p, i) => {
-      i === 0 ? ctx.moveTo(p.x, p.y - offset) : ctx.lineTo(p.x, p.y - offset);
-    });
-    for (let i = pts.length - 1; i >= 0; i--) {
-      ctx.lineTo(pts[i].x, pts[i].y + offset);
-    }
-    ctx.closePath();
-    ctx.fill();
-  };
-
-  UNCERTAINTY_LAYERS.forEach(({ margin, a }) => {
-    ctx.fillStyle = `rgba(74,144,226,${(a * opacityFactor).toFixed(3)})`;
-    fillLayer(bandPx * margin);
-  });
-}
-
 const unifiedChartPlugin = {
   id: "unifiedChartPlugin",
 
   beforeDatasetsDraw(chart) {
-    const { ctx } = chart;
     const locked   = chart._lockedDataset;
     const hovered  = chart._hoveredDataset;
     const focused  = locked ?? hovered;
@@ -606,46 +554,6 @@ const unifiedChartPlugin = {
         ds.pointHoverBorderColor     = "rgba(107, 114, 128, 0.55)";
         ds.pointHoverBorderWidth     = 2;
       }
-    });
-
-    // ── Uncertainty bands ±0.5 g/kg (drawn before datasets) ──
-    const yScale = chart.scales.y;
-    const xScale = chart.scales.x;
-    if (!yScale || !xScale) return;
-
-    const PX_PER_UNIT = Math.abs(
-      yScale.getPixelForValue(0) - yScale.getPixelForValue(1)
-    );
-    const BAND_PX = 0.5 * PX_PER_UNIT;
-
-    chart.data.datasets.forEach((ds, i) => {
-      if (!isChartDatasetVisible(chart, i)) return;
-      const meta = chart.getDatasetMeta(i);
-      if (!meta?.data?.length) return;
-
-      const isActive = (focused === i);
-      const isDimmed = hasFocus && !isActive;
-      const factor   = isDimmed ? 0.08 : (isActive ? 0.4 : 0.2);
-
-      const pts = [];
-      ds.data.forEach((val, j) => {
-        if (val == null || !Number.isFinite(val)) return;
-        const px = meta.data[j]?.x;
-        if (px == null) return;
-        pts.push({ x: px, y: yScale.getPixelForValue(val) });
-      });
-      if (pts.length < 1) return;
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(xScale.left, yScale.top,
-               xScale.right - xScale.left,
-               yScale.bottom - yScale.top);
-      ctx.clip();
-
-      drawVerticalUncertaintyBand(ctx, pts, BAND_PX, factor);
-
-      ctx.restore();
     });
   },
 
@@ -1335,21 +1243,6 @@ async function initSparklineCanvas(canvas) {
     ctx.textAlign    = "center";
     ctx.textBaseline = "top";
     ctx.fillText(uiText("oc_over_time"), pad.left + iW / 2, 3);
-
-    // ── Uncertainty band ±0.5 g/kg ──────────────────
-    if (values.length >= 1) {
-      const BAND_PX = 0.5 * (iH / yRange);
-
-      ctx.save();
-      ctx.beginPath();
-      ctx.rect(pad.left, pad.top, iW, iH);
-      ctx.clip();
-
-      const pts = values.map((v, i) => ({ x: toX(i), y: toY(v) }));
-      drawVerticalUncertaintyBand(ctx, pts, BAND_PX);
-
-      ctx.restore();
-    }
 
     // ── Y-Axis title + tick labels ─────────────
     ctx.save();
