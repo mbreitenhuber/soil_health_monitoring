@@ -1810,3 +1810,4 @@ def update_analysis(id: int, req: SaveRequest):
     conn.close()
 
     return {"status": "updated"}
+    
