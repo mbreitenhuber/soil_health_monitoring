@@ -91,7 +91,7 @@ build:buildah:
         - backend
   tags:
     - ivialab-student-cluster
-  timeout: 10m
+  timeout: 30m
   retry: 2
   before_script:
     - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PWD}" "${CI_REGISTRY}"
