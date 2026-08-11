@@ -11,8 +11,12 @@ variables:
   HELM_TIMEOUT: 25m0s
   #
   # Generic helm chart from https://gitlab.inf.ethz.ch/ou-ivia/generic-helm-chart
-  HELM_CHART: oci://harbor.ivia.ch/ivia-generic-helm-chart/ivia-generic-helm-chart
+  HELM_CHART: oci://${CI_REGISTRY}/ivia-generic-helm-chart/ivia-generic-helm-chart
   HELM_CHART_VERSION: 4.6.3
+  # Harbor project (ivialabreg), same layout as kubi-ivia apps like ivia-dashboard.
+  CI_REGISTRY_IMAGE: ${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}
+  # Shared buildah/kaniko layer cache for all student projects.
+  BUILD_CACHE: ${CI_REGISTRY}/ivialabreg/build-cache
 
 default:
   tags:
@@ -33,8 +37,7 @@ export-environment:
     - URL_FRONTEND="${PROJECT_NAME_SHORTENED}.${BASE_URL}"
     - URL_BACKEND="be.${PROJECT_NAME_SHORTENED}.${BASE_URL}"
     - RELEASE_NAME="${PROJECT_NAME_SHORTENED}"
-    - CI_REGISTRY_IMAGE_RAW="${CI_REGISTRY}/${CI_PROJECT_PATH}"
-    - CI_REGISTRY_IMAGE="$(echo -n ${CI_REGISTRY_IMAGE_RAW} | tr '[:upper:]' '[:lower:]')"
+    - CI_REGISTRY_IMAGE="$(echo -n "${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}" | tr '[:upper:]' '[:lower:]')"
     - SECRET=$(echo -n "${CI_REGISTRY_USER}:${CI_REGISTRY_PWD}" | base64 -w 0)
     - echo "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}" > .env
     - echo "DOCKER_REGISTRY_AUTH=${DOCKER_REGISTRY_AUTH}" >> .env
@@ -97,12 +100,11 @@ build:buildah:
     - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PWD}" "${CI_REGISTRY}"
   script:
     - IMG="${CI_REGISTRY_IMAGE}-${APP_LAYER}:latest"
-    - CACHE_REF="${CI_REGISTRY}/ai4good-cache"
     - >
       buildah bud
       --layers
-      --cache-from "${CACHE_REF}"
-      --cache-to "${CACHE_REF}"
+      --cache-from "${BUILD_CACHE}"
+      --cache-to "${BUILD_CACHE}"
       --file "./Dockerfile"
       --tag "${IMG}"
       "./${APP_LAYER}"
