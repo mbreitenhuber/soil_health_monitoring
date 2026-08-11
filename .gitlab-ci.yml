@@ -15,8 +15,8 @@ variables:
   HELM_CHART_VERSION: 4.6.3
   # Harbor project (ivialabreg), same layout as kubi-ivia apps like ivia-dashboard.
   CI_REGISTRY_IMAGE: ${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}
-  # Shared buildah layer cache for student projects under ivialabreg.
-  BUILD_CACHE: ${CI_REGISTRY}/ivialabreg/build-cache
+  # Shared buildah layer cache for all student-projects under ivialabreg.
+  BUILD_CACHE: ${CI_REGISTRY}/ivialabreg/ou-ivia/projects/student-projects/build-cache
 
 default:
   tags:
@@ -40,7 +40,7 @@ export-environment:
     # CI_REGISTRY must be the Harbor host only (e.g. harbor.ivia.ch), not a project path.
     - CI_REGISTRY="$(echo -n "${CI_REGISTRY%%/*}" | tr -d '\r\n')"
     - CI_REGISTRY_IMAGE="$(echo -n "${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}" | tr '[:upper:]' '[:lower:]')"
-    - BUILD_CACHE="$(echo -n "${CI_REGISTRY}/ivialabreg/build-cache" | tr '[:upper:]' '[:lower:]')"
+    - BUILD_CACHE="$(echo -n "${CI_REGISTRY}/ivialabreg/ou-ivia/projects/student-projects/build-cache" | tr '[:upper:]' '[:lower:]')"
     - echo "CI_REGISTRY=${CI_REGISTRY}" > .env
     - echo "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}" >> .env
     - echo "BUILD_CACHE=${BUILD_CACHE}" >> .env
