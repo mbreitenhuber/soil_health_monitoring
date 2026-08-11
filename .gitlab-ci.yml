@@ -34,8 +34,8 @@ export-environment:
   stage: prepare
   script:
     - PROJECT_NAME_SHORTENED=$(echo -n ${CI_PROJECT_NAME} | cut -c 1-30 | tr / - | tr . - | tr _ - | tr '[:upper:]' '[:lower:]' | sed -E 's#-+$##')
-    - URL_FRONTEND="${PROJECT_NAME_SHORTENED}.${BASE_URL}"
-    - URL_BACKEND="be.${PROJECT_NAME_SHORTENED}.${BASE_URL}"
+    - URL_FRONTEND="agroscan.ivia.ch"
+    - URL_BACKEND="be.agroscan.ivia.ch"
     - RELEASE_NAME="${PROJECT_NAME_SHORTENED}"
     # CI_REGISTRY must be the Harbor host only (e.g. harbor.ivia.ch), not a project path.
     - CI_REGISTRY="$(echo -n "${CI_REGISTRY%%/*}" | tr -d '\r\n')"
@@ -110,9 +110,8 @@ build:buildah:
       fi
       echo "${REGISTRY_PASSWORD}" | buildah login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
   script:
-    # One Harbor repo per project; layer as tag suffix (dashboard style).
-    - IMAGE="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${APP_LAYER}"
-    - LATEST="${CI_REGISTRY_IMAGE}:latest-${APP_LAYER}"
+    # Only push the tag deploy uses (latest-<layer>).
+    - IMAGE="${CI_REGISTRY_IMAGE}:latest-${APP_LAYER}"
     - >
       buildah bud
       --layers
@@ -121,9 +120,7 @@ build:buildah:
       --file "./Dockerfile"
       --tag "${IMAGE}"
       "./${APP_LAYER}"
-    - buildah tag "${IMAGE}" "${LATEST}"
     - buildah push "${IMAGE}"
-    - buildah push "${LATEST}"
 
 
 ###########################################
