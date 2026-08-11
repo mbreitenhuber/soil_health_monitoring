@@ -4,21 +4,12 @@ components:
     enabled: true
     updateStrategy: Recreate
 
-    # Pin to GTX 1080 Ti worker; no nvidia.com/gpu request (CPU-only inference).
-    nodeSelector:
-      kubernetes.io/hostname: k8s-ivia-no-42.inf.ethz.ch
-    tolerations:
-      - key: node-role.kubernetes.io/gpu
-        operator: Equal
-        value: "true"
-        effect: NoSchedule
-      - key: nvidia.com/gpu
-        operator: Exists
-        effect: NoSchedule
     requests:
-      memory: 4Gi
+      memory: 500Mi
+      cpu: 100m
     limits:
-      memory: 8Gi
+      memory: 2Gi
+      cpu: 1000m
 
     image:
       repository: null  # set via --set in CI
