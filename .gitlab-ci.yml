@@ -119,15 +119,25 @@ build:buildah:
     name: alpine/helm:3.14.1
     entrypoint: [ "bash" ]
   before_script:
-    - mkdir -p "${CI_PROJECT_DIR}/.kube"
-    - echo "${KUBECONFIG_B64}" | base64 -d > "${CI_PROJECT_DIR}/.kube/config"
-    - chmod 600 "${CI_PROJECT_DIR}/.kube/config"
-    - export KUBECONFIG="${CI_PROJECT_DIR}/.kube/config"
     - |
-      if [ -z "${K8S_NAMESPACE}" ]; then
-        echo "ERROR: K8S_NAMESPACE is not set. Add it under CI/CD variables (project or group)."
+      if [ -z "${DIRECT_KUBECONFIG:-}" ]; then
+        echo "ERROR: DIRECT_KUBECONFIG is not set."
         exit 1
       fi
+      if [ -z "${DIRECT_K8S_NAMESPACE:-}" ]; then
+        echo "ERROR: DIRECT_K8S_NAMESPACE is not set."
+        exit 1
+      fi
+      if [ -f "${DIRECT_KUBECONFIG}" ]; then
+        export KUBECONFIG="${DIRECT_KUBECONFIG}"
+      else
+        mkdir -p "${CI_PROJECT_DIR}/.kube"
+        printf '%s\n' "${DIRECT_KUBECONFIG}" > "${CI_PROJECT_DIR}/.kube/config"
+        chmod 600 "${CI_PROJECT_DIR}/.kube/config"
+        export KUBECONFIG="${CI_PROJECT_DIR}/.kube/config"
+      fi
+      export DIRECT_K8S_NAMESPACE="$(printf '%s' "${DIRECT_K8S_NAMESPACE}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+      echo "Using namespace: ${DIRECT_K8S_NAMESPACE}"
     - echo ${CI_REGISTRY_PWD} | helm registry login -u ${CI_REGISTRY_USER} --password-stdin ${CI_REGISTRY}
 
 deploy-app:
@@ -140,7 +150,7 @@ deploy-app:
       ${RELEASE_NAME}
       ${HELM_CHART}
       --version ${HELM_CHART_VERSION}
-      --namespace "${K8S_NAMESPACE}"
+      --namespace "${DIRECT_K8S_NAMESPACE}"
       --install
       --atomic
       -f "helm/values.yaml"
