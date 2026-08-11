@@ -15,7 +15,7 @@ variables:
   HELM_CHART_VERSION: 4.6.3
   # Harbor project (ivialabreg), same layout as kubi-ivia apps like ivia-dashboard.
   CI_REGISTRY_IMAGE: ${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}
-  # Shared buildah/kaniko layer cache for all student projects.
+  # Shared buildah layer cache for student projects under ivialabreg.
   BUILD_CACHE: ${CI_REGISTRY}/ivialabreg/build-cache
 
 default:
@@ -37,13 +37,17 @@ export-environment:
     - URL_FRONTEND="${PROJECT_NAME_SHORTENED}.${BASE_URL}"
     - URL_BACKEND="be.${PROJECT_NAME_SHORTENED}.${BASE_URL}"
     - RELEASE_NAME="${PROJECT_NAME_SHORTENED}"
+    # CI_REGISTRY must be the Harbor host only (e.g. harbor.ivia.ch), not a project path.
+    - CI_REGISTRY="$(echo -n "${CI_REGISTRY%%/*}" | tr -d '\r\n')"
     - CI_REGISTRY_IMAGE="$(echo -n "${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}" | tr '[:upper:]' '[:lower:]')"
-    - SECRET=$(echo -n "${CI_REGISTRY_USER}:${CI_REGISTRY_PWD}" | base64 -w 0)
-    - echo "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}" > .env
-    - echo "DOCKER_REGISTRY_AUTH=${DOCKER_REGISTRY_AUTH}" >> .env
+    - BUILD_CACHE="$(echo -n "${CI_REGISTRY}/ivialabreg/build-cache" | tr '[:upper:]' '[:lower:]')"
+    - echo "CI_REGISTRY=${CI_REGISTRY}" > .env
+    - echo "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}" >> .env
+    - echo "BUILD_CACHE=${BUILD_CACHE}" >> .env
     - echo "RELEASE_NAME=${RELEASE_NAME}" >> .env
     - echo "URL_FRONTEND=${URL_FRONTEND}" >> .env
     - echo "URL_BACKEND=${URL_BACKEND}" >> .env
+    - 'echo "Registry host:  ${CI_REGISTRY}"'
     - 'echo "Registry image: ${CI_REGISTRY_IMAGE}"'
     - 'echo "Release name:   ${RELEASE_NAME}"'
     - 'echo "Frontend URL:   ${URL_FRONTEND}"'
@@ -97,18 +101,29 @@ build:buildah:
   timeout: 30m
   retry: 2
   before_script:
-    - buildah login -u "${CI_REGISTRY_USER}" -p "${CI_REGISTRY_PWD}" "${CI_REGISTRY}"
+    # Same as ivia-dashboard: CI_REGISTRY_PASSWORD + stdin login to Harbor host.
+    - |
+      REGISTRY_PASSWORD="${CI_REGISTRY_PASSWORD:-${CI_REGISTRY_PWD:-}}"
+      if [ -z "${REGISTRY_PASSWORD}" ]; then
+        echo "ERROR: CI_REGISTRY_PASSWORD (or CI_REGISTRY_PWD) is not set."
+        exit 1
+      fi
+      echo "${REGISTRY_PASSWORD}" | buildah login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
   script:
-    - IMG="${CI_REGISTRY_IMAGE}-${APP_LAYER}:latest"
+    # One Harbor repo per project; layer as tag suffix (dashboard style).
+    - IMAGE="${CI_REGISTRY_IMAGE}:${CI_COMMIT_SHORT_SHA}-${APP_LAYER}"
+    - LATEST="${CI_REGISTRY_IMAGE}:latest-${APP_LAYER}"
     - >
       buildah bud
       --layers
       --cache-from "${BUILD_CACHE}"
       --cache-to "${BUILD_CACHE}"
       --file "./Dockerfile"
-      --tag "${IMG}"
+      --tag "${IMAGE}"
       "./${APP_LAYER}"
-    - buildah push "${IMG}"
+    - buildah tag "${IMAGE}" "${LATEST}"
+    - buildah push "${IMAGE}"
+    - buildah push "${LATEST}"
 
 
 ###########################################
@@ -140,7 +155,13 @@ build:buildah:
       fi
       export DIRECT_K8S_NAMESPACE="$(printf '%s' "${DIRECT_K8S_NAMESPACE}" | tr -d '\r\n' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
       echo "Using namespace: ${DIRECT_K8S_NAMESPACE}"
-    - echo ${CI_REGISTRY_PWD} | helm registry login -u ${CI_REGISTRY_USER} --password-stdin ${CI_REGISTRY}
+    - |
+      REGISTRY_PASSWORD="${CI_REGISTRY_PASSWORD:-${CI_REGISTRY_PWD:-}}"
+      if [ -z "${REGISTRY_PASSWORD}" ]; then
+        echo "ERROR: CI_REGISTRY_PASSWORD (or CI_REGISTRY_PWD) is not set."
+        exit 1
+      fi
+      echo "${REGISTRY_PASSWORD}" | helm registry login -u "${CI_REGISTRY_USER}" --password-stdin "${CI_REGISTRY}"
 
 deploy-app:
   extends: .deploy-template
@@ -157,7 +178,8 @@ deploy-app:
       --atomic
       -f "helm/values.yaml"
       --timeout "${HELM_TIMEOUT}"
-      --set components.backend.image.repository="${CI_REGISTRY_IMAGE}-backend"
+      --set-string components.backend.image.repository="${CI_REGISTRY_IMAGE}"
+      --set-string components.backend.image.tag="latest-backend"
       --set components.backend.ingress.url="${URL_BACKEND}"
   environment:
     url: https://$URL_BACKEND
