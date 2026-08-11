@@ -35,7 +35,7 @@ export-environment:
   script:
     - PROJECT_NAME_SHORTENED=$(echo -n ${CI_PROJECT_NAME} | cut -c 1-30 | tr / - | tr . - | tr _ - | tr '[:upper:]' '[:lower:]' | sed -E 's#-+$##')
     - URL_FRONTEND="agroscan.ivia.ch"
-    - URL_BACKEND="be.agroscan.ivia.ch"
+    - URL_BACKEND="agroscan.ivia.ch"
     - RELEASE_NAME="${PROJECT_NAME_SHORTENED}"
     # CI_REGISTRY must be the Harbor host only (e.g. harbor.ivia.ch), not a project path.
     - CI_REGISTRY="$(echo -n "${CI_REGISTRY%%/*}" | tr -d '\r\n')"
