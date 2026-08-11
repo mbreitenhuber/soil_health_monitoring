@@ -13,10 +13,10 @@ variables:
   # Generic helm chart from https://gitlab.inf.ethz.ch/ou-ivia/generic-helm-chart
   HELM_CHART: oci://${CI_REGISTRY}/ivia-generic-helm-chart/ivia-generic-helm-chart
   HELM_CHART_VERSION: 4.6.3
-  # Harbor project (ivialabreg), same layout as kubi-ivia apps like ivia-dashboard.
-  CI_REGISTRY_IMAGE: ${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}
-  # Shared buildah layer cache for all student-projects under ivialabreg.
-  BUILD_CACHE: ${CI_REGISTRY}/ivialabreg/ou-ivia/projects/student-projects/build-cache
+  # Harbor project (iviastudent), same layout as kubi-ivia apps like ivia-dashboard.
+  CI_REGISTRY_IMAGE: ${CI_REGISTRY}/iviastudent/${CI_PROJECT_PATH}
+  # Shared buildah layer cache for all student-projects under iviastudent.
+  BUILD_CACHE: ${CI_REGISTRY}/iviastudent/ou-ivia/projects/student-projects/build-cache
 
 default:
   tags:
@@ -39,8 +39,8 @@ export-environment:
     - RELEASE_NAME="${PROJECT_NAME_SHORTENED}"
     # CI_REGISTRY must be the Harbor host only (e.g. harbor.ivia.ch), not a project path.
     - CI_REGISTRY="$(echo -n "${CI_REGISTRY%%/*}" | tr -d '\r\n')"
-    - CI_REGISTRY_IMAGE="$(echo -n "${CI_REGISTRY}/ivialabreg/${CI_PROJECT_PATH}" | tr '[:upper:]' '[:lower:]')"
-    - BUILD_CACHE="$(echo -n "${CI_REGISTRY}/ivialabreg/ou-ivia/projects/student-projects/build-cache" | tr '[:upper:]' '[:lower:]')"
+    - CI_REGISTRY_IMAGE="$(echo -n "${CI_REGISTRY}/iviastudent/${CI_PROJECT_PATH}" | tr '[:upper:]' '[:lower:]')"
+    - BUILD_CACHE="$(echo -n "${CI_REGISTRY}/iviastudent/ou-ivia/projects/student-projects/build-cache" | tr '[:upper:]' '[:lower:]')"
     - echo "CI_REGISTRY=${CI_REGISTRY}" > .env
     - echo "CI_REGISTRY_IMAGE=${CI_REGISTRY_IMAGE}" >> .env
     - echo "BUILD_CACHE=${BUILD_CACHE}" >> .env
