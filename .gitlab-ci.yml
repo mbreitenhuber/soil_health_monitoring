@@ -16,7 +16,7 @@ variables:
 
 default:
   tags:
-    - runner-shared
+    - ivialab-on-premise-cluster
 
 ###############################
 # SETUP ENVIRONMENT VARIABLES #
@@ -90,7 +90,7 @@ build:buildah:
       - APP_LAYER:
         - backend
   tags:
-    - ivialab-student-cluster
+    - ivialab-on-premise-cluster
   timeout: 30m
   retry: 2
   before_script:
