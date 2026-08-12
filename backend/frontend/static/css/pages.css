@@ -3,6 +3,7 @@
 .hero::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(60, 120, 80, 0.10) 1px, transparent 1px), linear-gradient(90deg, rgba(60, 120, 80, 0.10) 1px, transparent 1px); background-size: 48px 48px; pointer-events: none;  -webkit-mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%); mask-image: radial-gradient(circle at center, rgba(0,0,0,1) 40%, rgba(0,0,0,0) 100%);}
 .hero::after { content: ''; position: absolute; top: 42%; left: 50%; transform: translate(-50%,-50%); width: 1500px; height: 250px; background: radial-gradient(ellipse at center, rgba(60, 120, 80, 0.25) 0%, transparent 70%); pointer-events: none; }
 .hero-eyebrow { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; position: relative; z-index: 1; }
+.hero-eyebrow2 { font-size: 0.68rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 20px; position: relative; z-index: 1; }
 .hero-title { font-family: var(--font-display); font-weight: 800; font-size: clamp(2.8rem, 6vw, 5rem); letter-spacing: -0.04em; line-height: 1.05; color: var(--text); position: relative; z-index: 1; margin-bottom: 24px; }
 .hero-title .accent { color: var(--accent); }
 .hero-sub { font-size: 1rem; color: var(--text-dim); max-width: 520px; line-height: 1.7; position: relative; z-index: 1; margin-bottom: 40px; }

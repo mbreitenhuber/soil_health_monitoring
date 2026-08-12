@@ -1,6 +1,13 @@
 {# partials/footer.html — current_year kommt aus main.py → ctx() #}
 <footer>
   <a class="footer-logo" href="/">Agro<span>Scan</span></a>
-  <div>{{ "ML-based field analysis" if lang == "en" else "ML-gestützte Flächenanalyse" }} </div>
-  <div>© {{ current_year }} AgroScan</div>
+  <div class="footer-legal">
+    <strong>Disclaimer:</strong>
+    AgroScan is a non-commercial, purely academic research demonstration developed and maintained by students 
+    during a course of the IVIA Lab (Interactive Visualization &amp; Intelligence Augmentation) at ETH Zurich.
+    This website is for scientific evaluation purposes only.
+    It is not affiliated with, sponsored by, or associated with any commercial enterprise, corporation,
+    or registered trademark of the same name.
+    <span class="footer-copy">© {{ current_year }} AgroScan</span>
+  </div>
 </footer>
