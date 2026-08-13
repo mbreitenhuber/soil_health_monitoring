@@ -1,4 +1,8 @@
-# Agro scan
+# AgroScan Framework (Academic Research Project)
+
+Check out our [website](https://agroscan.ivia.ch/)
+
+This repository contains the official code and implementation for the academic project "AgroScan: An Interactive SOC Prediction Tool for Farmers" created as part of the "AI4Good" Course of the IVIA Lab at ETH Zürich.
 
 This platform is designed to monitor soil health using Earth Observation data derived from satellite imagery. By enabling large-scale and accessible soil monitoring, it supports the development of productive, resilient, and sustainable agricultural systems. The platform contributes to the European Union’s Soil Monitoring Goal 2030 by providing digital tools for the continuous assessment of agricultural soils.
 At its current stage, the platform focuses specifically on soil organic carbon (SOC), as SOC is one of the key indicators of soil health and is strongly linked to soil fertility, ecosystem functioning, and long-term agricultural sustainability. The current implementation is limited to agricultural areas in Germany.
